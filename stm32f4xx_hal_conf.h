@@ -42,7 +42,7 @@
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
-
+#include "main.h"
 /* ########################## Module Selection ############################## */
 /**
   * @brief This is the list of modules to be used in the HAL driver 
@@ -166,10 +166,10 @@
 /* Section 1 : Ethernet peripheral configuration */
 
 /* MAC ADDRESS: MAC_ADDR0:MAC_ADDR1:MAC_ADDR2:MAC_ADDR3:MAC_ADDR4:MAC_ADDR5 */
-#define MAC_ADDR0   2
-#define MAC_ADDR1   0
-#define MAC_ADDR2   0
-#define MAC_ADDR3   0
+#define MAC_ADDR0   first_IP_ADDR0
+#define MAC_ADDR1   first_IP_ADDR1
+#define MAC_ADDR2   first_IP_ADDR2
+#define MAC_ADDR3   first_IP_ADDR3
 #define MAC_ADDR4   0
 #define MAC_ADDR5   0
 

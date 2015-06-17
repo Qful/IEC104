@@ -36,7 +36,8 @@
  *
  */
 
-#include "lwip/opt.h"
+//#include "lwip/opt.h"
+#include "lwipopts.h"
 
 #include "lwip/def.h"
 #include "lwip/ip_addr.h"

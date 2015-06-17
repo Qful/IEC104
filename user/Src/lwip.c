@@ -42,10 +42,10 @@
 
 
 /* Variables Initialization */
-struct netif gnetif;
-struct ip_addr ipaddr;
-struct ip_addr netmask;
-struct ip_addr gw;
+struct netif 	first_gnetif,second_gnetif;
+struct ip_addr 	first_ipaddr,second_ipaddr;
+struct ip_addr 	netmask;
+struct ip_addr 	gw;
 
 
 /* init function */
@@ -54,32 +54,29 @@ void MX_LWIP_Init(void)
 
 	tcpip_init( NULL, NULL );
  
-	// устанавливаем IP параметры
-	IP4_ADDR(&ipaddr, IP_ADDR0, IP_ADDR1, IP_ADDR2, IP_ADDR3);
+	// устанавливаем IP параметры для первичного IP соединения, всегда сервер
+	IP4_ADDR(&first_ipaddr, first_IP_ADDR0, first_IP_ADDR1, first_IP_ADDR2, first_IP_ADDR3);
+	// устанавливаем IP параметры для вторичного IP соединения, всегда хост
+	IP4_ADDR(&second_ipaddr, second_IP_ADDR0, second_IP_ADDR1, second_IP_ADDR2, second_IP_ADDR3);
+
 	IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1 , NETMASK_ADDR2, NETMASK_ADDR3);
 	IP4_ADDR(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
+
 // для автоматического получения IP
-// ipaddr.addr = 0;
+// first_ipaddr.addr = 0;
 //netmask.addr = 0;
 //gw.addr = 0;
   
 	// добавим  и регистрируем NETWORK интерфейс
-	netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);
-	netif_set_default(&gnetif);
+	netif_add(&first_gnetif, &first_ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);
+	netif_set_default(&first_gnetif);
 
-
-  if (netif_is_link_up(&gnetif))
-  {
-	/* When the netif is fully configured this function must be called */
-	netif_set_up(&gnetif);
-  }
-  else
-  {
-	/* When the netif link is down this function must be called */
-	netif_set_down(&gnetif);
-  }  
+	if (netif_is_link_up(&first_gnetif))
+		netif_set_up(&first_gnetif);		// When the netif is fully configured this function must be called
+	else
+		netif_set_down(&first_gnetif);		// When the netif link is down this function must be called
   
- //dhcp_start(&gnetif);		// автоматическое получение IP
+	//dhcp_start(&first_gnetif);		// автоматическое получение IP
   
 }
 
@@ -95,7 +92,7 @@ void MX_LWIP_Init(void)
  */
 void MX_LWIP_Process(void)
 {
-  ethernetif_input(&gnetif);
+  ethernetif_input(&first_gnetif);
        
   /* Handle timeouts */
   #if !NO_SYS_NO_TIMERS && NO_SYS

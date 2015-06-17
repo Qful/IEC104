@@ -8,12 +8,23 @@
 #ifndef MAIN_H_
 #define MAIN_H_
 
-/*Static IP ADDRESS*/
-#define IP_ADDR0   192
-#define IP_ADDR1   168
-#define IP_ADDR2   0
-#define IP_ADDR3   10
+#define ECHO_Port		7			/* 7 ECHO — предназначен для тестирования связи путём отправки данных на сервер и получения от него их же в неизменном виде*/
+#define TFTP_Port		69			/* 69 тривиальный FTP применяется при установке операционной системы, у нас бутлодер */
+#define HTTP_Port		80			/* 80 is the port used for HTTP protocol */
+#define FTP_Port		21			/* 21 для передачи команд FTP */
+#define IEC104_Port		2404		/* 2404 is the port used for IEC 60870-5-104 protocol */
 
+
+/*Static IP ADDRESS for first*/
+#define first_IP_ADDR0   192
+#define first_IP_ADDR1   168
+#define first_IP_ADDR2   0
+#define first_IP_ADDR3   254
+/*Static IP ADDRESS*/
+#define second_IP_ADDR0   192
+#define second_IP_ADDR1   168
+#define second_IP_ADDR2   0
+#define second_IP_ADDR3   253
 /*NETMASK*/
 #define NETMASK_ADDR0   255
 #define NETMASK_ADDR1   255

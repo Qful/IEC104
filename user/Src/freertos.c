@@ -38,6 +38,9 @@
 
 #include "main.h"
 
+#include "lwip.h"
+#include "lwip/init.h"
+#include "lwip/netif.h"
 
 #include "lwip/api.h"
 #include "lwip/sys.h"
@@ -49,6 +52,10 @@
 /* Variables -----------------------------------------------------------------*/
 osThreadId defaultTaskHandle;
 
+struct netif 	first_gnetif,second_gnetif;
+struct ip_addr 	first_ipaddr,second_ipaddr;
+struct ip_addr 	netmask;
+struct ip_addr 	gw;
 
 /* Function prototypes -------------------------------------------------------*/
 void StartIEC104Task(void const * argument);
@@ -106,77 +113,66 @@ void MX_FREERTOS_Init(void) {
 void StartIEC104Task(void const * argument)
 {
  struct netconn *conn, *newconn;
- err_t err,recv_err, accept_err;;
+ err_t err, accept_err;
  struct netbuf *buf;
- struct ip_addr *addr;
- unsigned short port;
  uint16_t len;
  void *data;
 
-	MX_LWIP_Init();		// инит. LWIP
+//	MX_LWIP_Init();		// инит. LWIP
 
-	// нужно делать 2 независимых таска
+	tcpip_init( NULL, NULL );
 
-	/* Initialize tcp echo server создаётся таск!!!!*/
-	//tcpecho_init();
-	/* Initialize udp echo server создаётся таск!!!!*/
-	//udpecho_init();
+	// устанавливаем IP параметры для первичного IP соединения, всегда сервер
+	IP4_ADDR(&first_ipaddr, first_IP_ADDR0, first_IP_ADDR1, first_IP_ADDR2, first_IP_ADDR3);
+	// устанавливаем IP параметры для вторичного IP соединения, всегда хост
+	IP4_ADDR(&second_ipaddr, second_IP_ADDR0, second_IP_ADDR1, second_IP_ADDR2, second_IP_ADDR3);
+
+	IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1 , NETMASK_ADDR2, NETMASK_ADDR3);
+	IP4_ADDR(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
+
+// для автоматического получения IP
+// first_ipaddr.addr = 0;
+//netmask.addr = 0;
+//gw.addr = 0;
+
+	// добавим  и регистрируем NETWORK интерфейс
+	netif_add(&first_gnetif, &first_ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);
+	netif_set_default(&first_gnetif);
+
+	if (netif_is_link_up(&first_gnetif))
+		netif_set_up(&first_gnetif);		// When the netif is fully configured this function must be called
+	else
+		netif_set_down(&first_gnetif);		// When the netif link is down this function must be called
+
+	//dhcp_start(&first_gnetif);		// автоматическое получение IP
 
   for(;;)
   {
 
-  /* Create a new connection identifier. */
-	conn = netconn_new(NETCONN_UDP);
-	  if (conn!= NULL) {
-			err = netconn_bind(conn, IP_ADDR_ANY, 7);
-			if (err == ERR_OK){
-				while (1)
-				  {
-					recv_err = netconn_recv(conn, &buf);
 
-					if (recv_err == ERR_OK){
-					  addr = netbuf_fromaddr(buf);
-					  port = netbuf_fromport(buf);
-					  netconn_connect(conn, addr, port);
-					  buf->addr.addr = 0;
-					  netconn_send(conn,buf);
-					  netbuf_delete(buf);
-					}
-				  }
-			}
-			else	netconn_delete(conn);
-	  }
-
-  /* Create a new connection identifier. */
-	conn = netconn_new(NETCONN_TCP);
+	conn = netconn_new(NETCONN_TCP);											// создадим новое соединение
 	  if (conn!=NULL){
-		/* Bind connection to well known port number 7. */
-		err = netconn_bind(conn, NULL, 7);
+		err = netconn_bind(conn, &first_ipaddr, ECHO_Port);						// привяжем соединение на IP и порт IEC 60870-5-104 (IEC104_Port)
 	    if (err == ERR_OK)
 	    {
-	        /* Tell connection to go into listening mode. */
-	        netconn_listen(conn);
-// !!!!!! переделать, объединив с  UDP циклом
-	        while (1)
+	        netconn_listen(conn);												// переводим соединение в режим прослушивания
+	        while (1)															// далее слушаем и  захватываем соединение
 	        {
-	            /* Grab new connection. */
-	             accept_err = netconn_accept(conn, &newconn);
-	             /* Process the new connection. */
-	             if (accept_err == ERR_OK)
+	             accept_err = netconn_accept(conn, &newconn);					// принимаем соединение
+	             if (accept_err == ERR_OK)										// если приняли, то обработаем его
 	             {
-	                 while (netconn_recv(newconn, &buf) == ERR_OK)
+	                 while (netconn_recv(newconn, &buf) == ERR_OK)				// принимаем данные в буфер
 	                 {
 	                     do
 	                     {
 	                       netbuf_data(buf, &data, &len);
-	                       netconn_write(newconn, data, len, NETCONN_COPY);
+	                       netconn_write(newconn, data, len, NETCONN_COPY);		// отправляем данные по протоколу TCP
 
 	                     }
 	                     while (netbuf_next(buf) >= 0);
 	                     netbuf_delete(buf);
 	                 }
-	                 /* Close connection and discard connection identifier. */
-	                 netconn_close(newconn);
+	                 netconn_close(newconn);									// закрываем и освобождаем соединение
 	                 netconn_delete(newconn);
 	             }
 	        }

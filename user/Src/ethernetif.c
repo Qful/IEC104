@@ -101,9 +101,7 @@ void HAL_ETH_MspInit(ETH_HandleTypeDef* heth)
   GPIO_InitTypeDef GPIO_InitStruct;
   if(heth->Instance==ETH)
   {
-  /* USER CODE BEGIN ETH_MspInit 0 */
 
-  /* USER CODE END ETH_MspInit 0 */
     /* Peripheral clock enable */
     __ETH_CLK_ENABLE();
   
@@ -153,9 +151,6 @@ void HAL_ETH_MspInit(ETH_HandleTypeDef* heth)
     /* Peripheral interrupt init*/
     HAL_NVIC_SetPriority(ETH_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(ETH_IRQn);
-  /* USER CODE BEGIN ETH_MspInit 1 */
-
-  /* USER CODE END ETH_MspInit 1 */
   }
 }
 
@@ -163,9 +158,7 @@ void HAL_ETH_MspDeInit(ETH_HandleTypeDef* heth)
 {
   if(heth->Instance==ETH)
   {
-  /* USER CODE BEGIN ETH_MspDeInit 0 */
 
-  /* USER CODE END ETH_MspDeInit 0 */
     /* Peripheral clock disable */
     __ETH_CLK_DISABLE();
   
@@ -200,9 +193,6 @@ void HAL_ETH_MspDeInit(ETH_HandleTypeDef* heth)
     /* Peripheral interrupt Deinit*/
     HAL_NVIC_DisableIRQ(ETH_IRQn);
 
-  /* USER CODE BEGIN ETH_MspDeInit 1 */
-
-  /* USER CODE END ETH_MspDeInit 1 */
   }
 }
 
@@ -216,9 +206,6 @@ void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth)
   osSemaphoreRelease(s_xSemaphore);
 }
 
-/* USER CODE BEGIN 4 */
-
-/* USER CODE END 4 */
 
 /*******************************************************************************
                        LL Driver Interface ( LwIP stack --> ETH) 
@@ -237,18 +224,12 @@ static void low_level_init(struct netif *netif)
   
 /* Init ETH */
 
-   uint8_t MACAddr[6] ;
+  uint8_t MACAddr[6]= { MAC_ADDR0, MAC_ADDR1, MAC_ADDR2, MAC_ADDR3, MAC_ADDR4, MAC_ADDR5 };
   heth.Instance = ETH;
   heth.Init.AutoNegotiation = ETH_AUTONEGOTIATION_DISABLE;
   heth.Init.Speed = ETH_SPEED_100M;
   heth.Init.DuplexMode = ETH_MODE_FULLDUPLEX;
-  heth.Init.PhyAddress = 1;
-  MACAddr[0] = 0x00;
-  MACAddr[1] = 0x80;
-  MACAddr[2] = 0xE1;
-  MACAddr[3] = 0x00;
-  MACAddr[4] = 0x00;
-  MACAddr[5] = 0x00;
+  heth.Init.PhyAddress = 2;		//1
   heth.Init.MACAddr = &MACAddr[0];
   heth.Init.RxMode = ETH_RXINTERRUPT_MODE;
   heth.Init.ChecksumMode = ETH_CHECKSUM_BY_HARDWARE;
