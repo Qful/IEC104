@@ -56,7 +56,7 @@
         * the Code Generation settings)
      PA8   ------> RCC_MCO_1
 */
-void MX_GPIO_Init(void)
+void GPIO_Init(void)
 {
 
   GPIO_InitTypeDef GPIO_InitStruct;

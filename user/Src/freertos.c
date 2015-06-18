@@ -38,16 +38,16 @@
 
 #include "main.h"
 
-#include "lwip.h"
+
+#include "ethernetif.h"
+#include "lwip/tcpip.h"
 #include "lwip/init.h"
 #include "lwip/netif.h"
-
 #include "lwip/api.h"
 #include "lwip/sys.h"
 
-//#include "ethernetif.h"
-//#include "lwip/tcpip.h"
-//#include "lwip/netif.h"
+
+
 
 /* Variables -----------------------------------------------------------------*/
 osThreadId defaultTaskHandle;
@@ -60,15 +60,12 @@ struct ip_addr 	gw;
 /* Function prototypes -------------------------------------------------------*/
 void StartIEC104Task(void const * argument);
 
-extern void MX_LWIP_Init(void);
-extern void tcpecho_init(void);
-extern void udpecho_init(void);
+//extern void MX_LWIP_Init(void);
+//extern void tcpecho_init(void);
+//extern void udpecho_init(void);
 
-void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
+void FREERTOS_Init(void);
 
-/* USER CODE BEGIN FunctionPrototypes */
-
-/* USER CODE END FunctionPrototypes */
 
 /* Hook prototypes */
 
@@ -76,7 +73,7 @@ void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 /*************************************************************************
  * FREERTOS_Init
  *************************************************************************/
-void MX_FREERTOS_Init(void) {
+void FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
        
   /* USER CODE END Init */
@@ -130,10 +127,6 @@ void StartIEC104Task(void const * argument)
 	IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1 , NETMASK_ADDR2, NETMASK_ADDR3);
 	IP4_ADDR(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
 
-// для автоматического получения IP
-// first_ipaddr.addr = 0;
-//netmask.addr = 0;
-//gw.addr = 0;
 
 	// добавим  и регистрируем NETWORK интерфейс
 	netif_add(&first_gnetif, &first_ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);
@@ -149,10 +142,9 @@ void StartIEC104Task(void const * argument)
   for(;;)
   {
 
-
 	conn = netconn_new(NETCONN_TCP);											// создадим новое соединение
 	  if (conn!=NULL){
-		err = netconn_bind(conn, &first_ipaddr, ECHO_Port);						// привяжем соединение на IP и порт IEC 60870-5-104 (IEC104_Port)
+		err = netconn_bind(conn, &first_ipaddr, IEC104_Port);					// привяжем соединение на IP и порт IEC 60870-5-104 (IEC104_Port)
 	    if (err == ERR_OK)
 	    {
 	        netconn_listen(conn);												// переводим соединение в режим прослушивания
@@ -161,6 +153,7 @@ void StartIEC104Task(void const * argument)
 	             accept_err = netconn_accept(conn, &newconn);					// принимаем соединение
 	             if (accept_err == ERR_OK)										// если приняли, то обработаем его
 	             {
+	                LED_On(LED1);
 	                 while (netconn_recv(newconn, &buf) == ERR_OK)				// принимаем данные в буфер
 	                 {
 	                     do
@@ -174,13 +167,14 @@ void StartIEC104Task(void const * argument)
 	                 }
 	                 netconn_close(newconn);									// закрываем и освобождаем соединение
 	                 netconn_delete(newconn);
+		           LED_Off(LED1);
 	             }
 	        }
 	    }
 	    else      netconn_delete(newconn);
 	  }
-
-    osDelay(1);
+//    osDelay(1);
   }
+
 }
 

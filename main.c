@@ -21,31 +21,49 @@
 #include "stm32f4xx_hal.h"
 #include "cmsis_os.h"
 //#include "iwdg.h"
-#include "lwip.h"
+//#include "lwip.h"
+#include "ethernetif.h"
 #include "usart.h"
 #include "gpio.h"
 
+#include "stm324xg_eval.h"
+
 
 /* Private variables ---------------------------------------------------------*/
+GPIO_TypeDef* GPIO_PORT[LEDn] = {LED1_GPIO_PORT,
+                                 LED2_GPIO_PORT,
+                                 LED3_GPIO_PORT,
+                                 LED4_GPIO_PORT};
+
+const uint16_t GPIO_PIN[LEDn] = {LED1_PIN,
+                                 LED2_PIN,
+                                 LED3_PIN,
+                                 LED4_PIN};
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-void MX_FREERTOS_Init(void);
+void FREERTOS_Init(void);
+
+void LED_Init(Led_TypeDef Led);
 
 int main(void) {
 
 
 	  HAL_Init();				// инит. Flash и Systick.
 	  SystemClock_Config();		// когфиг осциллятора.
-	  MX_GPIO_Init();			// конфиг портов.
+	  GPIO_Init();				// конфиг портов.
 
-	  MX_MODBUS_Init(115200);	// настройка MODBUS интерфейса.
-	  MX_BOOT_UART_Init();		// настройка BOOT интерфейса.
-	  MX_RS485_1_UART_Init();	// настройка RS485 1 канала.
-	  MX_RS485_2_UART_Init();	// настройка RS485 2 канала.
+	  MODBUS_Init(115200);		// настройка MODBUS интерфейса.
+	  BOOT_UART_Init();			// настройка BOOT интерфейса.
+	  RS485_1_UART_Init();		// настройка RS485 1 канала.
+	  RS485_2_UART_Init();		// настройка RS485 2 канала.
 
+	  LED_Init(LED1);
+	  LED_Init(LED2);
+	  LED_Init(LED3);
+	  LED_Init(LED4);
 
-	  MX_FREERTOS_Init();		// инит. FREERTOS.
+	  FREERTOS_Init();			// инит. FREERTOS.
 
 	  osKernelStart();			// Старт планировщика
 
@@ -108,4 +126,65 @@ void SystemClock_Config(void)
   HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
 
   HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
+}
+
+void LED_Init(Led_TypeDef Led)
+{
+  GPIO_InitTypeDef  GPIO_InitStruct;
+
+  /* Enable the GPIO_LED clock */
+  LEDx_GPIO_CLK_ENABLE(Led);
+
+  /* Configure the GPIO_LED pin */
+  GPIO_InitStruct.Pin = GPIO_PIN[Led];
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
+
+  HAL_GPIO_Init(GPIO_PORT[Led], &GPIO_InitStruct);
+}
+
+/**
+  * @brief  Turns selected LED On.
+  * @param  Led: LED to be set on
+  *          This parameter can be one of the following values:
+  *            @arg  LED1
+  *            @arg  LED2
+  *            @arg  LED3
+  *            @arg  LED4
+  * @retval None
+  */
+void LED_On(Led_TypeDef Led)
+{
+  HAL_GPIO_WritePin(GPIO_PORT[Led], GPIO_PIN[Led], GPIO_PIN_SET);
+}
+
+/**
+  * @brief  Turns selected LED Off.
+  * @param  Led: LED to be set off
+  *          This parameter can be one of the following values:
+  *            @arg  LED1
+  *            @arg  LED2
+  *            @arg  LED3
+  *            @arg  LED4
+  * @retval None
+  */
+void LED_Off(Led_TypeDef Led)
+{
+  HAL_GPIO_WritePin(GPIO_PORT[Led], GPIO_PIN[Led], GPIO_PIN_RESET);
+}
+
+/**
+  * @brief  Toggles the selected LED.
+  * @param  Led: LED to be toggled
+  *          This parameter can be one of the following values:
+  *            @arg  LED1
+  *            @arg  LED2
+  *            @arg  LED3
+  *            @arg  LED4
+  * @retval None
+  */
+void LED_Toggle(Led_TypeDef Led)
+{
+  HAL_GPIO_TogglePin(GPIO_PORT[Led], GPIO_PIN[Led]);
 }

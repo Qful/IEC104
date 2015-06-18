@@ -37,6 +37,11 @@
 #define GW_ADDR2   0
 #define GW_ADDR3   1
 
+#include "stm324xg_eval.h"
+
+extern void LED_On(Led_TypeDef Led);
+extern void LED_Off(Led_TypeDef Led);
+extern void LED_Toggle(Led_TypeDef Led);
 
 
 #endif /* MAIN_H_ */

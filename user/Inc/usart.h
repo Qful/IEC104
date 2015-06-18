@@ -45,10 +45,10 @@ extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart2;
 extern UART_HandleTypeDef huart3;
 
-void MX_MODBUS_Init(uint32_t BaudRate);
-void MX_BOOT_UART_Init(void);
-void MX_RS485_1_UART_Init(void);
-void MX_RS485_2_UART_Init(void);
+void MODBUS_Init(uint32_t BaudRate);
+void BOOT_UART_Init(void);
+void RS485_1_UART_Init(void);
+void RS485_2_UART_Init(void);
 
 #ifdef __cplusplus
 }

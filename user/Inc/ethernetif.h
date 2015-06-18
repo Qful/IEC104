@@ -45,10 +45,6 @@ struct link_str {
   osSemaphoreId semaphore;
 };
 
-/* Within 'USER CODE' section, code will be kept by default at each generation */
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
 
 /* Exported functions ------------------------------------------------------- */
 err_t ethernetif_init(struct netif *netif);
@@ -60,9 +56,9 @@ void ethernetif_set_link(void const *argument);
 void ethernetif_update_config(struct netif *netif);
 void ethernetif_notify_conn_changed(struct netif *netif);
 
-/* USER CODE BEGIN 1 */
+void MX_LWIP_Init(void);
+void MX_LWIP_Process(void);
 
-/* USER CODE END 1 */
 #endif
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

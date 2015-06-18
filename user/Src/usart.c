@@ -51,7 +51,7 @@ UART_HandleTypeDef huart3;
 * MODBUS init function
 * inpit: скорость.
 ***************************************/
-void MX_MODBUS_Init(uint32_t BaudRate)
+void MODBUS_Init(uint32_t BaudRate)
 {
 
   huart4.Instance = UART4;
@@ -67,7 +67,7 @@ void MX_MODBUS_Init(uint32_t BaudRate)
 }
 /* USART1 init function */
 
-void MX_BOOT_UART_Init(void)
+void BOOT_UART_Init(void)
 {
 
   huart1.Instance = USART1;
@@ -85,7 +85,7 @@ void MX_BOOT_UART_Init(void)
 * RS485_1 init function
 * inpit: скорость.
 ***************************************/
-void MX_RS485_1_UART_Init(void)
+void RS485_1_UART_Init(void)
 {
 
   huart2.Instance = USART2;
@@ -101,7 +101,7 @@ void MX_RS485_1_UART_Init(void)
 }
 /* USART3 init function */
 
-void MX_RS485_2_UART_Init(void)
+void RS485_2_UART_Init(void)
 {
 
   huart3.Instance = USART3;

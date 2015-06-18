@@ -42,7 +42,7 @@
 /* Includes ------------------------------------------------------------------*/
 
 
-void MX_GPIO_Init(void);
+void GPIO_Init(void);
 #ifdef __cplusplus
 }
 #endif
