@@ -20,10 +20,14 @@
 
 #include "stm32f4xx_hal.h"
 #include "cmsis_os.h"
+
+#include "stm32f4xx_it.h"
+#include "main.h"
 //#include "iwdg.h"
 //#include "lwip.h"
 #include "ethernetif.h"
 #include "usart.h"
+#include "clocks.h"
 #include "gpio.h"
 
 #include "stm324xg_eval.h"
@@ -40,8 +44,18 @@ const uint16_t GPIO_PIN[LEDn] = {LED1_PIN,
                                  LED3_PIN,
                                  LED4_PIN};
 
+extern uint8_t aTxRS485_1_Buffer[];
+extern UART_HandleTypeDef huart2;
+
+#ifdef __GNUC__
+/* With GCC/RAISONANCE, small printf (option LD Linker->Libraries->Small printf set to 'Yes') calls __io_putchar() */
+#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+#else
+#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+#endif /* __GNUC__ */
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+void NVIC_Configuration(void);
 void FREERTOS_Init(void);
 
 void LED_Init(Led_TypeDef Led);
@@ -51,12 +65,20 @@ int main(void) {
 
 	  HAL_Init();				// инит. Flash и Systick.
 	  SystemClock_Config();		// когфиг осциллятора.
+//	  NVIC_Configuration();
 	  GPIO_Init();				// конфиг портов.
+	  Clocks_Init();
 
-	  MODBUS_Init(115200);		// настройка MODBUS интерфейса.
-	  BOOT_UART_Init();			// настройка BOOT интерфейса.
-	  RS485_1_UART_Init();		// настройка RS485 1 канала.
-	  RS485_2_UART_Init();		// настройка RS485 2 канала.
+//	  MODBUS_Init(115200);		// настройка MODBUS интерфейса.
+//	  BOOT_UART_Init();			// настройка BOOT интерфейса.
+	  RS485_1_UART_Init(115200);// настройка RS485 1 канала.
+//	  RS485_2_UART_Init();		// настройка RS485 2 канала.
+
+//	  aTxRS485_1_Buffer[0]=12;
+//	  aTxRS485_1_Buffer[1]=34;
+//	  HAL_UART_Transmit(&huart2, (uint8_t *)&aTxRS485_1_Buffer, 2, 0xFFFF);
+
+//	  printf("RS485_1_UART_Init.. ok\n");
 
 	  LED_Init(LED1);
 	  LED_Init(LED2);
@@ -126,8 +148,22 @@ void SystemClock_Config(void)
   HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
 
   HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
+
 }
 
+/*************************************************************************
+ * NVIC_Configuration
+ *************************************************************************/
+void NVIC_Configuration(void)
+    {
+
+	  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);			//NVIC_PRIORITYGROUP_1
+	  HAL_NVIC_SetPriority(RCC_IRQn,(uint8_t)(configKERNEL_INTERRUPT_PRIORITY >> 4),0);
+
+    }
+/*************************************************************************
+ * LED_Init
+ *************************************************************************/
 void LED_Init(Led_TypeDef Led)
 {
   GPIO_InitTypeDef  GPIO_InitStruct;
@@ -144,47 +180,38 @@ void LED_Init(Led_TypeDef Led)
   HAL_GPIO_Init(GPIO_PORT[Led], &GPIO_InitStruct);
 }
 
-/**
-  * @brief  Turns selected LED On.
-  * @param  Led: LED to be set on
-  *          This parameter can be one of the following values:
-  *            @arg  LED1
-  *            @arg  LED2
-  *            @arg  LED3
-  *            @arg  LED4
-  * @retval None
-  */
+/*************************************************************************
+ *
+ *************************************************************************/
 void LED_On(Led_TypeDef Led)
 {
   HAL_GPIO_WritePin(GPIO_PORT[Led], GPIO_PIN[Led], GPIO_PIN_SET);
 }
 
-/**
-  * @brief  Turns selected LED Off.
-  * @param  Led: LED to be set off
-  *          This parameter can be one of the following values:
-  *            @arg  LED1
-  *            @arg  LED2
-  *            @arg  LED3
-  *            @arg  LED4
-  * @retval None
-  */
+/*************************************************************************
+ *
+ *************************************************************************/
 void LED_Off(Led_TypeDef Led)
 {
   HAL_GPIO_WritePin(GPIO_PORT[Led], GPIO_PIN[Led], GPIO_PIN_RESET);
 }
 
-/**
-  * @brief  Toggles the selected LED.
-  * @param  Led: LED to be toggled
-  *          This parameter can be one of the following values:
-  *            @arg  LED1
-  *            @arg  LED2
-  *            @arg  LED3
-  *            @arg  LED4
-  * @retval None
-  */
+/*************************************************************************
+ *
+ *************************************************************************/
 void LED_Toggle(Led_TypeDef Led)
 {
   HAL_GPIO_TogglePin(GPIO_PORT[Led], GPIO_PIN[Led]);
+}
+
+/*************************************************************************
+ * PUTCHAR_PROTOTYPE
+ *************************************************************************/
+PUTCHAR_PROTOTYPE
+{
+  HAL_UART_Transmit_DMA(&huart2, (uint8_t *)&ch, 1);
+  HAL_UART_Transmit_DMA(&huart2, (uint8_t *)&ch, 1);
+
+ // HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, 0xFFFF);
+  return ch;
 }
