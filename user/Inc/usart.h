@@ -40,6 +40,27 @@
 
 /* Includes ------------------------------------------------------------------*/
 
+#define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
+
+ /* Size of Trasmission buffer */
+ #define TXBUFFERSIZE_RS485_1			(COUNTOF(aTxRS485_1_Buffer) - 1)
+ #define RXBUFFERSIZE_RS485_1			10
+
+ /* Definition for USART2's DMA */
+ #define USART2_TX_DMA_CHANNEL             DMA_CHANNEL_4
+ #define USART2_TX_DMA_STREAM              DMA1_Stream6
+ #define USART2_RX_DMA_CHANNEL             DMA_CHANNEL_4
+ #define USART2_RX_DMA_STREAM              DMA1_Stream5
+
+
+ /* Definition for USART2's NVIC */
+ #define USART2_DMA_TX_IRQn                DMA1_Stream6_IRQn
+ #define USART2_DMA_RX_IRQn                DMA1_Stream5_IRQn
+ #define USART2_DMA_TX_IRQHandler          DMA1_Stream6_IRQHandler
+ #define USART2_DMA_RX_IRQHandler          DMA1_Stream5_IRQHandler
+ #define USART2_IRQn                       USART2_IRQn
+ #define USART2_IRQHandler                 USART2_IRQHandler
+
 extern UART_HandleTypeDef huart4;
 extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart2;
@@ -47,7 +68,7 @@ extern UART_HandleTypeDef huart3;
 
 void MODBUS_Init(uint32_t BaudRate);
 void BOOT_UART_Init(void);
-void RS485_1_UART_Init(void);
+void RS485_1_UART_Init(uint32_t BaudRate);
 void RS485_2_UART_Init(void);
 
 #ifdef __cplusplus

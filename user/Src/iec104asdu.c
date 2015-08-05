@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #include "iec104.h"
@@ -98,7 +99,59 @@ int iecasdu_parse_type100(struct iec_object *obj, unsigned char *buf, size_t buf
 }
 int iecasdu_parse_type101(struct iec_object *obj, unsigned char *buf, size_t buflen, u_char *str_ioa)
 {
-	iecasdu_parse_type(obj,buf,buflen,str_ioa,iec_type101,type101);
+//	iecasdu_parse_type(obj,buf,buflen,str_ioa,iec_type101,type101);
+	int i;
+	int step = 0;
+	struct iec_unit_id *unitp;
+	struct iec_type101 *typep;
+	u_short *addr, addr_cur;
+	u_char  *addr2;
+
+	unitp = (struct iec_unit_id *) buf;
+
+	if (unitp->sq == 0) {
+		step = sizeof(u_short)+sizeof(u_char)+sizeof(struct iec_type101);
+		if ( (step * unitp->num + sizeof(struct iec_unit_id)) > buflen )
+			return 1;
+		for (i=0; i < unitp->num; i++, obj++){
+			addr  = (u_short *) (buf + sizeof(struct iec_unit_id) + i*step);
+			addr2 = (u_char *) (buf + sizeof(struct iec_unit_id) +
+				sizeof(u_short) + i*step);
+			typep = (struct iec_type101 *) (buf +
+				sizeof(struct iec_unit_id) + sizeof(u_short) +
+				sizeof(u_char) + i*step);
+			if (*str_ioa) {
+				obj->ioa = *addr;
+				obj->ioa2  = *addr2;
+			} else {
+				obj->ioa  = *addr & 0xFFF;
+				obj->ioa2 = 0;
+			}
+			obj->o.type101 = *typep;
+		}
+	} else {
+		if ( sizeof(struct iec_type101) * unitp->num +
+		     sizeof(struct iec_unit_id) > buflen )
+			return 1;
+		addr  = (u_short *) (buf + sizeof(struct iec_unit_id));
+		addr2 = (u_char *) (buf + sizeof(struct iec_unit_id) + sizeof(u_short));
+		typep = (struct iec_type101 *) (buf + sizeof(struct iec_unit_id) +
+				sizeof(u_short) + sizeof(u_char));
+		addr_cur = *addr;
+
+		for (i=0; i < unitp->num; i++, obj++, typep++, addr_cur++){
+			if (*str_ioa) {
+				obj->ioa = addr_cur;
+				obj->ioa2  = *addr2;
+			} else {
+				obj->ioa  = addr_cur & 0xFFF;
+				obj->ioa2 = 0;
+			}
+			obj->o.type101 = *typep;
+		}
+	}
+	return 0;
+
 }
 int iecasdu_parse_type103(struct iec_object *obj, unsigned char *buf, size_t buflen, u_char *str_ioa)
 {
@@ -213,11 +266,19 @@ time_t cp56time2a_to_tm (cp56time2a *tm)
 
 /*
  *  iecasdu_create_header_all - create ASDU header (full version)
+ *  buf, buflen,
+ *  type(идентификатор типа)
+ *  num(число объектов)
+ *  sq(классификатор переменной структуры - последовательность(1) или одиночный(0))
+ *  cause(причина)
+ *  t(тест)
+ *  pn(подтверждение активации)
+ *  ma(общий адрес)
+ *  ca(адрес объекта)
+ *
  */
-
-void iecasdu_create_header_all (u_char *buf, size_t *buflen, u_char type, u_char num,
-			   u_char sq, u_char cause, u_char t, u_char pn, u_char ma,
-			   u_short ca)
+void iecasdu_create_header_all (uint8_t *buf, size_t *buflen, uint8_t type, uint8_t num,
+		uint8_t sq, uint8_t cause, uint8_t t, uint8_t pn, uint8_t initaddr, uint16_t ma, uint32_t ca)
 {
 	struct iec_unit_id unit;
 	unit.type  = type;
@@ -226,6 +287,7 @@ void iecasdu_create_header_all (u_char *buf, size_t *buflen, u_char type, u_char
 	unit.cause = cause;
 	unit.t	    = t;
 	unit.pn    = pn;
+	unit.initaddr = initaddr;
 	unit.ma    = ma;
 	unit.ca    = ca;
 
@@ -237,6 +299,52 @@ void iecasdu_create_header_all (u_char *buf, size_t *buflen, u_char type, u_char
  *  CREATE ASDU functions
  */
 	
+void iecasdu_create_type_1 (u_char *buf, size_t *buflen)
+{
+	struct iec_type1 type;
+	u_short ioa  = 1;
+	const u_char  ioa2 = 0;
+	type.sp = 1;
+	type.res = 0;
+	type.bl = 0; /* <блокировка/нет блокировки - значение блокировано дл€ передачи, остаЄтс€ в состо€нии которое было до блокировки*/
+	type.sb = 1; /* замещение/нет замещени€ - значение поступает или от диспетчера или от автоматического источника*/
+	type.nt = 1; /* неактуальное/актуальное - јктуально если большенство опросов успешно. Ќеактуально, если не обновл€лось или было недоступно*/
+	type.iv = 1; /* действительное/не действительное - действ. если правильно получено. Ќедейств. используетс€ дл€ указани€ получателю, что значение не правильное или нельз€ пользоватьс€*/
+
+
+	memcpy(buf, &ioa, sizeof(u_short));
+	memcpy(buf + sizeof(u_short), &ioa2, sizeof(u_char));
+	memcpy(buf + sizeof(u_short) + sizeof(u_char), &type, sizeof(struct iec_type1));
+	*buflen += sizeof(u_short) + sizeof(u_char) + sizeof(struct iec_type1);
+}
+
+void iecasdu_create_type_9 (u_char *buf, size_t *buflen,u_short mv)
+{
+	struct iec_type9 type;
+	//u_short ioa  = 1;
+	//const u_char  ioa2 = 0;
+
+	type.ov = 0; /* переполнение/нет переполнени€(0) */
+	type.res = 0;
+	type.bl = 0; /* <блокировка/нет блокировки(0) - значение блокировано дл€ передачи, остаЄтс€ в состо€нии которое было до блокировки*/
+	type.sb = 0; /* замещение/нет замещени€(0) - значение поступает или от диспетчера или от автоматического источника*/
+	type.nt = 0; /* неактуальное/актуальное(0) - јктуально если большенство опросов успешно. Ќеактуально, если не обновл€лось или было недоступно*/
+	type.iv = 0; /* действительное(0)/не действительное - действ. если правильно получено. Ќедейств. используетс€ дл€ указани€ получателю, что значение не правильное или нельз€ пользоватьс€*/
+
+	type.mv = mv;	/* normalized value */
+
+
+//	memcpy(buf, &ioa, sizeof(u_short));
+//	memcpy(buf + sizeof(u_short), &ioa2, sizeof(u_char));
+//	memcpy(buf + sizeof(u_short) + sizeof(u_char), &type, sizeof(struct iec_type9));
+//	*buflen += sizeof(u_short) + sizeof(u_char) + sizeof(struct iec_type9);
+	// адреса устанавливаютс€ при формировании "головы"
+	memcpy(buf, &type, sizeof(struct iec_type9));
+	*buflen += sizeof(struct iec_type9);
+}
+
+
+
 void iecasdu_create_type_100 (u_char *buf, size_t *buflen)
 {
 	struct iec_type100 type;
@@ -244,10 +352,12 @@ void iecasdu_create_type_100 (u_char *buf, size_t *buflen)
 	const u_char  ioa2 = 0;
 	type.qoi = 20;
 	
-	memcpy(buf, &ioa, sizeof(u_short));
-	memcpy(buf + sizeof(u_short), &ioa2, sizeof(u_char));
-	memcpy(buf + sizeof(u_short) + sizeof(u_char), &type, sizeof(struct iec_type100));
-	*buflen += sizeof(u_short) + sizeof(u_char) + sizeof(struct iec_type100);
+	//memcpy(buf, &ioa, sizeof(u_short));
+	//memcpy(buf + sizeof(u_short), &ioa2, sizeof(u_char));
+	//memcpy(buf + sizeof(u_short) + sizeof(u_char), &type, sizeof(struct iec_type100));
+	//*buflen += sizeof(u_short) + sizeof(u_char) + sizeof(struct iec_type100);
+	memcpy(buf, &type, sizeof(struct iec_type100));
+	*buflen += sizeof(struct iec_type100);
 }
 
 void iecasdu_create_type_101 (u_char *buf, size_t *buflen)
@@ -271,11 +381,12 @@ void iecasdu_create_type_103 (u_char *buf, size_t *buflen)
 	const u_char ioa2 = 0;
 	current_cp56time2a(&type.time);
 	
-	memcpy(buf, &ioa, sizeof(u_short));
-	memcpy(buf + sizeof(u_short), &ioa2, sizeof(u_char));
-	memcpy(buf + sizeof(u_short) + sizeof(u_char), &type, sizeof(struct iec_type103));
-	*buflen += sizeof(u_short) + sizeof(u_char) + sizeof(struct iec_type103);
-	
+	//memcpy(buf, &ioa, sizeof(u_short));
+	//memcpy(buf + sizeof(u_short), &ioa2, sizeof(u_char));
+	//memcpy(buf + sizeof(u_short) + sizeof(u_char), &type, sizeof(struct iec_type103));
+	//*buflen += sizeof(u_short) + sizeof(u_char) + sizeof(struct iec_type103);
+	memcpy(buf, &type, sizeof(struct iec_type103));
+	*buflen += sizeof(struct iec_type103);
 }
 
 void iecasdu_create_type_36 (u_char *buf, size_t *buflen, int num, float *mv) {

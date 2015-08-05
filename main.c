@@ -47,17 +47,12 @@ const uint16_t GPIO_PIN[LEDn] = {LED1_PIN,
 extern uint8_t aTxRS485_1_Buffer[];
 extern UART_HandleTypeDef huart2;
 
-#ifdef __GNUC__
-/* With GCC/RAISONANCE, small printf (option LD Linker->Libraries->Small printf set to 'Yes') calls __io_putchar() */
-#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-#else
-#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-#endif /* __GNUC__ */
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 void NVIC_Configuration(void);
 void FREERTOS_Init(void);
 
+void DebugOut(UART_HandleTypeDef *huart, char *ptr);
 void LED_Init(Led_TypeDef Led);
 
 int main(void) {
@@ -74,11 +69,7 @@ int main(void) {
 	  RS485_1_UART_Init(115200);// настройка RS485 1 канала.
 //	  RS485_2_UART_Init();		// настройка RS485 2 канала.
 
-//	  aTxRS485_1_Buffer[0]=12;
-//	  aTxRS485_1_Buffer[1]=34;
-//	  HAL_UART_Transmit(&huart2, (uint8_t *)&aTxRS485_1_Buffer, 2, 0xFFFF);
-
-//	  printf("RS485_1_UART_Init.. ok\n");
+	  printf("RS485_1_UART_Init.. ok\n");
 
 	  LED_Init(LED1);
 	  LED_Init(LED2);
@@ -207,11 +198,55 @@ void LED_Toggle(Led_TypeDef Led)
 /*************************************************************************
  * PUTCHAR_PROTOTYPE
  *************************************************************************/
-PUTCHAR_PROTOTYPE
-{
-  HAL_UART_Transmit_DMA(&huart2, (uint8_t *)&ch, 1);
-  HAL_UART_Transmit_DMA(&huart2, (uint8_t *)&ch, 1);
+int __io_putchar(int ch){
+//  HAL_UART_Transmit_DMA(&huart2, (uint8_t *)&ch, 1);
+//  HAL_UART_Transmit_DMA(&huart2, (uint8_t *)&ch, 1);
 
- // HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, 0xFFFF);
+  HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, 0xFFFF);
   return ch;
+}
+
+/*************************************************************************
+  * @brief  Tx Transfer completed callback
+  * @param  huart: UART handle.
+  * @retval None
+ *************************************************************************/
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
+
+	LED_Toggle(LED4);
+}
+
+/*************************************************************************
+  * @brief  Rx Transfer completed callback
+  * @param  huart: UART handle
+  * @retval None
+ *************************************************************************/
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+
+	LED_Toggle(LED4);
+}
+
+/*************************************************************************
+  * @brief  UART error callbacks
+  * @param  huart: UART handle
+  * @retval None
+ *************************************************************************/
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+
+	LED_Toggle(LED3);
+}
+
+void DebugOut(UART_HandleTypeDef *huart, char *ptr){
+uint8_t	len=255,index;
+
+
+for(index=0; index<=len; index++)
+{
+	if (ptr[index] == 0){
+		len = index;
+		break;
+	}
+}
+	  HAL_UART_Transmit(&huart2, (uint8_t *)ptr, len, 0xFFFF);
 }

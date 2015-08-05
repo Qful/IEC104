@@ -35,16 +35,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "gpio.h"
 #include "stm32f4xx_hal.h"
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
 
 /*----------------------------------------------------------------------------*/
 /* Configure GPIO                                                             */
 /*----------------------------------------------------------------------------*/
-/* USER CODE BEGIN 1 */
-
-/* USER CODE END 1 */
 
 /** Configure pins as 
         * Analog 
@@ -131,16 +125,5 @@ void GPIO_Init(void)
 
 }
 
-/* USER CODE BEGIN 2 */
-
-/* USER CODE END 2 */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

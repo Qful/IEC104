@@ -39,7 +39,7 @@
 /* External variables --------------------------------------------------------*/
 extern void xPortSysTickHandler(void);
 extern ETH_HandleTypeDef heth;
-
+extern UART_HandleTypeDef huart2;
 /******************************************************************************/
 /*            Cortex-M4 Processor Interruption and Exception Handlers         */ 
 /******************************************************************************/
@@ -66,6 +66,36 @@ void SysTick_Handler(void)
 void ETH_IRQHandler(void)
 {
   HAL_ETH_IRQHandler(&heth);
+}
+/******************************************************************************
+ * USARTx_DMA_TX_IRQHandler
+ ******************************************************************************/
+void USART2_DMA_TX_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(huart2.hdmatx);
+
+}
+/******************************************************************************
+ * USARTx_DMA_RX_IRQHandler
+ ******************************************************************************/
+
+void USART2_DMA_RX_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(huart2.hdmarx);
+}
+/******************************************************************************
+ * USARTx_IRQHandler
+ ******************************************************************************/
+void USART2_IRQHandler(void)
+{
+  HAL_UART_IRQHandler(&huart2);
+}
+/******************************************************************************
+ * USARTx_IRQHandler
+ ******************************************************************************/
+void WWDG_IRQHandler(void)
+{
+ // HAL_WWDG_IRQHandler();
 }
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

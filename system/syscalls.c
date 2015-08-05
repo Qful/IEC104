@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
+
 #undef errno
 extern int errno;
 
@@ -100,12 +101,14 @@ void _exit (int status)
 	while (1) {}
 }
 
+
 int _write(int file, char *ptr, int len)
 {
 	int DataIdx;
 
 		for (DataIdx = 0; DataIdx < len; DataIdx++)
 		{
+		//	HAL_UART_Transmit(&huart2,(uint8_t *)ptr, len, 0xFFFF);
 		   __io_putchar( *ptr++ );
 		}
 	return len;

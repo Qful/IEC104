@@ -9,8 +9,8 @@
 #include "main.h"
 #include "clocks.h"
 #include "cmsis_os.h"
-#include "stm32f4xx_hal_rtc.h"
-#include "stm32f4xx_hal_rtc_ex.h"
+#include "stm32f4xx_hal.h"
+#include "stm32f4xx_hal_rcc_ex.h"
 
 RTC_TimeTypeDef sTime;
 RTC_DateTypeDef sDate;
@@ -22,7 +22,8 @@ void Clocks_Init(void)
     RCC_PeriphCLKInitTypeDef PeriphClkInitStruct;
 
     PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
-    PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_HSE_DIV16;
+//TODO: на реальном приборе кварц не 8 а 25 ћ√ц. исправить делитель
+    PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_HSE_DIV8;		// RTCCLK = 1MHz
     HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct);
 
     __HAL_RCC_RTC_ENABLE();
