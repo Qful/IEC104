@@ -35,22 +35,31 @@
 #include "stm32f4xx.h"
 #include "stm32f4xx_it.h"
 #include "cmsis_os.h"
+#include "iec104.h"
 
 /* External variables --------------------------------------------------------*/
-extern void xPortSysTickHandler(void);
+//extern void xPortSysTickHandler(void);
 extern ETH_HandleTypeDef heth;
-extern UART_HandleTypeDef huart2;
+
+extern UART_HandleTypeDef BOOT_UART;
+extern UART_HandleTypeDef MODBUS;
+extern UART_HandleTypeDef RS485_1;
+extern UART_HandleTypeDef RS485_2;
+
+extern struct iecsock 	*s;
 /******************************************************************************/
 /*            Cortex-M4 Processor Interruption and Exception Handlers         */ 
 /******************************************************************************/
 
 /**
-* @brief This function handles System tick timer.
+* @brief This function handles System tick timer. 1 ms
 */
 void SysTick_Handler(void)
 {
   HAL_IncTick();
+  IEC104_IncTimers(s);
   osSystickHandler();
+
 }
 
 /******************************************************************************/
@@ -68,28 +77,71 @@ void ETH_IRQHandler(void)
   HAL_ETH_IRQHandler(&heth);
 }
 /******************************************************************************
- * USARTx_DMA_TX_IRQHandler
+ * USART1
+ ******************************************************************************/
+void USART1_DMA_TX_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(BOOT_UART.hdmatx);
+}
+
+void USART1_DMA_RX_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(BOOT_UART.hdmarx);
+}
+
+void USART1_IRQHandler(void)
+{
+  HAL_UART_IRQHandler(&BOOT_UART);
+}
+/******************************************************************************
+ * USART2
  ******************************************************************************/
 void USART2_DMA_TX_IRQHandler(void)
 {
-  HAL_DMA_IRQHandler(huart2.hdmatx);
-
+  HAL_DMA_IRQHandler(RS485_1.hdmatx);
 }
-/******************************************************************************
- * USARTx_DMA_RX_IRQHandler
- ******************************************************************************/
 
 void USART2_DMA_RX_IRQHandler(void)
 {
-  HAL_DMA_IRQHandler(huart2.hdmarx);
+  HAL_DMA_IRQHandler(RS485_1.hdmarx);
 }
-/******************************************************************************
- * USARTx_IRQHandler
- ******************************************************************************/
+
 void USART2_IRQHandler(void)
 {
-  HAL_UART_IRQHandler(&huart2);
+  HAL_UART_IRQHandler(&RS485_1);
 }
+
+/******************************************************************************
+ * USART3
+ ******************************************************************************/
+void USART3_DMA_RX_IRQHandler(void)
+{
+	  HAL_DMA_IRQHandler(RS485_2.hdmatx);
+}
+void USART3_DMA_TX_IRQHandler(void)
+{
+	  HAL_DMA_IRQHandler(RS485_2.hdmarx);
+}
+void USART3_IRQHandler(void)
+{
+	  HAL_UART_IRQHandler(&RS485_2);
+}
+/******************************************************************************
+ * UART4
+ ******************************************************************************/
+void UART4_DMA_RX_IRQHandler(void)
+{
+	  HAL_DMA_IRQHandler(MODBUS.hdmatx);
+}
+void UART4_DMA_TX_IRQHandler(void)
+{
+	  HAL_DMA_IRQHandler(MODBUS.hdmarx);
+}
+void UART4_IRQHandler(void)
+{
+	  HAL_UART_IRQHandler(&MODBUS);
+}
+
 /******************************************************************************
  * USARTx_IRQHandler
  ******************************************************************************/

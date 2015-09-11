@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "main.h"
 
 #include "iec104.h"
 
@@ -100,6 +101,7 @@ int iecasdu_parse_type100(struct iec_object *obj, unsigned char *buf, size_t buf
 int iecasdu_parse_type101(struct iec_object *obj, unsigned char *buf, size_t buflen, u_char *str_ioa)
 {
 //	iecasdu_parse_type(obj,buf,buflen,str_ioa,iec_type101,type101);
+
 	int i;
 	int step = 0;
 	struct iec_unit_id *unitp;
@@ -113,13 +115,12 @@ int iecasdu_parse_type101(struct iec_object *obj, unsigned char *buf, size_t buf
 		step = sizeof(u_short)+sizeof(u_char)+sizeof(struct iec_type101);
 		if ( (step * unitp->num + sizeof(struct iec_unit_id)) > buflen )
 			return 1;
+
 		for (i=0; i < unitp->num; i++, obj++){
-			addr  = (u_short *) (buf + sizeof(struct iec_unit_id) + i*step);
-			addr2 = (u_char *) (buf + sizeof(struct iec_unit_id) +
-				sizeof(u_short) + i*step);
-			typep = (struct iec_type101 *) (buf +
-				sizeof(struct iec_unit_id) + sizeof(u_short) +
-				sizeof(u_char) + i*step);
+			addr  = (u_short *) (buf + sizeof(struct iec_unit_id)-5 + i*step);
+			addr2 = (u_char *) (buf + sizeof(struct iec_unit_id)-3 + i*step);
+			typep = (struct iec_type101 *) (buf + sizeof(struct iec_unit_id) + i*step);
+
 			if (*str_ioa) {
 				obj->ioa = *addr;
 				obj->ioa2  = *addr2;
@@ -130,32 +131,65 @@ int iecasdu_parse_type101(struct iec_object *obj, unsigned char *buf, size_t buf
 			obj->o.type101 = *typep;
 		}
 	} else {
-		if ( sizeof(struct iec_type101) * unitp->num +
-		     sizeof(struct iec_unit_id) > buflen )
-			return 1;
-		addr  = (u_short *) (buf + sizeof(struct iec_unit_id));
-		addr2 = (u_char *) (buf + sizeof(struct iec_unit_id) + sizeof(u_short));
-		typep = (struct iec_type101 *) (buf + sizeof(struct iec_unit_id) +
-				sizeof(u_short) + sizeof(u_char));
-		addr_cur = *addr;
-
-		for (i=0; i < unitp->num; i++, obj++, typep++, addr_cur++){
-			if (*str_ioa) {
-				obj->ioa = addr_cur;
-				obj->ioa2  = *addr2;
-			} else {
-				obj->ioa  = addr_cur & 0xFFF;
-				obj->ioa2 = 0;
-			}
-			obj->o.type101 = *typep;
-		}
+//TODO: надо дописать если sq == 1
 	}
 	return 0;
 
 }
 int iecasdu_parse_type103(struct iec_object *obj, unsigned char *buf, size_t buflen, u_char *str_ioa)
 {
-	iecasdu_parse_type(obj,buf,buflen,str_ioa,iec_type103,type103);
+//	iecasdu_parse_type(obj,buf,buflen,str_ioa,iec_type103,type103);
+
+		int i;
+		int step = 0;
+		struct iec_unit_id *unitp;
+		struct iec_type103 *typep;
+		u_short *addr, addr_cur;
+		u_char  *addr2;
+
+		unitp = (struct iec_unit_id *) buf;
+
+		if (unitp->sq == 0) {
+			step = sizeof(u_short)+sizeof(u_char)+sizeof(struct iec_type103);
+			if ( (step * unitp->num + sizeof(struct iec_unit_id)) > buflen )
+				return 1;
+
+			for (i=0; i < unitp->num; i++, obj++){
+				addr  = (u_short *) (buf + sizeof(struct iec_unit_id)-5 + i*step);
+				addr2 = (u_char *) (buf + sizeof(struct iec_unit_id)-3 + i*step);
+				typep = (struct iec_type103 *) (buf + sizeof(struct iec_unit_id) + i*step);
+
+				if (*str_ioa) {
+					obj->ioa = *addr;
+					obj->ioa2  = *addr2;
+				} else {
+					obj->ioa  = *addr & 0xFFF;
+					obj->ioa2 = 0;
+				}
+				obj->o.type103 = *typep;
+			}
+		} else {
+			if ( sizeof(struct iec_type103) * unitp->num + sizeof(struct iec_unit_id) > buflen )
+				return 1;
+
+			addr  = (u_short *) (buf + sizeof(struct iec_unit_id));
+			addr2 = (u_char *) (buf + sizeof(struct iec_unit_id) + sizeof(u_short));
+			typep = (struct iec_type103 *) (buf + sizeof(struct iec_unit_id) + sizeof(u_short) + sizeof(u_char));
+			addr_cur = *addr;
+
+			for (i=0; i < unitp->num; i++, obj++, typep++, addr_cur++){
+				if (*str_ioa) {
+					obj->ioa = addr_cur;
+					obj->ioa2  = *addr2;
+				} else {
+					obj->ioa  = addr_cur & 0xFFF;
+					obj->ioa2 = 0;
+				}
+				obj->o.type103 = *typep;
+			}
+		}
+		return 0;
+
 }
 
 /*******************************************************************************************
@@ -216,34 +250,28 @@ int iecasdu_parse(struct iec_object *obj, u_char *type, u_short *com_addr,
 	return ret;
 }
 
-void time_t_to_cp56time2a (cp56time2a *tm, time_t *timet)
+void time_t_to_cp56time2a (cp56time2a *tm)
 {
-	struct tm tml;
+	extern RTC_HandleTypeDef hrtc;
+	RTC_TimeTypeDef sTimeg;
+	RTC_DateTypeDef sDateg;
 
-	tml = *localtime(timet);
-	
-	tm->msec = tml.tm_sec * 1000;
-	tm->min  = tml.tm_min;
+	HAL_RTC_GetTime(&hrtc, &sTimeg, FORMAT_BIN);
+	HAL_RTC_GetDate(&hrtc, &sDateg, FORMAT_BIN);
+
+	tm->msec = sTimeg.Seconds * 1000;
+	tm->min  = sTimeg.Minutes;
 	tm->res1 = 0;
 	tm->iv   = 0;
-	tm->hour = tml.tm_hour;
+	tm->hour = sTimeg.Hours;
 	tm->res2 = 0;
-	tm->su   = tml.tm_isdst;
-	tm->mday = tml.tm_mday;
+	tm->su   = 0;						// перевод зима-лето
+	tm->mday = sDateg.Date;
 	tm->wday = 0;
-	tm->month = tml.tm_mon+1;;
+	tm->month =sDateg.Month;
 	tm->res3 = 0;
-	tm->year = tml.tm_year - 100;
+	tm->year = sDateg.Year-20;
 	tm->res4 = 0;
-	
-}
-
-void current_cp56time2a (cp56time2a *tm)
-{
-	time_t timet;
-
-	timet = time(NULL);
-	time_t_to_cp56time2a(tm,&timet);
 }
 
 /*
@@ -295,6 +323,25 @@ void iecasdu_create_header_all (uint8_t *buf, size_t *buflen, uint8_t type, uint
 	*buflen += sizeof(struct iec_unit_id);
 }
 
+void iecasdu_add_APCI(u_char *buf, size_t buflen){
+
+struct iechdr *h;
+extern struct iecsock 	*s;
+
+	h = calloc(1, sizeof(struct iechdr));
+
+	h->start = 0x68;
+	h->length = buflen-2;
+	h->ic.ft = 0;
+	h->ic.ns = s->vs;
+	h->ic.nr = s->vr;
+	h->ic.res = 0;
+	memcpy(buf, h, sizeof(struct iechdr));
+
+	free(h);
+
+}
+
 /*
  *  CREATE ASDU functions
  */
@@ -312,10 +359,13 @@ void iecasdu_create_type_1 (u_char *buf, size_t *buflen)
 	type.iv = 1; /* действительное/не действительное - действ. если правильно получено. Недейств. используется для указания получателю, что значение не правильное или нельзя пользоваться*/
 
 
-	memcpy(buf, &ioa, sizeof(u_short));
-	memcpy(buf + sizeof(u_short), &ioa2, sizeof(u_char));
-	memcpy(buf + sizeof(u_short) + sizeof(u_char), &type, sizeof(struct iec_type1));
-	*buflen += sizeof(u_short) + sizeof(u_char) + sizeof(struct iec_type1);
+	//memcpy(buf, &ioa, sizeof(u_short));
+	//memcpy(buf + sizeof(u_short), &ioa2, sizeof(u_char));
+	//memcpy(buf + sizeof(u_short) + sizeof(u_char), &type, sizeof(struct iec_type1));
+	//*buflen += sizeof(u_short) + sizeof(u_char) + sizeof(struct iec_type1);
+
+	memcpy(buf, &type, sizeof(struct iec_type1));
+	*buflen += sizeof(struct iec_type1);
 }
 
 void iecasdu_create_type_9 (u_char *buf, size_t *buflen,u_short mv)
@@ -350,6 +400,7 @@ void iecasdu_create_type_100 (u_char *buf, size_t *buflen)
 	struct iec_type100 type;
 	u_short ioa  = 1;
 	const u_char  ioa2 = 0;
+
 	type.qoi = 20;
 	
 	//memcpy(buf, &ioa, sizeof(u_short));
@@ -365,30 +416,41 @@ void iecasdu_create_type_101 (u_char *buf, size_t *buflen)
 	struct iec_type101 type;
 	u_short ioa  = 1;
 	const u_char  ioa2 = 0;
+
 	type.rqt = 5;
 	type.frz = 0;
 	
-	memcpy(buf, &ioa, sizeof(u_short));
-	memcpy(buf + sizeof(u_short), &ioa2, sizeof(u_char));
-	memcpy(buf + sizeof(u_short) + sizeof(u_char), &type, sizeof(struct iec_type101));
-	*buflen += sizeof(u_short) + sizeof(u_char) + sizeof(struct iec_type101);
+	//memcpy(buf, &ioa, sizeof(u_short));
+	//memcpy(buf + sizeof(u_short), &ioa2, sizeof(u_char));
+	//memcpy(buf + sizeof(u_short) + sizeof(u_char), &type, sizeof(struct iec_type101));
+	//*buflen += sizeof(u_short) + sizeof(u_char) + sizeof(struct iec_type101);
+
+	memcpy(buf, &type, sizeof(struct iec_type101));
+	*buflen += sizeof(struct iec_type101);
+
 }
 
+/*************************************************************************
+ * iecasdu_create_type_103
+ *************************************************************************/
 void iecasdu_create_type_103 (u_char *buf, size_t *buflen)
 {
 	struct iec_type103 type;
-	u_short ioa = 1;
-	const u_char ioa2 = 0;
-	current_cp56time2a(&type.time);
-	
+
+	time_t_to_cp56time2a(&type.time);
+
+	//current_cp56time2a(&type.time);
 	//memcpy(buf, &ioa, sizeof(u_short));
 	//memcpy(buf + sizeof(u_short), &ioa2, sizeof(u_char));
 	//memcpy(buf + sizeof(u_short) + sizeof(u_char), &type, sizeof(struct iec_type103));
 	//*buflen += sizeof(u_short) + sizeof(u_char) + sizeof(struct iec_type103);
+
 	memcpy(buf, &type, sizeof(struct iec_type103));
 	*buflen += sizeof(struct iec_type103);
 }
-
+/*************************************************************************
+ * iecasdu_create_type_36
+ *************************************************************************/
 void iecasdu_create_type_36 (u_char *buf, size_t *buflen, int num, float *mv) {
 	struct iec_type36 type;
 	struct cp56time2a tm;
@@ -397,8 +459,9 @@ void iecasdu_create_type_36 (u_char *buf, size_t *buflen, int num, float *mv) {
 	int i;
 	size_t len;
 
-	current_cp56time2a(&tm);
-	len = sizeof(u_short)+sizeof(u_char)+sizeof(struct iec_type36);
+	time_t_to_cp56time2a(&tm);
+//	current_cp56time2a(&tm);
+//	len = sizeof(u_short)+sizeof(u_char)+sizeof(struct iec_type36);
 	
 	for (i=0; i < num; i++, mv++, ioa++) {
 		type.mv = *mv;
@@ -410,10 +473,182 @@ void iecasdu_create_type_36 (u_char *buf, size_t *buflen, int num, float *mv) {
 		type.iv=0;
 		type.time = tm;
 		
-		memcpy(buf + len*i, &ioa, sizeof(u_short));
-		memcpy(buf + len*i + sizeof(u_short), &ioa2, sizeof(u_char));
-		memcpy(buf + len*i + sizeof(u_short) + sizeof(u_char), &type,
-			sizeof(struct iec_type36));
-		*buflen += len;
+//		memcpy(buf + len*i, &ioa, sizeof(u_short));
+//		memcpy(buf + len*i + sizeof(u_short), &ioa2, sizeof(u_char));
+//		memcpy(buf + len*i + sizeof(u_short) + sizeof(u_char), &type,sizeof(struct iec_type36));
+//		*buflen += len;
+		memcpy(buf, &type, sizeof(struct iec_type36));
+		*buflen += sizeof(struct iec_type36);
 	}
+}
+
+/*************************************************************************
+ * IEC104_IncTimers
+ *************************************************************************/
+void IEC104_IncTimers(struct iecsock *s){
+
+	if (s->t0.run) {			// раборта таймера t0
+		s->t0.cntcurr++;
+		if (s->t0.cntdest <= s->t0.cntcurr){
+			s->t0.cntcurr = 0;
+			s->t0.evnt = 1;
+			s->t0.run = 0;
+		}
+	}
+	if (s->t1.run) {			// раборта таймера t1
+		s->t1.cntcurr++;
+		if (s->t1.cntdest <= s->t1.cntcurr){
+			s->t1.cntcurr = 0;
+			s->t1.evnt = 1;
+			s->t1.run = 0;
+		}
+	}
+	if (s->t2.run) {			// раборта таймера t2
+		s->t2.cntcurr++;
+		if (s->t2.cntdest <= s->t2.cntcurr){
+			s->t2.cntcurr = 0;
+			s->t2.evnt = 1;
+			s->t2.run = 0;
+		}
+	}
+	if (s->t3.run) {			// раборта таймера t3
+		s->t3.cntcurr++;
+		if (s->t3.cntdest <= s->t3.cntcurr){
+			s->t3.cntcurr = 0;
+			s->t3.evnt = 1;
+			s->t3.run = 0;
+		}
+	}
+
+	  LED_Toggle(LED3);
+}
+
+/*************************************************************************
+ * t0_timer
+ *************************************************************************/
+void t0_timer_start(struct iecsock *s){
+	s->t0.evnt = 0;
+	s->t0.run = 1;
+	USART_TRACE("t0 start.\n");
+}
+
+void t0_timer_stop( struct iecsock *s){
+	s->t0.cntcurr = 0;
+	s->t0.evnt = 0;
+	s->t0.run = 0;
+	USART_TRACE("t0 stop.\n");
+}
+/*************************************************************************
+ * t1_timer
+ *************************************************************************/
+void t1_timer_start( struct iecsock *s){
+	s->t1.evnt = 0;
+	s->t1.run = 1;
+	USART_TRACE("t1 start.\n");
+}
+
+void t1_timer_stop( struct iecsock *s){
+	s->t1.cntcurr = 0;
+	s->t1.evnt = 0;
+	s->t1.run = 0;
+	USART_TRACE("t1 stop.\n");
+}
+/*************************************************************************
+ * t2_timer
+ *************************************************************************/
+void t2_timer_start( struct iecsock *s){
+	s->t2.evnt = 0;
+	s->t2.run = 1;
+	USART_TRACE("t2 start.\n");
+}
+
+void t2_timer_stop( struct iecsock *s){
+	s->t2.cntcurr = 0;
+	s->t2.evnt = 0;
+	s->t2.run = 0;
+	USART_TRACE("t2 stop.\n");
+}
+/*************************************************************************
+ * t3_timer
+ *************************************************************************/
+void t3_timer_start( struct iecsock *s){
+	s->t3.evnt = 0;
+	s->t3.run = 1;
+	USART_TRACE("t3 start.\n");
+}
+
+void t3_timer_stop( struct iecsock *s){
+	s->t3.cntcurr = 0;
+	s->t3.evnt = 0;
+	s->t3.run = 0;
+	USART_TRACE("t3 stop.\n");
+}
+/*************************************************************************
+ * t0_timer_pending
+ *************************************************************************/
+int8_t t0_timer_pending ( struct iecsock *s){
+
+	return s->t0.evnt;
+}
+/*************************************************************************
+ * t1_timer_pending
+ *************************************************************************/
+int8_t t1_timer_pending ( struct iecsock *s){
+
+	return s->t1.evnt;
+}
+/*************************************************************************
+ * t2_timer_pending
+ *************************************************************************/
+int8_t t2_timer_pending ( struct iecsock *s){
+
+	return s->t2.evnt;
+}
+/*************************************************************************
+ * t3_timer_pending
+ *************************************************************************/
+int8_t t3_timer_pending ( struct iecsock *s){
+
+	return s->t3.evnt;
+}
+
+/*************************************************************************
+ * t1_timer_run
+ *************************************************************************/
+void t1_timer_run(struct iecsock *s)
+{
+	extern struct netconn *newconn;
+	USART_TRACE("!!! нужно активное закрытие соединения таймаут t1 !!!\n");
+	s->t1.evnt = 0;
+	s->t1.run = 0;
+
+	// попробуем закрыть
+	s->vr = 0;
+	s->vs = 0;
+	s->va = 0;
+	USART_TRACE("active close TCP/IP\n");
+    netconn_close(newconn);									// закрываем и освобождаем соединение
+    netconn_delete(newconn);
+
+}
+/*************************************************************************
+ * t2_timer_run
+ *************************************************************************/
+void t2_timer_run(struct iecsock *s)
+{
+	iec104_sframe_send(s);
+	s->va_peer = s->vr;
+	s->t2.evnt = 0;
+	s->t2.run = 0;
+}
+/*************************************************************************
+ * t3_timer_run
+ *************************************************************************/
+void t3_timer_run(struct iecsock *s)
+{
+	t1_timer_start(s);
+	s->testfr = 1;
+	iec104_uframe_send(s, TESTACT);
+	s->t3.evnt = 0;
+	s->t3.run = 0;
 }

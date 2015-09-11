@@ -80,7 +80,7 @@ struct iec_object {
 
 
 struct iec_buf {
-//	TAILQ_ENTRY(iec_buf) head;
+	//TAILQ_ENTRY(iec_buf) head;
 	u_char	data_len;	/* actual ASDU length */
 
 	// ----- APCI -----------------------------
@@ -147,25 +147,13 @@ struct iecsock {
 	u_short				va, vr, vs, va_peer;		// va - число правильно APDU (I) фармата.
 													// vr - переменная состояния приема.
 													// vs - переменная состояния передачи.
-													// va_peer -
+													// va_peer - номер последнего переданного (S) формата.
 
-	u_short				t0, t1, t2, t3;				// t0 - таймаут при установлении соединения.
+	struct iec_typeTimers	t0, t1, t2, t3;			// t0 - таймаут при установлении соединения.				был u_short
 													// t1 - таймаут при посылке или тестировании APDU.
 													// t2 - таймаут подтверждения.
 													// t3 - таймаут для посылки блоков тестирования в случае долгого простоя.
-//	struct event		t0_timer;
-//	struct event		t1_timer;
-//	struct event		t2_timer;
-//	struct event		t3_timer;
-//	struct sockaddr_in 	addr;	/* socket address */
-//	struct bufferevent *io;
-//	struct iec_buf_queue write_q;	/* write queue */
-//	struct iec_buf_queue ackw_q;	/* acknowledge wait queue */
-
 	struct iechooks 	hooks;
-//	struct event 		user;
-//	void	(*usercb)(struct iecsock *s, void *arg);
-//	void	*userarg;
 	u_long 				recv_cnt, xmit_cnt;
 };
 
@@ -194,8 +182,8 @@ int iecasdu_parse(struct iec_object *obj, u_char *type, u_short *com_addr,
 /*
  * New functions
  */
-void time_t_to_cp56time2a (cp56time2a *tm, time_t *timet);
-void current_cp56time2a (cp56time2a *tm);
+void time_t_to_cp56time2a (cp56time2a *tm);
+//void current_cp56time2a (cp56time2a *tm);
 time_t cp56time2a_to_tm (cp56time2a *tm);
 
 void iecasdu_create_header_all (uint8_t *buf, size_t *buflen, uint8_t type, uint8_t num,
@@ -208,6 +196,8 @@ void iecasdu_create_header_all (uint8_t *buf, size_t *buflen, uint8_t type, uint
 #define iecasdu_create_header(buf, buflen, type, num, cause, ca) \
 	iecasdu_create_header_all(buf, buflen, type, num, 0, cause, 0, 0, 0, ca);
 
+void iecasdu_add_APCI(u_char *buf, size_t buflen);
+
 void iecasdu_create_type_1 (u_char *buf, size_t *buflen);
 void iecasdu_create_type_9 (u_char *buf, size_t *buflen,u_short mv);
 
@@ -216,6 +206,29 @@ void iecasdu_create_type_100 (u_char *buf, size_t *buflen);
 void iecasdu_create_type_101 (u_char *buf, size_t *buflen);
 void iecasdu_create_type_103 (u_char *buf, size_t *buflen);
 
+void IEC104_IncTimers (struct iecsock *s);
+
+void t0_timer_start( struct iecsock *s);
+
+void t0_timer_stop( struct iecsock *s);
+void t1_timer_start( struct iecsock *s);
+void t1_timer_stop( struct iecsock *s);
+void t2_timer_start( struct iecsock *s);
+void t2_timer_stop( struct iecsock *s);
+void t3_timer_start( struct iecsock *s);
+void t3_timer_stop( struct iecsock *s);
+
+int8_t t0_timer_pending ( struct iecsock *s);
+int8_t t1_timer_pending ( struct iecsock *s);
+int8_t t2_timer_pending ( struct iecsock *s);
+int8_t t3_timer_pending ( struct iecsock *s);
+
+void t1_timer_run(struct iecsock *s);
+void t2_timer_run(struct iecsock *s);
+void t3_timer_run(struct iecsock *s);
+
+void iec104_sframe_send(struct iecsock *s);
+void iec104_uframe_send(struct iecsock *s, enum uframe_func func);
 /* end of New functions */
 
 #ifdef __cplusplus

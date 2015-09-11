@@ -51,10 +51,26 @@
 
 // IEC 60870-5-104
 #include "iec104.h"
+#include "modbus.h"
+#include "usart.h"
 
-
-
+/*Modbus includes*/
+#include "mb.h"
+#include "mb_m.h"
+#include "mbport.h"
 /* Variables -----------------------------------------------------------------*/
+
+
+// переделать структуру под формат данных запроса MODBUS
+	typedef struct					// для передачи через очереди структур.
+	{
+	  MBFrame	MBData;
+	  uint8_t 	Source;
+	} xData;
+
+
+extern xQueueHandle 	  xQueueMODBUS;				//для сохранения ссылки на очередь
+
 
 uint8_t sentTEST = 0;				// временно, удалить потом.
 u_short nm1;						// временно, удалить потом.
@@ -64,7 +80,6 @@ osThreadId defaultTaskHandle;
 extern RTC_HandleTypeDef hrtc;
 extern RTC_TimeTypeDef sTime;
 extern RTC_DateTypeDef sDate;
-
 
 
 struct netconn *conn, *newconn;
@@ -82,14 +97,15 @@ size_t  outbufLen;
 
 /* Function prototypes -------------------------------------------------------*/
 void StartIEC104Task(void const * argument);
-void StartLEDTask(void const * argument);
+void StartTimersTask(void const * argument);
+void StartMODBUSTask(void const * argument);
 
 static int iec104_iframe_recv(struct netconn *newconn, struct iecsock *s, struct iec_buf *buf);
 static int iec104_sframe_recv(struct iecsock *s, struct iec_buf *buf);
 static int iec104_uframe_recv(struct netconn *newconn, struct iecsock *s, struct iec_buf *buf);
 
-static void iec104_uframe_send(struct iecsock *s, enum uframe_func func);
-static void iec104_sframe_send(struct iecsock *s);
+//static void iec104_uframe_send(struct iecsock *s, enum uframe_func func);
+//static void iec104_sframe_send(struct iecsock *s);
 void iec104_prepare_iframe(struct iec_buf *buf);
 
 static inline enum frame_type frame104_type(struct iechdr *h);
@@ -111,6 +127,8 @@ void iec_send_frame(struct iecsock *s, u_char *buf, size_t *buflen);
 void iec104_run_write_queue(struct iecsock *s);
 size_t iec104_can_queue(struct iecsock *s);
 
+
+static inline char * uframe_func_to_string(enum uframe_func func);
 
 
 //extern void MX_LWIP_Init(void);
@@ -136,7 +154,7 @@ void FREERTOS_Init(void) {
   /* USER CODE END RTOS_MUTEX */
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
-  /* add semaphores, ... */
+//	vSemaphoreCreateBinary( xBinarySemaphore );			//создается двоичный семафор
   /* USER CODE END RTOS_SEMAPHORES */
 
   /* USER CODE BEGIN RTOS_TIMERS */
@@ -145,18 +163,21 @@ void FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(IEC104, StartIEC104Task, osPriorityNormal,0, 700);//700
+  osThreadDef(IEC104, StartIEC104Task, osPriorityNormal,0, 1024);//700
   defaultTaskHandle = osThreadCreate(osThread(IEC104), NULL);
 
-  osThreadDef(LED, StartLEDTask, osPriorityNormal,0, 256);//256
-  defaultTaskHandle = osThreadCreate(osThread(LED), NULL);
+  osThreadDef(Timers, StartTimersTask, osPriorityBelowNormal,0, 128);//256
+  defaultTaskHandle = osThreadCreate(osThread(Timers), NULL);
+
+  osThreadDef(MBUS, StartMODBUSTask, osPriorityBelowNormal,0, 512);//256
+  defaultTaskHandle = osThreadCreate(osThread(MBUS), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
+   xQueueMODBUS = xQueueCreate( 3, sizeof(xData) );
   /* USER CODE END RTOS_QUEUES */
 }
 
@@ -168,14 +189,13 @@ void StartIEC104Task(void const * argument)
 // struct netconn *conn, *newconn;
  err_t err, accept_err;
  struct netbuf *buf;
- uint16_t len,i;
+ uint16_t len;
  uint8_t *data;
 // uint8_t datTmp;
 
  struct iechdr *h;
  struct iec_buf *bufIEC;
 
- err_t reterror = ERR_OK;
  int ret = 0;
 
 // struct iec_object obj[IEC_OBJECT_MAX];
@@ -216,7 +236,12 @@ void StartIEC104Task(void const * argument)
 //	default_hooks.transmit_wakeup = transmit_wakeup;							// transmit_wakeup - called when all frames from transmition queue were sent, acknowledged and iecsock can accept more.
 
 	s = calloc(1, sizeof(struct iecsock));
-
+	if(!s){
+		USART_TRACE("Ошибка выделения памяти для s при ините.\n");
+	} else
+	{
+		USART_TRACE("Выделено памяти для s: %u байт.\n",sizeof(struct iecsock));
+	}
 	iec104_set_defaults(s);
 	s->type = IEC_SLAVE;
 	s->stopdt = 1;
@@ -225,9 +250,11 @@ void StartIEC104Task(void const * argument)
 
 	conn = netconn_new(NETCONN_TCP);											// создадим новое соединение
 	  if (conn!=NULL){
+		USART_TRACE("netconn_new TCP ... \n");
 		err = netconn_bind(conn, &first_ipaddr, IEC104_Port);					// привяжем соединение на IP и порт IEC 60870-5-104 (IEC104_Port)
 	    if (err == ERR_OK)
 	    {
+			USART_TRACE("netconn_listen ... \n");
 	        netconn_listen(conn);												// переводим соединение в режим прослушивания
 	        while (1)															// далее слушаем и  захватываем соединение
 	        {
@@ -235,53 +262,55 @@ void StartIEC104Task(void const * argument)
 	             accept_err = netconn_accept(conn, &newconn);					// принимаем соединение
 	             if (accept_err == ERR_OK)										// если приняли, то обработаем его
 	             {
+	     			USART_TRACE("netconn_accept ... ok \n");
+
+
 		        	 LED_On(LED2);
 	                 while (netconn_recv(newconn, &buf) == ERR_OK)				// принимаем данные в буфер
 	                 {
-
 	                	 LED_On(LED1);
 	                     do
 	                     {
 	                        netbuf_data(buf,(void *)&data, &len);					// указатель получил адрес вх. данных
 	                   	    h = (struct iechdr *) &data[0];
 
-	                   	    bufIEC = calloc(1,len + sizeof(struct iec_buf) - sizeof(struct iechdr));		// выделяем блок памяти для массива
-// TODO: запустить таймер
-	                   		//t3_timer_stop(s);
-	                   		//t3_timer_start(s);
 
+	    	     			bufIEC = calloc(1,len + sizeof(struct iec_buf) - sizeof(struct iechdr));		// выделяем блок памяти для массива
+	    	     			if (!bufIEC){
+	    	     				USART_TRACE("Ошибка выделения памяти для bufIEC после TCP соединения.\n");
+	    	     			} else{
+	    	     				USART_TRACE("Выделено памяти для bufIEC: %u байт.\n",len + sizeof(struct iec_buf) - sizeof(struct iechdr));
+	    	     			}
+
+	                   		t3_timer_stop(s);
+	                   		t3_timer_start(s);
 
 	                   		memcpy(&s->buf[0], h, len);
 	                   		memcpy(&bufIEC->h, h, len);
 	                   		s->len = len;
 
-							for (i=0;i<h->length;i++)
-								//printf("0x%02x ",s->buf[i]);
-								printf("0x%02x ",h->raw[i]);
-								printf("\n");
-
 							switch (frame104_type(h)) {
 
 								case FRAME_TYPE_I:
-									printf("FRAME_TYPE_I\n");
+									USART_TRACE("FRAME_TYPE_I\n");
 									if (s->type == IEC_SLAVE && s->stopdt) {
 										printf("-- iframe: free(buf);\n");
-										free(buf);
+										//free(bufIEC);
 										break;
 									}
 									ret = iec104_iframe_recv(newconn, s, bufIEC);
 								break;
 
 								case FRAME_TYPE_S:
-									printf("FRAME_TYPE_S\n");
+									USART_TRACE("FRAME_TYPE_S\n");
 									ret = iec104_sframe_recv(s, bufIEC);
-									free(bufIEC);
+									//free(bufIEC);
 								break;
 
 								case FRAME_TYPE_U:
-									printf("FRAME_TYPE_U\n");
+									USART_TRACE("FRAME_TYPE_U\n");
 									ret = iec104_uframe_recv(newconn, s, bufIEC);
-									free(bufIEC);
+									//free(bufIEC);
 								break;
 
 							}
@@ -290,12 +319,17 @@ void StartIEC104Task(void const * argument)
 								s->vr = 0;
 								s->vs = 0;
 								s->va = 0;
-								printf("active close TCP/IP\n");
+								USART_TRACE("active close TCP/IP\n");
 								netbuf_delete(buf);
+
+								free(bufIEC);
 			                    goto TCPCLOSE;
 							}
+							free(bufIEC);
+    	     				USART_TRACE("освободил память после bufIEC.\n");
+
 //	                       netconn_write(newconn, data, len, NETCONN_COPY);		// отправляем данные по протоколу TCP
-	//                 	   printf("%d\n",len);
+	//                 	   USART_TRACE("%d\n",len);
 	                     }
 	                     while (netbuf_next(buf) >= 0);
 	                     netbuf_delete(buf);
@@ -303,10 +337,13 @@ void StartIEC104Task(void const * argument)
 	  		           LED_Off(LED1);
 	                 }
 	         TCPCLOSE:
-					 printf("netconn_close\n");
+	         	 	 USART_TRACE("netconn_close\n");
 	                 netconn_close(newconn);									// закрываем и освобождаем соединение
 	                 netconn_delete(newconn);
 		           LED_Off(LED2);
+	             } else {
+		     			USART_TRACE("netconn_accept error: %d\n", accept_err);
+
 	             }
 	        }
 	    }
@@ -315,27 +352,54 @@ void StartIEC104Task(void const * argument)
 //    osDelay(1);
   }
 
+  USART_TRACE("освободил память после s .\n");
+
+
 }
 /*************************************************************************
- * StartLEDTask
+ * StartTimersTask
  *************************************************************************/
-void StartLEDTask(void const * argument)
+void StartTimersTask(void const * argument)
 {
 
-	  RTC_DateTypeDef sdatestructureget;
-	  RTC_TimeTypeDef stimestructureget;
+	  t0_timer_stop(s);
+	  t1_timer_stop(s);
+	  t2_timer_stop(s);
+	  t3_timer_stop(s);
 
 	  for(;;)
 	  {
       	LED_Toggle(LED4);
 
-        HAL_RTC_GetTime(&hrtc, &stimestructureget, RTC_FORMAT_BIN);
-        HAL_RTC_GetDate(&hrtc, &sdatestructureget, RTC_FORMAT_BIN);
+        if (s->t1.evnt) t1_timer_run(s);		// проверка событий срабатывания таймеров
+        if (s->t2.evnt) t2_timer_run(s);
+        if (s->t3.evnt) t3_timer_run(s);
+        taskYIELD();							// отпустим задачу до следующего вызова.
+	  }
+}
+/*************************************************************************
+ * StartMODBUSTask
+ * можно использовать текен для доступа из разных портов одновременно.
+ * возможно и использование очереди для передачи данных в функцию и вторая
+ * очередь для возврата принятых данных из порта.
+ * пример:
+ *  входные данные - адрес, функция, данные.
+ *  	1.далее формируем фрейм добавляем CRC и отсылаем в MODBUS
+ *  		соблюдая синхронизацию по времени начала (start:3,5t stop 1,5t)
+ *  	2.ожидаем возврат данных из порта в заданный таймаут.
+ *  	 	распаковываем данные считаем CRC. передаём в выходную очередь.
+ *  выходные данные - адрес, функция, количество байт, сами данные......
+ *
+ *************************************************************************/
+void StartMODBUSTask(void const * argument)
+{
 
- //   	printf("\n%1.4u-%1.2d-%1.2d ",1980+(uint16_t)sdatestructureget.Year,sdatestructureget.Month,sdatestructureget.Date);
- //   	printf("\n%1.2d:%1.2d:%1.2d> ",stimestructureget.Hours,stimestructureget.Minutes,stimestructureget.Seconds);
+	eMBMasterInit(MB_RTU, 4, 115200,  MB_PAR_EVEN);
 
-      	osDelay(1000);
+	  for(;;)
+	  {
+	     LED_Toggle(LED2);
+	     taskYIELD();							// отпустим задачу до следующего вызова.
 	  }
 }
 
@@ -349,51 +413,37 @@ static int iec104_iframe_recv(struct netconn *newconn, struct iecsock *s, struct
 	buf->data_len = h->length ;//- 2;								// дополним реальным размером ASDU
 
 	if (!check_nr(s, h->ic.nr))	{
-		printf("not check_nr\n");
-		return -1;						// проверим принимаемый порядковый номер
+		USART_TRACE("not check_nr. s->vs:%d h->ic.nr:%d\n",s->vs, h->ic.nr);
+		return -1;													// проверим принимаемый порядковый номер
 	}
 
 	s->va = h->ic.nr;
 	if (s->va == s->vs) {
-   	 	   printf("--- iframe: va==vs\n");
-
-// TODO: таймера нужно починить.
-	//	t1_timer_stop(s);										// таймаут при посылке или тестировании APDU.
-	//if (s->hooks.transmit_wakeup)				s->hooks.transmit_wakeup(s);					// пока нету передачи пробуждения
-	//else if (default_hooks.transmit_wakeup)		default_hooks.transmit_wakeup(s);
+ 		t1_timer_stop(s);											// таймаут при посылке или тестировании APDU.
+ 		//if (s->hooks.transmit_wakeup)				s->hooks.transmit_wakeup(s);					// пока нету передачи пробуждения
+ 		//else if (default_hooks.transmit_wakeup)		default_hooks.transmit_wakeup(s);
 	}
-// TODO: таймера нужно починить.
-	//t2_timer_stop(s);											// таймаут подтверждения.
-	//t2_timer_start(s);
+
+	t2_timer_stop(s);												// таймаут подтверждения.
+	t2_timer_start(s);
 
 	if (!check_ns(s, h->ic.ns)) {
-		printf("not check_ns: s->vr:%i h->ic.ns:%i\n",s->vr,h->ic.ns );
-		return -1;						// проверим передаваемый порядковый номер
+		USART_TRACE("not check_ns: s->vr:%i h->ic.ns:%i\n",s->vr,h->ic.ns );
+		return -1;													// проверим передаваемый порядковый номер
 	}
 
 	s->vr = (s->vr + 1) % 32767;
 
-	printf("--- iframe: s->vr:%i s->va:%i s->va_peer:%i s->vs:%i\n",s->vr, s->va,s->va_peer, s->vs);
+//	USART_TRACE("--- iframe: s->vr:%i s->va:%i s->va_peer:%i s->vs:%i\n",s->vr, s->va,s->va_peer, s->vs);
 
+	if ((s->vr - s->va_peer + 32767) % 32767 == s->w) {				// отошлем Sframe каждые "w" принятых пакетов
 
-	if ((s->vr - s->va_peer + 32767) % 32767 == s->w) {			// отошлем Sframe
-
-		h->start = 0x68;
-		h->length = sizeof(struct iec_s);
-		h->sc.res1 = 0;
-		h->sc.res2 = 0;
-		h->sc.ft = 1;
-		h->sc.nr = s->vr;
-	    netconn_write(newconn, h, sizeof(struct iechdr), NETCONN_NOCOPY);//NETCONN_COPY
-
-		s->xmit_cnt++;
+		iec104_sframe_send(s);
 		s->va_peer = s->vr;
-
 	}
 
 	if (s->hooks.data_indication)				s->hooks.data_indication(s, buf);			//расшифровываем ASDU
 	else if (default_hooks.data_indication)		default_hooks.data_indication(s, buf);
-	else free(buf);
 
 	return 0;
 }
@@ -402,21 +452,18 @@ static int iec104_iframe_recv(struct netconn *newconn, struct iecsock *s, struct
  *************************************************************************/
 static int iec104_sframe_recv(struct iecsock *s, struct iec_buf *buf)
 {
-	struct iec_buf *b, *tmp;
-
 	struct iechdr *h;
 	h = &buf->h;
 	buf->data_len = h->length - 2;
 
 	if (!check_nr(s, h->ic.nr))	return -1;
 
-//TODO: разобраться с этим, что она делает
+//TODO: разобраться с этим
 //	iecsock_run_ackw_queue(s, h->ic.nr);
 
 	s->va = h->ic.nr;
 	if (s->va == s->vs) {
-// TODO: таймера нужно починить.
-		//t1_timer_stop(s);																	// таймаут при посылке или тестировании APDU.
+		t1_timer_stop(s);																	// таймаут при посылке или тестировании APDU.
 		//if (s->hooks.transmit_wakeup)				s->hooks.transmit_wakeup(s);			// пока нету передачи пробуждения
 		//else if (default_hooks.transmit_wakeup)		default_hooks.transmit_wakeup(s);
 	}
@@ -436,21 +483,11 @@ static int iec104_uframe_recv(struct netconn *newconn, struct iecsock *s, struct
 			if (s->type != IEC_SLAVE)	return -1;
 
 			s->stopdt = 0;
-			h->start = 0x68;
-			h->length = sizeof(struct iec_u);
-			h->uc.res1 = 0;
-			h->uc.res2 = 0;
-			h->uc.ft = 3;
-			h->uc.start_act = 0;
-			h->uc.start_con = 1;
 
 			s->vs = 0;
-
 			s->vr = 0;
 			s->va_peer= 0;
-
-		    netconn_write(newconn, h, sizeof(struct iechdr), NETCONN_COPY);
-			s->xmit_cnt++;
+			iec104_uframe_send(s, STARTCON);
 
 // TODO: разобраться с iecsock_run_write_queue что она делает.
 			//iecsock_run_write_queue(s);
@@ -462,34 +499,24 @@ static int iec104_uframe_recv(struct netconn *newconn, struct iecsock *s, struct
 		break;
 		case STARTCON:
 			if (s->type != IEC_MASTER)	return -1;
-// TODO: таймера нужно починить.
-			//t1_timer_stop(s);
+
+			t1_timer_stop(s);
 			s->stopdt = 0;
 
 			if (s->hooks.activation_indication)					s->hooks.activation_indication(s);
 			else if (default_hooks.activation_indication)		default_hooks.activation_indication(s);
-
 		break;
+
 		case STOPACT:
 			if (s->type != IEC_SLAVE)	return -1;
 
 			s->stopdt = 1;
-
-			h->start = 0x68;
-			h->length = sizeof(struct iec_u);
-			h->uc.res1 = 0;
-			h->uc.res2 = 0;
-			h->uc.ft = 3;
-			h->uc.stop_act = 0;
-			h->uc.stop_con = 1;
-
-		    netconn_write(newconn, h, sizeof(struct iechdr), NETCONN_COPY);
-			s->xmit_cnt++;
+			iec104_uframe_send(s, STOPCON);
 
 			if (s->hooks.activation_indication)					s->hooks.activation_indication(s);
 			else if (default_hooks.activation_indication)		default_hooks.activation_indication(s);
-
 		break;
+
 		case STOPCON:
 			if (s->type != IEC_MASTER)	return -1;
 
@@ -497,43 +524,34 @@ static int iec104_uframe_recv(struct netconn *newconn, struct iecsock *s, struct
 
 			if (s->hooks.activation_indication)					s->hooks.activation_indication(s);
 			else if (default_hooks.activation_indication)		default_hooks.activation_indication(s);
-
 		break;
+
 		case TESTACT:
-			h->start = 0x68;
-			h->length = sizeof(struct iec_u);
-			h->uc.res1 = 0;
-			h->uc.res2 = 0;
-			h->uc.ft = 3;
-			h->uc.test_act = 0;
-			h->uc.test_con = 1;
 
-		    netconn_write(newconn, h, sizeof(struct iechdr), NETCONN_COPY);
-			s->xmit_cnt++;
+			iec104_uframe_send(s, TESTCON);
 
-			/* SLAVE must not send TESTFR while recieving them from MASTER */
-			if (s->type == IEC_SLAVE && !s->testfr){
-// TODO: таймера нужно починить.
-			//t3_timer_stop(s);
-			}
+			if (s->type == IEC_SLAVE && !s->testfr)		t3_timer_stop(s);
 		break;
+
 		case TESTCON:
 			if (!s->testfr)		return -1;
-// TODO: таймера нужно починить.
-			//t1_timer_stop(s);
-			s->testfr = 0;
 
+			t1_timer_stop(s);
+			s->testfr = 0;
 		break;
+
 	}
 	return 0;
 }
 /*************************************************************************
- * iecsock_uframe_send
+ * iec104_uframe_send
  *************************************************************************/
-static void iec104_uframe_send(struct iecsock *s, enum uframe_func func)
+void iec104_uframe_send(struct iecsock *s, enum uframe_func func)
 {
 	struct iechdr h;
-	memset(&h, 0, sizeof(struct iechdr));
+	memset(&h, 0, sizeof(struct iechdr));				// обнулим h
+
+	USART_TRACE("TX U %s stopdt:%i \n", uframe_func_to_string(func), s->stopdt);
 
 	h.start = 0x68;
 	h.length = sizeof(struct iec_u);
@@ -546,28 +564,31 @@ static void iec104_uframe_send(struct iecsock *s, enum uframe_func func)
 	else if (func == TESTACT)		h.uc.test_act = 1;
 	else if (func == TESTCON)		h.uc.test_con = 1;
 
-//	bufferevent_write(s->io, &h, sizeof(h));
+	netconn_write(newconn, &h, sizeof(h), NETCONN_COPY);
 	s->xmit_cnt++;
 }
 /*************************************************************************
- * iecsock_sframe_send
+ * iec104_sframe_send
  *************************************************************************/
-static void iec104_sframe_send(struct iecsock *s)
+void iec104_sframe_send(struct iecsock *s)
 {
 	struct iechdr h;
 	memset(&h, 0, sizeof(h));
 
-//	printf("TX S N(r)=%i", s->vr);					// дебаг мод.
+	USART_TRACE("TX S N(r)=%i \n", s->vr);
 
 	h.start = 0x68;
 	h.length = sizeof(struct iec_s);
+	h.sc.res1 = 0;
+	h.sc.res2 = 0;
 	h.sc.ft = 1;
 	h.sc.nr = s->vr;
-//    netconn_write(newconn, &h, sizeof(h), NETCONN_COPY);		// отправляем данные по протоколу TCP
+
+    netconn_write(newconn, &h, sizeof(h), NETCONN_COPY);
 	s->xmit_cnt++;
 }
 /*************************************************************************
- * iecsock_prepare_iframe
+ * iec104_prepare_iframe
  *************************************************************************/
 void iec104_prepare_iframe(struct iec_buf *buf)
 {
@@ -626,11 +647,8 @@ static inline int check_ns(struct iecsock *s, unsigned short ns)
  *************************************************************************/
 void activation_hook(struct iecsock *s)
 {
-//	struct timeval tv;
-//	tv.tv_sec  = 1;
-//	tv.tv_usec = 0;
 
-/*	iecsock_user_timer_set(s, timer_send_frame, NULL); */
+	USART_TRACE("send_base_request...\n");
 	send_base_request(s,NULL);
 
 }
@@ -640,19 +658,20 @@ void activation_hook(struct iecsock *s)
 void send_base_request(struct iecsock *s, void *arg)
 {
 /*	struct timeval tv; */
-	u_char *buf;
+	u_char *bufreq;
 	size_t buflen = 0;
 
-	buf = calloc(1,sizeof(struct iec_buf) + 249);
-	if (!buf)	return;
+	bufreq = calloc(1,sizeof(struct iec_buf) + 249);
+	if (!bufreq)	return;
 
-//	iecasdu_create_header(buf, &buflen, C_IC_NA_1, 1, ACTIVATION, ASDU_ADDR);
-	iecasdu_create_type_100(buf + buflen, &buflen);
-	iec_send_frame(s,buf,&buflen);
+	buflen+=sizeof(struct iechdr);
+	iecasdu_create_header_all(bufreq+buflen, &buflen, C_IC_NA_1,1,SINGLE,ACTIVATION,NOTTEST,ACTIVATIONOK,0,0,0);
+	iecasdu_create_type_100(bufreq+buflen,&buflen);									// 100
+	iec_send_frame(s,bufreq,&buflen);
 
-/*	tv.tv_sec = 0;
-	tv.tv_usec = 1000;
-	iecsock_user_timer_start(s, &tv); */
+	free(bufreq);
+
+
 }
 /*************************************************************************
  * iec_send_frame
@@ -667,16 +686,13 @@ void iec_send_frame(struct iecsock *s, u_char *buf, size_t *buflen){
 	if (!b)	return;
 
 	b->data_len = *buflen;
-
 	memcpy(b->data, buf, *buflen );
 
 	iec104_prepare_iframe(b);
-
-//TODO:   TAILQ_INSERT_TAIL ?????
-//	TAILQ_INSERT_TAIL(&s->write_q, b, head);
-//	fprintf(stderr, "packet added to queue\n");
-
+	//TAILQ_INSERT_TAIL(&s->write_q, b, head);
 	iec104_run_write_queue(s);
+
+	free(b);
 }
 /*************************************************************************
  * iec104_run_write_queue
@@ -688,15 +704,19 @@ void iec104_run_write_queue(struct iecsock *s)
 
 	if (s->type == IEC_SLAVE && s->stopdt)	return;
 
+	// далее по циклу выдаём все ответы из стека(которого нет)
+
 	h = &b->h;
 	h->ic.res = 0;
 	h->ic.nr = s->vr;
 	h->ic.ns = s->vs;
 
-	//if (t1_timer_pending(s))	t1_timer_stop(s);
-	//t1_timer_start(s);
+	USART_TRACE("TX I V(s)=%d V(a)=%d N(s)=%d N(r)=%d \n", s->vs, s->va, h->ic.ns, h->ic.nr);
 
-  //  netconn_write(newconn, h, sizeof(struct iechdr), NETCONN_COPY);
+	if (t1_timer_pending(s))	t1_timer_stop(s);
+	t1_timer_start(s);
+
+    netconn_write(newconn, &h, sizeof(struct iechdr), NETCONN_COPY);
 
 	s->vs = (s->vs + 1) % 32767;
 	s->xmit_cnt++;
@@ -743,7 +763,7 @@ void connect_hook(struct iecsock *s)
 	opt.t3  = 20;
 	iec104_set_options(s,&opt);
 
-//	printf(stderr, "%s: Sucess 0x%lu\n", __FUNCTION__, (unsigned long) s);
+//	USART_TRACE(stderr, "%s: Sucess 0x%lu\n", __FUNCTION__, (unsigned long) s);
 
 }
 /*************************************************************************
@@ -751,7 +771,7 @@ void connect_hook(struct iecsock *s)
  *************************************************************************/
 void disconnect_hook(struct iecsock *s, short reason)
 {
-	//fprintf(stderr, "%s: what=0x%02x\n", __FUNCTION__, reason);
+	//USART_TRACE("%s: what=0x%02x\n", __FUNCTION__, reason);
 	return;
 }
 /*************************************************************************
@@ -759,16 +779,22 @@ void disconnect_hook(struct iecsock *s, short reason)
  *************************************************************************/
 void data_received_hook(struct iecsock *s, struct iec_buf *b)
 {
+	uint16_t	dat[10];
+
 //	struct netconn *newconn;
 	struct iec_object obj[IEC_OBJECT_MAX];
 	int ret, n, i;
 	u_short caddr;
 	u_char cause, test, pn, t, str_ioa;
 
-
 	struct iechdr *h;
 	uint8_t apcibuf[6];
 //	uint8_t	*sa;
+
+
+	USART_TRACE("data_received_hook...\n");
+
+
 	h = (struct iechdr *)&apcibuf;
 	// парсим содержимое ASDU
    ret = iecasdu_parse(obj, &t, &caddr, &n, &cause, &test, &pn, &str_ioa, b->data, b->data_len);
@@ -826,19 +852,25 @@ void data_received_hook(struct iecsock *s, struct iec_buf *b)
 						   //--------- C -------------
 		   case C_IC_NA_1: /* 100 */		//ASDU Type ID 100 : C_IC_NA_1 - команда опроса
    	   	   	   	   	   	    outbuf = calloc(1,sizeof(struct iec_buf) + 249);
-							if (!outbuf) return;
+							if (!outbuf) {
+								USART_TRACE("Ошибка выделения памяти outbuf в C_IC_NA_1 запросе.\n");
+								return;
+							} else{
+								USART_TRACE("Выделено памяти outbuf в C_IC_NA_1: %u байт.\n",sizeof(struct iec_buf) + 249);
+							}
 							outbufLen = 0;
 
 
 							// нету APCI
 							outbufLen+=sizeof(struct iechdr);
-//						    iecasdu_create_header(outbuf+outbufLen, &outbufLen, C_IC_NA_1, 1, ACTCONFIRM, 0);		// заголовок ASDU по адрес абъекта
 							iecasdu_create_header_all(outbuf+outbufLen, &outbufLen, C_IC_NA_1,1,SINGLE,ACTCONFIRM,NOTTEST,ACTIVATIONOK,0,0,0);
    	   	   	   	   	   	    iecasdu_create_type_100(outbuf+outbufLen,&outbufLen);									// 100
 
 							//iecasdu_create_header(outbuf+outbufLen, &outbufLen, M_SP_NA_1, 1, 20, 1);		// заголовок ASDU по адрес абъекта
    	   	   	   	   	   	    //iecasdu_create_type_1(outbuf+outbufLen,&outbufLen);										// 1
    	   	   	   	   	   	    // ------------- APCI -------------------
+   	   	   	   	   	   	    iecasdu_add_APCI(outbuf, outbufLen);
+   	   	   	   	   	   	    /*
 							h->start = 0x68;
 							h->length = outbufLen-2;
 							h->ic.ft = 0;
@@ -846,6 +878,8 @@ void data_received_hook(struct iecsock *s, struct iec_buf *b)
 							h->ic.nr = s->vr;
 							h->ic.res = 0;
 							memcpy(outbuf, h, sizeof(struct iechdr));
+							*/
+
 							// !------------ APCI -------------------
 							/*
 							sa = outbuf--;
@@ -864,20 +898,32 @@ void data_received_hook(struct iecsock *s, struct iec_buf *b)
 							s->xmit_cnt++;
 
 							free(outbuf);
+							USART_TRACE("освободил память outbuf в C_IC_NA_1\n");
 
-	   	   	   	   	   	    printf("| 100 C_IC_NA_1: IDX:%i qoi:0x%02x\n",obj[0].ioa, obj[0].o.type100.qoi);
+
+							USART_TRACE("| 100 C_IC_NA_1: IDX:%i qoi:0x%02x\n",obj[0].ioa, obj[0].o.type100.qoi);
 						   break;
 		   case C_CI_NA_1: /* 101 */		//ASDU Type ID 101 : C_CI_NA_1 - Counter Interrogation Command
 
+							//Modbus_SendCmd(MB_SlaveAddres, MB_FUNC_READ_DISCRETE_INPUTS, nm1, 8,dat,0);	// модбас запрос
 
-	  	   	   	   	   	    outbuf = calloc(1,sizeof(struct iec_buf) + 249);
-							if (!outbuf) return;
+
+	  	   	   	   	   	    outbuf = calloc(1,sizeof(struct iec_buf) + 249);//249
+							if (!outbuf) {
+								USART_TRACE("Ошибка выделения памяти outbuf в C_CI_NA_1 запросе.\n");
+								return;
+							} else{
+								USART_TRACE("Выделено памяти outbuf в C_CI_NA_1: %u байт.\n",sizeof(struct iec_buf) + 249);
+							}
+
 							outbufLen = 0;
 							// нету APCI
 							outbufLen+=sizeof(struct iechdr);
 							iecasdu_create_header_all(outbuf+outbufLen, &outbufLen, M_ME_NA_1,1,SINGLE,ACTCONFIRM,NOTTEST,ACTIVATIONOK,0,5,2);
 							iecasdu_create_type_9(outbuf+outbufLen,&outbufLen, nm1++); //M_ME_NA_1 - значение измеряемой величины, нормализованное значение
    	   	   	   	   	   	    // ------------- APCI -------------------
+   	   	   	   	   	   	    iecasdu_add_APCI(outbuf, outbufLen);
+   	   	   	   	   	   	    /*
 							h->start = 0x68;
 							h->length = outbufLen-2;
 							h->ic.ft = 0;
@@ -885,20 +931,22 @@ void data_received_hook(struct iecsock *s, struct iec_buf *b)
 							h->ic.nr = s->vr;
 							h->ic.res = 0;
 							memcpy(outbuf, h, sizeof(struct iechdr));
+							*/
 							// !------------ APCI -------------------
 							netconn_write(newconn, outbuf , outbufLen, NETCONN_COPY);
 
 							s->vs = (s->vs + 1) % 32767;			// счетчик переданных
 							s->xmit_cnt++;
 
-							free(outbuf);
+					//		free(outbuf);
+							USART_TRACE("освободил память outbuf в C_CI_NA_1\n");
 
-				   	   	   	printf("| 101 C_CI_NA_1: IDX:%i rqt:0x%02x frz:0x%02x\n",obj[0].ioa, obj[0].o.type101.rqt, obj[0].o.type101.frz);
+							USART_TRACE("| 101 C_CI_NA_1: IDX:%i rqt:0x%02x frz:0x%02x\n",obj[0].ioa, obj[0].o.type101.rqt, obj[0].o.type101.frz);
 
 						   break;
 
 		   case C_RD_NA_1: /* 102 */		//ASDU Type ID 102 : C_RD_NA_1 - команда чтения
-			   	   	   	   printf("| 101 C_CI_NA_1: IDX:%i \n",obj[0].ioa);
+			   	   	   	   USART_TRACE("| 101 C_CI_NA_1: IDX:%i \n",obj[0].ioa);
 						   break;
 
 		   case C_CS_NA_1: /* 103 */		//ASDU Type ID 103 : C_CS_NA_1 - команда синхронизации времени
@@ -918,7 +966,13 @@ void data_received_hook(struct iecsock *s, struct iec_buf *b)
 
 
 							outbuf = calloc(1,sizeof(struct iec_buf) + 249);
-							if (!outbuf) return;
+							if (!outbuf) {
+								USART_TRACE("Ошибка выделения памяти outbuf в C_CS_NA_1 запросе.\n");
+								return;
+							} else{
+								USART_TRACE("Выделено памяти outbuf в C_CS_NA_1: %u байт.\n",sizeof(struct iec_buf) + 249);
+							}
+
 							outbufLen = 0;
 
 							// нету APCI
@@ -941,46 +995,48 @@ void data_received_hook(struct iecsock *s, struct iec_buf *b)
 							s->xmit_cnt++;
 
 							free(outbuf);
+							USART_TRACE("освободил память outbuf в C_CS_NA_1\n");
 
 
-			   	   	   	   printf("| 103 C_CS_NA_1: IDX:%i hour:%02d min:%02d\n",obj[0].ioa, obj[0].o.type103.time.hour, obj[0].o.type103.time.min);
+							USART_TRACE("| 103 C_CS_NA_1: IDX:%i hour:%02d min:%02d\n",obj[0].ioa, obj[0].o.type103.time.hour, obj[0].o.type103.time.min);
 
 						   break;
 //		   case C_TS_NA_1: /* 104 */		//ASDU Type ID 104: C_TS_NA_1 - тестовая команда				не используется в 104 стандарте
-//	   	   	   	   	   	   printf("| 104 C_TS_NA_1: IDX:%i qoi:0x%02x\n",obj[0].ioa, obj[0].o.type104.res);
+//	   	   	   	   	   	   USART_TRACE("| 104 C_TS_NA_1: IDX:%i qoi:0x%02x\n",obj[0].ioa, obj[0].o.type104.res);
 						   break;
 		   case C_RP_NA_1: /* 105 */		//ASDU Type ID 105: C_RP_NA_1 - Reset Process Command
-  	   	   	   	   	   	   printf("| 105 C_RP_NA_1: IDX:%i qoi:0x%02x\n",obj[0].ioa, obj[0].o.type105.res);
+			   	   	   	   USART_TRACE("| 105 C_RP_NA_1: IDX:%i qoi:0x%02x\n",obj[0].ioa, obj[0].o.type105.res);
 						   break;
 		   case C_TS_TA_1: /* 107 */		//ASDU Type ID 107 : C_TS_TA_1 - тестовая команда с меткой времени CP56Время2а
-	   	   	   	   	   	   printf("| 107 C_TS_TA_1: IDX:%i qoi:0x%02x\n",obj[0].ioa, obj[0].o.type107.res);
+			   	   	   	   USART_TRACE("| 107 C_TS_TA_1: IDX:%i qoi:0x%02x\n",obj[0].ioa, obj[0].o.type107.res);
 						   break;
 	   }
-		free(b);
    }
 
 }
 /*************************************************************************
  * iecsock_set_options
+ * счет идёт в мс
  *************************************************************************/
 void iec104_set_options(struct iecsock *s, struct iecsock_options *opt)
 {
-	s->t0 = opt->t0;
-	s->t1 = opt->t1;
-	s->t2 = opt->t2;
-	s->t3 = opt->t3;
+	s->t0.cntdest = opt->t0*1000;
+	s->t1.cntdest = opt->t1*1000;
+	s->t2.cntdest = opt->t2*1000;
+	s->t3.cntdest = opt->t3*1000;
 	s->w = opt->w;
 	s->k = opt->k;
 }
 /*************************************************************************
  * iecsock_set_defaults
+ * счет идёт в мс
  *************************************************************************/
 static void iec104_set_defaults(struct iecsock *s)
 {
-	s->t0	= DEFAULT_T0;
-	s->t1	= DEFAULT_T1;
-	s->t2	= DEFAULT_T2;
-	s->t3	= DEFAULT_T3;
+	s->t0.cntdest	= DEFAULT_T0*1000;
+	s->t1.cntdest	= DEFAULT_T1*1000;
+	s->t2.cntdest	= DEFAULT_T2*1000;
+	s->t3.cntdest	= DEFAULT_T3*1000;
 	s->w 	= DEFAULT_W;
 	s->k	= DEFAULT_K;
 //	TAILQ_INIT(&s->write_q);
@@ -988,6 +1044,9 @@ static void iec104_set_defaults(struct iecsock *s)
 //	evtimer_set(&s->t1_timer, t1_timer_run, s);
 //	evtimer_set(&s->t2_timer, t2_timer_run, s);
 //	evtimer_set(&s->t3_timer, t3_timer_run, s);
+
+	iec104_sframe_send(s);
+	s->va_peer = s->vr;
 }
 /*
 Макрос TAILQ_ENTRY объявляет структуру, связывающую элементы в хвостовой очереди.
@@ -1003,11 +1062,22 @@ static void iec104_set_defaults(struct iecsock *s)
 // t2_timer	- тайм-аут для подтверждения в случае отсутствия сообщения с данными
 // t3_timer	- тайм-аут для посылки блоков тестирования в случае долгого простоя
 
-
-t3_timer_start(){
-
-}
-
-t3_timer_stop(){
-
+static inline char * uframe_func_to_string(enum uframe_func func)
+{
+	switch (func) {
+	case STARTACT:
+		return "STARTACT";
+	case STARTCON:
+		return "STARTCON";
+	case STOPACT:
+		return "STOPACT";
+	case STOPCON:
+		return "STOPCON";
+	case TESTACT:
+		return "TESTACT";
+	case TESTCON:
+		return "TESTCON";
+	default:
+		return "UNKNOWN";
+	}
 }

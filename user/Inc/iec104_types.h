@@ -117,6 +117,14 @@ struct cp56time2a {
 
 typedef struct cp56time2a cp56time2a;
 
+struct iec_typeTimers {
+	u_char		run  :1;	// работа таймера
+	u_char		evnt :1;	// событие окончания счета
+	uint32_t	cntcurr;	// счетчик
+	uint32_t	cntdest;	// предел счёта
+}__attribute__((__packed__));
+
+
 /* M_SP_NA_1 - single point information with quality description */
 struct iec_type1 {
 	u_char		sp	:1; /* single point information */

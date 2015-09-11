@@ -18,8 +18,11 @@
 #include "semphr.h"
 #include "timers.h"
 
-#include "stm32f4xx_hal.h"
 #include "cmsis_os.h"
+#include "stm32f4xx_hal.h"
+
+#include "stm32f4xx_hal_pwr.h"
+#include "stm32f4xx_hal_gpio.h"
 
 #include "stm32f4xx_it.h"
 #include "main.h"
@@ -30,8 +33,13 @@
 #include "clocks.h"
 #include "gpio.h"
 
-#include "stm324xg_eval.h"
+/*Modbus includes*/
 
+#include "ConfBoard.h"
+
+
+
+uint8_t 	Modbus_DataTX[255];		// буфер передатчика Modbus
 
 /* Private variables ---------------------------------------------------------*/
 GPIO_TypeDef* GPIO_PORT[LEDn] = {LED1_GPIO_PORT,
@@ -44,8 +52,12 @@ const uint16_t GPIO_PIN[LEDn] = {LED1_PIN,
                                  LED3_PIN,
                                  LED4_PIN};
 
-extern uint8_t aTxRS485_1_Buffer[];
-extern UART_HandleTypeDef huart2;
+xQueueHandle 	  xQueueMODBUS;				//для сохранения ссылки на очередь
+
+UART_HandleTypeDef MODBUS;				//UART4
+UART_HandleTypeDef BOOT_UART;			//USART1
+UART_HandleTypeDef RS485_1;				//USART2
+UART_HandleTypeDef RS485_2;				//USART3
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
@@ -57,19 +69,41 @@ void LED_Init(Led_TypeDef Led);
 
 int main(void) {
 
+//	uint16_t	dat[10];
 
-	  HAL_Init();				// инит. Flash и Systick.
-	  SystemClock_Config();		// когфиг осциллятора.
-//	  NVIC_Configuration();
-	  GPIO_Init();				// конфиг портов.
+	  HAL_Init();						// инит. Flash и Systick.
+	  SystemClock_Config();				// когфиг осциллятора.
+	  NVIC_Configuration();
+	  GPIO_Init();						// конфиг портов.
 	  Clocks_Init();
 
-//	  MODBUS_Init(115200);		// настройка MODBUS интерфейса.
-//	  BOOT_UART_Init();			// настройка BOOT интерфейса.
-	  RS485_1_UART_Init(115200);// настройка RS485 1 канала.
-//	  RS485_2_UART_Init();		// настройка RS485 2 канала.
+	  BOOT_UART_Init(115200);			// настройка BOOT интерфейса.
+	  USART_TRACE("BOOT_Init.. ok\n");
 
-	  printf("RS485_1_UART_Init.. ok\n");
+//	  RS485_1_UART_Init(115200);		// настройка RS485 1 канала.
+//	  USART_TRACE("RS485_1_UART_Init.. ok\n");
+//  	  RS485_2_UART_Init(115200);		// настройка RS485 2 канала.
+//  	  USART_TRACE("RS485_2_UART_Init.. ok\n");
+
+
+	  // тут нужно получить параметры системы от головного(MODBUS) скорости, адреса, порты....
+/*
+	  switch (WorkChannel){
+	  case CH485_1:
+		  	  RS485_1_UART_Init(115200);		// настройка RS485 1 канала.
+			  USART_TRACE("RS485_1_UART_Init.. ok\n");
+		  break;
+	  case CH485_2:
+		  	  RS485_2_UART_Init(115200);		// настройка RS485 2 канала.
+		  	  USART_TRACE("RS485_2_UART_Init.. ok\n");
+		  break;
+
+	  }
+*/
+
+//	  dat[0] = 0x2E5F;
+//	  dat[1] = 0x1122;
+//	  Modbus_SendCmd(MB_SlaveAddres, MB_FUNC_WRITE_MULTIPLE_COILS, 0, 2,dat);
 
 	  LED_Init(LED1);
 	  LED_Init(LED2);
@@ -148,7 +182,6 @@ void SystemClock_Config(void)
 void NVIC_Configuration(void)
     {
 
-	  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);			//NVIC_PRIORITYGROUP_1
 	  HAL_NVIC_SetPriority(RCC_IRQn,(uint8_t)(configKERNEL_INTERRUPT_PRIORITY >> 4),0);
 
     }
@@ -198,11 +231,11 @@ void LED_Toggle(Led_TypeDef Led)
 /*************************************************************************
  * PUTCHAR_PROTOTYPE
  *************************************************************************/
-int __io_putchar(int ch){
-//  HAL_UART_Transmit_DMA(&huart2, (uint8_t *)&ch, 1);
-//  HAL_UART_Transmit_DMA(&huart2, (uint8_t *)&ch, 1);
+int __io_putchar(int ch)
+{
+//  HAL_UART_Transmit(&RS485_1, (uint8_t *)&ch, 1, 0xFFFF);
+  HAL_UART_Transmit(&BOOT_UART, (uint8_t *)&ch, 1, 0xFFFF);
 
-  HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, 0xFFFF);
   return ch;
 }
 
@@ -248,5 +281,5 @@ for(index=0; index<=len; index++)
 		break;
 	}
 }
-	  HAL_UART_Transmit(&huart2, (uint8_t *)ptr, len, 0xFFFF);
+	  HAL_UART_Transmit(&BOOT_UART, (uint8_t *)ptr, len, 0xFFFF);
 }
