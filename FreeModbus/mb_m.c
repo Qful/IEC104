@@ -143,14 +143,14 @@ eMBMasterInit( eMBMode eMode, UCHAR ucPort, ULONG ulBaudRate, eMBParity eParity 
 	{
 #if MB_MASTER_RTU_ENABLED > 0
 	case MB_RTU:
-		pvMBMasterFrameStartCur = eMBMasterRTUStart;
-		pvMBMasterFrameStopCur = eMBMasterRTUStop;
-		peMBMasterFrameSendCur = eMBMasterRTUSend;
-		peMBMasterFrameReceiveCur = eMBMasterRTUReceive;
-		pvMBMasterFrameCloseCur = MB_PORT_HAS_CLOSE ? vMBMasterPortClose : NULL;
-		pxMBMasterFrameCBByteReceived = xMBMasterRTUReceiveFSM;
-		pxMBMasterFrameCBTransmitterEmpty = xMBMasterRTUTransmitFSM;
-		pxMBMasterPortCBTimerExpired = xMBMasterRTUTimerExpired;
+		pvMBMasterFrameStartCur = eMBMasterRTUStart;								// Ожидание при старте t3.5 символа чтобы не ловить мусор при старте.
+		pvMBMasterFrameStopCur = eMBMasterRTUStop;									// Остановка интерфейса MODBUS.
+		peMBMasterFrameSendCur = eMBMasterRTUSend;									// Отправка пакета в MODBUS.
+		peMBMasterFrameReceiveCur = eMBMasterRTUReceive;							// Функция проверки целосности принятых данных.
+		pvMBMasterFrameCloseCur = MB_PORT_HAS_CLOSE ? vMBMasterPortClose : NULL;	// NULL
+		pxMBMasterFrameCBByteReceived = xMBMasterRTUReceiveFSM;						// Функция приёма данных из MODBUS.
+		pxMBMasterFrameCBTransmitterEmpty = xMBMasterRTUTransmitFSM;				// Функция окончания передачи Фрейма.
+		pxMBMasterPortCBTimerExpired = xMBMasterRTUTimerExpired;					// Обработчик таймаутов таймера
 
 		eStatus = eMBMasterRTUInit(ucPort, ulBaudRate, eParity);
 		break;
@@ -209,7 +209,10 @@ eMBMasterClose( void )
     }
     return eStatus;
 }
-
+/*************************************************************************
+ * eMBMasterEnable
+ * старт MODBUS
+ *************************************************************************/
 eMBErrorCode
 eMBMasterEnable( void )
 {
@@ -218,7 +221,7 @@ eMBMasterEnable( void )
     if( eMBState == STATE_DISABLED )
     {
         /* Activate the protocol stack. */
-        pvMBMasterFrameStartCur(  );
+        pvMBMasterFrameStartCur(  );			// стартуем MODBUS в режим приёма.
         eMBState = STATE_ENABLED;
     }
     else
@@ -227,7 +230,10 @@ eMBMasterEnable( void )
     }
     return eStatus;
 }
-
+/*************************************************************************
+ * eMBMasterEnable
+ * стоп MODBUS
+ *************************************************************************/
 eMBErrorCode
 eMBMasterDisable( void )
 {
@@ -250,6 +256,12 @@ eMBMasterDisable( void )
     return eStatus;
 }
 
+/*************************************************************************
+ * eMBMasterPoll
+ * Эта функция должна быть вызвана периодически. Интервал зависит от тайм-аута Modbus Slave устройства.
+ * Внутри вызывает функцию xMBMasterPortEventGet() и ждет события от передатчика или приёмника.
+ *
+ *************************************************************************/
 eMBErrorCode
 eMBMasterPoll( void )
 {
@@ -264,22 +276,24 @@ eMBMasterPoll( void )
     eMBMasterEventType    eEvent;
     eMBMasterErrorEventType errorType;
 
-    /* Check if the protocol stack is ready. */
-    if( eMBState != STATE_ENABLED )
-    {
-        return MB_EILLSTATE;
-    }
+    if( eMBState != STATE_ENABLED )        return MB_EILLSTATE;	 	// Check if the protocol stack is ready.
 
-    /* Check if there is a event available. If not return control to caller.
-     * Otherwise we will handle the event. */
-    if( xMBMasterPortEventGet( &eEvent ) == TRUE )
+    if( xMBMasterPortEventGet( &eEvent ) == TRUE )					// Проверим есть ли ккое либо событие от СТЭЙТ машины приёмника или передатчика
     {
         switch ( eEvent )
         {
+        case EV_MASTER_ERROR_RESPOND_TIMEOUT:
+        	break;
+        case EV_MASTER_PROCESS_SUCESS:
+            break;
+        case EV_MASTER_ERROR_EXECUTE_FUNCTION:
+            break;
+        case EV_MASTER_ERROR_RECEIVE_DATA:
+        	break;
         case EV_MASTER_READY:
             break;
 
-        case EV_MASTER_FRAME_RECEIVED:
+        case EV_MASTER_FRAME_RECEIVED:															// Приняли фрейм, проверим на целостность и обработаем
 			eStatus = peMBMasterFrameReceiveCur( &ucRcvAddress, &ucMBFrame, &usLength );
 			/* Check if the frame is for us. If not ,send an error process event. */
 			if ( ( eStatus == MB_ENOERR ) && ( ucRcvAddress == ucMBMasterGetDestAddress() ) )
@@ -293,7 +307,7 @@ eMBMasterPoll( void )
 			}
 			break;
 
-        case EV_MASTER_EXECUTE:
+        case EV_MASTER_EXECUTE:																	// приняли правильный пакет, адресованный нам. УРА РАБОТАЕМ
             ucFunctionCode = ucMBFrame[MB_PDU_FUNC_OFF];
             eException = MB_EX_ILLEGAL_FUNCTION;
             /* If receive frame has exception .The receive function code highest bit is 1.*/
@@ -339,14 +353,12 @@ eMBMasterPoll( void )
             }
             break;
 
-        case EV_MASTER_FRAME_SENT:
-        	/* Master is busy now. */
-        	vMBMasterGetPDUSndBuf( &ucMBFrame );
-			eStatus = peMBMasterFrameSendCur( ucMBMasterGetDestAddress(), ucMBFrame, usMBMasterGetPDUSndLength() );
+        case EV_MASTER_FRAME_SENT:				// передача в порт
+        	vMBMasterGetPDUSndBuf( &ucMBFrame );																		//ucMBFrame - буфер для передачи в MODBUS
+			eStatus = peMBMasterFrameSendCur( ucMBMasterGetDestAddress(), ucMBFrame, usMBMasterGetPDUSndLength() );		//подготовка пакета и активация передачи.
             break;
 
-        case EV_MASTER_ERROR_PROCESS:
-        	/* Execute specified error process callback function. */
+        case EV_MASTER_ERROR_PROCESS:			// колбэки по ошибкам
 			errorType = eMBMasterGetErrorType();
 			vMBMasterGetPDUSndBuf( &ucMBFrame );
 			switch (errorType) {

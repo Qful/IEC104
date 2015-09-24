@@ -37,9 +37,12 @@
 #include "cmsis_os.h"
 #include "iec104.h"
 
+#include "usart.h"
 /* External variables --------------------------------------------------------*/
 //extern void xPortSysTickHandler(void);
 extern ETH_HandleTypeDef heth;
+
+extern	TIM_HandleTypeDef    TimHandle;	// Timer handler declaration для таймаутов MODBUS
 
 extern UART_HandleTypeDef BOOT_UART;
 extern UART_HandleTypeDef MODBUS;
@@ -57,6 +60,7 @@ extern struct iecsock 	*s;
 void SysTick_Handler(void)
 {
   HAL_IncTick();
+  HAL_SYSTICK_IRQHandler();
   IEC104_IncTimers(s);
   osSystickHandler();
 
@@ -116,11 +120,11 @@ void USART2_IRQHandler(void)
  ******************************************************************************/
 void USART3_DMA_RX_IRQHandler(void)
 {
-	  HAL_DMA_IRQHandler(RS485_2.hdmatx);
+	  HAL_DMA_IRQHandler(RS485_2.hdmarx);
 }
 void USART3_DMA_TX_IRQHandler(void)
 {
-	  HAL_DMA_IRQHandler(RS485_2.hdmarx);
+	  HAL_DMA_IRQHandler(RS485_2.hdmatx);
 }
 void USART3_IRQHandler(void)
 {
@@ -131,11 +135,11 @@ void USART3_IRQHandler(void)
  ******************************************************************************/
 void UART4_DMA_RX_IRQHandler(void)
 {
-	  HAL_DMA_IRQHandler(MODBUS.hdmatx);
+	  HAL_DMA_IRQHandler(MODBUS.hdmarx);
 }
 void UART4_DMA_TX_IRQHandler(void)
 {
-	  HAL_DMA_IRQHandler(MODBUS.hdmarx);
+	  HAL_DMA_IRQHandler(MODBUS.hdmatx);
 }
 void UART4_IRQHandler(void)
 {
@@ -148,6 +152,15 @@ void UART4_IRQHandler(void)
 void WWDG_IRQHandler(void)
 {
  // HAL_WWDG_IRQHandler();
+}
+
+/******************************************************************************
+ * TIM2_IRQHandler
+ ******************************************************************************/
+void TIM2_IRQHandler( void )
+{
+	 HAL_TIM_IRQHandler(&TimHandle);
+
 }
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

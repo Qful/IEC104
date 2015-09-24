@@ -8,6 +8,8 @@
 #ifndef MAIN_H_
 #define MAIN_H_
 
+#include "stdint.h"
+
 // Enable/Disable tracing using LED outputs
 #define LED_TRACE_ENABLE            1
 // Enable/Disable tracing using USART outputs
@@ -61,8 +63,9 @@
 
 #include "ConfBoard.h"
 
-extern void LED_On(Led_TypeDef Led);
-extern void LED_Off(Led_TypeDef Led);
-extern void LED_Toggle(Led_TypeDef Led);
+extern void Port_Init(Port_TypeDef Port,uint32_t mode);
+extern void Port_On(Port_TypeDef Port);
+extern void Port_Off(Port_TypeDef Port);
+extern void Port_Toggle(Port_TypeDef Port);
 
 #endif /* MAIN_H_ */

@@ -68,7 +68,6 @@ PR_BEGIN_EXTERN_C
 
 /* ----------------------- Prototypes  0-------------------------------------*/
 typedef void    ( *pvMBFrameStart ) ( void );
-
 typedef void    ( *pvMBFrameStop ) ( void );
 
 typedef eMBErrorCode( *peMBFrameReceive ) ( UCHAR * pucRcvAddress,

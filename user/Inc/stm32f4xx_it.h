@@ -47,6 +47,7 @@
 
 void SysTick_Handler(void);
 void ETH_IRQHandler(void);
+/*
 void USART1_DMA_RX_IRQHandler(void);
 void USART1_DMA_TX_IRQHandler(void);
 void USART1_IRQHandler(void);
@@ -59,6 +60,7 @@ void USART3_IRQHandler(void);
 void UART4_DMA_RX_IRQHandler(void);
 void UART4_DMA_TX_IRQHandler(void);
 void UART4_IRQHandler(void);
+*/
 #ifdef __cplusplus
 }
 #endif

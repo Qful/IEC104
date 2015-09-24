@@ -17,14 +17,13 @@
 #include "queue.h"
 #include "semphr.h"
 #include "timers.h"
-
 #include "cmsis_os.h"
-#include "stm32f4xx_hal.h"
 
+#include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_pwr.h"
 #include "stm32f4xx_hal_gpio.h"
-
 #include "stm32f4xx_it.h"
+
 #include "main.h"
 //#include "iwdg.h"
 //#include "lwip.h"
@@ -33,82 +32,56 @@
 #include "clocks.h"
 #include "gpio.h"
 
-/*Modbus includes*/
-
 #include "ConfBoard.h"
 
 
+//uint8_t 	Modbus_DataTX[255];		// буфер передатчика Modbus
+uint8_t 	Modbus_DataRX[255];		// буфер приёмника Modbus
 
-uint8_t 	Modbus_DataTX[255];		// буфер передатчика Modbus
+// Светодиоды
+GPIO_TypeDef* GPIO_PORT[PORTn] = {LED1_GPIO_PORT, LED2_GPIO_PORT, LED3_GPIO_PORT, LED4_GPIO_PORT, RS485_1_DE_GPIO_PORT, RS485_2_DE_GPIO_PORT, MODBUS_DE_GPIO_PORT};
+const uint16_t GPIO_PIN[PORTn] = {LED1_PIN, LED2_PIN, LED3_PIN, LED4_PIN, RS485_1_DE, RS485_2_DE, MODBUS_DE};
 
-/* Private variables ---------------------------------------------------------*/
-GPIO_TypeDef* GPIO_PORT[LEDn] = {LED1_GPIO_PORT,
-                                 LED2_GPIO_PORT,
-                                 LED3_GPIO_PORT,
-                                 LED4_GPIO_PORT};
-
-const uint16_t GPIO_PIN[LEDn] = {LED1_PIN,
-                                 LED2_PIN,
-                                 LED3_PIN,
-                                 LED4_PIN};
-
-xQueueHandle 	  xQueueMODBUS;				//для сохранения ссылки на очередь
 
 UART_HandleTypeDef MODBUS;				//UART4
 UART_HandleTypeDef BOOT_UART;			//USART1
 UART_HandleTypeDef RS485_1;				//USART2
 UART_HandleTypeDef RS485_2;				//USART3
 
+xQueueHandle 	  xQueueMODBUS;			//для сохранения ссылки на очередь
+
+uint16_t	xMasterOsEvent;				// хранилище событий порта MODBUS
+
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-void NVIC_Configuration(void);
 void FREERTOS_Init(void);
-
-void DebugOut(UART_HandleTypeDef *huart, char *ptr);
-void LED_Init(Led_TypeDef Led);
 
 int main(void) {
 
-//	uint16_t	dat[10];
 
 	  HAL_Init();						// инит. Flash и Systick.
 	  SystemClock_Config();				// когфиг осциллятора.
-	  NVIC_Configuration();
 	  GPIO_Init();						// конфиг портов.
-	  Clocks_Init();
+	  Clocks_Init();					// конфиг часов.
 
 	  BOOT_UART_Init(115200);			// настройка BOOT интерфейса.
+	  USART_TRACE("------------------------------------\n");
 	  USART_TRACE("BOOT_Init.. ok\n");
 
-//	  RS485_1_UART_Init(115200);		// настройка RS485 1 канала.
-//	  USART_TRACE("RS485_1_UART_Init.. ok\n");
-//  	  RS485_2_UART_Init(115200);		// настройка RS485 2 канала.
-//  	  USART_TRACE("RS485_2_UART_Init.. ok\n");
+	  RS485_1_UART_Init(115200);		// настройка RS485 1 канала.
+	  USART_TRACE("RS485_1_UART_Init.. ok\n");
 
+  	  RS485_2_UART_Init(115200);		// настройка RS485 2 канала.
+  	  USART_TRACE("RS485_2_UART_Init.. ok\n");
 
 	  // тут нужно получить параметры системы от головного(MODBUS) скорости, адреса, порты....
-/*
-	  switch (WorkChannel){
-	  case CH485_1:
-		  	  RS485_1_UART_Init(115200);		// настройка RS485 1 канала.
-			  USART_TRACE("RS485_1_UART_Init.. ok\n");
-		  break;
-	  case CH485_2:
-		  	  RS485_2_UART_Init(115200);		// настройка RS485 2 канала.
-		  	  USART_TRACE("RS485_2_UART_Init.. ok\n");
-		  break;
 
-	  }
-*/
+	  Port_Init(LED1,GPIO_MODE_OUTPUT_PP);
+	  Port_Init(LED2,GPIO_MODE_OUTPUT_PP);
+	  Port_Init(LED3,GPIO_MODE_OUTPUT_PP);
+	  Port_Init(LED4,GPIO_MODE_OUTPUT_PP);
 
-//	  dat[0] = 0x2E5F;
-//	  dat[1] = 0x1122;
-//	  Modbus_SendCmd(MB_SlaveAddres, MB_FUNC_WRITE_MULTIPLE_COILS, 0, 2,dat);
-
-	  LED_Init(LED1);
-	  LED_Init(LED2);
-	  LED_Init(LED3);
-	  LED_Init(LED4);
+	  Port_Init(MODBUS_DEn,GPIO_MODE_INPUT);			// пока не используем
 
 	  FREERTOS_Init();			// инит. FREERTOS.
 
@@ -136,9 +109,16 @@ extern void vApplicationIdleHook(void)
 {
 
 }
-
 /*************************************************************************
 * System Clock Configuration
+* HSE 8MHz : PLLM = 8 PLLN = 336 PLLP = /2 PLLQ = 7 => HCLK = 168 MHz
+* 				APB1 = /4 => PCLK1 							= 42MHz
+* 				APB2 = /2 => PCLK1 							= 84MHz
+*
+* 				TIM2...TIM7,12,13,14 CLK = 2 * PCLK1 		= 84MHz
+* 				TIM1,8,9,10,11 CLK = 2 * PCLK2 				= 168MHz
+* 				Systick										= 21MHz
+*
  *************************************************************************/
 void SystemClock_Config(void)
 {
@@ -155,10 +135,10 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLM = 5;
-  RCC_OscInitStruct.PLL.PLLN = 210;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-  RCC_OscInitStruct.PLL.PLLQ = 7;
+  RCC_OscInitStruct.PLL.PLLM = 8;								//5
+  RCC_OscInitStruct.PLL.PLLN = 336;								//210
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;					//RCC_PLLP_DIV2
+  RCC_OscInitStruct.PLL.PLLQ = 7;								// 7
   HAL_RCC_OscConfig(&RCC_OscInitStruct);
 
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
@@ -175,111 +155,57 @@ void SystemClock_Config(void)
   HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
 
 }
-
 /*************************************************************************
- * NVIC_Configuration
+ * Port_Init
  *************************************************************************/
-void NVIC_Configuration(void)
-    {
-
-	  HAL_NVIC_SetPriority(RCC_IRQn,(uint8_t)(configKERNEL_INTERRUPT_PRIORITY >> 4),0);
-
-    }
-/*************************************************************************
- * LED_Init
- *************************************************************************/
-void LED_Init(Led_TypeDef Led)
+void Port_Init(Port_TypeDef Port,uint32_t mode)
 {
   GPIO_InitTypeDef  GPIO_InitStruct;
 
-  /* Enable the GPIO_LED clock */
-  LEDx_GPIO_CLK_ENABLE(Led);
+  PORTx_GPIO_CLK_ENABLE(Port);
 
-  /* Configure the GPIO_LED pin */
-  GPIO_InitStruct.Pin = GPIO_PIN[Led];
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Pin = GPIO_PIN[Port];
+  GPIO_InitStruct.Mode = mode;// GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
 
-  HAL_GPIO_Init(GPIO_PORT[Led], &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIO_PORT[Port], &GPIO_InitStruct);
 }
-
 /*************************************************************************
- *
+ * Port_On
  *************************************************************************/
-void LED_On(Led_TypeDef Led)
+void Port_On(Port_TypeDef Port)
 {
-  HAL_GPIO_WritePin(GPIO_PORT[Led], GPIO_PIN[Led], GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIO_PORT[Port], GPIO_PIN[Port], GPIO_PIN_SET);
 }
-
 /*************************************************************************
- *
+ * Port_Off
  *************************************************************************/
-void LED_Off(Led_TypeDef Led)
+void Port_Off(Port_TypeDef Port)
 {
-  HAL_GPIO_WritePin(GPIO_PORT[Led], GPIO_PIN[Led], GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIO_PORT[Port], GPIO_PIN[Port], GPIO_PIN_RESET);
 }
-
 /*************************************************************************
- *
+ * Port_Toggle
  *************************************************************************/
-void LED_Toggle(Led_TypeDef Led)
+void Port_Toggle(Port_TypeDef Port)
 {
-  HAL_GPIO_TogglePin(GPIO_PORT[Led], GPIO_PIN[Led]);
+  HAL_GPIO_TogglePin(GPIO_PORT[Port], GPIO_PIN[Port]);
 }
-
 /*************************************************************************
  * PUTCHAR_PROTOTYPE
  *************************************************************************/
 int __io_putchar(int ch)
 {
-//  HAL_UART_Transmit(&RS485_1, (uint8_t *)&ch, 1, 0xFFFF);
   HAL_UART_Transmit(&BOOT_UART, (uint8_t *)&ch, 1, 0xFFFF);
-
   return ch;
 }
-
-/*************************************************************************
-  * @brief  Tx Transfer completed callback
-  * @param  huart: UART handle.
-  * @retval None
- *************************************************************************/
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
-
-	LED_Toggle(LED4);
-}
-
-/*************************************************************************
-  * @brief  Rx Transfer completed callback
-  * @param  huart: UART handle
-  * @retval None
- *************************************************************************/
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-
-	LED_Toggle(LED4);
-}
-
-/*************************************************************************
-  * @brief  UART error callbacks
-  * @param  huart: UART handle
-  * @retval None
- *************************************************************************/
-void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+int __io_putstrDMA(char *ptr, int len)
 {
-
-	LED_Toggle(LED3);
+//  HAL_UART_Transmit_DMA(&BOOT_UART, (uint8_t *)ptr, len);
+  HAL_UART_Transmit(&BOOT_UART, (uint8_t *)ptr, len, 0xFFFF);
+  return len;
 }
-
-void DebugOut(UART_HandleTypeDef *huart, char *ptr){
-uint8_t	len=255,index;
-
-
-for(index=0; index<=len; index++)
-{
-	if (ptr[index] == 0){
-		len = index;
-		break;
-	}
-}
-	  HAL_UART_Transmit(&BOOT_UART, (uint8_t *)ptr, len, 0xFFFF);
-}
+/*************************************************************************
+ *
+ *************************************************************************/

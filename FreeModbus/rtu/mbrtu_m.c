@@ -55,32 +55,32 @@
 /* ----------------------- Type definitions ---------------------------------*/
 typedef enum
 {
-    STATE_M_RX_INIT,              /*!< Receiver is in initial state. */
-    STATE_M_RX_IDLE,              /*!< Receiver is in idle state. */
-    STATE_M_RX_RCV,               /*!< Frame is beeing received. */
-    STATE_M_RX_ERROR,              /*!< If the frame is invalid. */
+    STATE_M_RX_INIT,              /*!< Приемник в режиме инициализации. */
+    STATE_M_RX_IDLE,              /*!< Приемник находится в состоянии ожидания. */
+    STATE_M_RX_RCV,               /*!< Фрейм принят. */
+    STATE_M_RX_ERROR,              /*!< Неверный фрейм. */
 } eMBMasterRcvState;
 
 typedef enum
 {
-    STATE_M_TX_IDLE,              /*!< Transmitter is in idle state. */
-    STATE_M_TX_XMIT,              /*!< Transmitter is in transfer state. */
-    STATE_M_TX_XFWR,              /*!< Transmitter is in transfer finish and wait receive state. */
+    STATE_M_TX_IDLE,              /*!< Передатчик находится в состоянии ожидания. */
+    STATE_M_TX_XMIT,              /*!< Передатчик находится в режиме передачи. */
+    STATE_M_TX_XFWR,              /*!< Передатчик закончил передачу и ожидает режима приема. */
 } eMBMasterSndState;
 
 /* ----------------------- Static variables ---------------------------------*/
 static volatile eMBMasterSndState eSndState;
 static volatile eMBMasterRcvState eRcvState;
 
-static volatile UCHAR  ucMasterRTUSndBuf[MB_PDU_SIZE_MAX];
-static volatile UCHAR  ucMasterRTURcvBuf[MB_SER_PDU_SIZE_MAX];
-static volatile USHORT usMasterSendPDULength;
+static volatile UCHAR  ucMasterRTUSndBuf[MB_PDU_SIZE_MAX];				// буфер для передачи в MODBUS
+static volatile UCHAR  ucMasterRTURcvBuf[MB_SER_PDU_SIZE_MAX];			// буфер для приёма из MODBUS
+static volatile USHORT usMasterSendPDULength;							// длина фрейма готового для передачи
 
 static volatile UCHAR *pucMasterSndBufferCur;
 static volatile USHORT usMasterSndBufferCount;
 
 static volatile USHORT usMasterRcvBufferPos;
-static volatile BOOL   xFrameIsBroadcast = FALSE;
+static volatile BOOL   xFrameIsBroadcast = FALSE;						// признак широковешательного пакета
 
 static volatile eMBMasterTimerMode eMasterCurTimerMode;
 
@@ -93,16 +93,14 @@ eMBMasterRTUInit(UCHAR ucPort, ULONG ulBaudRate, eMBParity eParity )
 
     ENTER_CRITICAL_SECTION(  );
 
-    /* Modbus RTU uses 8 Databits. */
+    // инит USART порта 8бит режиме для MODBUS
     if( xMBMasterPortSerialInit( ucPort, ulBaudRate, 8, eParity ) != TRUE )
     {
         eStatus = MB_EPORTERR;
     }
     else
     {
-        /* If baudrate > 19200 then we should use the fixed timer values
-         * t35 = 1750us. Otherwise t35 must be 3.5 times the character time.
-         */
+    	// если скорость выше 19200 то используем фиксированную t3.5 = 1750us
         if( ulBaudRate > 19200 )
         {
             usTimerT35_50us = 35;       /* 1800us. */
@@ -119,6 +117,7 @@ eMBMasterRTUInit(UCHAR ucPort, ULONG ulBaudRate, eMBParity eParity )
              */
             usTimerT35_50us = ( 7UL * 220000UL ) / ( 2UL * ulBaudRate );
         }
+        // инит таймера тля отсчета t3.5
         if( xMBMasterPortTimersInit( ( USHORT ) usTimerT35_50us ) != TRUE )
         {
             eStatus = MB_EPORTERR;
@@ -129,22 +128,27 @@ eMBMasterRTUInit(UCHAR ucPort, ULONG ulBaudRate, eMBParity eParity )
     return eStatus;
 }
 
+/*************************************************************************
+ * eMBMasterRTUStart
+ * Изначально приемник в состоянии STATE_M_RX_INIT. Запускаем таймер на t3.5
+ * Если символ не получен, то переводим приемник в STATE_M_RX_IDLE.
+ * гарантировано пока не увидим начало фрейма(t3.5) не примем никакого мусора.
+ *************************************************************************/
 void
 eMBMasterRTUStart( void )
 {
     ENTER_CRITICAL_SECTION(  );
-    /* Initially the receiver is in the state STATE_M_RX_INIT. we start
-     * the timer and if no character is received within t3.5 we change
-     * to STATE_M_RX_IDLE. This makes sure that we delay startup of the
-     * modbus protocol stack until the bus is free.
-     */
+
     eRcvState = STATE_M_RX_INIT;
-    vMBMasterPortSerialEnable( TRUE, FALSE );
-    vMBMasterPortTimersT35Enable(  );
+ //   vMBMasterPortSerialEnable( TRUE, FALSE );			// Режим приёма
+    vMBMasterPortTimersT35Enable(  );					// Старт таймера t3.5 символа
 
     EXIT_CRITICAL_SECTION(  );
 }
-
+/*************************************************************************
+ * eMBMasterRTUStop
+ * Остановка и выключение приёма и передачи MODBUS с сотановкой таймера.
+ *************************************************************************/
 void
 eMBMasterRTUStop( void )
 {
@@ -153,7 +157,10 @@ eMBMasterRTUStop( void )
     vMBMasterPortTimersDisable(  );
     EXIT_CRITICAL_SECTION(  );
 }
-
+/*************************************************************************
+ * eMBMasterRTUReceive
+ * Функция приёма данных и проверка их целосности.
+ *************************************************************************/
 eMBErrorCode
 eMBMasterRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USHORT * pusLength )
 {
@@ -162,21 +169,17 @@ eMBMasterRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USHORT * pusLengt
     ENTER_CRITICAL_SECTION(  );
     assert_param( usMasterRcvBufferPos < MB_SER_PDU_SIZE_MAX );
 
-    /* Length and CRC check */
+    // Проверка длинны пакета и его CRC
     if( ( usMasterRcvBufferPos >= MB_SER_PDU_SIZE_MIN )
         && ( usMBCRC16( ( UCHAR * ) ucMasterRTURcvBuf, usMasterRcvBufferPos ) == 0 ) )
     {
-        /* Save the address field. All frames are passed to the upper layed
-         * and the decision if a frame is used is done there.
-         */
+        // Save the address field. All frames are passed to the upper layed and the decision if a frame is used is done there.
         *pucRcvAddress = ucMasterRTURcvBuf[MB_SER_PDU_ADDR_OFF];
 
-        /* Total length of Modbus-PDU is Modbus-Serial-Line-PDU minus
-         * size of address field and CRC checksum.
-         */
+        // Общая длина данных(Modbus-PDU) без поля адреса и CRC.
         *pusLength = ( USHORT )( usMasterRcvBufferPos - MB_SER_PDU_PDU_OFF - MB_SER_PDU_SIZE_CRC );
 
-        /* Return the start of the Modbus PDU to the caller. */
+        // Адрес начала данных(Modbus-PDU)
         *pucFrame = ( UCHAR * ) & ucMasterRTURcvBuf[MB_SER_PDU_PDU_OFF];
     }
     else
@@ -187,7 +190,10 @@ eMBMasterRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USHORT * pusLengt
     EXIT_CRITICAL_SECTION(  );
     return eStatus;
 }
-
+/*************************************************************************
+ * eMBMasterRTUSend
+ * отправка пакета в MODBUS
+ *************************************************************************/
 eMBErrorCode
 eMBMasterRTUSend( UCHAR ucSlaveAddress, const UCHAR * pucFrame, USHORT usLength )
 {
@@ -198,37 +204,39 @@ eMBMasterRTUSend( UCHAR ucSlaveAddress, const UCHAR * pucFrame, USHORT usLength 
 
     ENTER_CRITICAL_SECTION(  );
 
-    /* Check if the receiver is still in idle state. If not we where to
-     * slow with processing the received frame and the master sent another
-     * frame on the network. We have to abort sending the frame.
-     */
+    // Если приемник в режиме ожидания.
     if( eRcvState == STATE_M_RX_IDLE )
     {
-        /* First byte before the Modbus-PDU is the slave address. */
+        // Первый байт  до PDU это slave address.
         pucMasterSndBufferCur = ( UCHAR * ) pucFrame - 1;
         usMasterSndBufferCount = 1;
 
-        /* Now copy the Modbus-PDU into the Modbus-Serial-Line-PDU. */
+        // Добавляем к пакету SlaveAddress
         pucMasterSndBufferCur[MB_SER_PDU_ADDR_OFF] = ucSlaveAddress;
         usMasterSndBufferCount += usLength;
 
-        /* Calculate CRC16 checksum for Modbus-Serial-Line-PDU. */
+        // считаем CRC16
         usCRC16 = usMBCRC16( ( UCHAR * ) pucMasterSndBufferCur, usMasterSndBufferCount );
         ucMasterRTUSndBuf[usMasterSndBufferCount++] = ( UCHAR )( usCRC16 & 0xFF );
         ucMasterRTUSndBuf[usMasterSndBufferCount++] = ( UCHAR )( usCRC16 >> 8 );
 
-        /* Activate the transmitter. */
+        // Режим предачи.
         eSndState = STATE_M_TX_XMIT;
-        vMBMasterPortSerialEnable( FALSE, TRUE );
+        xMBMasterPortSerialPutBUF(( CHAR *)pucMasterSndBufferCur,usMasterSndBufferCount);						// передадим в порт весь блок сразу
+        xFrameIsBroadcast = ( ucMasterRTUSndBuf[MB_SER_PDU_ADDR_OFF] == MB_ADDRESS_BROADCAST ) ? TRUE : FALSE;	// определяем широковещательный ли ?
+
     }
     else
     {
-        eStatus = MB_EIO;
+        eStatus = MB_EIO;					// I/O ошибка.
     }
     EXIT_CRITICAL_SECTION(  );
     return eStatus;
 }
-
+/*************************************************************************
+ * xMBMasterRTUReceiveFSM
+ * приёмник Фрейма
+ *************************************************************************/
 BOOL
 xMBMasterRTUReceiveFSM( void )
 {
@@ -237,22 +245,16 @@ xMBMasterRTUReceiveFSM( void )
 
     assert_param(( eSndState == STATE_M_TX_IDLE ) || ( eSndState == STATE_M_TX_XFWR ));
 
-    /* Always read the character. */
+    // чтение CHAR из порта.
     ( void )xMBMasterPortSerialGetByte( ( CHAR * ) & ucByte );
 
     switch ( eRcvState )
     {
-        /* If we have received a character in the init state we have to
-         * wait until the frame is finished.
-         */
-    case STATE_M_RX_INIT:
+
+    case STATE_M_RX_INIT:							// Если получили фрейм в состоянии инициализации порта, то нужно ждать конца фрейма.
         vMBMasterPortTimersT35Enable( );
         break;
-
-        /* In the error state we wait until all characters in the
-         * damaged frame are transmitted.
-         */
-    case STATE_M_RX_ERROR:
+    case STATE_M_RX_ERROR:							// В состоянии ошибки приема ждем пока весь мусор не передастся.
         vMBMasterPortTimersT35Enable( );
         break;
 
@@ -265,15 +267,18 @@ xMBMasterRTUReceiveFSM( void )
     	/* In time of respond timeout,the receiver receive a frame.
     	 * Disable timer of respond timeout and change the transmiter state to idle.
     	 */
-    	vMBMasterPortTimersDisable( );
+
+//TODO: вернуть назад когда включу другой таймер на приёмник.
+//    	vMBMasterPortTimersDisable( );
     	eSndState = STATE_M_TX_IDLE;
 
         usMasterRcvBufferPos = 0;
         ucMasterRTURcvBuf[usMasterRcvBufferPos++] = ucByte;
-        eRcvState = STATE_M_RX_RCV;
+        eRcvState = STATE_M_RX_RCV;							// начали принимать фрейм.
 
         /* Enable t3.5 timers. */
-        vMBMasterPortTimersT35Enable( );
+//TODO: вернуть назад когда включу другой таймер на приёмник.
+   //     vMBMasterPortTimersT35Enable( );
         break;
 
         /* We are currently receiving a frame. Reset the timer after
@@ -281,21 +286,25 @@ xMBMasterRTUReceiveFSM( void )
          * number of bytes in a modbus frame is received the frame is
          * ignored.
          */
-    case STATE_M_RX_RCV:
+    case STATE_M_RX_RCV:									// принимаем фрейм.
         if( usMasterRcvBufferPos < MB_SER_PDU_SIZE_MAX )
         {
             ucMasterRTURcvBuf[usMasterRcvBufferPos++] = ucByte;
         }
         else
         {
-            eRcvState = STATE_M_RX_ERROR;
+            eRcvState = STATE_M_RX_ERROR;					// Если символов больше чем макс. возможный размер фрейма, то ошибка фрейма.
         }
-        vMBMasterPortTimersT35Enable();
+//TODO: вернуть назад когда включу другой таймер на приёмник.
+    //        vMBMasterPortTimersT35Enable();						// Перезапуск таймера после каждого символа.
         break;
     }
     return xTaskNeedSwitch;
 }
-
+/*************************************************************************
+ * xMBMasterRTUTransmitFSM
+ * обработчик прерывания по окончанию передачи фрейма
+ *************************************************************************/
 BOOL
 xMBMasterRTUTransmitFSM( void )
 {
@@ -305,71 +314,51 @@ xMBMasterRTUTransmitFSM( void )
 
     switch ( eSndState )
     {
-        /* We should not get a transmitter event if the transmitter is in
-         * idle state.  */
-    case STATE_M_TX_IDLE:
-        /* enable receiver/disable transmitter. */
-        vMBMasterPortSerialEnable( TRUE, FALSE );
+
+    case STATE_M_TX_XMIT:												// Передатчик находится в режиме передачи.
+		eSndState = STATE_M_TX_XFWR;									// Передатчик закончил передачу.
+		xNeedPoll = TRUE;
+
+ 		// тут только запуск таймера
+		if ( xFrameIsBroadcast == TRUE )
+				vMBMasterPortTimersConvertDelayEnable( );				// Таймаут для широковещательного пакета.
+		else   	vMBMasterPortTimersRespondTimeoutEnable( );				// Таймаут для не широковещательного пакета.
+
         break;
 
-    case STATE_M_TX_XMIT:
-        /* check if we are finished. */
-        if( usMasterSndBufferCount != 0 )
-        {
-            xMBMasterPortSerialPutByte( ( CHAR )*pucMasterSndBufferCur );
-            pucMasterSndBufferCur++;  /* next byte in sendbuffer. */
-            usMasterSndBufferCount--;
-        }
-        else
-        {
-            xFrameIsBroadcast = ( ucMasterRTUSndBuf[MB_SER_PDU_ADDR_OFF] == MB_ADDRESS_BROADCAST ) ? TRUE : FALSE;
-            /* Disable transmitter. This prevents another transmit buffer
-             * empty interrupt. */
-            vMBMasterPortSerialEnable( TRUE, FALSE );
-            eSndState = STATE_M_TX_XFWR;
-            /* If the frame is broadcast ,master will enable timer of convert delay,
-             * else master will enable timer of respond timeout. */
-            if ( xFrameIsBroadcast == TRUE )
-            {
-            	vMBMasterPortTimersConvertDelayEnable( );
-            }
-            else
-            {
-            	vMBMasterPortTimersRespondTimeoutEnable( );
-            }
-        }
+// эти состояния не могут возникнуть. Прерывания возникают только в режиме STATE_M_TX_XMIT
+    case STATE_M_TX_IDLE:  												// состояние ожидания.
+    		// если нужно то переводим в режим приёма (для управляемых RS485)
+        break;
+    case   STATE_M_TX_XFWR:
         break;
     }
 
     return xNeedPoll;
 }
-
+/*************************************************************************
+ * xMBMasterRTUTimerExpired
+ * обработчик таймаутов таймера
+ *************************************************************************/
 BOOL
 xMBMasterRTUTimerExpired(void)
 {
 	BOOL xNeedPoll = FALSE;
 
+	// Прием
 	switch (eRcvState)
 	{
-		/* Timer t35 expired. Startup phase is finished. */
-	case STATE_M_RX_INIT:
-		xNeedPoll = xMBMasterPortEventPost(EV_MASTER_READY);
+	case STATE_M_RX_INIT:												// Время t3.5 истекло. Начало финишной фазы.
+		xNeedPoll = xMBMasterPortEventPost(EV_MASTER_READY);			// Startup закончен. MASTER готов к работе.
 		break;
-
-		/* A frame was received and t35 expired. Notify the listener that
-		 * a new frame was received. */
-	case STATE_M_RX_RCV:
-		xNeedPoll = xMBMasterPortEventPost(EV_MASTER_FRAME_RECEIVED);
+	case STATE_M_RX_RCV:												// Был получен фрейм и таймаут t3.5 истек. Сообщаем слушателю, что был получен новый фрейм .
+		xNeedPoll = xMBMasterPortEventPost(EV_MASTER_FRAME_RECEIVED);	// фрейм принят.
 		break;
-
-		/* An error occured while receiving the frame. */
-	case STATE_M_RX_ERROR:
+	case STATE_M_RX_ERROR:												// Ошибка при получении фрейма.
 		vMBMasterSetErrorType(EV_ERROR_RECEIVE_DATA);
-		xNeedPoll = xMBMasterPortEventPost( EV_MASTER_ERROR_PROCESS );
+		xNeedPoll = xMBMasterPortEventPost( EV_MASTER_ERROR_PROCESS );	// Ошибка при получении фрейма.EV_MASTER_ERROR_PROCESS
 		break;
-
-		/* Function called in an illegal state. */
-	default:
+	default:															// Несуществующее состояние функции.
 		assert_param(
 				( eRcvState == STATE_M_RX_INIT ) || ( eRcvState == STATE_M_RX_RCV ) ||
 				( eRcvState == STATE_M_RX_ERROR ) || ( eRcvState == STATE_M_RX_IDLE ));
@@ -377,26 +366,24 @@ xMBMasterRTUTimerExpired(void)
 	}
 	eRcvState = STATE_M_RX_IDLE;
 
+	// Передача
 	switch (eSndState)
 	{
-		/* A frame was send finish and convert delay or respond timeout expired.
-		 * If the frame is broadcast,The master will idle,and if the frame is not
-		 * broadcast.Notify the listener process error.*/
-	case STATE_M_TX_XFWR:
+	case STATE_M_TX_XFWR:												//  Передатчик закончил передачу. Если фрейм не пришел в течении времени ожидания сообщаем об ошибке.
 		if ( xFrameIsBroadcast == FALSE ) {
 			vMBMasterSetErrorType(EV_ERROR_RESPOND_TIMEOUT);
 			xNeedPoll = xMBMasterPortEventPost(EV_MASTER_ERROR_PROCESS);
 		}
 		break;
-		/* Function called in an illegal state. */
-	default:
+	default:															// Несуществующее состояние функции.
 		assert_param(
 				( eSndState == STATE_M_TX_XFWR ) || ( eSndState == STATE_M_TX_IDLE ));
 		break;
 	}
 	eSndState = STATE_M_TX_IDLE;
 
-	vMBMasterPortTimersDisable( );
+
+	vMBMasterPortTimersDisable( );										// Останавливаем таймер.
 	/* If timer mode is convert delay, the master event then turns EV_MASTER_EXECUTE status. */
 	if (eMasterCurTimerMode == MB_TMODE_CONVERT_DELAY) {
 		xNeedPoll = xMBMasterPortEventPost( EV_MASTER_EXECUTE );

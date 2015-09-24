@@ -51,13 +51,13 @@
 
 // IEC 60870-5-104
 #include "iec104.h"
-#include "modbus.h"
 #include "usart.h"
 
-/*Modbus includes*/
+/*Modbus includes ------------------------------------------------------------*/
 #include "mb.h"
 #include "mb_m.h"
 #include "mbport.h"
+#include "modbus.h"
 /* Variables -----------------------------------------------------------------*/
 
 
@@ -81,6 +81,7 @@ extern RTC_HandleTypeDef hrtc;
 extern RTC_TimeTypeDef sTime;
 extern RTC_DateTypeDef sDate;
 
+extern UART_HandleTypeDef MODBUS;
 
 struct netconn *conn, *newconn;
 
@@ -145,6 +146,7 @@ void FREERTOS_Init(void);
  * FREERTOS_Init
  *************************************************************************/
 void FREERTOS_Init(void) {
+ size_t	fre;
   /* USER CODE BEGIN Init */
        
   /* USER CODE END Init */
@@ -161,16 +163,31 @@ void FREERTOS_Init(void) {
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
 
-  /* Create the thread(s) */
-  /* definition and creation of defaultTask */
-  osThreadDef(IEC104, StartIEC104Task, osPriorityNormal,0, 1024);//700
+
+  fre = xPortGetFreeHeapSize();			// размер кучи
+  USART_TRACE("FreeHeap:%u\n",fre);
+
+  osThreadDef(IEC104, StartIEC104Task, osPriorityAboveNormal,0, 1024);//700
   defaultTaskHandle = osThreadCreate(osThread(IEC104), NULL);
 
-  osThreadDef(Timers, StartTimersTask, osPriorityBelowNormal,0, 128);//256
-  defaultTaskHandle = osThreadCreate(osThread(Timers), NULL);
+  fre = xPortGetFreeHeapSize();
+  USART_TRACE("FreeHeap(IEC104):%u\n",fre);
 
-  osThreadDef(MBUS, StartMODBUSTask, osPriorityBelowNormal,0, 512);//256
+  // создадим таск только после IEC104. Таймера нужны только там
+  if (defaultTaskHandle){
+	  osThreadDef(Timers, StartTimersTask, osPriorityNormal,0, 128);//256
+	  defaultTaskHandle = osThreadCreate(osThread(Timers), NULL);
+
+	  fre = xPortGetFreeHeapSize();
+	  USART_TRACE("FreeHeap(Timers):%u\n",fre);
+  }
+
+
+  osThreadDef(MBUS, StartMODBUSTask, osPriorityNormal,0, 256);//256
   defaultTaskHandle = osThreadCreate(osThread(MBUS), NULL);
+
+  fre = xPortGetFreeHeapSize();
+  USART_TRACE("FreeHeap(MBUS):%u\n",fre);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -178,6 +195,10 @@ void FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_QUEUES */
    xQueueMODBUS = xQueueCreate( 3, sizeof(xData) );
+
+   fre = xPortGetFreeHeapSize();
+   USART_TRACE("FreeHeap(Queue):%u\n",fre);
+
   /* USER CODE END RTOS_QUEUES */
 }
 
@@ -265,10 +286,10 @@ void StartIEC104Task(void const * argument)
 	     			USART_TRACE("netconn_accept ... ok \n");
 
 
-		        	 LED_On(LED2);
+//		        	 LED_On(LED2);
 	                 while (netconn_recv(newconn, &buf) == ERR_OK)				// принимаем данные в буфер
 	                 {
-	                	 LED_On(LED1);
+	                	 Port_On(LED1);
 	                     do
 	                     {
 	                        netbuf_data(buf,(void *)&data, &len);					// указатель получил адрес вх. данных
@@ -334,13 +355,16 @@ void StartIEC104Task(void const * argument)
 	                     while (netbuf_next(buf) >= 0);
 	                     netbuf_delete(buf);
 
-	  		           LED_Off(LED1);
+	  		           Port_Off(LED1);
 	                 }
 	         TCPCLOSE:
-	         	 	 USART_TRACE("netconn_close\n");
+	         	 	 USART_TRACE("netconn_close TCPCLOSE:\n");
 	                 netconn_close(newconn);									// закрываем и освобождаем соединение
 	                 netconn_delete(newconn);
-		           LED_Off(LED2);
+	                 t1_timer_stop(s);
+	                 t2_timer_stop(s);
+	                 t3_timer_stop(s);
+//		           LED_Off(LED2);
 	             } else {
 		     			USART_TRACE("netconn_accept error: %d\n", accept_err);
 
@@ -361,6 +385,7 @@ void StartIEC104Task(void const * argument)
  *************************************************************************/
 void StartTimersTask(void const * argument)
 {
+//	eMBMasterReqErrCode    errorCode = MB_MRE_NO_ERR;
 
 	  t0_timer_stop(s);
 	  t1_timer_stop(s);
@@ -369,7 +394,9 @@ void StartTimersTask(void const * argument)
 
 	  for(;;)
 	  {
-      	LED_Toggle(LED4);
+//	     errorCode = eMBMasterReqReadDiscreteInputs(1,3,8,RT_WAITING_FOREVER);		// указываем время ожидания ответа от менеджера событий
+//	     vTaskDelay(500);
+//      	LED_Toggle(LED4);
 
         if (s->t1.evnt) t1_timer_run(s);		// проверка событий срабатывания таймеров
         if (s->t2.evnt) t2_timer_run(s);
@@ -394,12 +421,14 @@ void StartTimersTask(void const * argument)
 void StartMODBUSTask(void const * argument)
 {
 
-	eMBMasterInit(MB_RTU, 4, 115200,  MB_PAR_EVEN);
+	eMBMasterInit(MB_RTU, 4, 115200,  MB_PAR_NONE);
+	eMBMasterEnable();
 
 	  for(;;)
 	  {
-	     LED_Toggle(LED2);
-	     taskYIELD();							// отпустим задачу до следующего вызова.
+	    eMBMasterPoll();						// ждём события от MODBUS
+	//	  vTaskDelay(1000);
+		  taskYIELD();							// отпустим задачу до следующего вызова.
 	  }
 }
 
@@ -791,6 +820,7 @@ void data_received_hook(struct iecsock *s, struct iec_buf *b)
 	uint8_t apcibuf[6];
 //	uint8_t	*sa;
 
+	eMBMasterReqErrCode    errorCode = MB_MRE_NO_ERR;
 
 	USART_TRACE("data_received_hook...\n");
 
@@ -851,6 +881,10 @@ void data_received_hook(struct iecsock *s, struct iec_buf *b)
 						   break;
 						   //--------- C -------------
 		   case C_IC_NA_1: /* 100 */		//ASDU Type ID 100 : C_IC_NA_1 - команда опроса
+
+			   	   	   	   errorCode = eMBMasterReqReadInputRegister(1,3,2,RT_WAITING_FOREVER);
+   	   	   	   	   	   	   //errorCode = eMBMasterReqReadCoils(1,3,8,RT_WAITING_FOREVER);
+
    	   	   	   	   	   	    outbuf = calloc(1,sizeof(struct iec_buf) + 249);
 							if (!outbuf) {
 								USART_TRACE("Ошибка выделения памяти outbuf в C_IC_NA_1 запросе.\n");
@@ -907,6 +941,7 @@ void data_received_hook(struct iecsock *s, struct iec_buf *b)
 
 							//Modbus_SendCmd(MB_SlaveAddres, MB_FUNC_READ_DISCRETE_INPUTS, nm1, 8,dat,0);	// модбас запрос
 
+			   	   	   	   errorCode = eMBMasterReqReadDiscreteInputs(1,0,128,RT_WAITING_FOREVER);		// указываем время ожидания ответа от менеджера событий
 
 	  	   	   	   	   	    outbuf = calloc(1,sizeof(struct iec_buf) + 249);//249
 							if (!outbuf) {
@@ -938,7 +973,7 @@ void data_received_hook(struct iecsock *s, struct iec_buf *b)
 							s->vs = (s->vs + 1) % 32767;			// счетчик переданных
 							s->xmit_cnt++;
 
-					//		free(outbuf);
+							free(outbuf);
 							USART_TRACE("освободил память outbuf в C_CI_NA_1\n");
 
 							USART_TRACE("| 101 C_CI_NA_1: IDX:%i rqt:0x%02x frz:0x%02x\n",obj[0].ioa, obj[0].o.type101.rqt, obj[0].o.type101.frz);
