@@ -99,6 +99,7 @@ ETH_HandleTypeDef heth;
 void HAL_ETH_MspInit(ETH_HandleTypeDef* heth)
 {
   GPIO_InitTypeDef GPIO_InitStruct;
+
   if(heth->Instance==ETH)
   {
 
@@ -152,6 +153,7 @@ void HAL_ETH_MspInit(ETH_HandleTypeDef* heth)
     HAL_NVIC_SetPriority(ETH_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(ETH_IRQn);
   }
+
 }
 /*******************************************************************************
  * HAL_ETH_MspDeInit
@@ -162,7 +164,7 @@ void HAL_ETH_MspDeInit(ETH_HandleTypeDef* heth)
   {
     /* Peripheral clock disable */
     __ETH_CLK_DISABLE();
-  
+
     /**ETH GPIO Configuration    
     PC1     ------> ETH_MDC
     PC2     ------> ETH_TXD2
@@ -187,7 +189,6 @@ void HAL_ETH_MspDeInit(ETH_HandleTypeDef* heth)
     HAL_GPIO_DeInit(GPIOB, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_10|GPIO_PIN_11|GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_8);
     /* Peripheral interrupt Deinit*/
     HAL_NVIC_DisableIRQ(ETH_IRQn);
-
   }
 }
 
@@ -231,7 +232,12 @@ static void low_level_init(struct netif *netif)
 /* TODO:
  * для боевого борда переключить на ETH_MEDIA_INTERFACE_MII
  */
-  heth.Init.MediaInterface = ETH_MEDIA_INTERFACE_RMII;				//ETH_MEDIA_INTERFACE_MII
+#ifdef STM32F407xx			// ETH_MEDIA_INTERFACE_RMII
+  heth.Init.MediaInterface = ETH_MEDIA_INTERFACE_RMII;
+#endif
+#ifdef STM32F417xx			// ETH_MEDIA_INTERFACE_MII
+  heth.Init.MediaInterface = ETH_MEDIA_INTERFACE_MII;
+#endif
   hal_eth_init_status = HAL_ETH_Init(&heth);
 
   if (hal_eth_init_status == HAL_OK)

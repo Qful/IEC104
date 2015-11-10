@@ -40,7 +40,9 @@
 /* ----------------------- Variables ----------------------------------------*/
 extern UART_HandleTypeDef MODBUS;
 
-extern	uint8_t 	Modbus_DataRX[];
+extern	uint8_t 	Modbus_DataRX[];		// буфер приёмника Modbus
+extern	uint8_t 	Modbus_SizeRX;			// размер ожидаемого ответа от MODBUS
+
 
 extern uint16_t	xMasterOsEvent;				// хранилище событий порта MODBUS
 
@@ -126,7 +128,7 @@ BOOL	xMBMasterPortSerialInit( UCHAR ucPort, ULONG ulBaudRate, UCHAR ucDataBits, 
     	MODBUS.Init.Parity 		= eUARTParity;
     	MODBUS.Init.Mode 		= UART_MODE_TX_RX;
     	MODBUS.Init.HwFlowCtl 	= UART_HWCONTROL_NONE;
-    	MODBUS.Init.OverSampling = UART_OVERSAMPLING_16;
+    	MODBUS.Init.OverSampling = UART_OVERSAMPLING_8;
  		HAL_UART_Init(&MODBUS);
 
 		//HAL_UART_Receive_DMA(&MODBUS, &Modbus_DataRX[0], 6);			// запуск приёма по кольцу в DMA
@@ -150,7 +152,7 @@ BOOL            xMBPortTimersInit( USHORT usTimeOut50us )
 {
 	uint32_t uwPrescalerValue = (uint32_t) ((SystemCoreClock /2) / RT_TICK_PER_SECOND) - 1;
 
-	Port_On(LED2);
+//	Port_On(LED2);
 
 	TimHandle.Instance 				 = TIM2;
 	TimHandle.Init.Period            = ( (uint32_t) usTimeOut50us ) - 1;
@@ -192,32 +194,26 @@ BOOL            xMBMasterPortTimersInit( USHORT usTimeOut50us )
 //TODO: сделать переключение направления ПРИЕМ-ПЕРЕДАЧА. сигнал DE
 void            vMBMasterPortSerialEnable( BOOL xRxEnable, BOOL xTxEnable )
 {
-	if( xRxEnable )
-	    {
-//			__HAL_UART_ENABLE_IT(&MODBUS, USART_IT_RXNE);
-	    }
-	    else
-	    {
-//	    	__HAL_UART_DISABLE_IT(&MODBUS, USART_IT_RXNE);
-	    }
+	if( xRxEnable ){ }
+	else  { }
+	if ( xTxEnable ){ }
+	else{}
 
-	    if ( xTxEnable )
-	    {
-//			__HAL_UART_ENABLE_IT(&MODBUS, USART_IT_TXE);
-
-	    }
-	    else
-	    {
-//	    	__HAL_UART_DISABLE_IT(&MODBUS, USART_IT_TXE);
-	    }
-
+}
+/*************************************************************************
+ * vMBMODBUSPortRxDisable
+ * UART4_DMA_RX_IRQn
+ *************************************************************************/
+void     vMBMODBUSPortRxDisable( void )
+{
+	HAL_UART_DMAStop(&MODBUS);
 }
 /*************************************************************************
  * vMBMasterPortTimersT35Enable
  *************************************************************************/
 void     vMBMasterPortTimersT35Enable( void )
 {
-	 Port_On(LED2);
+//	 Port_On(LED2);
      vMBMasterSetCurTimerMode(MB_TMODE_T35);
      xMBPortTimersInit( (50 * usT35TimeOut50us) / (1000 * 1000 / RT_TICK_PER_SECOND) );
 }
@@ -227,6 +223,16 @@ void     vMBMasterPortTimersT35Enable( void )
 void     vMBMasterPortTimersDisable( void )
 {
 	HAL_TIM_Base_Stop_IT(&TimHandle);
+}
+/*************************************************************************
+ * xMBMasterPortSerialGetBuf
+ *************************************************************************/
+BOOL     xMBMasterPortSerialGetBuf(UCHAR pos, CHAR * pucByte )
+{
+	*pucByte = Modbus_DataRX[pos];
+	//HAL_UART_Receive(&MODBUS,(uint8_t *) pucByte, 1, 0xFFFF);
+	//*pucByte = (CHAR) USART_ReceiveData( UART4 );
+    return TRUE;
 }
 /*************************************************************************
  * xMBMasterPortSerialGetByte
@@ -263,7 +269,7 @@ BOOL     xMBMasterPortSerialPutBUF( CHAR * putBuf, USHORT leng )
  *************************************************************************/
 void     vMBMasterPortTimersConvertDelayEnable( void )
 {
-	Port_On(LED2);
+//	Port_On(LED2);
     vMBMasterSetCurTimerMode(MB_TMODE_CONVERT_DELAY);
     xMBPortTimersInit(MB_MASTER_DELAY_MS_CONVERT * RT_TICK_PER_SECOND / 1000);
 }
@@ -274,9 +280,28 @@ void     vMBMasterPortTimersConvertDelayEnable( void )
  *************************************************************************/
 void     vMBMasterPortTimersRespondTimeoutEnable( void )
 {
-	Port_On(LED2);
+//	Port_On(LED2);
     vMBMasterSetCurTimerMode(MB_TMODE_RESPOND_TIMEOUT);
     xMBPortTimersInit(MB_MASTER_TIMEOUT_MS_RESPOND * RT_TICK_PER_SECOND / 1000);
+}
+/*************************************************************************
+ * xModbus_Set_Size
+ * передача размера  ответа от слейва
+ *************************************************************************/
+BOOL            xModbus_Set_SizeAnswer( uint8_t Size )
+{
+	if (!Size) return FALSE;
+	Modbus_SizeRX = Size;
+	return TRUE;
+}
+/*************************************************************************
+ * xModbus_Get_Size
+ * передача размера  ответа от слейва
+ *************************************************************************/
+BOOL            xModbus_Get_SizeAnswer( uint8_t * Size )
+{
+	*Size = Modbus_SizeRX;
+	return TRUE;
 }
 /*************************************************************************
  * xMBMasterPortEventPost
@@ -294,6 +319,7 @@ BOOL            xMBMasterPortEventPost( eMBMasterEventType eEvent )
  *************************************************************************/
 BOOL            xMBMasterPortEventInit( void )
 {
+	xMasterOsEvent = 0;
 //    rt_event_init(&xMasterOsEvent,"master event",RT_IPC_FLAG_PRIO);
     return TRUE;
 }
@@ -475,20 +501,41 @@ void vMBPortTimersDisable()
   * @retval None
  *************************************************************************/
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
-	HAL_UART_DMAStop(huart);
+	uint8_t		size;
+	Port_On(LED3);
 
-	HAL_UART_Receive_DMA(&MODBUS, &Modbus_DataRX[0], 1);	// запуск приёма по кольцу в DMA
-	pxMBMasterFrameCBTransmitterEmpty();					// скажем что закончили предачу
+	HAL_UART_DMAStop(huart);									// остановим DMA после передачи фрейма
+
+	// Запускать на приём будем на заранее извесный размер буфера, т.к. в запросе уже есть инфа
+	//  флаг готовности будет по заполнению всего пакета. Ответы об ошибках будем анализировать по таймауту
+	//  на весь ответ. Размер буфера нужно вычислить в функциях подготовки запросов. Для каждого типа данных.
+	Modbus_DataRX[0] = 0;
+	Modbus_DataRX[1] = 0;
+	xModbus_Get_SizeAnswer(&size);
+	HAL_UART_Receive_DMA(huart, &Modbus_DataRX[0], size);		// запуск приёма по кольцу в DMA,
+
+	if (MODBUS.hdmarx->XferCpltCallback == 0xa5a5a5a5)
+		Port_On(LED2);
+
+//	HAL_UART_Receive_DMA(&MODBUS, &Modbus_DataRX[0], size);		// запуск приёма по кольцу в DMA,
+	//если указать размер ожидаемых данных, то то приёму получим колбэк по заполнению.
+	pxMBMasterFrameCBTransmitterEmpty();						// скажем что закончили предачу
 }
 
 /*************************************************************************
  * HAL_TIM_PeriodElapsedCallback
+ * Отработали таймаут, после чего принимать уже не надо, пакет потерян. Или принят ответ об ошибке размером 2 байта.
+ * перед приёмом они = 0.
+ *
+ * !!!!!! по таймауту нужно остановить прием. Т.к. уже может начаться приём пакета и сработать таймер
+ * до окончания приёма, что вызовет прерываетие по приёму уже после таймера.
  *************************************************************************/
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 //	Port_Toggle(LED2);
-	Port_Off(LED2);
+//	Port_Off(LED2);
 	(void) pxMBMasterPortCBTimerExpired();
+
 }
 /*************************************************************************
   * @brief  Rx Transfer completed callback
@@ -496,8 +543,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   * @retval None
  *************************************************************************/
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-	Port_Toggle(LED3);
 	pxMBMasterFrameCBByteReceived();
+	// приняли ожидаемое количество, переложим и в оборот.
 }
 /*************************************************************************
   * @brief  Rx Transfer completed callback
@@ -505,7 +552,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
   * @retval None
  *************************************************************************/
 void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart) {
-	Port_Toggle(LED3);
+//	Port_Toggle(LED3);
 }
 /*************************************************************************
   * @brief  UART error callbacks
@@ -513,6 +560,7 @@ void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart) {
   * @retval None
  *************************************************************************/
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart){
+//	Port_On(LED4);
 }
 
 
@@ -772,8 +820,7 @@ eMBErrorCode eMBMasterRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress, USH
     /* it already plus one in modbus function method. */
     usAddress--;
 
-    if ((usAddress >= DISCRETE_INPUT_START)
-            && (usAddress + usNDiscrete    <= DISCRETE_INPUT_START + DISCRETE_INPUT_NDISCRETES))
+    if (/* (usAddress >= DISCRETE_INPUT_START) && */( (usAddress + usNDiscrete )<= (DISCRETE_INPUT_START + DISCRETE_INPUT_NDISCRETES) ) )
     {
         iRegIndex = (USHORT) (usAddress - usDiscreteInputStart) / 8;
         iRegBitIndex = (USHORT) (usAddress - usDiscreteInputStart) % 8;

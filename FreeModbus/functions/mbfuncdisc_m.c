@@ -44,6 +44,7 @@
 #include "mbproto.h"
 #include "mbconfig.h"
 
+#include "modbus.h"
 /* ----------------------- Defines ------------------------------------------*/
 #define MB_PDU_REQ_READ_ADDR_OFF            ( MB_PDU_DATA_OFF + 0 )
 #define MB_PDU_REQ_READ_DISCCNT_OFF         ( MB_PDU_DATA_OFF + 2 )
@@ -72,13 +73,19 @@ eMBException    prveMBError2Exception( eMBErrorCode eErrorCode );
 eMBMasterReqErrCode
 eMBMasterReqReadDiscreteInputs( UCHAR ucSndAddr, USHORT usDiscreteAddr, USHORT usNDiscreteIn, LONG lTimeOut )
 {
-    UCHAR                 *ucMBFrame;
+    UCHAR           *ucMBFrame;
+    uint8_t			SizeAnswer;
+    uint8_t			SizeData;
     eMBMasterReqErrCode    eErrStatus = MB_MRE_NO_ERR;
 
     if ( ucSndAddr > MB_MASTER_TOTAL_SLAVE_NUM ) eErrStatus = MB_MRE_ILL_ARG;
     else if ( xMBMasterRunResTake( lTimeOut ) == FALSE ) eErrStatus = MB_MRE_MASTER_BUSY;
     else
     {
+    	SizeData = (usNDiscreteIn+1)/8;
+    	if ( (usNDiscreteIn+1) % 8 ) SizeData++;
+    	SizeAnswer = SizeAddr+SizeFunct+1+SizeCRC+SizeData;
+
 		vMBMasterGetPDUSndBuf(&ucMBFrame);
 		vMBMasterSetDestAddress(ucSndAddr);
 		ucMBFrame[MB_PDU_FUNC_OFF]                 = MB_FUNC_READ_DISCRETE_INPUTS;
@@ -87,6 +94,7 @@ eMBMasterReqReadDiscreteInputs( UCHAR ucSndAddr, USHORT usDiscreteAddr, USHORT u
 		ucMBFrame[MB_PDU_REQ_READ_DISCCNT_OFF ]    = usNDiscreteIn >> 8;
 		ucMBFrame[MB_PDU_REQ_READ_DISCCNT_OFF + 1] = usNDiscreteIn;
 		vMBMasterSetPDUSndLength( MB_PDU_SIZE_MIN + MB_PDU_REQ_READ_SIZE );
+		xModbus_Set_SizeAnswer(SizeAnswer);
 		( void ) xMBMasterPortEventPost( EV_MASTER_FRAME_SENT );				// передаём событие "FRAME_SENT" в менеджер событий
 		eErrStatus = eMBMasterWaitRequestFinish( );								// ожидаем ответ от менеджера событий об окончании с возвратом статуса
     }

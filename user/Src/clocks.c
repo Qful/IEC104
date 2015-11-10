@@ -23,7 +23,13 @@ void Clocks_Init(void)
 
     PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
 //TODO: на реальном приборе кварц не 8 а 25 ћ√ц. исправить делитель
+#ifdef STM32F407xx
     PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_HSE_DIV8;		// RTCCLK = 1MHz
+#endif
+#ifdef STM32F417xx			// HSE = 25MHz
+    PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_HSE_DIV25;		// RTCCLK = 1MHz
+#endif
+
     HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct);
 
     __HAL_RCC_RTC_ENABLE();

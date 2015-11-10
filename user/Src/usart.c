@@ -82,8 +82,9 @@ void RS485_2_UART_Init(uint32_t BaudRate)
 void HAL_UART_MspInit(UART_HandleTypeDef* huart)
 {
   GPIO_InitTypeDef GPIO_InitStruct;
-  DMA_HandleTypeDef hdma_tx;
-  DMA_HandleTypeDef hdma_rx;
+static  DMA_HandleTypeDef hdma_rx;
+static  DMA_HandleTypeDef hdma_tx;
+
   // ---------------------------- MODBUS ---------------------------------
   if(huart->Instance==UART4)
   {
@@ -128,8 +129,8 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
     hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
     hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-    hdma_rx.Init.Mode                = DMA_CIRCULAR;//DMA_NORMAL;
-    hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
+    hdma_rx.Init.Mode                = DMA_NORMAL;//DMA_CIRCULAR;//DMA_NORMAL;
+    hdma_rx.Init.Priority            = DMA_PRIORITY_MEDIUM;
     hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
     hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
     hdma_rx.Init.MemBurst            = DMA_MBURST_INC4;
@@ -139,13 +140,13 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     // Associate the initialized DMA handle to the UART handle
     __HAL_LINKDMA(huart, hdmarx, hdma_rx);
 
-    HAL_NVIC_SetPriority(UART4_DMA_TX_IRQn, 0, 1);	//0,1
+    HAL_NVIC_SetPriority(UART4_DMA_TX_IRQn, 1, 0);	//0,1
     HAL_NVIC_EnableIRQ(UART4_DMA_TX_IRQn);
 
-    HAL_NVIC_SetPriority(UART4_DMA_RX_IRQn, 0, 0);	//0,0
+    HAL_NVIC_SetPriority(UART4_DMA_RX_IRQn, 1, 0);	//0,0
     HAL_NVIC_EnableIRQ(UART4_DMA_RX_IRQn);
 
-    HAL_NVIC_SetPriority(UART4_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(UART4_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(UART4_IRQn);
 
   }
@@ -185,7 +186,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     __HAL_LINKDMA(huart, hdmatx, hdma_tx);
 
     // NVIC configuration for DMA transfer complete interrupt (USARTx_TX)
-    HAL_NVIC_SetPriority(USART1_DMA_TX_IRQn, 0, 1);	//0,1
+    HAL_NVIC_SetPriority(USART1_DMA_TX_IRQn, 6, 1);	//0,1
     HAL_NVIC_EnableIRQ(USART1_DMA_TX_IRQn);
 
  //   HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
@@ -248,13 +249,13 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     __HAL_LINKDMA(huart, hdmarx, hdma_rx);
 
     // NVIC configuration for DMA transfer complete interrupt (USARTx_TX)
-    HAL_NVIC_SetPriority(USART2_DMA_TX_IRQn, 0, 1);	//0,1
+    HAL_NVIC_SetPriority(USART2_DMA_TX_IRQn, 6, 1);	//0,1
 //    HAL_NVIC_EnableIRQ(USART2_DMA_TX_IRQn);
     // NVIC configuration for DMA transfer complete interrupt (USARTx_RX)
-    HAL_NVIC_SetPriority(USART2_DMA_RX_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(USART2_DMA_RX_IRQn, 6, 0);
  //   HAL_NVIC_EnableIRQ(USART2_DMA_RX_IRQn);
     /* NVIC configuration for USART TC interrupt */
-    HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(USART2_IRQn, 6, 0);
     HAL_NVIC_EnableIRQ(USART2_IRQn);
 
   }
@@ -313,13 +314,13 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     __HAL_LINKDMA(huart, hdmarx, hdma_rx);
 
 
-    HAL_NVIC_SetPriority(USART3_DMA_TX_IRQn, 0, 1);	//0,1
+    HAL_NVIC_SetPriority(USART3_DMA_TX_IRQn, 6, 1);	//0,1
   //  HAL_NVIC_EnableIRQ(USART3_DMA_TX_IRQn);
 
-    HAL_NVIC_SetPriority(USART3_DMA_RX_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(USART3_DMA_RX_IRQn, 6, 0);
   //  HAL_NVIC_EnableIRQ(USART3_DMA_RX_IRQn);
     /* NVIC configuration for USART TC interrupt */
-    HAL_NVIC_SetPriority(USART3_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(USART3_IRQn, 6, 0);
     HAL_NVIC_EnableIRQ(USART3_IRQn);
 
 
@@ -330,8 +331,8 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
 **************************************************************************/
 void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
 {
-	  static DMA_HandleTypeDef hdma_tx;
-	  static DMA_HandleTypeDef hdma_rx;
+static DMA_HandleTypeDef hdma_tx;
+static DMA_HandleTypeDef hdma_rx;
 
   if(huart->Instance==UART4)
   {

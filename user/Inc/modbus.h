@@ -101,6 +101,9 @@
 #define RT_WAITING_FOREVER              -1              /**< Block forever until get resource. */
 #define RT_WAITING_NO                   0               /**< Non-block. */
 
+#define		SizeAddr		1
+#define		SizeFunct		1
+#define		SizeCRC			2
 typedef struct					// для передачи через очереди структур.
 {
   uint8_t 	MBSlaveAddr;
@@ -109,6 +112,10 @@ typedef struct					// для передачи через очереди структур.
 //  uint16_t 	MBCRC;
 } MBFrame;
 
+BOOL	xModbus_Set_SizeAnswer( uint8_t Size );
+BOOL	xModbus_Get_SizeAnswer( uint8_t * Size );
+
+void     vMBMODBUSPortRxDisable( void );
 
 void Modbus_SendCmd(uint8_t MB_SlaveAddr, uint8_t MB_Funct, uint16_t addr, uint16_t numb, uint16_t *Data, uint16_t len);
 

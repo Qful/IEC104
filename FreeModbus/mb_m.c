@@ -96,12 +96,12 @@ BOOL( *pxMBMasterPortCBTimerExpired ) ( void );
 BOOL( *pxMBMasterFrameCBReceiveFSMCur ) ( void );
 BOOL( *pxMBMasterFrameCBTransmitFSMCur ) ( void );
 
-/* An array of Modbus functions handlers which associates Modbus function
- * codes with implementing functions.
- */
+
+// --------------------- Исполнители MODBUS функций --------------------------
+//TODO Add Master function define
+
 static xMBFunctionHandler xMasterFuncHandlers[MB_FUNC_HANDLERS_MAX] = {
 #if MB_FUNC_OTHER_REP_SLAVEID_ENABLED > 0
-	//TODO Add Master function define
     {MB_FUNC_OTHER_REPORT_SLAVEID, eMBFuncReportSlaveID},
 #endif
 #if MB_FUNC_READ_INPUT_ENABLED > 0
@@ -267,7 +267,7 @@ eMBMasterPoll( void )
 {
     static UCHAR   *ucMBFrame;
     static UCHAR    ucRcvAddress;
-    static UCHAR    ucFunctionCode;
+    UCHAR    ucFunctionCode;
     static USHORT   usLength;
     static eMBException eException;
 
@@ -295,38 +295,37 @@ eMBMasterPoll( void )
 
         case EV_MASTER_FRAME_RECEIVED:															// Приняли фрейм, проверим на целостность и обработаем
 			eStatus = peMBMasterFrameReceiveCur( &ucRcvAddress, &ucMBFrame, &usLength );
-			/* Check if the frame is for us. If not ,send an error process event. */
-			if ( ( eStatus == MB_ENOERR ) && ( ucRcvAddress == ucMBMasterGetDestAddress() ) )
+
+			if ( ( eStatus == MB_ENOERR ) && ( ucRcvAddress == ucMBMasterGetDestAddress() ) )	// Проверим, нам ли пакет и принят без ошибок.
 			{
-				( void ) xMBMasterPortEventPost( EV_MASTER_EXECUTE );
+				( void ) xMBMasterPortEventPost( EV_MASTER_EXECUTE );							// если нам, то переходим к дальнейшей работе с данными.
 			}
 			else
 			{
-				vMBMasterSetErrorType(EV_ERROR_RECEIVE_DATA);
+				vMBMasterSetErrorType(EV_ERROR_RECEIVE_DATA);									// если не нам или ошибки то идём в обработчик ошибок.
 				( void ) xMBMasterPortEventPost( EV_MASTER_ERROR_PROCESS );
 			}
 			break;
 
         case EV_MASTER_EXECUTE:																	// приняли правильный пакет, адресованный нам. УРА РАБОТАЕМ
-            ucFunctionCode = ucMBFrame[MB_PDU_FUNC_OFF];
+        	Port_Toggle(LED4);
+        	ucFunctionCode = ucMBFrame[MB_PDU_FUNC_OFF];
             eException = MB_EX_ILLEGAL_FUNCTION;
-            /* If receive frame has exception .The receive function code highest bit is 1.*/
-            if(ucFunctionCode >> 7) {
+
+            if(ucFunctionCode >> 7) {															// Старший бит указывает на ответ об ошибке.
             	eException = (eMBException)ucMBFrame[MB_PDU_DATA_OFF];
             }
-			else
-			{
+			else																				// нормальный пакет принят.
+			{/*
 				for (i = 0; i < MB_FUNC_HANDLERS_MAX; i++)
 				{
-					/* No more function handlers registered. Abort. */
-					if (xMasterFuncHandlers[i].ucFunctionCode == 0)	{
-						break;
-					}
+					if (xMasterFuncHandlers[i].ucFunctionCode == 0)		break;					// дальше нет обработчиков функций, выходим из поиска обработчика.
+
+
 					else if (xMasterFuncHandlers[i].ucFunctionCode == ucFunctionCode) {
 						vMBMasterSetCBRunInMasterMode(TRUE);
-						/* If master request is broadcast,
-						 * the master need execute function for all slave.
-						 */
+
+						// If master request is broadcast, the master need execute function for all slave.
 						if ( xMBMasterRequestIsBroadcast() ) {
 							usLength = usMBMasterGetPDUSndLength();
 							for(j = 1; j <= MB_MASTER_TOTAL_SLAVE_NUM; j++){
@@ -335,12 +334,13 @@ eMBMasterPoll( void )
 							}
 						}
 						else {
-							eException = xMasterFuncHandlers[i].pxHandler(ucMBFrame, &usLength);
+							eException = xMasterFuncHandlers[i].pxHandler(ucMBFrame, &usLength);	// обработчик для конкретной функции.
 						}
 						vMBMasterSetCBRunInMasterMode(FALSE);
 						break;
 					}
 				}
+				*/
 			}
             /* If master has exception ,Master will send error process.Otherwise the Master is idle.*/
             if (eException != MB_EX_NONE) {
@@ -356,9 +356,9 @@ eMBMasterPoll( void )
         case EV_MASTER_FRAME_SENT:				// передача в порт
         	vMBMasterGetPDUSndBuf( &ucMBFrame );																		//ucMBFrame - буфер для передачи в MODBUS
 			eStatus = peMBMasterFrameSendCur( ucMBMasterGetDestAddress(), ucMBFrame, usMBMasterGetPDUSndLength() );		//подготовка пакета и активация передачи.
-            break;
+             break;
 
-        case EV_MASTER_ERROR_PROCESS:			// колбэки по ошибкам
+        case EV_MASTER_ERROR_PROCESS:			// колбэки по ошибкам.
 			errorType = eMBMasterGetErrorType();
 			vMBMasterGetPDUSndBuf( &ucMBFrame );
 			switch (errorType) {

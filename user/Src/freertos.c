@@ -69,13 +69,15 @@
 	} xData;
 
 
-extern xQueueHandle 	  xQueueMODBUS;				//для сохранения ссылки на очередь
+//extern xQueueHandle 	  xQueueMODBUS;				//для сохранения ссылки на очередь
 
 
 uint8_t sentTEST = 0;				// временно, удалить потом.
 u_short nm1;						// временно, удалить потом.
 
 osThreadId defaultTaskHandle;
+
+extern osMessageQId xQueueMODBUSHandle;
 
 extern RTC_HandleTypeDef hrtc;
 extern RTC_TimeTypeDef sTime;
@@ -174,7 +176,8 @@ void FREERTOS_Init(void) {
   USART_TRACE("FreeHeap(IEC104):%u\n",fre);
 
   // создадим таск только после IEC104. Таймера нужны только там
-  if (defaultTaskHandle){
+  if (defaultTaskHandle)
+  {
 	  osThreadDef(Timers, StartTimersTask, osPriorityNormal,0, 128);//256
 	  defaultTaskHandle = osThreadCreate(osThread(Timers), NULL);
 
@@ -194,7 +197,11 @@ void FREERTOS_Init(void) {
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_QUEUES */
-   xQueueMODBUS = xQueueCreate( 3, sizeof(xData) );
+//   xQueueMODBUS = xQueueCreate( 3, sizeof(xData) );
+
+  /* definition and creation of xQueueMODBUS */
+//  osMessageQDef(xQueueMODBUS, 3, sizeof(xData));
+//  xQueueMODBUSHandle = osMessageCreate(osMessageQ(xQueueMODBUS), NULL);
 
    fre = xPortGetFreeHeapSize();
    USART_TRACE("FreeHeap(Queue):%u\n",fre);
@@ -286,10 +293,10 @@ void StartIEC104Task(void const * argument)
 	     			USART_TRACE("netconn_accept ... ok \n");
 
 
-//		        	 LED_On(LED2);
+//	     			Port_Off(LED1);
 	                 while (netconn_recv(newconn, &buf) == ERR_OK)				// принимаем данные в буфер
 	                 {
-	                	 Port_On(LED1);
+//	                	 Port_On(LED1);
 	                     do
 	                     {
 	                        netbuf_data(buf,(void *)&data, &len);					// указатель получил адрес вх. данных
@@ -355,7 +362,7 @@ void StartIEC104Task(void const * argument)
 	                     while (netbuf_next(buf) >= 0);
 	                     netbuf_delete(buf);
 
-	  		           Port_Off(LED1);
+//	  		           Port_Off(LED1);
 	                 }
 	         TCPCLOSE:
 	         	 	 USART_TRACE("netconn_close TCPCLOSE:\n");
@@ -364,7 +371,7 @@ void StartIEC104Task(void const * argument)
 	                 t1_timer_stop(s);
 	                 t2_timer_stop(s);
 	                 t3_timer_stop(s);
-//		           LED_Off(LED2);
+//	              Port_On(LED1);
 	             } else {
 		     			USART_TRACE("netconn_accept error: %d\n", accept_err);
 
@@ -394,14 +401,15 @@ void StartTimersTask(void const * argument)
 
 	  for(;;)
 	  {
-//	     errorCode = eMBMasterReqReadDiscreteInputs(1,3,8,RT_WAITING_FOREVER);		// указываем время ожидания ответа от менеджера событий
-//	     vTaskDelay(500);
-//      	LED_Toggle(LED4);
+	     eMBMasterReqReadDiscreteInputs(1,0,54,RT_WAITING_FOREVER);		// указываем время ожидания ответа от менеджера событий
+//	     vTaskDelay(10);
+//      	Port_Toggle(LED1);
 
         if (s->t1.evnt) t1_timer_run(s);		// проверка событий срабатывания таймеров
         if (s->t2.evnt) t2_timer_run(s);
         if (s->t3.evnt) t3_timer_run(s);
         taskYIELD();							// отпустим задачу до следующего вызова.
+
 	  }
 }
 /*************************************************************************
@@ -426,6 +434,7 @@ void StartMODBUSTask(void const * argument)
 
 	  for(;;)
 	  {
+//		  Port_Toggle(LED1);
 	    eMBMasterPoll();						// ждём события от MODBUS
 	//	  vTaskDelay(1000);
 		  taskYIELD();							// отпустим задачу до следующего вызова.
@@ -879,10 +888,10 @@ void data_received_hook(struct iecsock *s, struct iec_buf *b)
 		   case M_EP_TF_1: /* 40 */			// упакованная информация о срабатывании выходных цепей устройств защиты с меткой времени CP56Time2a
 
 						   break;
-						   //--------- C -------------
+	//--------- C -------------
 		   case C_IC_NA_1: /* 100 */		//ASDU Type ID 100 : C_IC_NA_1 - команда опроса
 
-			   	   	   	   errorCode = eMBMasterReqReadInputRegister(1,3,2,RT_WAITING_FOREVER);
+			   	   	   	   errorCode = eMBMasterReqReadInputRegister(1,0,24,RT_WAITING_FOREVER);
    	   	   	   	   	   	   //errorCode = eMBMasterReqReadCoils(1,3,8,RT_WAITING_FOREVER);
 
    	   	   	   	   	   	    outbuf = calloc(1,sizeof(struct iec_buf) + 249);
@@ -897,8 +906,11 @@ void data_received_hook(struct iecsock *s, struct iec_buf *b)
 
 							// нету APCI
 							outbufLen+=sizeof(struct iechdr);
-							iecasdu_create_header_all(outbuf+outbufLen, &outbufLen, C_IC_NA_1,1,SINGLE,ACTCONFIRM,NOTTEST,ACTIVATIONOK,0,0,0);
-   	   	   	   	   	   	    iecasdu_create_type_100(outbuf+outbufLen,&outbufLen);									// 100
+							//iecasdu_create_header_all(outbuf+outbufLen, &outbufLen, C_IC_NA_1,1,SINGLE,ACTCONFIRM,NOTTEST,ACTIVATIONOK,0,5,2);
+   	   	   	   	   	   	    //iecasdu_create_type_100(outbuf+outbufLen,&outbufLen);									// 100
+
+							iecasdu_create_header_all(outbuf+outbufLen, &outbufLen, M_ME_NA_1,1,SINGLE,ACTCONFIRM,NOTTEST,ACTIVATIONOK,0,5,2);
+							iecasdu_create_type_9(outbuf+outbufLen,&outbufLen, nm1++); //M_ME_NA_1 - значение измеряемой величины, нормализованное значение
 
 							//iecasdu_create_header(outbuf+outbufLen, &outbufLen, M_SP_NA_1, 1, 20, 1);		// заголовок ASDU по адрес абъекта
    	   	   	   	   	   	    //iecasdu_create_type_1(outbuf+outbufLen,&outbufLen);										// 1
@@ -939,9 +951,9 @@ void data_received_hook(struct iecsock *s, struct iec_buf *b)
 						   break;
 		   case C_CI_NA_1: /* 101 */		//ASDU Type ID 101 : C_CI_NA_1 - Counter Interrogation Command
 
-							//Modbus_SendCmd(MB_SlaveAddres, MB_FUNC_READ_DISCRETE_INPUTS, nm1, 8,dat,0);	// модбас запрос
 
-			   	   	   	   errorCode = eMBMasterReqReadDiscreteInputs(1,0,128,RT_WAITING_FOREVER);		// указываем время ожидания ответа от менеджера событий
+
+			   	   	   	   errorCode = eMBMasterReqReadDiscreteInputs(1,0,31,RT_WAITING_FOREVER);		// указываем время ожидания ответа от менеджера событий
 
 	  	   	   	   	   	    outbuf = calloc(1,sizeof(struct iec_buf) + 249);//249
 							if (!outbuf) {
@@ -954,8 +966,15 @@ void data_received_hook(struct iecsock *s, struct iec_buf *b)
 							outbufLen = 0;
 							// нету APCI
 							outbufLen+=sizeof(struct iechdr);
-							iecasdu_create_header_all(outbuf+outbufLen, &outbufLen, M_ME_NA_1,1,SINGLE,ACTCONFIRM,NOTTEST,ACTIVATIONOK,0,5,2);
-							iecasdu_create_type_9(outbuf+outbufLen,&outbufLen, nm1++); //M_ME_NA_1 - значение измеряемой величины, нормализованное значение
+							iecasdu_create_header_all(outbuf+outbufLen, &outbufLen, M_SP_NA_1,8,SERIAL,ACTCONFIRM,NOTTEST,ACTIVATIONOK,0,5,0);
+							iecasdu_create_type_1(outbuf+outbufLen,&outbufLen,1);
+							iecasdu_create_type_1(outbuf+outbufLen,&outbufLen,1);
+							iecasdu_create_type_1(outbuf+outbufLen,&outbufLen,0);
+							iecasdu_create_type_1(outbuf+outbufLen,&outbufLen,0);
+							iecasdu_create_type_1(outbuf+outbufLen,&outbufLen,1);
+							iecasdu_create_type_1(outbuf+outbufLen,&outbufLen,0);
+							iecasdu_create_type_1(outbuf+outbufLen,&outbufLen,1);
+							iecasdu_create_type_1(outbuf+outbufLen,&outbufLen,0);
    	   	   	   	   	   	    // ------------- APCI -------------------
    	   	   	   	   	   	    iecasdu_add_APCI(outbuf, outbufLen);
    	   	   	   	   	   	    /*

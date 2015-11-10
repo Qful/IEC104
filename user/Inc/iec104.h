@@ -198,7 +198,7 @@ void iecasdu_create_header_all (uint8_t *buf, size_t *buflen, uint8_t type, uint
 
 void iecasdu_add_APCI(u_char *buf, size_t buflen);
 
-void iecasdu_create_type_1 (u_char *buf, size_t *buflen);
+void iecasdu_create_type_1 (u_char *buf, size_t *buflen, uint8_t sp);
 void iecasdu_create_type_9 (u_char *buf, size_t *buflen,u_short mv);
 
 void iecasdu_create_type_36 (u_char *buf, size_t *buflen, int num, float *mv);

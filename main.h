@@ -13,7 +13,7 @@
 // Enable/Disable tracing using LED outputs
 #define LED_TRACE_ENABLE            1
 // Enable/Disable tracing using USART outputs
-#define USART_TRACE_ENABLE          1
+#define USART_TRACE_ENABLE          0
 
 #if (USART_TRACE_ENABLE)
 #define  USART_TRACE(...)   printf("DBG: ") ;\

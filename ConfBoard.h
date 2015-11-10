@@ -63,8 +63,8 @@ typedef enum
 #define PORTn                             7
 
 
-#define LED1_PIN                         GPIO_PIN_12
-#define LED1_GPIO_PORT                   GPIOD
+#define LED1_PIN                         GPIO_PIN_12				//GPIO_PIN_12		//GPIO_PIN_6 - для боевого борда
+#define LED1_GPIO_PORT                   GPIOD						//GPIOD			//GPIOC
 #define LED1_GPIO_CLK_ENABLE()           __GPIOD_CLK_ENABLE()
 #define LED1_GPIO_CLK_DISABLE()          __GPIOD_CLK_DISABLE()
   

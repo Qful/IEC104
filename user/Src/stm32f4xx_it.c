@@ -135,7 +135,14 @@ void USART3_IRQHandler(void)
  ******************************************************************************/
 void UART4_DMA_RX_IRQHandler(void)
 {
+	Port_On(LED2);
+	if (MODBUS.hdmarx->XferCpltCallback == 0xa5a5a5a5){
+		Port_On(LED2);
+		MODBUS.hdmarx->XferCpltCallback = 0x0800a785;
+		MODBUS.hdmarx->XferHalfCpltCallback = 0x0800a7b9;
+	}
 	  HAL_DMA_IRQHandler(MODBUS.hdmarx);
+	Port_Off(LED2);
 }
 void UART4_DMA_TX_IRQHandler(void)
 {
@@ -159,8 +166,9 @@ void WWDG_IRQHandler(void)
  ******************************************************************************/
 void TIM2_IRQHandler( void )
 {
+//	 Port_On(LED1);
 	 HAL_TIM_IRQHandler(&TimHandle);
-
+//	 Port_Off(LED1);
 }
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

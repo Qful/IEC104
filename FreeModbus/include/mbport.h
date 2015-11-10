@@ -131,6 +131,8 @@ BOOL     xMBMasterPortSerialPutByte( CHAR ucByte );
 
 BOOL     xMBMasterPortSerialPutBUF( CHAR * putBuf, USHORT leng );
 
+BOOL     xMBMasterPortSerialGetBuf(UCHAR pos, CHAR * pucByte );
+
 /* ----------------------- Timers functions ---------------------------------*/
 BOOL            xMBPortTimersInit( USHORT usTimeOut50us );
 

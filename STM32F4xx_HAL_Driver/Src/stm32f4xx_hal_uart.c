@@ -1026,6 +1026,9 @@ HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pData
     /* Enable the DMA transfer for the receiver request by setting the DMAR bit 
     in the UART CR3 register */
     huart->Instance->CR3 |= USART_CR3_DMAR;
+
+    // очистим флаг прерывания
+    __HAL_DMA_CLEAR_FLAG(huart->hdmarx,__HAL_DMA_GET_TC_FLAG_INDEX(huart->hdmarx));//DMA_FLAG_TCIF2_6
     
     /* Process Unlocked */
     __HAL_UNLOCK(huart);

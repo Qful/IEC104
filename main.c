@@ -38,19 +38,23 @@
 //uint8_t 	Modbus_DataTX[255];		// буфер передатчика Modbus
 uint8_t 	Modbus_DataRX[255];		// буфер приёмника Modbus
 
+uint8_t	Modbus_SizeRX;				// размер ожидаемого ответа от MODBUS.
+
 // Светодиоды
 GPIO_TypeDef* GPIO_PORT[PORTn] = {LED1_GPIO_PORT, LED2_GPIO_PORT, LED3_GPIO_PORT, LED4_GPIO_PORT, RS485_1_DE_GPIO_PORT, RS485_2_DE_GPIO_PORT, MODBUS_DE_GPIO_PORT};
 const uint16_t GPIO_PIN[PORTn] = {LED1_PIN, LED2_PIN, LED3_PIN, LED4_PIN, RS485_1_DE, RS485_2_DE, MODBUS_DE};
 
 
-UART_HandleTypeDef MODBUS;				//UART4
-UART_HandleTypeDef BOOT_UART;			//USART1
-UART_HandleTypeDef RS485_1;				//USART2
-UART_HandleTypeDef RS485_2;				//USART3
+volatile UART_HandleTypeDef BOOT_UART;			//USART1
+volatile UART_HandleTypeDef MODBUS;				//UART4
+volatile UART_HandleTypeDef RS485_1;				//USART2
+volatile UART_HandleTypeDef RS485_2;				//USART3
 
-xQueueHandle 	  xQueueMODBUS;			//для сохранения ссылки на очередь
+//xQueueHandle 	  xQueueMODBUS;			//для сохранения ссылки на очередь
 
-uint16_t	xMasterOsEvent;				// хранилище событий порта MODBUS
+volatile uint16_t	xMasterOsEvent;				// хранилище событий порта MODBUS
+
+osMessageQId xQueueMODBUSHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
@@ -64,15 +68,15 @@ int main(void) {
 	  GPIO_Init();						// конфиг портов.
 	  Clocks_Init();					// конфиг часов.
 
-	  BOOT_UART_Init(115200);			// настройка BOOT интерфейса.
-	  USART_TRACE("------------------------------------\n");
-	  USART_TRACE("BOOT_Init.. ok\n");
+//	  BOOT_UART_Init(115200);			// настройка BOOT интерфейса.
+//	  USART_TRACE("------------------------------------\n");
+//	  USART_TRACE("BOOT_Init.. ok\n");
 
-	  RS485_1_UART_Init(115200);		// настройка RS485 1 канала.
-	  USART_TRACE("RS485_1_UART_Init.. ok\n");
+//	  RS485_1_UART_Init(115200);		// настройка RS485 1 канала.
+//	  USART_TRACE("RS485_1_UART_Init.. ok\n");
 
-  	  RS485_2_UART_Init(115200);		// настройка RS485 2 канала.
-  	  USART_TRACE("RS485_2_UART_Init.. ok\n");
+//  	  RS485_2_UART_Init(115200);		// настройка RS485 2 канала.
+//  	  USART_TRACE("RS485_2_UART_Init.. ok\n");
 
 	  // тут нужно получить параметры системы от головного(MODBUS) скорости, адреса, порты....
 
@@ -80,6 +84,7 @@ int main(void) {
 	  Port_Init(LED2,GPIO_MODE_OUTPUT_PP);
 	  Port_Init(LED3,GPIO_MODE_OUTPUT_PP);
 	  Port_Init(LED4,GPIO_MODE_OUTPUT_PP);
+//	  Port_On(LED1);
 
 	  Port_Init(MODBUS_DEn,GPIO_MODE_INPUT);			// пока не используем
 
@@ -125,11 +130,13 @@ void SystemClock_Config(void)
 
   RCC_OscInitTypeDef RCC_OscInitStruct;
   RCC_ClkInitTypeDef RCC_ClkInitStruct;
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct;
 
   __PWR_CLK_ENABLE();
 
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
+#ifdef STM32F407xx
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.LSIState = RCC_LSI_ON;
@@ -140,6 +147,19 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;					//RCC_PLLP_DIV2
   RCC_OscInitStruct.PLL.PLLQ = 7;								// 7
   HAL_RCC_OscConfig(&RCC_OscInitStruct);
+#endif
+#ifdef STM32F417xx			// HSE = 25MHz
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLM = 25;
+  RCC_OscInitStruct.PLL.PLLN = 336;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  RCC_OscInitStruct.PLL.PLLQ = 4;
+  HAL_RCC_OscConfig(&RCC_OscInitStruct);
+#endif
 
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
@@ -147,6 +167,10 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
   HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5);
+
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
+  PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
+  HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct);
 
   HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_HSE, RCC_MCODIV_1);
 

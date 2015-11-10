@@ -39,20 +39,20 @@ PR_BEGIN_EXTERN_C
 #define MB_ADDRESS_MIN          ( 1 )   /*! Smallest possible slave address. */
 #define MB_ADDRESS_MAX          ( 247 ) /*! Biggest possible slave address. */
 #define MB_FUNC_NONE                          (  0 )
-#define MB_FUNC_READ_COILS                    (  1 )
-#define MB_FUNC_READ_DISCRETE_INPUTS          (  2 )
-#define MB_FUNC_WRITE_SINGLE_COIL             (  5 )
-#define MB_FUNC_WRITE_MULTIPLE_COILS          ( 15 )
-#define MB_FUNC_READ_HOLDING_REGISTER         (  3 )
-#define MB_FUNC_READ_INPUT_REGISTER           (  4 )
-#define MB_FUNC_WRITE_REGISTER                (  6 )
-#define MB_FUNC_WRITE_MULTIPLE_REGISTERS      ( 16 )
-#define MB_FUNC_READWRITE_MULTIPLE_REGISTERS  ( 23 )
-#define MB_FUNC_DIAG_READ_EXCEPTION           (  7 )
-#define MB_FUNC_DIAG_DIAGNOSTIC               (  8 )
-#define MB_FUNC_DIAG_GET_COM_EVENT_CNT        ( 11 )
-#define MB_FUNC_DIAG_GET_COM_EVENT_LOG        ( 12 )
-#define MB_FUNC_OTHER_REPORT_SLAVEID          ( 17 )
+#define MB_FUNC_READ_COILS                    (  1 )				//+ Чтение статуса дискретных выходов.
+#define MB_FUNC_READ_DISCRETE_INPUTS          (  2 )				//+ Чтение статуса дискретных входов.
+#define MB_FUNC_WRITE_SINGLE_COIL             (  5 )				//+ Установка одного дискрета.
+#define MB_FUNC_WRITE_MULTIPLE_COILS          ( 15 )				//+ Устанавливает выходы в "1" или "0"
+#define MB_FUNC_READ_HOLDING_REGISTER         (  3 )				//+ Чтение последовательности выходных регистров
+#define MB_FUNC_READ_INPUT_REGISTER           (  4 )				//+ Чтение последовательности входных регистров
+#define MB_FUNC_WRITE_REGISTER                (  6 )				//+ запись данных в один регистр.
+#define MB_FUNC_WRITE_MULTIPLE_REGISTERS      ( 16 )				//+ Запись данных в последовательность регистров.
+#define MB_FUNC_READWRITE_MULTIPLE_REGISTERS  ( 23 )				// Чтение и запись за одну транзакцию.
+#define MB_FUNC_DIAG_READ_EXCEPTION           (  7 )				// Чтение статусных выходов в подчинённом контроллере.
+#define MB_FUNC_DIAG_DIAGNOSTIC               (  8 )				// Диагностика
+#define MB_FUNC_DIAG_GET_COM_EVENT_CNT        ( 11 )				// Возвращает слово сотояния,счетчик событий
+#define MB_FUNC_DIAG_GET_COM_EVENT_LOG        ( 12 )				// Возвращает слово сотояния,счетчик событий и поле байтов событий.
+#define MB_FUNC_OTHER_REPORT_SLAVEID          ( 17 )				// Чтение ID подчиненного.
 #define MB_FUNC_ERROR                         ( 128 )
 /* ----------------------- Type definitions ---------------------------------*/
     typedef enum
