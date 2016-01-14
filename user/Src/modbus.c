@@ -52,26 +52,26 @@ static USHORT usT35TimeOut50us;
 TIM_HandleTypeDef    TimHandle;
 
 
-//Master mode:DiscreteInputs variables
-USHORT   usMDiscInStart                             = M_DISCRETE_INPUT_START;
+//Master mode: хранилище дискретных входов
+USHORT   usMDiscInStart;
 #if      M_DISCRETE_INPUT_NDISCRETES%8
-UCHAR    ucMDiscInBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_DISCRETE_INPUT_NDISCRETES/8+1];
+extern  UCHAR    ucMDiscInBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_DISCRETE_INPUT_NDISCRETES/8+1];
 #else
-UCHAR    ucMDiscInBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_DISCRETE_INPUT_NDISCRETES/8];
+extern UCHAR    ucMDiscInBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_DISCRETE_INPUT_NDISCRETES/8];
 #endif
 //Master mode:Coils variables
-USHORT   usMCoilStart                               = M_COIL_START;
+USHORT   usMCoilStart;
 #if      M_COIL_NCOILS%8
-UCHAR    ucMCoilBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_COIL_NCOILS/8+1];
+extern UCHAR    ucMCoilBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_COIL_NCOILS/8+1];
 #else
-UCHAR    ucMCoilBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_COIL_NCOILS/8];
+extern UCHAR    ucMCoilBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_COIL_NCOILS/8];
 #endif
-//Master mode:InputRegister variables
-USHORT   usMRegInStart                              = M_REG_INPUT_START;
-USHORT   usMRegInBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_REG_INPUT_NREGS];
-//Master mode:HoldingRegister variables
-USHORT   usMRegHoldStart                            = M_REG_HOLDING_START;
-USHORT   usMRegHoldBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_REG_HOLDING_NREGS];
+//Master mode: хранилище входных регистров
+extern USHORT   usMRegInStart;
+extern USHORT   usMRegInBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_REG_INPUT_NREGS];
+//Master mode:хранилище выходных регистров
+extern USHORT   usMRegHoldStart;
+extern USHORT   usMRegHoldBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_REG_HOLDING_NREGS];
 
 /*************************************************************************
  * xMBMasterPortSerialInit
@@ -320,7 +320,6 @@ BOOL            xMBMasterPortEventPost( eMBMasterEventType eEvent )
 BOOL            xMBMasterPortEventInit( void )
 {
 	xMasterOsEvent = 0;
-//    rt_event_init(&xMasterOsEvent,"master event",RT_IPC_FLAG_PRIO);
     return TRUE;
 }
 /*************************************************************************
@@ -330,7 +329,7 @@ BOOL            xMBMasterPortEventInit( void )
  *************************************************************************/
 void            vMBMasterOsResInit( void )
 {
-    //rt_sem_init(&xMasterRunRes, "master res", 0x01 , RT_IPC_FLAG_PRIO);
+
 }
 /*************************************************************************
  * xMBMasterPortEventGet
@@ -348,26 +347,6 @@ BOOL            xMBMasterPortEventGet(  /*@out@ */ eMBMasterEventType * eEvent )
 
      xMasterOsEvent &= ~set;
 
-    /* waiting forever OS event */
-//TODO: Переделать монитор событий под FREERTOS
-    // функция будет получать события из объекта события
-    /*
-    rt_event_recv(&xMasterOsEvent,													// прием события от менеджера событий xMasterOsEvent
-            EV_MASTER_READY | EV_MASTER_FRAME_RECEIVED | EV_MASTER_EXECUTE |
-            EV_MASTER_FRAME_SENT | EV_MASTER_ERROR_PROCESS,
-            RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR, RT_WAITING_FOREVER,
-            &recvedEvent);
-*/
-/*
-    EV_MASTER_READY				- Startup finished
-    EV_MASTER_FRAME_RECEIVED	- Frame received
-    EV_MASTER_EXECUTE			- Execute function
-    EV_MASTER_FRAME_SENT		- Frame sent
-    EV_MASTER_ERROR_PROCESS		- Frame error process
-
-    RT_EVENT_FLAG_OR
-    RT_EVENT_FLAG_CLEAR
-*/
     /* the enum type couldn't convert to int type */
     switch (recvedEvent)
     {
@@ -395,7 +374,7 @@ BOOL            xMBMasterPortEventGet(  /*@out@ */ eMBMasterEventType * eEvent )
  *************************************************************************/
 void            vMBMasterCBRequestScuuess( void )
 {
-	//   rt_event_send(&xMasterOsEvent, EV_MASTER_PROCESS_SUCESS);
+
 }
 /*************************************************************************
  * vMBMasterErrorCBExecuteFunction
@@ -502,7 +481,7 @@ void vMBPortTimersDisable()
  *************************************************************************/
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 	uint8_t		size;
-	Port_On(LED3);
+//	Port_On(LED3);
 
 	HAL_UART_DMAStop(huart);									// остановим DMA после передачи фрейма
 
@@ -513,9 +492,6 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 	Modbus_DataRX[1] = 0;
 	xModbus_Get_SizeAnswer(&size);
 	HAL_UART_Receive_DMA(huart, &Modbus_DataRX[0], size);		// запуск приёма по кольцу в DMA,
-
-	if (MODBUS.hdmarx->XferCpltCallback == 0xa5a5a5a5)
-		Port_On(LED2);
 
 //	HAL_UART_Receive_DMA(&MODBUS, &Modbus_DataRX[0], size);		// запуск приёма по кольцу в DMA,
 	//если указать размер ожидаемых данных, то то приёму получим колбэк по заполнению.
@@ -532,10 +508,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
  *************************************************************************/
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-//	Port_Toggle(LED2);
-//	Port_Off(LED2);
 	(void) pxMBMasterPortCBTimerExpired();
-
 }
 /*************************************************************************
   * @brief  Rx Transfer completed callback
@@ -544,7 +517,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
  *************************************************************************/
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	pxMBMasterFrameCBByteReceived();
-	// приняли ожидаемое количество, переложим и в оборот.
 }
 /*************************************************************************
   * @brief  Rx Transfer completed callback
@@ -552,7 +524,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
   * @retval None
  *************************************************************************/
 void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart) {
-//	Port_Toggle(LED3);
+
 }
 /*************************************************************************
   * @brief  UART error callbacks
@@ -560,7 +532,7 @@ void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart) {
   * @retval None
  *************************************************************************/
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart){
-//	Port_On(LED4);
+
 }
 
 

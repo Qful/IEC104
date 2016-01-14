@@ -63,10 +63,10 @@ typedef enum
 #define PORTn                             7
 
 
-#define LED1_PIN                         GPIO_PIN_12				//GPIO_PIN_12		//GPIO_PIN_6 - для боевого борда
-#define LED1_GPIO_PORT                   GPIOD						//GPIOD			//GPIOC
-#define LED1_GPIO_CLK_ENABLE()           __GPIOD_CLK_ENABLE()
-#define LED1_GPIO_CLK_DISABLE()          __GPIOD_CLK_DISABLE()
+#define LED1_PIN                         GPIO_PIN_6				//GPIO_PIN_12		//GPIO_PIN_6 - для боевого борда
+#define LED1_GPIO_PORT                   GPIOC						//GPIOD			//GPIOC
+#define LED1_GPIO_CLK_ENABLE()           __GPIOC_CLK_ENABLE()	//__GPIOD_CLK_ENABLE()
+#define LED1_GPIO_CLK_DISABLE()          __GPIOC_CLK_DISABLE()
   
 #define LED2_PIN                         GPIO_PIN_13
 #define LED2_GPIO_PORT                   GPIOD
@@ -93,10 +93,15 @@ typedef enum
 #define RS485_2_DE_GPIO_CLK_ENABLE()     __GPIOD_CLK_ENABLE()
 #define RS485_2_DE_GPIO_CLK_DISABLE()    __GPIOD_CLK_DISABLE()
 
-#define MODBUS_DE                       GPIO_PIN_0					// не использовать
-#define MODBUS_DE_GPIO_PORT             GPIOC
-#define MODBUS_DE_GPIO_CLK_ENABLE()     __GPIOC_CLK_ENABLE()
-#define MODBUS_DE_GPIO_CLK_DISABLE()    __GPIOC_CLK_DISABLE()
+#define MODBUS_DE                        GPIO_PIN_0					// не использовать
+#define MODBUS_DE_GPIO_PORT              GPIOC
+#define MODBUS_DE_GPIO_CLK_ENABLE()      __GPIOC_CLK_ENABLE()
+#define MODBUS_DE_GPIO_CLK_DISABLE()     __GPIOC_CLK_DISABLE()
+
+#define db161d_CS_PIN                    GPIO_PIN_4
+#define db161d_CS_GPIO_PORT              GPIOA
+#define db161d_CS_GPIO_CLK_ENABLE()      __GPIOA_CLK_ENABLE()
+#define db161d_CS_GPIO_CLK_DISABLE()     __GPIOA_CLK_DISABLE()
 
 #define PORTx_GPIO_CLK_ENABLE(__INDEX__)  do{if((__INDEX__) == 0) LED1_GPIO_CLK_ENABLE(); else \
                                             if((__INDEX__) == 1) LED2_GPIO_CLK_ENABLE(); else \

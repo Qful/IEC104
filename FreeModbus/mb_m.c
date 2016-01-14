@@ -55,6 +55,8 @@
 #include "mbtcp.h"
 #endif
 
+#include "modbus.h"
+
 #if MB_MASTER_RTU_ENABLED > 0 || MB_MASTER_ASCII_ENABLED > 0
 
 #ifndef MB_PORT_HAS_CLOSE
@@ -276,7 +278,7 @@ eMBMasterPoll( void )
     eMBMasterEventType    eEvent;
     eMBMasterErrorEventType errorType;
 
-    if( eMBState != STATE_ENABLED )        return MB_EILLSTATE;	 	// Check if the protocol stack is ready.
+    if( eMBState != STATE_ENABLED )        return MB_EILLSTATE;	 	// проверим, готов ли модбас для работы
 
     if( xMBMasterPortEventGet( &eEvent ) == TRUE )					// Проверим есть ли ккое либо событие от СТЭЙТ машины приёмника или передатчика
     {
@@ -308,7 +310,6 @@ eMBMasterPoll( void )
 			break;
 
         case EV_MASTER_EXECUTE:																	// приняли правильный пакет, адресованный нам. УРА РАБОТАЕМ
-        	Port_Toggle(LED4);
         	ucFunctionCode = ucMBFrame[MB_PDU_FUNC_OFF];
             eException = MB_EX_ILLEGAL_FUNCTION;
 
@@ -316,7 +317,7 @@ eMBMasterPoll( void )
             	eException = (eMBException)ucMBFrame[MB_PDU_DATA_OFF];
             }
 			else																				// нормальный пакет принят.
-			{/*
+			{
 				for (i = 0; i < MB_FUNC_HANDLERS_MAX; i++)
 				{
 					if (xMasterFuncHandlers[i].ucFunctionCode == 0)		break;					// дальше нет обработчиков функций, выходим из поиска обработчика.
@@ -340,7 +341,7 @@ eMBMasterPoll( void )
 						break;
 					}
 				}
-				*/
+
 			}
             /* If master has exception ,Master will send error process.Otherwise the Master is idle.*/
             if (eException != MB_EX_NONE) {

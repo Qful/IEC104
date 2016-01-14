@@ -71,7 +71,7 @@
 #define HAL_RTC_MODULE_ENABLED
 //#define HAL_SAI_MODULE_ENABLED   
 //#define HAL_SD_MODULE_ENABLED   
-//#define HAL_SPI_MODULE_ENABLED   
+#define HAL_SPI_MODULE_ENABLED
 #define HAL_TIM_MODULE_ENABLED
 #define HAL_UART_MODULE_ENABLED
 #define HAL_USART_MODULE_ENABLED
@@ -172,12 +172,14 @@
 /* Section 1 : Ethernet peripheral configuration */
 
 /* MAC ADDRESS: MAC_ADDR0:MAC_ADDR1:MAC_ADDR2:MAC_ADDR3:MAC_ADDR4:MAC_ADDR5 */
+ /*
 #define MAC_ADDR0   first_IP_ADDR0
 #define MAC_ADDR1   first_IP_ADDR1
 #define MAC_ADDR2   first_IP_ADDR2
 #define MAC_ADDR3   first_IP_ADDR3
 #define MAC_ADDR4   0
 #define MAC_ADDR5   0
+*/
 
 /* Definition of the Ethernet driver buffers size and count */   
 #define ETH_RX_BUF_SIZE                ETH_MAX_PACKET_SIZE /* buffer size for receive               */

@@ -53,11 +53,16 @@
 #include "iec104.h"
 #include "usart.h"
 
+// IEC 61850
+#include "iec850.h"
 /*Modbus includes ------------------------------------------------------------*/
 #include "mb.h"
 #include "mb_m.h"
 #include "mbport.h"
 #include "modbus.h"
+
+// память SPI
+#include "at45db161d.h"
 /* Variables -----------------------------------------------------------------*/
 
 
@@ -71,10 +76,6 @@
 
 //extern xQueueHandle 	  xQueueMODBUS;				//для сохранения ссылки на очередь
 
-
-uint8_t sentTEST = 0;				// временно, удалить потом.
-u_short nm1;						// временно, удалить потом.
-
 osThreadId defaultTaskHandle;
 
 extern osMessageQId xQueueMODBUSHandle;
@@ -85,7 +86,31 @@ extern RTC_DateTypeDef sDate;
 
 extern UART_HandleTypeDef MODBUS;
 
+//  --------------------------------------------------------------------------------
+//Master mode: хранилище дискретных входов
+extern USHORT   usMDiscInStart;
+#if      M_DISCRETE_INPUT_NDISCRETES%8
+extern UCHAR    ucMDiscInBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_DISCRETE_INPUT_NDISCRETES/8+1];
+#else
+extern UCHAR    ucMDiscInBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_DISCRETE_INPUT_NDISCRETES/8];
+#endif
+//Master mode:Coils variables
+extern USHORT   usMCoilStart;
+#if      M_COIL_NCOILS%8
+extern UCHAR    ucMCoilBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_COIL_NCOILS/8+1];
+#else
+extern UCHAR    ucMCoilBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_COIL_NCOILS/8];
+#endif
+//Master mode: хранилище входных регистров
+extern USHORT   usMRegInStart;
+extern USHORT   usMRegInBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_REG_INPUT_NREGS];
+//Master mode:хранилище выходных регистров
+extern USHORT   usMRegHoldStart;
+extern USHORT   usMRegHoldBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_REG_HOLDING_NREGS];
+//  --------------------------------------------------------------------------------
+
 struct netconn *conn, *newconn;
+struct netconn *conn850,*newconn850;
 
 struct netif 	first_gnetif,second_gnetif;
 struct ip_addr 	first_ipaddr,second_ipaddr;
@@ -99,6 +124,7 @@ uint8_t *outbuf;
 size_t  outbufLen;
 
 /* Function prototypes -------------------------------------------------------*/
+
 void StartIEC104Task(void const * argument);
 void StartTimersTask(void const * argument);
 void StartMODBUSTask(void const * argument);
@@ -169,24 +195,28 @@ void FREERTOS_Init(void) {
   fre = xPortGetFreeHeapSize();			// размер кучи
   USART_TRACE("FreeHeap:%u\n",fre);
 
-  osThreadDef(IEC104, StartIEC104Task, osPriorityAboveNormal,0, 1024);//700
-  defaultTaskHandle = osThreadCreate(osThread(IEC104), NULL);
+  osThreadDef(IEC850, StartIEC850Task, osPriorityAboveNormal,0, 1024);//1024
+  defaultTaskHandle = osThreadCreate(osThread(IEC850), NULL);
+  fre = xPortGetFreeHeapSize();
+  USART_TRACE("FreeHeap(IEC850):%u\n",fre);
 
+/*
+  osThreadDef(IEC104, StartIEC104Task, osPriorityAboveNormal,0, 640);//1024
+  defaultTaskHandle = osThreadCreate(osThread(IEC104), NULL);
   fre = xPortGetFreeHeapSize();
   USART_TRACE("FreeHeap(IEC104):%u\n",fre);
 
   // создадим таск только после IEC104. Таймера нужны только там
   if (defaultTaskHandle)
   {
-	  osThreadDef(Timers, StartTimersTask, osPriorityNormal,0, 128);//256
+	  osThreadDef(Timers, StartTimersTask, osPriorityNormal,0, 128);//128
 	  defaultTaskHandle = osThreadCreate(osThread(Timers), NULL);
 
 	  fre = xPortGetFreeHeapSize();
 	  USART_TRACE("FreeHeap(Timers):%u\n",fre);
   }
-
-
-  osThreadDef(MBUS, StartMODBUSTask, osPriorityNormal,0, 256);//256
+*/
+  osThreadDef(MBUS, StartMODBUSTask, osPriorityNormal,0, 128);//256
   defaultTaskHandle = osThreadCreate(osThread(MBUS), NULL);
 
   fre = xPortGetFreeHeapSize();
@@ -209,191 +239,142 @@ void FREERTOS_Init(void) {
   /* USER CODE END RTOS_QUEUES */
 }
 
+
 /*************************************************************************
  * StartIEC104Task
  *************************************************************************/
 void StartIEC104Task(void const * argument)
 {
-// struct netconn *conn, *newconn;
- err_t err, accept_err;
- struct netbuf *buf;
- uint16_t len;
- uint8_t *data;
-// uint8_t datTmp;
+	 err_t err, accept_err;
+	 struct netbuf *buf;
+	 struct iechdr *h;
+	 struct iec_buf *bufIEC;
 
- struct iechdr *h;
- struct iec_buf *bufIEC;
+	 uint16_t len;
+	 uint8_t *data;
+	 int ret = 0;
 
- int ret = 0;
+	//	MX_LWIP_Init();		// инит. LWIP
 
-// struct iec_object obj[IEC_OBJECT_MAX];
-// int ret, n;
-// uint8_t cause, test, pn, *cp, t, str_ioa;
-// u_short caddr;
+		tcpip_init( NULL, NULL );
+		// устанавливаем IP параметры для первичного IP соединения, всегда сервер
+		IP4_ADDR(&first_ipaddr, first_IP_ADDR0, first_IP_ADDR1, first_IP_ADDR2, first_IP_ADDR3);
+		// устанавливаем IP параметры для вторичного IP соединения, всегда хост
+		IP4_ADDR(&second_ipaddr, second_IP_ADDR0, second_IP_ADDR1, second_IP_ADDR2, second_IP_ADDR3);
+		// устанавливаем маску подсети.
+		IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1 , NETMASK_ADDR2, NETMASK_ADDR3);
+		// устанавливаем адрес шлюза.
+		IP4_ADDR(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
 
-//	MX_LWIP_Init();		// инит. LWIP
+		// добавим  и регистрируем NETWORK интерфейс
+		netif_add(&first_gnetif, &first_ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);
+		netif_set_default(&first_gnetif);
 
-	tcpip_init( NULL, NULL );
+		if (netif_is_link_up(&first_gnetif))	netif_set_up(&first_gnetif);		// When the netif is fully configured this function must be called
+		else									netif_set_down(&first_gnetif);		// When the netif link is down this function must be called
+		//dhcp_start(&first_gnetif);		// автоматическое получение IP
 
-	// устанавливаем IP параметры для первичного IP соединения, всегда сервер
-	IP4_ADDR(&first_ipaddr, first_IP_ADDR0, first_IP_ADDR1, first_IP_ADDR2, first_IP_ADDR3);
-	// устанавливаем IP параметры для вторичного IP соединения, всегда хост
-	IP4_ADDR(&second_ipaddr, second_IP_ADDR0, second_IP_ADDR1, second_IP_ADDR2, second_IP_ADDR3);
+		default_hooks.disconnect_indication = disconnect_hook;						// disconnect_indication - called when link layer connection terminates.
+		default_hooks.connect_indication = connect_hook;							// connect_indication - called when link layer connection is established.
+		default_hooks.data_indication = data_received_hook;							// data_activation - called when ASDU was received, buf points to allocated structure. It is user responsibility to free allocated resources.
+		default_hooks.activation_indication = activation_hook;						// activation_indication - called when monitor direction activates with  STARTACT/STARTCON S-frames.
+	//	default_hooks.deactivation_indication = deactivation_hook;					// deactivation_indication - called when monitor direction deactivates  with STOPACT/STOPCON S-frames.
+	//	default_hooks.transmit_wakeup = transmit_wakeup;							// transmit_wakeup - called when all frames from transmition queue were sent, acknowledged and iecsock can accept more.
 
-	IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1 , NETMASK_ADDR2, NETMASK_ADDR3);
-	IP4_ADDR(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
+		s = calloc(1, sizeof(struct iecsock));
 
+		if (!s)		{USART_TRACE("Ошибка выделения памяти для s при ините.\n");}
+		else		{USART_TRACE("Выделено памяти для s: %u байт.\n",sizeof(struct iecsock));}
 
-	// добавим  и регистрируем NETWORK интерфейс
-	netif_add(&first_gnetif, &first_ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);
-	netif_set_default(&first_gnetif);
+		iec104_set_defaults(s);														// установка таймаутов 104 по умолчанию и отправка s фрейма.
+		s->type = IEC_SLAVE;
+		s->stopdt = 1;
 
-	if (netif_is_link_up(&first_gnetif))
-		netif_set_up(&first_gnetif);		// When the netif is fully configured this function must be called
-	else
-		netif_set_down(&first_gnetif);		// When the netif link is down this function must be called
+		for(;;) {
+		conn = netconn_new(NETCONN_TCP);											// создадим новое соединение
 
-	//dhcp_start(&first_gnetif);		// автоматическое получение IP
+		if (conn!=NULL){
+			USART_TRACE("netconn_new TCP ... \n");
+			err = netconn_bind(conn, &first_ipaddr, IEC104_Port);					// привяжем соединение на IP и порт IEC 60870-5-104 (IEC104_Port)
+//TODO: Разобраться с etconn_delete(newconn); почему newconn ????
+			if (err != ERR_OK) 		netconn_delete(conn);						//
+		    else
+		    {
+				USART_TRACE("netconn_listen ... \n");
+		        netconn_listen(conn);												// переводим соединение в режим прослушивания
+		        while (1)															// далее слушаем и  захватываем соединение
+		        {
+		             accept_err = netconn_accept(conn, &newconn);					// принимаем соединение
+		             if (accept_err == ERR_OK)										// если приняли, то обработаем его
+		             {
+		     			USART_TRACE("netconn_accept ... ok \n");
+		                 while (netconn_recv(newconn, &buf) == ERR_OK)				// принимаем данные в буфер
+		                 {
+		                	 Port_Off(LED1);
+		                     do
+		                     {
+		                        netbuf_data(buf,(void *)&data, &len);				// указатель получил адрес вх. данных
+		                   	    h = (struct iechdr *) &data[0];
 
+		    	     			bufIEC = calloc(1,len + sizeof(struct iec_buf) - sizeof(struct iechdr));		// выделяем блок памяти для bufIEC
 
-	default_hooks.disconnect_indication = disconnect_hook;						// disconnect_indication - called when link layer connection terminates.
-	default_hooks.connect_indication = connect_hook;							// connect_indication - called when link layer connection is established.
-	default_hooks.data_indication = data_received_hook;							// data_activation - called when ASDU was received, buf points to allocated structure. It is user responsibility to free allocated resources.
-	default_hooks.activation_indication = activation_hook;						// activation_indication - called when monitor direction activates with  STARTACT/STARTCON S-frames.
-//	default_hooks.deactivation_indication = deactivation_hook;					// deactivation_indication - called when monitor direction deactivates  with STOPACT/STOPCON S-frames.
-//	default_hooks.transmit_wakeup = transmit_wakeup;							// transmit_wakeup - called when all frames from transmition queue were sent, acknowledged and iecsock can accept more.
+		                   		t3_timer_stop(s);
+		                   		t3_timer_start(s);
 
-	s = calloc(1, sizeof(struct iecsock));
-	if(!s){
-		USART_TRACE("Ошибка выделения памяти для s при ините.\n");
-	} else
-	{
-		USART_TRACE("Выделено памяти для s: %u байт.\n",sizeof(struct iecsock));
-	}
-	iec104_set_defaults(s);
-	s->type = IEC_SLAVE;
-	s->stopdt = 1;
-  for(;;)
-  {
+		                   		memcpy(&s->buf[0], h, len);
+		                   		memcpy(&bufIEC->h, h, len);
+		                   		s->len = len;										// размер принятого пакета.
 
-	conn = netconn_new(NETCONN_TCP);											// создадим новое соединение
-	  if (conn!=NULL){
-		USART_TRACE("netconn_new TCP ... \n");
-		err = netconn_bind(conn, &first_ipaddr, IEC104_Port);					// привяжем соединение на IP и порт IEC 60870-5-104 (IEC104_Port)
-	    if (err == ERR_OK)
-	    {
-			USART_TRACE("netconn_listen ... \n");
-	        netconn_listen(conn);												// переводим соединение в режим прослушивания
-	        while (1)															// далее слушаем и  захватываем соединение
-	        {
-	        	sentTEST = 1;
-	             accept_err = netconn_accept(conn, &newconn);					// принимаем соединение
-	             if (accept_err == ERR_OK)										// если приняли, то обработаем его
-	             {
-	     			USART_TRACE("netconn_accept ... ok \n");
-
-
-//	     			Port_Off(LED1);
-	                 while (netconn_recv(newconn, &buf) == ERR_OK)				// принимаем данные в буфер
-	                 {
-//	                	 Port_On(LED1);
-	                     do
-	                     {
-	                        netbuf_data(buf,(void *)&data, &len);					// указатель получил адрес вх. данных
-	                   	    h = (struct iechdr *) &data[0];
-
-
-	    	     			bufIEC = calloc(1,len + sizeof(struct iec_buf) - sizeof(struct iechdr));		// выделяем блок памяти для массива
-	    	     			if (!bufIEC){
-	    	     				USART_TRACE("Ошибка выделения памяти для bufIEC после TCP соединения.\n");
-	    	     			} else{
-	    	     				USART_TRACE("Выделено памяти для bufIEC: %u байт.\n",len + sizeof(struct iec_buf) - sizeof(struct iechdr));
-	    	     			}
-
-	                   		t3_timer_stop(s);
-	                   		t3_timer_start(s);
-
-	                   		memcpy(&s->buf[0], h, len);
-	                   		memcpy(&bufIEC->h, h, len);
-	                   		s->len = len;
-
-							switch (frame104_type(h)) {
-
-								case FRAME_TYPE_I:
-									USART_TRACE("FRAME_TYPE_I\n");
-									if (s->type == IEC_SLAVE && s->stopdt) {
-										printf("-- iframe: free(buf);\n");
-										//free(bufIEC);
-										break;
-									}
-									ret = iec104_iframe_recv(newconn, s, bufIEC);
-								break;
-
-								case FRAME_TYPE_S:
-									USART_TRACE("FRAME_TYPE_S\n");
-									ret = iec104_sframe_recv(s, bufIEC);
-									//free(bufIEC);
-								break;
-
-								case FRAME_TYPE_U:
-									USART_TRACE("FRAME_TYPE_U\n");
-									ret = iec104_uframe_recv(newconn, s, bufIEC);
-									//free(bufIEC);
-								break;
-
-							}
-
-							if (ret) {
-								s->vr = 0;
-								s->vs = 0;
-								s->va = 0;
-								USART_TRACE("active close TCP/IP\n");
-								netbuf_delete(buf);
-
+		                   		// ---------------------------------------------------
+								switch (frame104_type(h)) {	                   		// определяем тип фрейма.
+									case FRAME_TYPE_I:								// функция передачи информации с нумерацией.
+										if (s->type == IEC_SLAVE && s->stopdt) 	break;
+										ret = iec104_iframe_recv(newconn, s, bufIEC);
+									break;
+									case FRAME_TYPE_S:								// функция контроля с нумерацией.
+										ret = iec104_sframe_recv(s, bufIEC);
+									break;
+									case FRAME_TYPE_U:								// функция управления без нумерации.
+										ret = iec104_uframe_recv(newconn, s, bufIEC);
+									break;
+								}
+								if (ret) {											// если обработчик функции вернул ошибку
+									s->vr = 0;
+									s->vs = 0;
+									s->va = 0;
+									USART_TRACE("active close TCP/IP\n");
+									netbuf_delete(buf);
+									free(bufIEC);
+				                    goto TCPCLOSE;
+								}
+								// ---------------------------------------------------
 								free(bufIEC);
-			                    goto TCPCLOSE;
-							}
-							free(bufIEC);
-    	     				USART_TRACE("освободил память после bufIEC.\n");
+	    	     				USART_TRACE("освободил память после bufIEC.\n");
+		                     }
+		                     while (netbuf_next(buf) >= 0);
+		                     netbuf_delete(buf);
 
-//	                       netconn_write(newconn, data, len, NETCONN_COPY);		// отправляем данные по протоколу TCP
-	//                 	   USART_TRACE("%d\n",len);
-	                     }
-	                     while (netbuf_next(buf) >= 0);
-	                     netbuf_delete(buf);
-
-//	  		           Port_Off(LED1);
-	                 }
-	         TCPCLOSE:
-	         	 	 USART_TRACE("netconn_close TCPCLOSE:\n");
-	                 netconn_close(newconn);									// закрываем и освобождаем соединение
-	                 netconn_delete(newconn);
-	                 t1_timer_stop(s);
-	                 t2_timer_stop(s);
-	                 t3_timer_stop(s);
-//	              Port_On(LED1);
-	             } else {
-		     			USART_TRACE("netconn_accept error: %d\n", accept_err);
-
-	             }
-	        }
-	    }
-	    else      netconn_delete(newconn);
+		  		           Port_On(LED1);
+		                 }
+		         TCPCLOSE:
+		         	 	 USART_TRACE("netconn_close TCPCLOSE:\n");
+		                 netconn_close(newconn);									// закрываем и освобождаем соединение
+		                 netconn_delete(newconn);
+		                 t1_timer_stop(s);
+		                 t2_timer_stop(s);
+		                 t3_timer_stop(s);
+		             } else 	USART_TRACE("netconn_accept error: %d\n", accept_err);
+		        }//! while (1)
+		    }
+		  } //! if (conn!=NULL)
 	  }
-//    osDelay(1);
-  }
-
-  USART_TRACE("освободил память после s .\n");
-
-
 }
 /*************************************************************************
  * StartTimersTask
+ * обработчик таймаутов 104 протокола.
  *************************************************************************/
 void StartTimersTask(void const * argument)
 {
-//	eMBMasterReqErrCode    errorCode = MB_MRE_NO_ERR;
-
 	  t0_timer_stop(s);
 	  t1_timer_stop(s);
 	  t2_timer_stop(s);
@@ -401,44 +382,36 @@ void StartTimersTask(void const * argument)
 
 	  for(;;)
 	  {
-	     eMBMasterReqReadDiscreteInputs(1,0,54,RT_WAITING_FOREVER);		// указываем время ожидания ответа от менеджера событий
-//	     vTaskDelay(10);
-//      	Port_Toggle(LED1);
-
-        if (s->t1.evnt) t1_timer_run(s);		// проверка событий срабатывания таймеров
+        if (s->t1.evnt) t1_timer_run(s);		// проверка событий срабатывания таймеров.
         if (s->t2.evnt) t2_timer_run(s);
         if (s->t3.evnt) t3_timer_run(s);
-        taskYIELD();							// отпустим задачу до следующего вызова.
-
+        taskYIELD();							// отпустим задачу.
 	  }
 }
 /*************************************************************************
  * StartMODBUSTask
- * можно использовать текен для доступа из разных портов одновременно.
- * возможно и использование очереди для передачи данных в функцию и вторая
- * очередь для возврата принятых данных из порта.
- * пример:
- *  входные данные - адрес, функция, данные.
- *  	1.далее формируем фрейм добавляем CRC и отсылаем в MODBUS
- *  		соблюдая синхронизацию по времени начала (start:3,5t stop 1,5t)
- *  	2.ожидаем возврат данных из порта в заданный таймаут.
- *  	 	распаковываем данные считаем CRC. передаём в выходную очередь.
- *  выходные данные - адрес, функция, количество байт, сами данные......
- *
  *************************************************************************/
 void StartMODBUSTask(void const * argument)
 {
+	uint32_t	TimerReadMB;
+	uint8_t		ReadNmb=0;
 
 	eMBMasterInit(MB_RTU, 4, 115200,  MB_PAR_NONE);
 	eMBMasterEnable();
 
-	  for(;;)
-	  {
-//		  Port_Toggle(LED1);
-	    eMBMasterPoll();						// ждём события от MODBUS
-	//	  vTaskDelay(1000);
-		  taskYIELD();							// отпустим задачу до следующего вызова.
-	  }
+	TimerReadMB = HAL_GetTick();
+	for(;;)
+	{
+		if ((HAL_GetTick()-TimerReadMB)>100){					// периодический опрос дискретов
+			TimerReadMB = HAL_GetTick();
+			ReadNmb++; if (ReadNmb>1) ReadNmb = 0;
+	   	   	if (ReadNmb==0) eMBMasterReqReadCoils(MB_Slaveaddr,MB_StartDiscreetaddr,MB_NumbDiscreet,RT_WAITING_FOREVER);
+	   		if (ReadNmb==1) eMBMasterReqReadHoldingRegister(MB_Slaveaddr,MB_StartAnalogINaddr,MB_NumbAnalogIN,RT_WAITING_FOREVER);
+		}
+
+		eMBMasterPoll();						// мониторим события от MODBUS.
+		taskYIELD();							// отпустим задачу.
+	}
 }
 
 /*************************************************************************
@@ -448,19 +421,15 @@ static int iec104_iframe_recv(struct netconn *newconn, struct iecsock *s, struct
 {
 	struct iechdr *h;
 	h = &buf->h;
-	buf->data_len = h->length ;//- 2;								// дополним реальным размером ASDU
+	buf->data_len = h->length ;										// дополним реальным размером ASDU
 
-	if (!check_nr(s, h->ic.nr))	{
+	if (!check_nr(s, h->ic.nr))	{									// проверим принимаемый порядковый номер
 		USART_TRACE("not check_nr. s->vs:%d h->ic.nr:%d\n",s->vs, h->ic.nr);
-		return -1;													// проверим принимаемый порядковый номер
+		return -1;
 	}
 
 	s->va = h->ic.nr;
-	if (s->va == s->vs) {
- 		t1_timer_stop(s);											// таймаут при посылке или тестировании APDU.
- 		//if (s->hooks.transmit_wakeup)				s->hooks.transmit_wakeup(s);					// пока нету передачи пробуждения
- 		//else if (default_hooks.transmit_wakeup)		default_hooks.transmit_wakeup(s);
-	}
+	if (s->va == s->vs)		t1_timer_stop(s);						// если номер передающего совпал с принятым.
 
 	t2_timer_stop(s);												// таймаут подтверждения.
 	t2_timer_start(s);
@@ -469,13 +438,9 @@ static int iec104_iframe_recv(struct netconn *newconn, struct iecsock *s, struct
 		USART_TRACE("not check_ns: s->vr:%i h->ic.ns:%i\n",s->vr,h->ic.ns );
 		return -1;													// проверим передаваемый порядковый номер
 	}
-
-	s->vr = (s->vr + 1) % 32767;
-
-//	USART_TRACE("--- iframe: s->vr:%i s->va:%i s->va_peer:%i s->vs:%i\n",s->vr, s->va,s->va_peer, s->vs);
+	s->vr = (s->vr + 1) % 32767;									// инкрементим номер принятого
 
 	if ((s->vr - s->va_peer + 32767) % 32767 == s->w) {				// отошлем Sframe каждые "w" принятых пакетов
-
 		iec104_sframe_send(s);
 		s->va_peer = s->vr;
 	}
@@ -496,16 +461,12 @@ static int iec104_sframe_recv(struct iecsock *s, struct iec_buf *buf)
 
 	if (!check_nr(s, h->ic.nr))	return -1;
 
-//TODO: разобраться с этим
-//	iecsock_run_ackw_queue(s, h->ic.nr);
-
 	s->va = h->ic.nr;
 	if (s->va == s->vs) {
 		t1_timer_stop(s);																	// таймаут при посылке или тестировании APDU.
 		//if (s->hooks.transmit_wakeup)				s->hooks.transmit_wakeup(s);			// пока нету передачи пробуждения
 		//else if (default_hooks.transmit_wakeup)		default_hooks.transmit_wakeup(s);
 	}
-
 	return 0;
 }
 /*************************************************************************
@@ -521,16 +482,11 @@ static int iec104_uframe_recv(struct netconn *newconn, struct iecsock *s, struct
 			if (s->type != IEC_SLAVE)	return -1;
 
 			s->stopdt = 0;
-
 			s->vs = 0;
 			s->vr = 0;
 			s->va_peer= 0;
 			iec104_uframe_send(s, STARTCON);
 
-// TODO: разобраться с iecsock_run_write_queue что она делает.
-			//iecsock_run_write_queue(s);
-
-			// принимаеи и парсим данные для дальнейшей обработки
 			if (s->hooks.activation_indication)					s->hooks.activation_indication(s);
 			else if (default_hooks.activation_indication)		default_hooks.activation_indication(s);
 
@@ -565,7 +521,6 @@ static int iec104_uframe_recv(struct netconn *newconn, struct iecsock *s, struct
 		break;
 
 		case TESTACT:
-
 			iec104_uframe_send(s, TESTCON);
 
 			if (s->type == IEC_SLAVE && !s->testfr)		t3_timer_stop(s);
@@ -573,7 +528,6 @@ static int iec104_uframe_recv(struct netconn *newconn, struct iecsock *s, struct
 
 		case TESTCON:
 			if (!s->testfr)		return -1;
-
 			t1_timer_stop(s);
 			s->testfr = 0;
 		break;
@@ -806,6 +760,7 @@ void connect_hook(struct iecsock *s)
 }
 /*************************************************************************
  * disconnect_hook
+ * Отключение TCP
  *************************************************************************/
 void disconnect_hook(struct iecsock *s, short reason)
 {
@@ -814,10 +769,10 @@ void disconnect_hook(struct iecsock *s, short reason)
 }
 /*************************************************************************
  * data_received_hook
+ *  приём данных
  *************************************************************************/
 void data_received_hook(struct iecsock *s, struct iec_buf *b)
 {
-	uint16_t	dat[10];
 
 //	struct netconn *newconn;
 	struct iec_object obj[IEC_OBJECT_MAX];
@@ -827,11 +782,8 @@ void data_received_hook(struct iecsock *s, struct iec_buf *b)
 
 	struct iechdr *h;
 	uint8_t apcibuf[6];
-//	uint8_t	*sa;
 
 	eMBMasterReqErrCode    errorCode = MB_MRE_NO_ERR;
-
-	USART_TRACE("data_received_hook...\n");
 
 
 	h = (struct iechdr *)&apcibuf;
@@ -891,8 +843,8 @@ void data_received_hook(struct iecsock *s, struct iec_buf *b)
 	//--------- C -------------
 		   case C_IC_NA_1: /* 100 */		//ASDU Type ID 100 : C_IC_NA_1 - команда опроса
 
-			   	   	   	   errorCode = eMBMasterReqReadInputRegister(1,0,24,RT_WAITING_FOREVER);
-   	   	   	   	   	   	   //errorCode = eMBMasterReqReadCoils(1,3,8,RT_WAITING_FOREVER);
+//				   	   	   errorCode = eMBMasterReqReadHoldingRegister(MB_Slaveaddr,MB_StartAnalogINaddr,MB_NumbAnalogIN,RT_WAITING_FOREVER);
+
 
    	   	   	   	   	   	    outbuf = calloc(1,sizeof(struct iec_buf) + 249);
 							if (!outbuf) {
@@ -909,9 +861,18 @@ void data_received_hook(struct iecsock *s, struct iec_buf *b)
 							//iecasdu_create_header_all(outbuf+outbufLen, &outbufLen, C_IC_NA_1,1,SINGLE,ACTCONFIRM,NOTTEST,ACTIVATIONOK,0,5,2);
    	   	   	   	   	   	    //iecasdu_create_type_100(outbuf+outbufLen,&outbufLen);									// 100
 
-							iecasdu_create_header_all(outbuf+outbufLen, &outbufLen, M_ME_NA_1,1,SINGLE,ACTCONFIRM,NOTTEST,ACTIVATIONOK,0,5,2);
-							iecasdu_create_type_9(outbuf+outbufLen,&outbufLen, nm1++); //M_ME_NA_1 - значение измеряемой величины, нормализованное значение
+//							iecasdu_create_header_all(outbuf+outbufLen, &outbufLen, M_ME_NA_1,1,SINGLE,ACTCONFIRM,NOTTEST,ACTIVATIONOK,0,5,2);
 
+//							iecasdu_create_header_all(outbuf+outbufLen, &outbufLen, M_ME_NA_1,MB_NumbAnalogIN,SERIAL,ACTCONFIRM,NOTTEST,ACTIVATIONOK,0,5,0);
+//							for (i=MB_StartAnalogINaddr;i<(MB_StartAnalogINaddr+MB_NumbAnalogIN);i++){
+//								iecasdu_create_type_9(outbuf+outbufLen,&outbufLen, usMRegInBuf[0][i]); //M_ME_NA_1 - значение измеряемой величины, нормализованное значение
+//							}
+
+
+							iecasdu_create_header_all(outbuf+outbufLen, &outbufLen, M_ME_NA_1,MB_NumbAnalogIN,SERIAL,ACTCONFIRM,NOTTEST,ACTIVATIONOK,0,MB_Slaveaddr,MB_StartAnalogINaddr);
+							for (i=0;i<MB_NumbAnalogIN;i++){
+								iecasdu_create_type_9(outbuf+outbufLen,&outbufLen, usMRegHoldBuf[0][i]); //M_ME_NA_1 - значение измеряемой величины, нормализованное значение
+							}
 							//iecasdu_create_header(outbuf+outbufLen, &outbufLen, M_SP_NA_1, 1, 20, 1);		// заголовок ASDU по адрес абъекта
    	   	   	   	   	   	    //iecasdu_create_type_1(outbuf+outbufLen,&outbufLen);										// 1
    	   	   	   	   	   	    // ------------- APCI -------------------
@@ -953,7 +914,7 @@ void data_received_hook(struct iecsock *s, struct iec_buf *b)
 
 
 
-			   	   	   	   errorCode = eMBMasterReqReadDiscreteInputs(1,0,31,RT_WAITING_FOREVER);		// указываем время ожидания ответа от менеджера событий
+//			   	   	   	   errorCode = eMBMasterReqReadCoils(MB_Slaveaddr,MB_StartDiscreetaddr,MB_NumbDiscreet,RT_WAITING_FOREVER);		// указываем время ожидания ответа от менеджера событий
 
 	  	   	   	   	   	    outbuf = calloc(1,sizeof(struct iec_buf) + 249);//249
 							if (!outbuf) {
@@ -966,16 +927,16 @@ void data_received_hook(struct iecsock *s, struct iec_buf *b)
 							outbufLen = 0;
 							// нету APCI
 							outbufLen+=sizeof(struct iechdr);
-							iecasdu_create_header_all(outbuf+outbufLen, &outbufLen, M_SP_NA_1,8,SERIAL,ACTCONFIRM,NOTTEST,ACTIVATIONOK,0,5,0);
-							iecasdu_create_type_1(outbuf+outbufLen,&outbufLen,1);
-							iecasdu_create_type_1(outbuf+outbufLen,&outbufLen,1);
-							iecasdu_create_type_1(outbuf+outbufLen,&outbufLen,0);
-							iecasdu_create_type_1(outbuf+outbufLen,&outbufLen,0);
-							iecasdu_create_type_1(outbuf+outbufLen,&outbufLen,1);
-							iecasdu_create_type_1(outbuf+outbufLen,&outbufLen,0);
-							iecasdu_create_type_1(outbuf+outbufLen,&outbufLen,1);
-							iecasdu_create_type_1(outbuf+outbufLen,&outbufLen,0);
-   	   	   	   	   	   	    // ------------- APCI -------------------
+							iecasdu_create_header_all(outbuf+outbufLen, &outbufLen, M_SP_NA_1,MB_NumbDiscreet,SERIAL,ACTCONFIRM,NOTTEST,ACTIVATIONOK,0,MB_Slaveaddr,MB_StartDiscreetaddr);
+
+							for (i=0;i<1+MB_NumbDiscreet/8;i++){
+								for (n=0;n<8;n++){
+									if (ucMCoilBuf[0][i]&(1<<n))  iecasdu_create_type_1(outbuf+outbufLen,&outbufLen,1);
+											else 				  iecasdu_create_type_1(outbuf+outbufLen,&outbufLen,0);
+								}
+							}
+
+  	   	   	   	   	   	    // ------------- APCI -------------------
    	   	   	   	   	   	    iecasdu_add_APCI(outbuf, outbufLen);
    	   	   	   	   	   	    /*
 							h->start = 0x68;
@@ -1083,7 +1044,10 @@ void iec104_set_options(struct iecsock *s, struct iecsock_options *opt)
 }
 /*************************************************************************
  * iecsock_set_defaults
- * счет идёт в мс
+ * t0_timer	- тайм-аут при установлении соединения
+ * t1_timer	- тайм-аут при посылке или тестировании
+ * t2_timer	- тайм-аут для подтверждения в случае отсутствия сообщения с данными
+ * t3_timer	- тайм-аут для посылки блоков тестирования в случае долгого простоя
  *************************************************************************/
 static void iec104_set_defaults(struct iecsock *s)
 {
@@ -1093,29 +1057,14 @@ static void iec104_set_defaults(struct iecsock *s)
 	s->t3.cntdest	= DEFAULT_T3*1000;
 	s->w 	= DEFAULT_W;
 	s->k	= DEFAULT_K;
-//	TAILQ_INIT(&s->write_q);
-//	TAILQ_INIT(&s->ackw_q);
-//	evtimer_set(&s->t1_timer, t1_timer_run, s);
-//	evtimer_set(&s->t2_timer, t2_timer_run, s);
-//	evtimer_set(&s->t3_timer, t3_timer_run, s);
 
-	iec104_sframe_send(s);
+	iec104_sframe_send(s);					// передача s фрейма после инита
 	s->va_peer = s->vr;
 }
-/*
-Макрос TAILQ_ENTRY объявляет структуру, связывающую элементы в хвостовой очереди.
-Макрос TAILQ_INIT инициализирует хвостовую очередь, на которую ссылается Fa head .
-Макрос TAILQ_INSERT_HEAD вставляет новый элемент Fa elm в начало хвостовой очереди.
-Макрос TAILQ_INSERT_TAIL вставляет новый элемент Fa elm в конец хвостовой очереди.
-Макрос TAILQ_INSERT_AFTER вставляет новый элемент Fa elm после элемента Fa listelm .
-Макрос TAILQ_REMOVE удаляет элемент Fa elm из хвостовой очереди.
-*/
 
-// t0_timer	- тайм-аут при установлении соединения
-// t1_timer	- тайм-аут при посылке или тестировании
-// t2_timer	- тайм-аут для подтверждения в случае отсутствия сообщения с данными
-// t3_timer	- тайм-аут для посылки блоков тестирования в случае долгого простоя
-
+/*************************************************************************
+ * uframe_func_to_string
+ *************************************************************************/
 static inline char * uframe_func_to_string(enum uframe_func func)
 {
 	switch (func) {

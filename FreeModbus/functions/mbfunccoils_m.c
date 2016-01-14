@@ -42,6 +42,7 @@
 #include "mbproto.h"
 #include "mbconfig.h"
 
+#include "modbus.h"
 /* ----------------------- Defines ------------------------------------------*/
 #define MB_PDU_REQ_READ_ADDR_OFF            ( MB_PDU_DATA_OFF + 0 )
 #define MB_PDU_REQ_READ_COILCNT_OFF         ( MB_PDU_DATA_OFF + 2 )
@@ -88,12 +89,19 @@ eMBMasterReqErrCode
 eMBMasterReqReadCoils( UCHAR ucSndAddr, USHORT usCoilAddr, USHORT usNCoils ,LONG lTimeOut )
 {
     UCHAR                 *ucMBFrame;
+    uint8_t					SizeAnswer;
+    uint8_t					SizeData;
     eMBMasterReqErrCode    eErrStatus = MB_MRE_NO_ERR;
 
     if ( ucSndAddr > MB_MASTER_TOTAL_SLAVE_NUM ) eErrStatus = MB_MRE_ILL_ARG;
     else if ( xMBMasterRunResTake( lTimeOut ) == FALSE ) eErrStatus = MB_MRE_MASTER_BUSY;
     else
     {
+
+        if( ( usNCoils & 0x0007 ) != 0 )   	SizeData = ( UCHAR )( usNCoils / 8 + 1 );
+        else        						SizeData = ( UCHAR )( usNCoils / 8 );
+    	SizeAnswer = SizeAddr+SizeFunct+1+SizeCRC+SizeData;
+
 		vMBMasterGetPDUSndBuf(&ucMBFrame);
 		vMBMasterSetDestAddress(ucSndAddr);
 		ucMBFrame[MB_PDU_FUNC_OFF]                 = MB_FUNC_READ_COILS;
@@ -102,6 +110,7 @@ eMBMasterReqReadCoils( UCHAR ucSndAddr, USHORT usCoilAddr, USHORT usNCoils ,LONG
 		ucMBFrame[MB_PDU_REQ_READ_COILCNT_OFF ]    = usNCoils >> 8;
 		ucMBFrame[MB_PDU_REQ_READ_COILCNT_OFF + 1] = usNCoils;
 		vMBMasterSetPDUSndLength( MB_PDU_SIZE_MIN + MB_PDU_REQ_READ_SIZE );
+		xModbus_Set_SizeAnswer(SizeAnswer);
 		( void ) xMBMasterPortEventPost( EV_MASTER_FRAME_SENT );
 		eErrStatus = eMBMasterWaitRequestFinish( );
 
@@ -137,14 +146,8 @@ eMBMasterFuncReadCoils( UCHAR * pucFrame, USHORT * usLen )
 
         /* Test if the quantity of coils is a multiple of 8. If not last
          * byte is only partially field with unused coils set to zero. */
-        if( ( usCoilCount & 0x0007 ) != 0 )
-        {
-        	ucByteCount = ( UCHAR )( usCoilCount / 8 + 1 );
-        }
-        else
-        {
-        	ucByteCount = ( UCHAR )( usCoilCount / 8 );
-        }
+        if( ( usCoilCount & 0x0007 ) != 0 )       	ucByteCount = ( UCHAR )( usCoilCount / 8 + 1 );
+        else        	ucByteCount = ( UCHAR )( usCoilCount / 8 );
 
         /* Check if the number of registers to read is valid. If not
          * return Modbus illegal data value exception. 
@@ -153,7 +156,7 @@ eMBMasterFuncReadCoils( UCHAR * pucFrame, USHORT * usLen )
             ( ucByteCount == pucFrame[MB_PDU_FUNC_READ_COILCNT_OFF] ) )
         {
         	/* Make callback to fill the buffer. */
-            eRegStatus = eMBMasterRegCoilsCB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usCoilCount, MB_REG_READ );
+            eRegStatus = eMBMasterRegCoilsCB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], 1/*usRegAddress-MB_StartDiscreetaddr*/, usCoilCount, MB_REG_READ );
 
             /* If an error occured convert it into a Modbus exception. */
             if( eRegStatus != MB_ENOERR )

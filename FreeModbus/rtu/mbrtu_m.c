@@ -245,8 +245,6 @@ xMBMasterRTUReceiveFSM( void )
     BOOL            xTaskNeedSwitch = FALSE;
     UCHAR           ucByte;
 
-	Port_Off(LED3);
-
     // чтение CHAR из порта.
     //( void )xMBMasterPortSerialGetByte( ( CHAR * ) & ucByte );
     xModbus_Get_SizeAnswer((uint8_t *) &usMasterRcvBufferPos);

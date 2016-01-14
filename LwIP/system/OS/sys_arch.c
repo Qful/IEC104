@@ -171,7 +171,7 @@ portTickType StartTime, EndTime, Elapsed;
 	}
 	else // block forever for a message.
 	{
-		while( pdTRUE != xQueueReceive( *mbox, &(*msg), portMAX_DELAY ) ){} // time is arbitrary
+		while( pdTRUE != xQueueReceive( *mbox, &(*msg), portMAX_DELAY ) ){} // time is arbitrary		//portMAX_DELAY
 		EndTime = xTaskGetTickCount();
 		Elapsed = (EndTime - StartTime) * portTICK_RATE_MS;
 		

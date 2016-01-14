@@ -82,9 +82,9 @@ eMBMasterReqReadDiscreteInputs( UCHAR ucSndAddr, USHORT usDiscreteAddr, USHORT u
     else if ( xMBMasterRunResTake( lTimeOut ) == FALSE ) eErrStatus = MB_MRE_MASTER_BUSY;
     else
     {
-    	SizeData = (usNDiscreteIn+1)/8;
-    	if ( (usNDiscreteIn+1) % 8 ) SizeData++;
-    	SizeAnswer = SizeAddr+SizeFunct+1+SizeCRC+SizeData;
+        if( ( usNDiscreteIn & 0x0007 ) != 0 )   SizeData = ( UCHAR )( usNDiscreteIn / 8 + 1 );
+        else        							SizeData = ( UCHAR )( usNDiscreteIn / 8 );
+     	SizeAnswer = SizeAddr+SizeFunct+1+SizeCRC+SizeData;
 
 		vMBMasterGetPDUSndBuf(&ucMBFrame);
 		vMBMasterSetDestAddress(ucSndAddr);
@@ -129,14 +129,8 @@ eMBMasterFuncReadDiscreteInputs( UCHAR * pucFrame, USHORT * usLen )
 
         /* Test if the quantity of coils is a multiple of 8. If not last
          * byte is only partially field with unused coils set to zero. */
-        if( ( usDiscreteCnt & 0x0007 ) != 0 )
-        {
-        	ucNBytes = ( UCHAR )( usDiscreteCnt / 8 + 1 );
-        }
-        else
-        {
-        	ucNBytes = ( UCHAR )( usDiscreteCnt / 8 );
-        }
+        if( ( usDiscreteCnt & 0x0007 ) != 0 )       ucNBytes = ( UCHAR )( usDiscreteCnt / 8 + 1 );
+        else        								ucNBytes = ( UCHAR )( usDiscreteCnt / 8 );
 
         /* Check if the number of registers to read is valid. If not
          * return Modbus illegal data value exception. 
@@ -144,7 +138,7 @@ eMBMasterFuncReadDiscreteInputs( UCHAR * pucFrame, USHORT * usLen )
 		if ((usDiscreteCnt >= 1) && ucNBytes == pucFrame[MB_PDU_FUNC_READ_DISCCNT_OFF])
         {
 	       	/* Make callback to fill the buffer. */
-			eRegStatus = eMBMasterRegDiscreteCB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usDiscreteCnt );
+			eRegStatus = eMBMasterRegDiscreteCB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], 1/*usRegAddress-MB_StartDiscreetaddr*/, usDiscreteCnt );
 
 			/* If an error occured convert it into a Modbus exception. */
 			if( eRegStatus != MB_ENOERR )

@@ -49,6 +49,8 @@ extern UART_HandleTypeDef MODBUS;
 extern UART_HandleTypeDef RS485_1;
 extern UART_HandleTypeDef RS485_2;
 
+extern SPI_HandleTypeDef SpiHandle;
+
 extern struct iecsock 	*s;
 /******************************************************************************/
 /*            Cortex-M4 Processor Interruption and Exception Handlers         */ 
@@ -135,14 +137,7 @@ void USART3_IRQHandler(void)
  ******************************************************************************/
 void UART4_DMA_RX_IRQHandler(void)
 {
-	Port_On(LED2);
-	if (MODBUS.hdmarx->XferCpltCallback == 0xa5a5a5a5){
-		Port_On(LED2);
-		MODBUS.hdmarx->XferCpltCallback = 0x0800a785;
-		MODBUS.hdmarx->XferHalfCpltCallback = 0x0800a7b9;
-	}
 	  HAL_DMA_IRQHandler(MODBUS.hdmarx);
-	Port_Off(LED2);
 }
 void UART4_DMA_TX_IRQHandler(void)
 {
@@ -170,5 +165,21 @@ void TIM2_IRQHandler( void )
 	 HAL_TIM_IRQHandler(&TimHandle);
 //	 Port_Off(LED1);
 }
+/******************************************************************************
+ * SPIx_DMA_RX_IRQHandler
+ ******************************************************************************/
+void DMA2_Stream0_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(SpiHandle.hdmarx);
+}
+
+/******************************************************************************
+ * SPIx_DMA_TX_IRQHandler
+ ******************************************************************************/
+void DMA2_Stream3_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(SpiHandle.hdmatx);
+}
+
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -22,6 +22,7 @@
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_pwr.h"
 #include "stm32f4xx_hal_gpio.h"
+#include "stm32f4xx_hal_spi.h"
 #include "stm32f4xx_it.h"
 
 #include "main.h"
@@ -33,29 +34,67 @@
 #include "gpio.h"
 
 #include "ConfBoard.h"
+#include "modbus.h"
+
+// память SPI
+#include "at45db161d.h"
+
+// карта памяти Устройства -----------
+USHORT		Memory_00[1];
+USHORT		Memory_02[7];
+
+USHORT		Memory_05[17];
+USHORT		Memory_06[0xFF];
+USHORT		Memory_07[0xFF];
+// 0x08- 0x0C - Осциллограф
+USHORT		Memory_0D[0xFF];
+USHORT		Memory_0E[0xFF];
+USHORT		Memory_10[0xFF];
+// ----------------------------------
 
 
-//uint8_t 	Modbus_DataTX[255];		// буфер передатчика Modbus
 uint8_t 	Modbus_DataRX[255];		// буфер приёмника Modbus
-
-uint8_t	Modbus_SizeRX;				// размер ожидаемого ответа от MODBUS.
+uint8_t		Modbus_SizeRX;				// размер ожидаемого ответа от MODBUS.
 
 // Светодиоды
 GPIO_TypeDef* GPIO_PORT[PORTn] = {LED1_GPIO_PORT, LED2_GPIO_PORT, LED3_GPIO_PORT, LED4_GPIO_PORT, RS485_1_DE_GPIO_PORT, RS485_2_DE_GPIO_PORT, MODBUS_DE_GPIO_PORT};
 const uint16_t GPIO_PIN[PORTn] = {LED1_PIN, LED2_PIN, LED3_PIN, LED4_PIN, RS485_1_DE, RS485_2_DE, MODBUS_DE};
 
+//Master mode: хранилище дискретных входов
+USHORT   usMDiscInStart                             = M_DISCRETE_INPUT_START;
+#if      M_DISCRETE_INPUT_NDISCRETES%8
+UCHAR    ucMDiscInBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_DISCRETE_INPUT_NDISCRETES/8+1];
+#else
+UCHAR    ucMDiscInBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_DISCRETE_INPUT_NDISCRETES/8];
+#endif
+//Master mode:Coils variables
+USHORT   usMCoilStart                               = M_COIL_START;
+#if      M_COIL_NCOILS%8
+UCHAR    ucMCoilBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_COIL_NCOILS/8+1];
+#else
+UCHAR    ucMCoilBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_COIL_NCOILS/8];
+#endif
+//Master mode: хранилище входных регистров
+USHORT   usMRegInStart                              = M_REG_INPUT_START;
+USHORT   usMRegInBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_REG_INPUT_NREGS];
+//Master mode:хранилище выходных регистров
+USHORT   usMRegHoldStart                            = M_REG_HOLDING_START;
+USHORT   usMRegHoldBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_REG_HOLDING_NREGS];
+
 
 volatile UART_HandleTypeDef BOOT_UART;			//USART1
 volatile UART_HandleTypeDef MODBUS;				//UART4
-volatile UART_HandleTypeDef RS485_1;				//USART2
-volatile UART_HandleTypeDef RS485_2;				//USART3
+volatile UART_HandleTypeDef RS485_1;			//USART2
+volatile UART_HandleTypeDef RS485_2;			//USART3
 
-//xQueueHandle 	  xQueueMODBUS;			//для сохранения ссылки на очередь
+volatile SPI_HandleTypeDef SpiHandle;			// память на шине SPI
+
+
+//xQueueHandle 	  xQueueMODBUS;					//для сохранения ссылки на очередь
 
 volatile uint16_t	xMasterOsEvent;				// хранилище событий порта MODBUS
 
 osMessageQId xQueueMODBUSHandle;
-
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 void FREERTOS_Init(void);
@@ -68,29 +107,33 @@ int main(void) {
 	  GPIO_Init();						// конфиг портов.
 	  Clocks_Init();					// конфиг часов.
 
-//	  BOOT_UART_Init(115200);			// настройка BOOT интерфейса.
-//	  USART_TRACE("------------------------------------\n");
-//	  USART_TRACE("BOOT_Init.. ok\n");
+	  BOOT_UART_Init(115200);			// настройка BOOT интерфейса.
+	  USART_TRACE("\033[2J\033[1;1H");
+	  USART_TRACE("------------------------------------\n");
+	  USART_TRACE("BOOT_Init.. ok\n");
 
-//	  RS485_1_UART_Init(115200);		// настройка RS485 1 канала.
-//	  USART_TRACE("RS485_1_UART_Init.. ok\n");
+	  RS485_1_UART_Init(115200);		// настройка RS485 1 канала.
+	  USART_TRACE("RS485_1_UART_Init.. ok\n");
 
-//  	  RS485_2_UART_Init(115200);		// настройка RS485 2 канала.
-//  	  USART_TRACE("RS485_2_UART_Init.. ok\n");
+  	  RS485_2_UART_Init(115200);		// настройка RS485 2 канала.
+  	  USART_TRACE("RS485_2_UART_Init.. ok\n");
+
+	  AT45DB161D_spi_init();			// Инит SPI памяти
+	  uint32_t MEMId = MEM_ID_Read();
+	  USART_TRACE("AT45DB161D Id = %u\n",(uint16_t)(MEMId>>16));
 
 	  // тут нужно получить параметры системы от головного(MODBUS) скорости, адреса, порты....
 
-	  Port_Init(LED1,GPIO_MODE_OUTPUT_PP);
-	  Port_Init(LED2,GPIO_MODE_OUTPUT_PP);
-	  Port_Init(LED3,GPIO_MODE_OUTPUT_PP);
-	  Port_Init(LED4,GPIO_MODE_OUTPUT_PP);
+	  Port_Init(LED1,GPIO_MODE_OUTPUT_OD);
+//	  Port_Init(LED2,GPIO_MODE_OUTPUT_PP);
+//	  Port_Init(LED3,GPIO_MODE_OUTPUT_PP);
+//	  Port_Init(LED4,GPIO_MODE_OUTPUT_PP);
 //	  Port_On(LED1);
 
 	  Port_Init(MODBUS_DEn,GPIO_MODE_INPUT);			// пока не используем
 
-	  FREERTOS_Init();			// инит. FREERTOS.
-
-	  osKernelStart();			// Старт планировщика
+	  FREERTOS_Init();					// инит. FREERTOS.
+	  osKernelStart();					// Старт планировщика
 
 	while (1) {
 	}
