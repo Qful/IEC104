@@ -189,8 +189,8 @@ static  DMA_HandleTypeDef hdma_tx;
     HAL_NVIC_SetPriority(USART1_DMA_TX_IRQn, 6, 1);	//0,1
     HAL_NVIC_EnableIRQ(USART1_DMA_TX_IRQn);
 
- //   HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
- //   HAL_NVIC_EnableIRQ(USART1_IRQn);
+    HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(USART1_IRQn);
 
   }
   // ---------------------------- RS485_1 ---------------------------------

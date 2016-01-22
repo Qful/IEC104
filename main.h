@@ -53,6 +53,9 @@ print '\033[1;48mHighlighted Crimson like Chianti\033[1;m'
                             printf(__VA_ARGS__);\
                             printf("\033[1;m");
 
+#define  USART_TRACE_MAGENTA(...)   printf("\033[1;35mDBG: ") ;\
+                            printf(__VA_ARGS__);\
+                            printf("\033[1;m");
 #define  USART_0TRACE(...)  printf(__VA_ARGS__);
 
 #else

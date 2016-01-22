@@ -108,7 +108,8 @@ int main(void) {
 	  Clocks_Init();					// конфиг часов.
 
 	  BOOT_UART_Init(115200);			// настройка BOOT интерфейса.
-	  USART_TRACE("\033[2J\033[1;1H");
+//	  USART_0TRACE("\033[0;0H");
+	  USART_0TRACE("\033[2J\033[1;1H");
 	  USART_TRACE("------------------------------------\n");
 	  USART_TRACE("BOOT_Init.. ok\n");
 
@@ -121,6 +122,7 @@ int main(void) {
 	  AT45DB161D_spi_init();			// Инит SPI памяти
 	  uint32_t MEMId = MEM_ID_Read();
 	  USART_TRACE("AT45DB161D Id = %u\n",(uint16_t)(MEMId>>16));
+
 
 	  // тут нужно получить параметры системы от головного(MODBUS) скорости, адреса, порты....
 
@@ -269,8 +271,10 @@ int __io_putchar(int ch)
 }
 int __io_putstrDMA(char *ptr, int len)
 {
+
 //  HAL_UART_Transmit_DMA(&BOOT_UART, (uint8_t *)ptr, len);
   HAL_UART_Transmit(&BOOT_UART, (uint8_t *)ptr, len, 0xFFFF);
+
   return len;
 }
 /*************************************************************************

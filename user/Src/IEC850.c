@@ -10,6 +10,7 @@
 #include "task.h"
 #include "cmsis_os.h"
 #include "queue.h"
+#include "signal.h"
 
 #include "main.h"
 #include "time.h"
@@ -26,10 +27,18 @@
 
 /*iec850 includes ------------------------------------------------------------*/
 #include "iec850.h"
+
+#include "byte_stream.h"
 #include "cotp.h"
-#include "acse.h"
 #include "iso_session.h"
 #include "iso_presentation.h"
+#include "acse.h"
+#include "iso_server.h"
+#include "iec61850_server.h"
+#include "static_model.h"
+
+//#include "MmsPdu.h"
+
 /*Modbus includes ------------------------------------------------------------*/
 #include "mb.h"
 #include "mb_m.h"
@@ -38,10 +47,13 @@
 
 
 /* Variables -----------------------------------------------------------------*/
+/* import IEC 61850 device model created from SCL-File */
+extern IedModel iedModel;
+
+static IedServer iedServer = NULL;
+
 typedef void* Semaphore;
 
-
-//extern struct netconn *conn, *newconn;
 extern struct netconn *conn850,*newconn850;
 
 extern struct netif 	first_gnetif;
@@ -57,6 +69,9 @@ struct sIsoConnection {
     uint8_t* 		receive_buf;					// буфер принятых данных
     uint8_t* 		send_buf_1;						// буфер для передачи
     uint8_t* 		send_buf_2;
+    Socket			socket;
+    MessageReceivedHandler msgRcvdHandler;
+    void* 			msgRcvdHandlerParameter;
     int 			state;							// статус разобранного сообщения		ISO_CON_STATE_STOPPED/ISO_CON_STATE_RUNNING
     IsoSession* 	session;
     IsoPresentation* presentation;
@@ -67,10 +82,11 @@ struct sIsoConnection {
 typedef struct sIsoConnection* IsoConnection;
 
 
-IsoConnection	IsoConnection_create(struct netconn *conn,IsoConnection self,uint8_t* Inbuffer);
-char*	Socket_getPeerAddress(struct netconn *conn);
+IsoConnection	Connection_create(struct netconn *conn,IsoConnection self,uint8_t* Inbuffer);
+char*			Socket_getPeerAddress(struct netconn *conn);
+void			observerCallback(DataAttribute* dataAttribute);
 
-
+void 			sigint_handler(int signalId);
 /*************************************************************************
  * StartIEC850Task
  *************************************************************************/
@@ -86,14 +102,6 @@ void StartIEC850Task(void const * argument){
 	IsoConnection self = calloc(1, sizeof(struct sIsoConnection));
 
     ByteBuffer responseBuffer;
-
-
-// TODO: нужно создать функции подготовки буферов (инита каждого )
-//	self = calloc(1, sizeof(struct sIsoConnection));
-//	self->cotpConnection = calloc(1, sizeof(CotpConnection));
-//	self->cotpConnection->readBuffer = ByteBuffer_create(NULL,sizeof(ByteBuffer));
-//   	self->cotpConnection->payload = ByteBuffer_create(NULL,sizeof(ByteBuffer));
-
 
 	tcpip_init( NULL, NULL );
 	USART_TRACE_BLUE("MAC:%.2X-%.2X-%.2X-%.2X-%.2X-%.2X \n",MAC_ADDR0, MAC_ADDR1, MAC_ADDR2, MAC_ADDR3,MAC_ADDR4,MAC_ADDR5);
@@ -124,26 +132,38 @@ void StartIEC850Task(void const * argument){
 		    if (ready850 != ERR_OK)	{netconn_delete(conn850);USART_TRACE("Create NETCONN_TCP ERROR!!!\n");}
 		    else	{netconn_listen(conn850);USART_TRACE("Open port: %d\n",IEC850_Port);}		// переводим соединение в режим прослушивания
 		}
+		// -------------------------------------------------------------------------------------------------------------------
+		// -------------------------------------------------------------------------------------------------------------------
+		// -------------------------------------------------------------------------------------------------------------------
+		//iedServer = IedServer_create(&iedModel);								// создадим IED электронное устройство
+
+		//IedServer_observeDataAttribute(iedServer, IEDMODEL_GenericIO_GGIO1_NamPlt_vendor,observerCallback);
+
+		//signal(SIGINT, sigint_handler);
+		// -------------------------------------------------------------------------------------------------------------------
+		// -------------------------------------------------------------------------------------------------------------------
+		// -------------------------------------------------------------------------------------------------------------------
+
 		// далее приём данных и обработка в цикле
         while (1){																	// далее слушаем и  захватываем соединение
         	accept_err850 = netconn_accept(conn850, &newconn850);
         	if (accept_err850 == ERR_OK){											// если приняли, то обработаем его
         		USART_TRACE("a new connection has been received...\n");
 
-        		IsoConnection_create(newconn850,self,data);							// настроим структуру для работы
 
+        		Connection_create(newconn850,self,data);							// настроим структуру для работы
         		AcseConnection_init(&acseConnection);
-        	    //AcseConnection_setAuthenticationParameter(&acseConnection,IsoServer_getAuthenticationParameter(self->isoServer));
-
 
         		while (netconn_recv(newconn850, &buf850) == ERR_OK)					// принимаем данные в буфер
                 {
+                    USART_TRACE_GREEN(" ---------------------- netbuf Receive data ---------------------- \n");
                     do
                     {
-
                     netbuf_data(buf850,(void *)&data, &len);						// указатель получил адрес вх. данных и его размер
                     self->cotpConnection->readBuffer->buffer = data;
                     self->cotpConnection->readBuffer->maxSize = len;
+
+                    USART_TRACE("Receive data from a netconn. %u bytes \n",len);
 
                     ByteBuffer_wrap(&responseBuffer, self->send_buf_1, 0, SEND_BUF_SIZE);	// буфер подготовки данных для передачи в TCP/IP
 
@@ -161,7 +181,7 @@ void StartIEC850Task(void const * argument){
 
                             ByteBuffer* 			cotpPayload = CotpConnection_getPayload(self->cotpConnection);		// получаем адрес сообщения
                             IsoSessionIndication	sIndication = IsoSession_parseMessage(self->session, cotpPayload);	// парсим Session сообщение
-                            ByteBuffer*				sessionUserData = IsoSession_getUserData(self->session);			// iso8823 OSI Presentation protocol
+                            ByteBuffer*				sessionUserData = IsoSession_getUserData(self->session);			// iso8823 OSI Presentation protocol в sessionUserData находится всё начиная с ISO 8823
 
                             switch (sIndication) {
                             IsoPresentationIndication 	pIndication;
@@ -173,44 +193,64 @@ void StartIEC850Task(void const * argument){
                             	case SESSION_CONNECT:
                             		USART_TRACE("iso_connection: session connect indication\n");
                             		pIndication = IsoPresentation_parseConnect(self->presentation, sessionUserData);	// парсим Presentation сообщение
+                            		// далее в self->presentation-nextPayload данные начиная с ISO 8650-1 (AARP) сообщения запроса от клиента.
+
                             		if (pIndication == PRESENTATION_OK) {
                                         ByteBuffer* 	acseBuffer;
                                         AcseIndication 	aIndication;
                                         ByteBuffer 		mmsRequest;
 
                             			USART_TRACE("iso_connection: presentation ok\n");
-                            			acseBuffer = &(self->presentation->nextPayload);
-                            			aIndication = AcseConnection_parseMessage(&acseConnection, acseBuffer);
+
+                            			acseBuffer = &(self->presentation->nextPayload);								// берём указатель на входящий ISO 8650-1 (AARP) и парсим
+                            			aIndication = AcseConnection_parseMessage(&acseConnection, acseBuffer);			// возвращаем указатель на юзерданные в acseConnection->userDataBuffer
+
                             			if (aIndication == ACSE_ASSOCIATE) {
                             				USART_TRACE("cotp_server: acse associate\n");
 
                             				ByteBuffer_wrap(&mmsRequest, acseConnection.userDataBuffer,acseConnection.userDataBufferSize, acseConnection.userDataBufferSize);
 
-                            				if (self->cotpConnection->payload->currPos > 0) {
-                            					USART_TRACE("iso_connection: application payload size: %i\n", self->cotpConnection->payload->currPos);
+                            				// Получили запрос Request, нужно его проанализировать и сформировать ответ Response
+//TODO: Нужна функция анализа Request и формирования Response.
 
-                            					// пишем в writeBuffer заголовок ISO 8650-1 (AARQ 24 байта) + содержимое payload (user infirmation)
-                            					AcseConnection_createAssociateResponseMessage(&acseConnection,ACSE_RESULT_ACCEPT, self->cotpConnection->writeBuffer, self->cotpConnection->payload);
-                            					self->cotpConnection->payload->currPos = 0;
+                            				//ByteBuffer_setcurrPos(&responseBuffer,0);
+                            				//self->msgRcvdHandler(self->msgRcvdHandlerParameter, &mmsRequest, &responseBuffer);							// та самая фунцция подготовки данных для ответа
+
+
+                            				mmsRequest.buffer[0]++;	//ответим response
+
+
+                            				if (mmsRequest.currPos > 0) {
+                            					USART_TRACE("iso_connection: application payload size: %i\n", mmsRequest.currPos);
+
+
+                            					// пишем в writeBuffer заголовок ISO 8650-1 (AARQ 24 байта) + содержимое mmsRequest (user infirmation = MMS)
+                            					AcseConnection_createAssociateResponseMessage(&acseConnection,ACSE_RESULT_ACCEPT, self->cotpConnection->writeBuffer, &mmsRequest);
+                            					USART_TRACE("add ISO 8650-1(AARQ) total size: %i\n", self->cotpConnection->writeBuffer->currPos);
+
                             					//  пишем в payload ISO 8823 + содержимое writeBuffer (AARQ + user infirmation)
+                            					ByteBuffer_setcurrPos(self->cotpConnection->payload,0);
                             					IsoPresentation_createCpaMessage(self->presentation, self->cotpConnection->payload,self->cotpConnection->writeBuffer);
+                            					USART_TRACE("add ISO 8823(ANS.1) total size: %i\n", self->cotpConnection->payload->currPos);
+
                             					// с этого момента в payload->buffer с лежит блок: ISO 8823 + ISO 8650-1 + MMS
                             					// до TCP уровня осталось ISO 8327-1 (SPDU), ISO 8073 (COTP), TPKT
 
-                            					self->cotpConnection->writeBuffer->currPos = 0;							// обнулим укозатель для формирования хвоста начиная с ISO 8327-1
-                            					responseBuffer.currPos = 0;
+                            					ByteBuffer_setcurrPos(self->cotpConnection->writeBuffer,0);		// обнулим укозатель для формирования хвоста начиная с ISO 8327-1
+                            					ByteBuffer_setcurrPos(&responseBuffer,0);
 
                             					// формитуем в буфере writeBuffer конструкцию AcceptSpdu ( ISO 8327-1 OSI Session protocol )
-                            					//IsoSession_createAcceptSpdu(self->session, self->cotpConnection->writeBuffer,self->cotpConnection->payload->currPos);
                             					IsoSession_createAcceptSpdu(self->session,&responseBuffer,self->cotpConnection->payload->currPos);
+                            					USART_TRACE_MAGENTA("create new buffer ISO 8327-1(SPDU) total size: %i\n", responseBuffer.currPos);
 
                             					// дополняем его буфером payload->buffer (ISO 8823 + ISO 8650-1 + MMS)
-                            					//ByteBuffer_append(self->cotpConnection->writeBuffer, self->cotpConnection->payload->buffer,self->cotpConnection->payload->currPos);
                             					ByteBuffer_append(&responseBuffer, self->cotpConnection->payload->buffer,self->cotpConnection->payload->currPos);
+                            					USART_TRACE_MAGENTA("add ISO 8823 + ISO 8650-1 + ISO 9506 (MMS) total size: %i\n", responseBuffer.currPos);
 
                             					// добавляем TPKT и ISO 8073 (COTP) и отправляем всё в стек TCP/IP
-                            					//CotpConnection_sendDataMessage(self->cotpConnection, self->cotpConnection->writeBuffer);
                             					CotpConnection_sendDataMessage(self->cotpConnection, &responseBuffer);
+                            					USART_TRACE_MAGENTA("add TPKT & ISO 8073 (COTP) total size: %i\n", self->cotpConnection->writeBuffer->currPos);
+
                             				}
                             				else {
                             					USART_TRACE_RED("iso_connection: association error. No response from application!\n");
@@ -225,7 +265,50 @@ void StartIEC850Task(void const * argument){
 
                             	case SESSION_DATA:
                             		USART_TRACE("iso_connection: session data indication\n");
-                            		USART_TRACE_RED("TODO: iso_connection: session data indication\n");
+
+                            		pIndication = IsoPresentation_parseUserData(self->presentation, sessionUserData);
+                                    if (pIndication == PRESENTATION_ERROR) {
+                                        USART_TRACE_RED("cotp_server: presentation error\n");
+                                        self->state = ISO_CON_STATE_STOPPED;
+                                        break;
+                                    }
+
+                                    if (self->presentation->nextContextId == 3) {
+                                    	ByteBuffer* mmsRequest;
+
+                                    	USART_TRACE("iso_connection: mms message\n");
+
+                                    	mmsRequest = &(self->presentation->nextPayload);
+                                    	ByteBuffer_setcurrPos(self->cotpConnection->writeBuffer,0);
+
+                        				// Получили запрос Request, нужно его проанализировать и сформировать ответ Response
+//TODO: Нужна функция анализа Request и формирования Response.
+                                    	//self->msgRcvdHandler(self->msgRcvdHandlerParameter, mmsRequest, &responseBuffer);					// та самая фунцция подготовки данных для ответа
+
+                                    	mmsRequest->buffer[0]++;	//ответим response
+
+                                    	// создадим MMS сообщение в буфере writeBuffer с юзерданными из payload
+                                    	IsoPresentation_createUserData(self->presentation,self->cotpConnection->writeBuffer, mmsRequest);
+
+                                    	ByteBuffer_setcurrPos(&responseBuffer,0);						// обнулим укозатель для формирования
+
+                                    	// добавим GiveToken Data SPDU в оконечный буфер для отправки
+                                    	IsoSession_createDataSpdu(self->session, &responseBuffer);
+                                    	USART_TRACE_MAGENTA("create new buffer ISO 8327-1(SPDU) total size: %i\n", responseBuffer.currPos);
+
+                                    	// дополняем его буфером writeBuffer->buffer (ISO 8823 + ISO 8650-1 + MMS)
+                                    	ByteBuffer_append(&responseBuffer, self->cotpConnection->writeBuffer->buffer,self->cotpConnection->writeBuffer->currPos);
+                                    	USART_TRACE_MAGENTA("add ISO 8823 + ISO 8650-1 + ISO 9506 (MMS) total size: %i\n", responseBuffer.currPos);
+
+                                    	ByteBuffer_setcurrPos(self->cotpConnection->writeBuffer,0);
+
+                    					// добавляем TPKT и ISO 8073 (COTP) и отправляем всё в стек TCP/IP
+                                    	CotpConnection_sendDataMessage(self->cotpConnection, &responseBuffer);
+                                    	USART_TRACE_MAGENTA("add TPKT & ISO 8073 (COTP) total size: %i\n", self->cotpConnection->writeBuffer->currPos);
+
+                                    }else{
+                                    	USART_TRACE_RED(" iso_connection: unknown presentation layer context!\n");
+                                    }
                             		break;
 
                             	case SESSION_GIVE_TOKEN:
@@ -252,8 +335,6 @@ void StartIEC850Task(void const * argument){
                             self->state = ISO_CON_STATE_STOPPED;
                         break;
                     }
-
-                    USART_TRACE("Receive data from a netconn. %u bytes \n",len);
 
                 	Port_Toggle(LED1);
                     }while (netbuf_next(buf850) >= 0);
@@ -288,15 +369,17 @@ int		ByteBuffer_send(ByteBuffer* self)
 }
 
 /*************************************************************************
- * IsoConnection_create
+ * Connection_create
  *
  *************************************************************************/
-IsoConnection	IsoConnection_create(struct netconn *conn, IsoConnection self, uint8_t* Inbuffer)
+IsoConnection	Connection_create(struct netconn *conn, IsoConnection self, uint8_t* Inbuffer)
 {
 
 	self->cotpConnection = calloc(1, sizeof(CotpConnection));
 	self->cotpConnection->readBuffer = ByteBuffer_create(NULL,RECEIVE_BUF_SIZE);
    	self->cotpConnection->payload = ByteBuffer_create(NULL,SEND_BUF_SIZE);
+
+   	self->socket = conn;
 
     self->session = calloc(1, sizeof(IsoSession));
     IsoSession_init(self->session);
@@ -307,8 +390,12 @@ IsoConnection	IsoConnection_create(struct netconn *conn, IsoConnection self, uin
 	self->receive_buf = Inbuffer;
 	self->send_buf_1 = malloc(SEND_BUF_SIZE);
 	self->send_buf_2 = NULL;
+
+	self->msgRcvdHandler = NULL;
+	self->msgRcvdHandlerParameter = NULL;
+
 	self->state = ISO_CON_STATE_RUNNING;
-	self->clientAddress = Socket_getPeerAddress(newconn850);							// адрес клиента
+	self->clientAddress = Socket_getPeerAddress(conn);							// адрес клиента
 
 	USART_TRACE("new iso connection thread started\n");
 
@@ -336,4 +423,34 @@ char*	Socket_getPeerAddress(struct netconn *conn)
 
     sprintf(clientConnection, "%d.%d.%d.%d[%i]",ip0, ip1, ip2, ip3, port);
     USART_TRACE("PeerAddress: IP:%d.%d.%d.%d[%i]\n",ip0, ip1, ip2, ip3,port);
+
+   return clientConnection;
+}
+/*************************************************************************
+ * observerCallback
+ * колбэк монитора за атрибутами
+ *************************************************************************/
+void	observerCallback(DataAttribute* dataAttribute){
+    if (dataAttribute == IEDMODEL_GenericIO_GGIO1_NamPlt_vendor) {
+ //   	USART_TRACE("GGIO.NamPlt.vendor changed to %s\n", MmsValue_toString(dataAttribute->mmsValue));
+    }
+    else if (dataAttribute == IEDMODEL_GenericIO_GGIO1_NamPlt_swRev) {
+ //   	USART_TRACE("GGIO.NamPlt.swRef changed to %s\n", MmsValue_toString(dataAttribute->mmsValue));
+    }
+}
+/*************************************************************************
+ * Hal_getTimeInMs
+ *
+ *************************************************************************/
+void sigint_handler(int signalId)
+{
+
+}
+/*************************************************************************
+ * Hal_getTimeInMs
+ *
+ *************************************************************************/
+uint64_t 	Hal_getTimeInMs (void){
+
+	   return 0;
 }

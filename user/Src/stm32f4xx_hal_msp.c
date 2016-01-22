@@ -185,11 +185,11 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi)
 
 void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
 {
-	  USART_TRACE("HAL_SPI_RxCpltCallback.\n");
+	  USART_TRACE("HAL_SPI_RxCpltCallback\n");
 }
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 {
-	  USART_TRACE("HAL_SPI_TxCpltCallback.\n");
+	  USART_TRACE("HAL_SPI_TxCpltCallback\n");
 
 }
 void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)

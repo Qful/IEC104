@@ -195,7 +195,7 @@ void FREERTOS_Init(void) {
   fre = xPortGetFreeHeapSize();			// размер кучи
   USART_TRACE("FreeHeap:%u\n",fre);
 
-  osThreadDef(IEC850, StartIEC850Task, osPriorityAboveNormal,0, 1024);//1024
+  osThreadDef(IEC850, StartIEC850Task, osPriorityAboveNormal,0, 1524);//1024
   defaultTaskHandle = osThreadCreate(osThread(IEC850), NULL);
   fre = xPortGetFreeHeapSize();
   USART_TRACE("FreeHeap(IEC850):%u\n",fre);

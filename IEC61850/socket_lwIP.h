@@ -39,7 +39,8 @@
 typedef struct sServerSocket* ServerSocket;
 
 /** Opaque reference for a client or connection socket instance */
-typedef struct sSocket* Socket;
+//typedef struct sSocket* Socket;
+typedef struct netconn* Socket;
 
 /**
  * Create a new TcpServerSocket instance
@@ -49,37 +50,26 @@ typedef struct sSocket* Socket;
  *
  * \return the newly create TcpServerSocket instance
  */
-ServerSocket
-TcpServerSocket_create(char* address, int port);
+ServerSocket	TcpServerSocket_create(char* address, int port);
+
+void			ServerSocket_listen(ServerSocket socket);
+
+Socket			ServerSocket_accept(ServerSocket socket);
+
+void			ServerSocket_setBacklog(ServerSocket socket, int backlog);
+
+void			ServerSocket_destroy(ServerSocket socket);
+
+Socket			TcpSocket_create();
 
 
-void
-ServerSocket_listen(ServerSocket socket);
+int				Socket_connect(Socket socket, char* address, int port);
 
-Socket
-ServerSocket_accept(ServerSocket socket);
+int				Socket_read(Socket socket, uint8_t* buf, int size);
 
-void
-ServerSocket_setBacklog(ServerSocket socket, int backlog);
+int				Socket_write(Socket socket, uint8_t* buf, int size);
 
-void
-ServerSocket_destroy(ServerSocket socket);
-
-Socket
-TcpSocket_create();
-
-
-int
-Socket_connect(Socket socket, char* address, int port);
-
-int
-Socket_read(Socket socket, uint8_t* buf, int size);
-
-int
-Socket_write(Socket socket, uint8_t* buf, int size);
-
-void
-Socket_destroy(Socket socket);
+void			Socket_destroy(Socket socket);
 
 /*! @} */
 
