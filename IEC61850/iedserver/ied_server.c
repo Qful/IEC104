@@ -21,6 +21,8 @@
  *  See COPYING file for the complete license text.
  */
 
+#include "main.h"
+
 #include "iec61850_server.h"
 #include "mms_mapping.h"
 #include "control.h"
@@ -36,6 +38,10 @@ struct sIedServer {
 	MmsMapping* mmsMapping;
 };
 
+/*************************************************************************
+ * createControlObjects
+ *
+ *************************************************************************/
 static void		createControlObjects(IedServer self, MmsDomain* domain, char* lnName, MmsTypeSpecification* typeSpec)
 {
     MmsMapping* mapping = self->mmsMapping;
@@ -81,7 +87,7 @@ static void		createControlObjects(IedServer self, MmsDomain* domain, char* lnNam
                     ControlObject_setSBOw(controlObject, sbowVal);
                 }
                 else {
-                    printf("createControlObjects: Unknown element in CO!\n");
+                	USART_TRACE_RED("createControlObjects: Unknown element in CO!\n");
                 }
             }
 
@@ -90,6 +96,10 @@ static void		createControlObjects(IedServer self, MmsDomain* domain, char* lnNam
     }
 }
 
+/*************************************************************************
+ * createMmsServerCache
+ * инсталируем все MMSnamedvariables верхнего уровня в кэш MMS сервера
+ *************************************************************************/
 static void		createMmsServerCache(IedServer self)
 {
 
@@ -105,7 +115,7 @@ static void		createMmsServerCache(IedServer self)
 		for (i = 0; i < logicalDevice->namedVariablesCount; i++) {
 			char* lnName = logicalDevice->namedVariables[i]->name;
 
-			if (DEBUG) printf("Insert into cache %s - %s\n", logicalDevice->domainName, lnName);
+			USART_TRACE("Добавим в КЭШ сервера %s - %s\n", logicalDevice->domainName, lnName);
 
 			int fcCount = logicalDevice->namedVariables[i]->typeSpec.structure.elementCount;
 			int j;
@@ -128,7 +138,8 @@ static void		createMmsServerCache(IedServer self)
 
 					MmsValue* defaultValue = MmsValue_newDefaultValue(fcSpec);
 
-					if (DEBUG) printf("Insert into cache %s - %s\n", logicalDevice->domainName, variableName);
+					USART_TRACE("Добавим в КЭШ сервера %s - %s\n", logicalDevice->domainName, variableName);
+
 					MmsServer_insertIntoCache(self->mmsServer, logicalDevice, variableName, defaultValue);
 
 					free(variableName);
@@ -179,8 +190,11 @@ static void		installDefaultValuesForDataAttribute(IedServer self, DataAttribute*
 	}
 }
 
-static void
-installDefaultValuesForDataObject(IedServer self, DataObject* dataObject,
+/*************************************************************************
+ * installDefaultValuesForDataObject
+ *
+ *************************************************************************/
+static void		installDefaultValuesForDataObject(IedServer self, DataObject* dataObject,
 		char* objectReference, int position)
 {
 	sprintf(objectReference + position, ".%s", dataObject->name);
@@ -200,9 +214,11 @@ installDefaultValuesForDataObject(IedServer self, DataObject* dataObject,
 		childNode = childNode->sibling;
 	}
 }
-
-static void
-installDefaultValuesInCache(IedServer self)
+/*************************************************************************
+ * installDefaultValuesInCache
+ *
+ *************************************************************************/
+static void	installDefaultValuesInCache(IedServer self)
 {
 	IedModel* model = self->model;
 
@@ -237,8 +253,11 @@ installDefaultValuesInCache(IedServer self)
 	}
 }
 
-static void
-updateDataSetsWithCachedValues(IedServer self)
+/*************************************************************************
+ * updateDataSetsWithCachedValues
+ *
+ *************************************************************************/
+static void		updateDataSetsWithCachedValues(IedServer self)
 {
 	DataSet** dataSets = self->model->dataSets;
 
@@ -267,32 +286,53 @@ updateDataSetsWithCachedValues(IedServer self)
 }
 /*************************************************************************
  * IedServer_create
- * создадим IED электронное устройство
+ * создадим IED электронное устройство IedServer
+ *
+ * self->mmsMapping
+ * self->mmsDevice
+ * self->isoServer
+ * self->mmsServer
+ *
  *************************************************************************/
 IedServer	IedServer_create(IedModel* iedModel)
 {
 	IedServer self = calloc(1, sizeof(struct sIedServer));
 
 	self->model = iedModel;
+
+	USART_TRACE("-> IedServer_create -> MmsMapping_create(iedModel);\n");
+
 	self->mmsMapping = MmsMapping_create(iedModel);
 	self->mmsDevice = MmsMapping_getMmsDeviceModel(self->mmsMapping);
-	self->isoServer = IsoServer_create();
+
+	USART_TRACE("-> IedServer_create -> IsoServer_create();\n");
+
+	self->isoServer = IsoServer_create();								// установим ISO_SVR_STATE_IDLE и укажем номер порта
+
+
+	USART_TRACE("-> IedServer_create -> MmsServer_create(self->isoServer, self->mmsDevice);\n");
+
 	self->mmsServer = MmsServer_create(self->isoServer, self->mmsDevice);
 
 	MmsMapping_setMmsServer(self->mmsMapping, self->mmsServer);
 	MmsMapping_installHandlers(self->mmsMapping);
 
+	USART_TRACE("-> IedServer_create -> createMmsServerCache(self);\n");
 	createMmsServerCache(self);
 
-	iedModel->initializer();
+	USART_TRACE("-> IedServer_create -> iedModel->initializer();\n");
+	iedModel->initializer();											// добавим переменные в кэш. static_model.c
 
-	installDefaultValuesInCache(self); /* This will also connect cached MmsValues to DataAttributes */
+	installDefaultValuesInCache(self); 									// This will also connect cached MmsValues to DataAttributes
 
 	updateDataSetsWithCachedValues(self);
 
 	return self;
 }
-
+/*************************************************************************
+ * IedServer_destroy
+ * уничтожим IED электронное устройство
+ *************************************************************************/
 void	IedServer_destroy(IedServer self)
 {
 	MmsServer_destroy(self->mmsServer);
@@ -300,28 +340,38 @@ void	IedServer_destroy(IedServer self)
 	MmsMapping_destroy(self->mmsMapping);
 	free(self);
 }
-
-MmsServer
-IedServer_getMmsServer(IedServer self)
+/*************************************************************************
+ * IedServer_getMmsServer
+ * получим MmsServer из IED сервера
+ *************************************************************************/
+MmsServer	IedServer_getMmsServer(IedServer self)
 {
 	return self->mmsServer;
 }
-
-IsoServer
-IedServer_getIsoServer(IedServer self)
+/*************************************************************************
+ * IedServer_getIsoServer
+ * получим IsoServer из IED сервера
+ *************************************************************************/
+IsoServer	IedServer_getIsoServer(IedServer self)
 {
 	return self->isoServer;
 }
-
-void
-IedServer_start(IedServer self, int tcpPort)
+/*************************************************************************
+ * IedServer_start
+ * старт IED сервера
+ *************************************************************************/
+//TODO: не работает Thread
+void	IedServer_start(IedServer self, int tcpPort)
 {
 	MmsServer_startListening(self->mmsServer, tcpPort);
 	MmsMapping_startEventWorkerThread(self->mmsMapping);
 }
 
-bool
-IedServer_isRunning(IedServer self)
+/*************************************************************************
+ * IedServer_isRunning
+ * узнаем работает ли IED сервер
+ *************************************************************************/
+bool	IedServer_isRunning(IedServer self)
 {
 	if (IsoServer_getState(self->isoServer) == ISO_SVR_STATE_RUNNING)
 		return true;
@@ -329,8 +379,11 @@ IedServer_isRunning(IedServer self)
 		return false;
 }
 
-void
-IedServer_stop(IedServer self)
+/*************************************************************************
+ * IedServer_stop
+ * остановим IED сервер
+ *************************************************************************/
+void	IedServer_stop(IedServer self)
 {
 	MmsServer_stopListening(self->mmsServer);
 }

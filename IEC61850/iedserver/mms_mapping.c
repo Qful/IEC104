@@ -30,6 +30,8 @@
 #include "mms_goose.h"
 #include "reporting.h"
 
+#include "main.h"
+
 typedef struct sAttributeObserver {
     DataAttribute* attribute;
     void (*handler) (DataAttribute* dataAttribute);
@@ -295,29 +297,28 @@ createFCNamedVariableFromDataObject(DataObject* dataObject,
     namedVariable->typeSpec.structure.elementCount = elementCount;
     return namedVariable;
 }
-
-static MmsTypeSpecification*
-createFCNamedVariable(LogicalNode* logicalNode, FunctionalConstraint fc)
+/*************************************************************************
+ * createFCNamedVariable
+ * создадим FC
+ *************************************************************************/
+static MmsTypeSpecification*	createFCNamedVariable(LogicalNode* logicalNode, FunctionalConstraint fc)
 {
-    MmsTypeSpecification* namedVariable = calloc(1,
-            sizeof(MmsTypeSpecification));
-    namedVariable->name = copyString(FunctionalConstrained_toString(fc));
-    namedVariable->type = MMS_STRUCTURE;
+    MmsTypeSpecification* namedVariable = calloc(1, sizeof(MmsTypeSpecification));
+
+    namedVariable->name = copyString(FunctionalConstrained_toString(fc));			// им€ переменной в строковом виде
+    namedVariable->type = MMS_STRUCTURE;											// тип переменной
 
     int dataObjectCount = 0;
 
     DataObject* dataObject = (DataObject*) logicalNode->firstChild;
 
     while (dataObject != NULL ) {
-        if (DataObject_hasFCData(dataObject, fc))
-            dataObjectCount++;
-
+        if (DataObject_hasFCData(dataObject, fc)) dataObjectCount++;
         dataObject = (DataObject*) dataObject->sibling;
     }
 
     namedVariable->typeSpec.structure.elementCount = dataObjectCount;
-    namedVariable->typeSpec.structure.elements = calloc(dataObjectCount,
-            sizeof(MmsTypeSpecification*));
+    namedVariable->typeSpec.structure.elements = calloc(dataObjectCount, sizeof(MmsTypeSpecification*));
 
     dataObjectCount = 0;
 
@@ -326,8 +327,7 @@ createFCNamedVariable(LogicalNode* logicalNode, FunctionalConstraint fc)
     while (dataObject != NULL ) {
         if (DataObject_hasFCData(dataObject, fc)) {
 
-            namedVariable->typeSpec.structure.elements[dataObjectCount] =
-                    createFCNamedVariableFromDataObject(dataObject, fc);
+            namedVariable->typeSpec.structure.elements[dataObjectCount] = createFCNamedVariableFromDataObject(dataObject, fc);
 
             dataObjectCount++;
         }
@@ -337,18 +337,18 @@ createFCNamedVariable(LogicalNode* logicalNode, FunctionalConstraint fc)
 
     return namedVariable;
 }
-
-
-
-static int
-determineLogicalNodeComponentCount(LogicalNode* logicalNode)
+/*************************************************************************
+ * determineLogicalNodeComponentCount
+ * ‘ункциональные св€зи
+ *************************************************************************/
+static int	determineLogicalNodeComponentCount(LogicalNode* logicalNode)
 {
     int componentCount = 0;
 
-    if (LogicalNode_hasFCData(logicalNode, ST))
+    if (LogicalNode_hasFCData(logicalNode, ST))		//logicalNode->firstChild;
         componentCount++;
 
-    if (LogicalNode_hasFCData(logicalNode, MX))
+    if (LogicalNode_hasFCData(logicalNode, MX))		// следующий  ->sibling
         componentCount++;
 
     if (LogicalNode_hasFCData(logicalNode, SP))
@@ -387,8 +387,14 @@ determineLogicalNodeComponentCount(LogicalNode* logicalNode)
     return componentCount;
 }
 
-static int
-countReportControlBlocksForLogicalNode(MmsMapping* self, LogicalNode* logicalNode, bool buffered)
+/*************************************************************************
+ * createNamedVariableFromLogicalNode
+ * посчитаем количество RCB в логическом узле
+ * REPORT-CONTROL-BLOCK (блок управлени€ отчетом)
+ *
+ * bool buffered Ѕуферизованный или нет BRCB или URCB
+ *************************************************************************/
+static int		countReportControlBlocksForLogicalNode(MmsMapping* self, LogicalNode* logicalNode, bool buffered)
 {
     int rcbCount = 0;
 
@@ -432,34 +438,35 @@ countGSEControlBlocksForLogicalNode(MmsMapping* self, LogicalNode* logicalNode)
 
 #endif
 
-static MmsTypeSpecification*
-createNamedVariableFromLogicalNode(MmsMapping* self, MmsDomain* domain,
-        LogicalNode* logicalNode)
+/*************************************************************************
+ * createNamedVariableFromLogicalNode
+ * создадим из логических узлов (LN) именованные переменные (namedVariables)
+ *************************************************************************/
+static MmsTypeSpecification*	createNamedVariableFromLogicalNode(MmsMapping* self, MmsDomain* domain, LogicalNode* logicalNode)
 {
     MmsTypeSpecification* namedVariable = malloc(sizeof(MmsTypeSpecification));
 
-    namedVariable->name = copyString(logicalNode->name);
+    namedVariable->name = copyString(logicalNode->name);							// им€ MMS именованной переменной = им€ LN
+    namedVariable->type = MMS_STRUCTURE;											// тип переменной = MMS_STRUCTURE
 
-    namedVariable->type = MMS_STRUCTURE;
+    int componentCount = determineLogicalNodeComponentCount(logicalNode);			// создадим функциональные св€зи возвратили число FC компонентов
 
-    int componentCount = determineLogicalNodeComponentCount(logicalNode);
+//    USART_TRACE("LogicalNode %s has %i fc components\n", logicalNode->name,componentCount);
+    USART_TRACE("Ћогический узел(LN) %s имеет %i функциональные св€зи (fc components)\n", logicalNode->name,componentCount);
 
-    if (DEBUG) printf("LogicalNode %s has %i fc components\n", logicalNode->name,
-            componentCount);
-
-    int brcbCount = countReportControlBlocksForLogicalNode(self, logicalNode,
-            true);
+    int brcbCount = countReportControlBlocksForLogicalNode(self, logicalNode, true); // посчитаем количество блок управлени€ отчетом BRCB(true) в LN
 
     if (brcbCount > 0) {
-        if (DEBUG) printf("  and %i buffered RCBs\n", brcbCount);
+//    	USART_TRACE("  and %i buffered RCBs\n", brcbCount);
+    	USART_TRACE("  и %i блоков управлени€ буферизованным отчетом BRCBs\n", brcbCount);
         componentCount++;
     }
 
-    int urcbCount = countReportControlBlocksForLogicalNode(self, logicalNode,
-            false);
+    int urcbCount = countReportControlBlocksForLogicalNode(self, logicalNode, false); // посчитаем количество блок управлени€ отчетом URCB(false) в LN
 
     if (urcbCount > 0) {
-        if (DEBUG) printf("  and %i unbuffered RCBs\n", urcbCount);
+//    	USART_TRACE("  and %i unbuffered RCBs\n", urcbCount);
+    	USART_TRACE("  и %i блоков управлени€ небуферизованным отчетом URCBs\n", urcbCount);
         componentCount++;
     }
 
@@ -468,114 +475,88 @@ createNamedVariableFromLogicalNode(MmsMapping* self, MmsDomain* domain,
     int gseCount = countGSEControlBlocksForLogicalNode(self, logicalNode);
 
     if (gseCount > 0) {
-        if (DEBUG) printf("   and %i GSE control blocks\n", gseCount);
+    	USART_TRACE("   and %i GSE control blocks\n", gseCount);
         componentCount++;
     }
 
 #endif
 
-    namedVariable->typeSpec.structure.elements = calloc(componentCount,
-            sizeof(MmsTypeSpecification*));
+    namedVariable->typeSpec.structure.elements = calloc(componentCount, sizeof(MmsTypeSpecification*));
 
     /* Create a named variable of type structure for each functional constrained */
+    // —оздание именованного переменной структуры типа дл€ каждого FC функционального ограничени€
     int currentComponent = 0;
 
     if (LogicalNode_hasFCData(logicalNode, ST)) {
-        namedVariable->typeSpec.structure.elements[currentComponent] =
-                createFCNamedVariable(logicalNode, ST);
+        namedVariable->typeSpec.structure.elements[currentComponent] = createFCNamedVariable(logicalNode, ST);
         currentComponent++;
     }
-
     if (LogicalNode_hasFCData(logicalNode, MX)) {
-        namedVariable->typeSpec.structure.elements[currentComponent] =
-                createFCNamedVariable(logicalNode, MX);
+        namedVariable->typeSpec.structure.elements[currentComponent] = createFCNamedVariable(logicalNode, MX);
         currentComponent++;
     }
-
     if (LogicalNode_hasFCData(logicalNode, SP)) {
-        namedVariable->typeSpec.structure.elements[currentComponent] =
-                createFCNamedVariable(logicalNode, SP);
+        namedVariable->typeSpec.structure.elements[currentComponent] = createFCNamedVariable(logicalNode, SP);
         currentComponent++;
     }
-
     if (LogicalNode_hasFCData(logicalNode, SV)) {
-        namedVariable->typeSpec.structure.elements[currentComponent] =
-                createFCNamedVariable(logicalNode, SV);
+        namedVariable->typeSpec.structure.elements[currentComponent] = createFCNamedVariable(logicalNode, SV);
         currentComponent++;
     }
-
     if (LogicalNode_hasFCData(logicalNode, CF)) {
-        namedVariable->typeSpec.structure.elements[currentComponent] =
-                createFCNamedVariable(logicalNode, CF);
+        namedVariable->typeSpec.structure.elements[currentComponent] = createFCNamedVariable(logicalNode, CF);
         currentComponent++;
     }
-
     if (LogicalNode_hasFCData(logicalNode, DC)) {
-        namedVariable->typeSpec.structure.elements[currentComponent] =
-                createFCNamedVariable(logicalNode, DC);
+        namedVariable->typeSpec.structure.elements[currentComponent] = createFCNamedVariable(logicalNode, DC);
         currentComponent++;
     }
-
     if (LogicalNode_hasFCData(logicalNode, SG)) {
-        namedVariable->typeSpec.structure.elements[currentComponent] =
-                createFCNamedVariable(logicalNode, SG);
+        namedVariable->typeSpec.structure.elements[currentComponent] = createFCNamedVariable(logicalNode, SG);
         currentComponent++;
     }
-
     if (LogicalNode_hasFCData(logicalNode, SE)) {
-        namedVariable->typeSpec.structure.elements[currentComponent] =
-                createFCNamedVariable(logicalNode, SE);
+        namedVariable->typeSpec.structure.elements[currentComponent] = createFCNamedVariable(logicalNode, SE);
         currentComponent++;
     }
-
     if (LogicalNode_hasFCData(logicalNode, SR)) {
-        namedVariable->typeSpec.structure.elements[currentComponent] =
-                createFCNamedVariable(logicalNode, SR);
+        namedVariable->typeSpec.structure.elements[currentComponent] = createFCNamedVariable(logicalNode, SR);
         currentComponent++;
     }
 
     if (LogicalNode_hasFCData(logicalNode, OR)) {
-        namedVariable->typeSpec.structure.elements[currentComponent] =
-                createFCNamedVariable(logicalNode, OR);
+        namedVariable->typeSpec.structure.elements[currentComponent] = createFCNamedVariable(logicalNode, OR);
         currentComponent++;
     }
 
     if (LogicalNode_hasFCData(logicalNode, BL)) {
-        namedVariable->typeSpec.structure.elements[currentComponent] =
-                createFCNamedVariable(logicalNode, BL);
+        namedVariable->typeSpec.structure.elements[currentComponent] = createFCNamedVariable(logicalNode, BL);
         currentComponent++;
     }
 
     if (LogicalNode_hasFCData(logicalNode, EX)) {
-        namedVariable->typeSpec.structure.elements[currentComponent] =
-                createFCNamedVariable(logicalNode, EX);
+        namedVariable->typeSpec.structure.elements[currentComponent] = createFCNamedVariable(logicalNode, EX);
         currentComponent++;
     }
 
     if (LogicalNode_hasFCData(logicalNode, CO)) {
-        namedVariable->typeSpec.structure.elements[currentComponent] =
-                createFCNamedVariable(logicalNode, CO);
+        namedVariable->typeSpec.structure.elements[currentComponent] = createFCNamedVariable(logicalNode, CO);
         currentComponent++;
     }
 
     if (brcbCount > 0) {
-        namedVariable->typeSpec.structure.elements[currentComponent] =
-                Reporting_createMmsBufferedRCBs(self, domain, logicalNode,
-                        brcbCount);
+        namedVariable->typeSpec.structure.elements[currentComponent] = Reporting_createMmsBufferedRCBs(self, domain, logicalNode, brcbCount);
         currentComponent++;
     }
 
     if (urcbCount > 0) {
-        namedVariable->typeSpec.structure.elements[currentComponent] =
-                Reporting_createMmsUnbufferedRCBs(self, domain, logicalNode,
-                        urcbCount);
+        namedVariable->typeSpec.structure.elements[currentComponent] = Reporting_createMmsUnbufferedRCBs(self, domain, logicalNode, urcbCount);
         currentComponent++;
     }
 
 #if CONFIG_INCLUDE_GOOSE_SUPPORT == 1
     if (gseCount > 0) {
-        namedVariable->typeSpec.structure.elements[currentComponent] =
-                GOOSE_createGOOSEControlBlocks(self, domain, logicalNode, gseCount);
+        namedVariable->typeSpec.structure.elements[currentComponent] = GOOSE_createGOOSEControlBlocks(self, domain, logicalNode, gseCount);
 
         currentComponent++;
     }
@@ -585,24 +566,28 @@ createNamedVariableFromLogicalNode(MmsMapping* self, MmsDomain* domain,
 
     return namedVariable;
 }
-
-static MmsDomain*
-createMmsDomainFromIedDevice(MmsMapping* self, LogicalDevice* logicalDevice)
+/*************************************************************************
+ * createMmsDomainFromIedDevice
+ * создадим ƒомен из логического устройства LD
+ * дадим им€ домену такое же как и им€ LD
+ * количество элементов = количество узлов LN
+ *
+ *************************************************************************/
+static MmsDomain*	createMmsDomainFromIedDevice(MmsMapping* self, LogicalDevice* logicalDevice)
 {
-    MmsDomain* domain = MmsDomain_create(logicalDevice->name);
+    MmsDomain* domain = MmsDomain_create(logicalDevice->name);						// создадим ƒомен с именем logicalDevice->name
 
-    int nodesCount = LogicalDevice_getLogicalNodeCount(logicalDevice);
+    int nodesCount = LogicalDevice_getLogicalNodeCount(logicalDevice);				// получим число логических узлов LN в логическом устройстве LD.
 
-    /* Logical nodes are first level named variables */
-    domain->namedVariablesCount = nodesCount;
-    domain->namedVariables = malloc(nodesCount * sizeof(MmsTypeSpecification*));
+    // LN первый элемент списка
+    domain->namedVariablesCount = nodesCount;										// количество узлов LN
+    domain->namedVariables = malloc(nodesCount * sizeof(MmsTypeSpecification*));	// выделим пам€ть дл€ всех элементов списка LN
 
     LogicalNode* logicalNode = logicalDevice->firstChild;
 
     int i = 0;
-    while (logicalNode != NULL ) {
-        domain->namedVariables[i] = createNamedVariableFromLogicalNode(self,
-                domain, logicalNode);
+    while (logicalNode != NULL ) {													// перелистаем все LN
+        domain->namedVariables[i] = createNamedVariableFromLogicalNode(self, domain, logicalNode);	// и создадим из LN переменные namedVariables
 
         logicalNode = (LogicalNode*) logicalNode->sibling;
         i++;
@@ -611,9 +596,11 @@ createMmsDomainFromIedDevice(MmsMapping* self, LogicalDevice* logicalDevice)
     return domain;
 }
 
-static void
-createMmsDataModel(MmsMapping* self, int iedDeviceCount,
-        MmsDevice* mmsDevice, IedModel* iedModel)
+/*************************************************************************
+ * createMmsDataModel
+ * создадим домены
+ *************************************************************************/
+static void	createMmsDataModel(MmsMapping* self, int iedDeviceCount, MmsDevice* mmsDevice, IedModel* iedModel)
 {
     mmsDevice->domains = malloc((iedDeviceCount) * sizeof(MmsDomain*));
     mmsDevice->domainCount = iedDeviceCount;
@@ -622,26 +609,26 @@ createMmsDataModel(MmsMapping* self, int iedDeviceCount,
 
     int i = 0;
     while (logicalDevice != NULL ) {
-        mmsDevice->domains[i] = createMmsDomainFromIedDevice(self,
-                logicalDevice);
+        mmsDevice->domains[i] = createMmsDomainFromIedDevice(self, logicalDevice);	//  создадим домены
         i++;
         logicalDevice = logicalDevice->sibling;
     }
 }
 
-static void
-createDataSets(MmsDevice* mmsDevice, IedModel* iedModel)
+/*************************************************************************
+ * createDataSets
+ *
+ *************************************************************************/
+static void	createDataSets(MmsDevice* mmsDevice, IedModel* iedModel)
 {
     DataSet** datasets = (DataSet**) iedModel->dataSets;
 
     int i = 0;
 
     while (datasets[i] != NULL ) {
-        MmsDomain* dataSetDomain = MmsDevice_getDomain(mmsDevice,
-                datasets[i]->logicalDeviceName);
+        MmsDomain* dataSetDomain = MmsDevice_getDomain(mmsDevice, datasets[i]->logicalDeviceName);
 
-        MmsNamedVariableList varList = MmsNamedVariableList_create(
-                datasets[i]->name, false);
+        MmsNamedVariableList varList = MmsNamedVariableList_create(datasets[i]->name, false);
 
         int fcdaCount = datasets[i]->elementCount;
         int fcdaIdx = 0;
@@ -650,14 +637,12 @@ createDataSets(MmsDevice* mmsDevice, IedModel* iedModel)
 
         for (fcdaIdx = 0; fcdaIdx < fcdaCount; fcdaIdx++) {
             MmsAccessSpecifier accessSpecifier;
-            accessSpecifier.domain = MmsDevice_getDomain(mmsDevice,
-                    fcdas[fcdaIdx]->logicalDeviceName);
+            accessSpecifier.domain = MmsDevice_getDomain(mmsDevice, fcdas[fcdaIdx]->logicalDeviceName);
             accessSpecifier.variableName = fcdas[fcdaIdx]->variableName;
             accessSpecifier.arrayIndex = fcdas[fcdaIdx]->index;
             accessSpecifier.componentName = fcdas[fcdaIdx]->componentName;
 
-            MmsNamedVariableListEntry variableListEntry =
-                    MmsNamedVariableListEntry_create(accessSpecifier);
+            MmsNamedVariableListEntry variableListEntry = MmsNamedVariableListEntry_create(accessSpecifier);
 
             MmsNamedVariableList_addVariable(varList, variableListEntry);
         }
@@ -667,48 +652,54 @@ createDataSets(MmsDevice* mmsDevice, IedModel* iedModel)
         i++;
     }
 }
-
-static MmsDevice*
-createMmsModelFromIedModel(MmsMapping* self, IedModel* iedModel)
+/*************************************************************************
+ * createMmsModelFromIedModel
+ * создадим MMS из IED
+ *************************************************************************/
+static MmsDevice*	createMmsModelFromIedModel(MmsMapping* self, IedModel* iedModel)
 {
     MmsDevice* mmsDevice = NULL;
 
     if (iedModel->firstChild != NULL ) {
 
-        mmsDevice = MmsDevice_create(iedModel->name);
+        mmsDevice = MmsDevice_create(iedModel->name);						// дадим им€ модели mmsDevice->deviceName =  iedModel->name
 
-        int iedDeviceCount = IedModel_getLogicalDeviceCount(iedModel);
+        int iedDeviceCount = IedModel_getLogicalDeviceCount(iedModel);		// получим количество LD логических устройств
 
-        createMmsDataModel(self, iedDeviceCount, mmsDevice, iedModel);
+        createMmsDataModel(self, iedDeviceCount, mmsDevice, iedModel);		// создадим MmsData из LD
 
         createDataSets(mmsDevice, iedModel);
     }
 
     return mmsDevice;
 }
-
-MmsMapping*
-MmsMapping_create(IedModel* model)
+/*************************************************************************
+ * MmsMapping_create
+ * создадим структуру
+ *************************************************************************/
+MmsMapping*	MmsMapping_create(IedModel* model)
 {
     MmsMapping* self = calloc(1, sizeof(struct sMmsMapping));
 
     self->model = model;
 
-    self->reportControls = LinkedList_create();
+    self->reportControls = LinkedList_create();					//
 
-    if (CONFIG_INCLUDE_GOOSE_SUPPORT)
+    if (CONFIG_INCLUDE_GOOSE_SUPPORT)							// если будем использовать GOOSE протокол
         self->gseControls = LinkedList_create();
 
-    self->controlObjects = LinkedList_create();
-    self->observedObjects = LinkedList_create();
+    self->controlObjects = LinkedList_create();					//
+    self->observedObjects = LinkedList_create();				//
 
-    self->mmsDevice = createMmsModelFromIedModel(self, model);
+    self->mmsDevice = createMmsModelFromIedModel(self, model);	// —оздадим MMS модель из Ied сервера
 
     return self;
 }
-
-void
-MmsMapping_destroy(MmsMapping* self)
+/*************************************************************************
+ * MmsMapping_create
+ * освободим структуру
+ *************************************************************************/
+void	MmsMapping_destroy(MmsMapping* self)
 {
 
     if (self->reportWorkerThread != NULL) {
@@ -731,8 +722,11 @@ MmsMapping_destroy(MmsMapping* self)
     free(self);
 }
 
-MmsDevice*
-MmsMapping_getMmsDeviceModel(MmsMapping* mapping)
+/*************************************************************************
+ * MmsMapping_getMmsDeviceModel
+ *
+ *************************************************************************/
+MmsDevice*		MmsMapping_getMmsDeviceModel(MmsMapping* mapping)
 {
     return mapping->mmsDevice;
 }
@@ -1271,9 +1265,11 @@ MmsMapping_enableGoosePublishing(MmsMapping* self)
 
 #endif
 }
-
-void
-MmsMapping_addControlObject(MmsMapping* self, ControlObject* controlObject)
+/*************************************************************************
+ * MmsMapping_addControlObject
+ *
+ *************************************************************************/
+void	MmsMapping_addControlObject(MmsMapping* self, ControlObject* controlObject)
 {
     LinkedList_add(self->controlObjects, controlObject);
 }
@@ -1418,8 +1414,11 @@ eventWorkerThread(MmsMapping* self)
     if (DEBUG) printf("event worker thread finished!\n");
 }
 
-void
-MmsMapping_startEventWorkerThread(MmsMapping* self)
+/*************************************************************************
+ * MmsMapping_startEventWorkerThread
+ * не рабоча€ функци€
+ *************************************************************************/
+void	MmsMapping_startEventWorkerThread(MmsMapping* self)
 {
     self->reportThreadRunning = true;
 

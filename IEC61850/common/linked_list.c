@@ -33,8 +33,11 @@ LinkedList_getLastElement(LinkedList list)
 	return list;
 }
 
-LinkedList
-LinkedList_create()
+/*************************************************************************
+ * LinkedList_create
+ * выделяем память на элемент списка
+ *************************************************************************/
+LinkedList	LinkedList_create()
 {
 	LinkedList newList;
 
@@ -99,9 +102,11 @@ LinkedList_size(LinkedList list)
 
 	return size;
 }
-
-void
-LinkedList_add(LinkedList list, void* data)
+/*************************************************************************
+ * LinkedList_add
+ *
+ *************************************************************************/
+void	LinkedList_add(LinkedList list, void* data)
 {
 	LinkedList newElement;
     LinkedList listEnd;

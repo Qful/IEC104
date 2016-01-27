@@ -62,12 +62,22 @@ typedef enum
 // ----------------------------------------------------------------------------------------------------
 #define PORTn                             7
 
+#ifdef STM32F407xx
 
-#define LED1_PIN                         GPIO_PIN_6				//GPIO_PIN_12		//GPIO_PIN_6 - для боевого борда
+#define LED1_PIN                         GPIO_PIN_12
+#define LED1_GPIO_PORT                   GPIOD
+#define LED1_GPIO_CLK_ENABLE()           __GPIOD_CLK_ENABLE()
+#define LED1_GPIO_CLK_DISABLE()          __GPIOD_CLK_DISABLE()
+
+#elif STM32F417xx
+
+#define LED1_PIN                         GPIO_PIN_6					//GPIO_PIN_12		//GPIO_PIN_6 - для боевого борда
 #define LED1_GPIO_PORT                   GPIOC						//GPIOD			//GPIOC
-#define LED1_GPIO_CLK_ENABLE()           __GPIOC_CLK_ENABLE()	//__GPIOD_CLK_ENABLE()
+#define LED1_GPIO_CLK_ENABLE()           __GPIOC_CLK_ENABLE()		//__GPIOD_CLK_ENABLE()
 #define LED1_GPIO_CLK_DISABLE()          __GPIOC_CLK_DISABLE()
-  
+
+#endif
+
 #define LED2_PIN                         GPIO_PIN_13
 #define LED2_GPIO_PORT                   GPIOD
 #define LED2_GPIO_CLK_ENABLE()           __GPIOD_CLK_ENABLE()

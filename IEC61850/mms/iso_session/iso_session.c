@@ -352,18 +352,23 @@ IsoSessionIndication		IsoSession_parseMessage(IsoSession* session, ByteBuffer* m
 	if (message->currPos > 1) {
 		id = buffer[0];
 		length = buffer[1];
+		USART_TRACE("iso_session.c: id: %u length: %u\n",id,length);
 	}
-	else
+	else {
+		USART_TRACE_RED("iso_session.c: message->currPos == 0 \n");
 		return SESSION_ERROR;
+	}
 
 	switch (id) {
 	case 13: /* CONNECT(CN) SPDU */
-		if (length != (message->currPos - 2))
+		if (length != (message->currPos - 2)){
+			USART_TRACE_RED("iso_session.c: CONNECT(CN) SPDU ERROR. length \n");
 			return SESSION_ERROR;
+		}
 		if (parseSessionHeaderParameters(session, message, length) == SESSION_OK)
 			return SESSION_CONNECT;
 		else {
-			USART_TRACE("iso_session.c: error parsing connect spdu\n");
+			USART_TRACE_RED("iso_session.c: error parsing connect spdu\n");
 			return SESSION_ERROR;
 		}
 		break;
@@ -379,8 +384,10 @@ IsoSessionIndication		IsoSession_parseMessage(IsoSession* session, ByteBuffer* m
 
 		break;
 	case 1: /* Give token / data SPDU */
-		if (message->currPos < 4)
+		if (message->currPos < 4){
+			USART_TRACE_RED("iso_session.c: Give token / data SPDU error. %u\n",message->currPos);
 			return SESSION_ERROR;
+		}
 		if ((length == 0) && (buffer[2] == 1) && (buffer[3] == 0)) {
 			ByteBuffer_wrap(&session->userData, message->buffer + 4, message->currPos - 4, message->maxSize - 4);
 

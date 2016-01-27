@@ -126,12 +126,16 @@ int main(void) {
 
 	  // тут нужно получить параметры системы от головного(MODBUS) скорости, адреса, порты....
 
-	  Port_Init(LED1,GPIO_MODE_OUTPUT_OD);
-//	  Port_Init(LED2,GPIO_MODE_OUTPUT_PP);
-//	  Port_Init(LED3,GPIO_MODE_OUTPUT_PP);
-//	  Port_Init(LED4,GPIO_MODE_OUTPUT_PP);
-//	  Port_On(LED1);
 
+#ifdef STM32F407xx
+	  Port_Init(LED1,GPIO_MODE_OUTPUT_PP);
+	  Port_Init(LED2,GPIO_MODE_OUTPUT_PP);
+	  Port_Init(LED3,GPIO_MODE_OUTPUT_PP);
+	  Port_Init(LED4,GPIO_MODE_OUTPUT_PP);
+	  Port_Off(LED1);
+#elif STM32F417xx
+	  Port_Init(LED1,GPIO_MODE_OUTPUT_OD);
+#endif
 	  Port_Init(MODBUS_DEn,GPIO_MODE_INPUT);			// пока не используем
 
 	  FREERTOS_Init();					// инит. FREERTOS.

@@ -24,6 +24,33 @@
 #ifndef MMS_DOMAIN_H_
 #define MMS_DOMAIN_H_
 
+/*
+ * Домены следует рассматривать в качестве контейнеров, которые представляют области памяти.
+ * Содержание доменов могут быть взаимозаменяемыми между различными устройствами.
+ * Тип объекта "Домен" с его 12 атрибутов и 12 прямых операций, которые создают, манипулируют, ... удалить домен,
+ * являются частью модели.
+ *
+ * Абстрактный структура объекта домена состоит из следующих признаков:
+ * Object: 			Domain
+ * Key Attribute:	Domain Name
+ * Attribute:		List of Capabilities
+ * Attribute:		State (LOADING, COMPLETE, INCOMPLETE, READY, IN-USE)
+ *
+ * Constraint:		State = (LOADING, COMPLETE, INCOMPLETE)
+ *
+ *		Attribute:	Assigned Application Association
+ *		Attribute:	MMS Deletable								// указывает можно или нет удалить домен.
+ *		Attribute:	Sharable (TRUE, FALSE)						// указывает можно или нет вызывать более одного экземпляра
+ *		Attribute:	Domain Content
+ *		Attribute:	List of Subordinate Objects
+ *
+ * Constraint:		State = (IN-USE)
+ *
+ *		Attribute:	List of Program Invocation References
+ *		Attribute:	Upload In Progress
+ *		Attribute:	Additional Detail
+ *
+ */
 /**
  * \defgroup mms_server_api_group MMS server API
  */
@@ -35,12 +62,13 @@
 
 /**
  * Server side data structure to hold informations for a MMS domain (Logical Device)
+ * Структура данных с инфой для MMS домена (логического устройства)
  */
 struct sMmsDomain {
-	char* domainName;
-	int namedVariablesCount;
-	MmsTypeSpecification** namedVariables;
-	LinkedList /*<MmsNamedVariableList>*/ namedVariableLists;
+	char* 									domainName;				// имя домена
+	int 									namedVariablesCount;	// количество именованных переменных
+	MmsTypeSpecification** 					namedVariables;			//
+	LinkedList /*<MmsNamedVariableList>*/ 	namedVariableLists;		// список переменных
 };
 
 /**
@@ -52,19 +80,15 @@ struct sMmsDomain {
  *
  * \return the new MmsDomain instance
  */
-MmsDomain*
-MmsDomain_create(char* domainName);
+MmsDomain*	MmsDomain_create(char* domainName);
 
-char*
-MmsDomain_getName(MmsDomain* self);
+char*		MmsDomain_getName(MmsDomain* self);
 
 /**
  * Delete a MmsDomain instance
- *
  * This method should not be invoked by client code!
  */
-void
-MmsDomain_destroy(MmsDomain* self);
+void		MmsDomain_destroy(MmsDomain* self);
 
 /**
  * Add a new MMS Named Variable List (Data set) to a MmsDomain instance
@@ -78,8 +102,7 @@ MmsDomain_destroy(MmsDomain* self);
  *
  * \return true if operation was successful.
  */
-bool
-MmsDomain_addNamedVariableList(MmsDomain* self, MmsNamedVariableList variableList);
+bool		MmsDomain_addNamedVariableList(MmsDomain* self, MmsNamedVariableList variableList);
 
 /**
  * Delete a MMS Named Variable List from this MmsDomain instance
@@ -90,20 +113,14 @@ MmsDomain_addNamedVariableList(MmsDomain* self, MmsNamedVariableList variableLis
  * \param variableListName the name of the variable list to delete.
  *
  */
-void
-MmsDomain_deleteNamedVariableList(MmsDomain* self, char* variableListName);
+void		MmsDomain_deleteNamedVariableList(MmsDomain* self, char* variableListName);
 
 MmsNamedVariableList
-MmsDomain_getNamedVariableList(MmsDomain* self, char* variableListName);
+			MmsDomain_getNamedVariableList(MmsDomain* self, char* variableListName);
 
-LinkedList
-MmsDomain_getNamedVariableLists(MmsDomain* self);
-
-LinkedList
-MmsDomain_getNamedVariableListValues(MmsDomain* self, char* variableListName);
-
-LinkedList
-MmsDomain_createNamedVariableListValues(MmsDomain* self, char* variableListName);
+LinkedList	MmsDomain_getNamedVariableLists(MmsDomain* self);
+LinkedList	MmsDomain_getNamedVariableListValues(MmsDomain* self, char* variableListName);
+LinkedList	MmsDomain_createNamedVariableListValues(MmsDomain* self, char* variableListName);
 
 /**
  * Get the MmsTypeSpecification instance of a MMS named variable
@@ -114,7 +131,7 @@ MmsDomain_createNamedVariableListValues(MmsDomain* self, char* variableListName)
  * \return MmsTypeSpecification instance of the named variable
  */
 MmsTypeSpecification*
-MmsDomain_getNamedVariable(MmsDomain* domain, char* nameId);
+			MmsDomain_getNamedVariable(MmsDomain* domain, char* nameId);
 
 /**@}*/
 

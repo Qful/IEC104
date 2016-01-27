@@ -245,8 +245,7 @@ sendReport(ReportControl* self, bool isIntegrity, bool isGI)
         }
     }
 
-    MmsServerConnection_sendInformationReport(self->clientConnection, NULL,
-            "RPT", reportElements);
+    MmsServerConnection_sendInformationReport(self->clientConnection, NULL, "RPT", reportElements);
 
     /* Increase sequence number */
     self->sqNum++;

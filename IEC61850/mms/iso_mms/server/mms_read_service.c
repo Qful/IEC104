@@ -28,6 +28,8 @@
 
 #include "linked_list.h"
 
+#include "main.h"
+
 /**********************************************************************************************
  * MMS Read Service
  *********************************************************************************************/
@@ -364,8 +366,7 @@ isSpecWithResult(ReadRequest_t* read)
 	return false;
 }
 
-static void
-handleReadListOfVariablesRequest(
+static void	handleReadListOfVariablesRequest(
 		MmsServerConnection* connection,
 		ReadRequest_t* read,
 		int invokeId,
@@ -411,7 +412,7 @@ handleReadListOfVariablesRequest(
                 MmsTypeSpecification* namedVariable;
 
 				if (domain == NULL) {
-					if (DEBUG) printf("MMS read: domain %s not found!\n", domainIdStr);
+					USART_TRACE_RED("MMS read: domain %s not found!\n", domainIdStr);
 					mmsMsg_addResultToResultList(resultListEntry, NULL);
 					break;
 				}
@@ -426,13 +427,13 @@ handleReadListOfVariablesRequest(
 			}
 			else {
 				mmsMsg_addResultToResultList(resultListEntry, NULL);
-				if (DEBUG) printf("MMS read: object name type not supported!\n");
+				USART_TRACE_RED("MMS read: object name type not supported!\n");
 			}
 		}
 		else {
 			//TODO should we send a ConfirmedErrorPdu here?
 			mmsMsg_addResultToResultList(resultListEntry, NULL);
-			if (DEBUG) printf("MMS read: varspec type not supported!\n");
+			USART_TRACE_RED("MMS read: varspec type not supported!\n");
 		}
 	}
 
@@ -527,8 +528,7 @@ createNamedVariableListResponse(MmsServerConnection* connection, MmsNamedVariabl
 	}
 }
 
-static void
-handleReadNamedVariableListRequest(
+static void	handleReadNamedVariableListRequest(
 		MmsServerConnection* connection,
 		ReadRequest_t* read,
 		int invokeId,
@@ -546,7 +546,7 @@ handleReadNamedVariableListRequest(
 		MmsDomain* domain = MmsDevice_getDomain(MmsServer_getDevice(connection->server), domainId);
 
 		if (domain == NULL) {
-			if (DEBUG) printf("MMS read: domain %s not found!\n", domainId);
+			USART_TRACE_RED("MMS read: domain %s not found!\n", domainId);
 			mmsServer_createConfirmedErrorPdu(invokeId, response, MMS_ERROR_TYPE_OBJECT_NON_EXISTENT);
 		}
 		else {
@@ -556,7 +556,7 @@ handleReadNamedVariableListRequest(
 				createNamedVariableListResponse(connection, namedList, invokeId, response, read);
 			}
 			else {
-				if (DEBUG) printf("MMS read: named variable list %s not found!\n", listName);
+				USART_TRACE_RED("MMS read: named variable list %s not found!\n", listName);
 				mmsServer_createConfirmedErrorPdu(invokeId, response, MMS_ERROR_TYPE_OBJECT_NON_EXISTENT);
 			}
 		}

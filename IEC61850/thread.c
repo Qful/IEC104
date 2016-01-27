@@ -34,12 +34,16 @@ struct sThread {
 	int state;
 	bool autodestroy;
 };
-
-Semaphore
-Semaphore_create(int initialValue)
+/*
+ * Создаём семафор
+ *
+ */
+Semaphore	Semaphore_create(int initialValue)
 {
-
-    return 0;
+	Semaphore self = NULL;
+//    Semaphore self = malloc(sizeof(sem_t));
+//    sem_init((sem_t*) self, 0, initialValue);
+    return self;
 }
 
 /* Wait until semaphore value is more than zero. Then decrease the semaphore value. */

@@ -3,7 +3,7 @@
  *
  * automatically generated from simpleIO_direct_control.scd
  */
-#include <stdlib.h>
+#include "stdlib.h"
 #include "model.h"
 
 IedModel iedModel;
@@ -11,75 +11,95 @@ static DataSet* datasets[];
 static ReportControlBlock* reportControlBlocks[];
 static GSEControlBlock* gseControlBlocks[];
 static void initializeValues();
+
 LogicalDevice iedModel_GenericIO;
-LogicalNode   iedModel_GenericIO_LLN0;
-DataObject    iedModel_GenericIO_LLN0_Mod;
+
+LogicalNode   iedModel_GenericIO_LLN0;								// Логический нуль узла. Имя: LLN0
+
+DataObject    iedModel_GenericIO_LLN0_Mod;							// Mod - Режим
 DataAttribute iedModel_GenericIO_LLN0_Mod_q;
 DataAttribute iedModel_GenericIO_LLN0_Mod_t;
 DataAttribute iedModel_GenericIO_LLN0_Mod_ctlModel;
-DataObject    iedModel_GenericIO_LLN0_Beh;
+
+DataObject    iedModel_GenericIO_LLN0_Beh;							// Beh - Режим работы
 DataAttribute iedModel_GenericIO_LLN0_Beh_stVal;
 DataAttribute iedModel_GenericIO_LLN0_Beh_q;
 DataAttribute iedModel_GenericIO_LLN0_Beh_t;
-DataObject    iedModel_GenericIO_LLN0_Health;
+
+DataObject    iedModel_GenericIO_LLN0_Health;						// Health - Состояние работоспособности
 DataAttribute iedModel_GenericIO_LLN0_Health_stVal;
 DataAttribute iedModel_GenericIO_LLN0_Health_q;
 DataAttribute iedModel_GenericIO_LLN0_Health_t;
-DataObject    iedModel_GenericIO_LLN0_NamPlt;
+
+DataObject    iedModel_GenericIO_LLN0_NamPlt;						// NamPIt - Паспортная табличка
 DataAttribute iedModel_GenericIO_LLN0_NamPlt_vendor;
 DataAttribute iedModel_GenericIO_LLN0_NamPlt_swRev;
 DataAttribute iedModel_GenericIO_LLN0_NamPlt_d;
 DataAttribute iedModel_GenericIO_LLN0_NamPlt_configRev;
 DataAttribute iedModel_GenericIO_LLN0_NamPlt_ldNs;
-LogicalNode   iedModel_GenericIO_LPHD1;
-DataObject    iedModel_GenericIO_LPHD1_PhyNam;
+
+LogicalNode   iedModel_GenericIO_LPHD1;								// LPHD - Информация о физическом устройстве. Наименование: LPHD
+
+DataObject    iedModel_GenericIO_LPHD1_PhyNam;						// PhyNam - Паспортная табличка физического устройства
 DataAttribute iedModel_GenericIO_LPHD1_PhyNam_vendor;
-DataObject    iedModel_GenericIO_LPHD1_PhyHealth;
+
+DataObject    iedModel_GenericIO_LPHD1_PhyHealth;					// PhyHealth - Состояние работоспособности физического устройства
 DataAttribute iedModel_GenericIO_LPHD1_PhyHealth_stVal;
 DataAttribute iedModel_GenericIO_LPHD1_PhyHealth_q;
 DataAttribute iedModel_GenericIO_LPHD1_PhyHealth_t;
-DataObject    iedModel_GenericIO_LPHD1_Proxy;
+
+DataObject    iedModel_GenericIO_LPHD1_Proxy;						// Proxy - Означает, служит ли данный LN посредником
 DataAttribute iedModel_GenericIO_LPHD1_Proxy_stVal;
 DataAttribute iedModel_GenericIO_LPHD1_Proxy_q;
 DataAttribute iedModel_GenericIO_LPHD1_Proxy_t;
-LogicalNode   iedModel_GenericIO_GGIO1;
-DataObject    iedModel_GenericIO_GGIO1_Mod;
+
+LogicalNode   iedModel_GenericIO_GGIO1;								// GGIO - Вход/выход для общих процессов. Имя: GGIO
+
+DataObject    iedModel_GenericIO_GGIO1_Mod;							// Mod - Режим
 DataAttribute iedModel_GenericIO_GGIO1_Mod_q;
 DataAttribute iedModel_GenericIO_GGIO1_Mod_t;
 DataAttribute iedModel_GenericIO_GGIO1_Mod_ctlModel;
-DataObject    iedModel_GenericIO_GGIO1_Beh;
+
+DataObject    iedModel_GenericIO_GGIO1_Beh;							// Beh - Режим работы
 DataAttribute iedModel_GenericIO_GGIO1_Beh_stVal;
 DataAttribute iedModel_GenericIO_GGIO1_Beh_q;
 DataAttribute iedModel_GenericIO_GGIO1_Beh_t;
-DataObject    iedModel_GenericIO_GGIO1_Health;
+
+DataObject    iedModel_GenericIO_GGIO1_Health;						// Health - Состояние работоспособности
 DataAttribute iedModel_GenericIO_GGIO1_Health_stVal;
 DataAttribute iedModel_GenericIO_GGIO1_Health_q;
 DataAttribute iedModel_GenericIO_GGIO1_Health_t;
-DataObject    iedModel_GenericIO_GGIO1_NamPlt;
+
+DataObject    iedModel_GenericIO_GGIO1_NamPlt;						// NamPIt - Паспортная табличка
 DataAttribute iedModel_GenericIO_GGIO1_NamPlt_vendor;
 DataAttribute iedModel_GenericIO_GGIO1_NamPlt_swRev;
 DataAttribute iedModel_GenericIO_GGIO1_NamPlt_d;
-DataObject    iedModel_GenericIO_GGIO1_AnIn1;
+
+DataObject    iedModel_GenericIO_GGIO1_AnIn1;						//An Аналоговый
 DataAttribute iedModel_GenericIO_GGIO1_AnIn1_mag;
 DataAttribute iedModel_GenericIO_GGIO1_AnIn1_mag_f;
 DataAttribute iedModel_GenericIO_GGIO1_AnIn1_q;
 DataAttribute iedModel_GenericIO_GGIO1_AnIn1_t;
+
 DataObject    iedModel_GenericIO_GGIO1_AnIn2;
 DataAttribute iedModel_GenericIO_GGIO1_AnIn2_mag;
 DataAttribute iedModel_GenericIO_GGIO1_AnIn2_mag_f;
 DataAttribute iedModel_GenericIO_GGIO1_AnIn2_q;
 DataAttribute iedModel_GenericIO_GGIO1_AnIn2_t;
+
 DataObject    iedModel_GenericIO_GGIO1_AnIn3;
 DataAttribute iedModel_GenericIO_GGIO1_AnIn3_mag;
 DataAttribute iedModel_GenericIO_GGIO1_AnIn3_mag_f;
 DataAttribute iedModel_GenericIO_GGIO1_AnIn3_q;
 DataAttribute iedModel_GenericIO_GGIO1_AnIn3_t;
+
 DataObject    iedModel_GenericIO_GGIO1_AnIn4;
 DataAttribute iedModel_GenericIO_GGIO1_AnIn4_mag;
 DataAttribute iedModel_GenericIO_GGIO1_AnIn4_mag_f;
 DataAttribute iedModel_GenericIO_GGIO1_AnIn4_q;
 DataAttribute iedModel_GenericIO_GGIO1_AnIn4_t;
-DataObject    iedModel_GenericIO_GGIO1_SPCSO1;
+
+DataObject    iedModel_GenericIO_GGIO1_SPCSO1;								//SPCSO Контролируемый выход статуса недублированного управления
 DataAttribute iedModel_GenericIO_GGIO1_SPCSO1_stVal;
 DataAttribute iedModel_GenericIO_GGIO1_SPCSO1_q;
 DataAttribute iedModel_GenericIO_GGIO1_SPCSO1_Oper;
@@ -93,6 +113,7 @@ DataAttribute iedModel_GenericIO_GGIO1_SPCSO1_Oper_Test;
 DataAttribute iedModel_GenericIO_GGIO1_SPCSO1_Oper_Check;
 DataAttribute iedModel_GenericIO_GGIO1_SPCSO1_ctlModel;
 DataAttribute iedModel_GenericIO_GGIO1_SPCSO1_t;
+
 DataObject    iedModel_GenericIO_GGIO1_SPCSO2;
 DataAttribute iedModel_GenericIO_GGIO1_SPCSO2_stVal;
 DataAttribute iedModel_GenericIO_GGIO1_SPCSO2_q;
@@ -107,6 +128,7 @@ DataAttribute iedModel_GenericIO_GGIO1_SPCSO2_Oper_Test;
 DataAttribute iedModel_GenericIO_GGIO1_SPCSO2_Oper_Check;
 DataAttribute iedModel_GenericIO_GGIO1_SPCSO2_ctlModel;
 DataAttribute iedModel_GenericIO_GGIO1_SPCSO2_t;
+
 DataObject    iedModel_GenericIO_GGIO1_SPCSO3;
 DataAttribute iedModel_GenericIO_GGIO1_SPCSO3_stVal;
 DataAttribute iedModel_GenericIO_GGIO1_SPCSO3_q;
@@ -121,6 +143,7 @@ DataAttribute iedModel_GenericIO_GGIO1_SPCSO3_Oper_Test;
 DataAttribute iedModel_GenericIO_GGIO1_SPCSO3_Oper_Check;
 DataAttribute iedModel_GenericIO_GGIO1_SPCSO3_ctlModel;
 DataAttribute iedModel_GenericIO_GGIO1_SPCSO3_t;
+
 DataObject    iedModel_GenericIO_GGIO1_SPCSO4;
 DataAttribute iedModel_GenericIO_GGIO1_SPCSO4_stVal;
 DataAttribute iedModel_GenericIO_GGIO1_SPCSO4_q;
@@ -135,52 +158,64 @@ DataAttribute iedModel_GenericIO_GGIO1_SPCSO4_Oper_Test;
 DataAttribute iedModel_GenericIO_GGIO1_SPCSO4_Oper_Check;
 DataAttribute iedModel_GenericIO_GGIO1_SPCSO4_ctlModel;
 DataAttribute iedModel_GenericIO_GGIO1_SPCSO4_t;
-DataObject    iedModel_GenericIO_GGIO1_Ind1;
+
+DataObject    iedModel_GenericIO_GGIO1_Ind1;							//Ind Индикация
 DataAttribute iedModel_GenericIO_GGIO1_Ind1_stVal;
 DataAttribute iedModel_GenericIO_GGIO1_Ind1_q;
 DataAttribute iedModel_GenericIO_GGIO1_Ind1_t;
+
 DataObject    iedModel_GenericIO_GGIO1_Ind2;
 DataAttribute iedModel_GenericIO_GGIO1_Ind2_stVal;
 DataAttribute iedModel_GenericIO_GGIO1_Ind2_q;
 DataAttribute iedModel_GenericIO_GGIO1_Ind2_t;
+
 DataObject    iedModel_GenericIO_GGIO1_Ind3;
 DataAttribute iedModel_GenericIO_GGIO1_Ind3_stVal;
 DataAttribute iedModel_GenericIO_GGIO1_Ind3_q;
 DataAttribute iedModel_GenericIO_GGIO1_Ind3_t;
+
 DataObject    iedModel_GenericIO_GGIO1_Ind4;
 DataAttribute iedModel_GenericIO_GGIO1_Ind4_stVal;
 DataAttribute iedModel_GenericIO_GGIO1_Ind4_q;
 DataAttribute iedModel_GenericIO_GGIO1_Ind4_t;
 
 IedModel iedModel = {
-    "simpleIO",
-    &iedModel_GenericIO,
+    "BEMN_Device",						// имя электронного устройства
+    &iedModel_GenericIO,				// первое логическое устройство LD в IED
     datasets,
     reportControlBlocks,
     gseControlBlocks,
     initializeValues
 };
 
-LogicalDevice iedModel_GenericIO = {
-    "simpleIOGenericIO",
-    NULL,
-    &iedModel_GenericIO_LLN0
-};
 
+/*************************************************************************
+ * Логическое устройство LD
+ *
+ *************************************************************************/
+LogicalDevice iedModel_GenericIO = {
+    "MR801",								// имя нашего логического устройства		//"simpleIOGenericIO"
+    NULL,									// родитель
+    &iedModel_GenericIO_LLN0				// первый LN(логический узел)
+};
+/*************************************************************************
+ * Логический узел LN
+ * Логический нуль узла LLN0
+ *************************************************************************/
 LogicalNode iedModel_GenericIO_LLN0 = {
-    LogicalNodeModelType,
-    "LLN0",
-    &iedModel_GenericIO,
-    (ModelNode*) &iedModel_GenericIO_LPHD1,
-    (ModelNode*) &iedModel_GenericIO_LLN0_Mod,
+    LogicalNodeModelType,						// тип модели : LogicalNode,DataObject,DataAttribute
+    "LLN0",										// имя узла
+    &iedModel_GenericIO,						// родитель узла (LD (logical device))
+    (ModelNode*) &iedModel_GenericIO_LPHD1,		// одноранговый следующий узел
+    (ModelNode*) &iedModel_GenericIO_LLN0_Mod,	// первый наследник
 };
 
 DataObject iedModel_GenericIO_LLN0_Mod = {
     DataObjectModelType,
-    "Mod",
-    (ModelNode*) &iedModel_GenericIO_LLN0,
-    (ModelNode*) &iedModel_GenericIO_LLN0_Beh,
-    (ModelNode*) &iedModel_GenericIO_LLN0_Mod_q,
+    "Mod",										// Режим
+    (ModelNode*) &iedModel_GenericIO_LLN0,		// Родитель
+    (ModelNode*) &iedModel_GenericIO_LLN0_Beh,	// одноранговый
+    (ModelNode*) &iedModel_GenericIO_LLN0_Mod_q,// первый наследник
     0,
     0
 };
@@ -226,7 +261,7 @@ DataAttribute iedModel_GenericIO_LLN0_Mod_ctlModel = {
 
 DataObject iedModel_GenericIO_LLN0_Beh = {
     DataObjectModelType,
-    "Beh",
+    "Beh",												// Режим работы
     (ModelNode*) &iedModel_GenericIO_LLN0,
     (ModelNode*) &iedModel_GenericIO_LLN0_Health,
     (ModelNode*) &iedModel_GenericIO_LLN0_Beh_stVal,
@@ -275,7 +310,7 @@ DataAttribute iedModel_GenericIO_LLN0_Beh_t = {
 
 DataObject iedModel_GenericIO_LLN0_Health = {
     DataObjectModelType,
-    "Health",
+    "Health",												// Состояние работоспособности
     (ModelNode*) &iedModel_GenericIO_LLN0,
     (ModelNode*) &iedModel_GenericIO_LLN0_NamPlt,
     (ModelNode*) &iedModel_GenericIO_LLN0_Health_stVal,
@@ -324,7 +359,7 @@ DataAttribute iedModel_GenericIO_LLN0_Health_t = {
 
 DataObject iedModel_GenericIO_LLN0_NamPlt = {
     DataObjectModelType,
-    "NamPlt",
+    "NamPlt",													// 	Паспортная табличка
     (ModelNode*) &iedModel_GenericIO_LLN0,
     NULL,
     (ModelNode*) &iedModel_GenericIO_LLN0_NamPlt_vendor,
@@ -396,10 +431,13 @@ DataAttribute iedModel_GenericIO_LLN0_NamPlt_ldNs = {
     VISIBLE_STRING_255,
     NULL
 };
-
+/*************************************************************************
+ * Логический узел LN
+ *
+ *************************************************************************/
 LogicalNode iedModel_GenericIO_LPHD1 = {
     LogicalNodeModelType,
-    "LPHD1",
+    "LPHD1",											// Информация о физическом устройстве LPHD
     &iedModel_GenericIO,
     (ModelNode*) &iedModel_GenericIO_GGIO1,
     (ModelNode*) &iedModel_GenericIO_LPHD1_PhyNam,
@@ -407,7 +445,7 @@ LogicalNode iedModel_GenericIO_LPHD1 = {
 
 DataObject iedModel_GenericIO_LPHD1_PhyNam = {
     DataObjectModelType,
-    "PhyNam",
+    "PhyNam",												//Паспортная табличка физического устройства
     (ModelNode*) &iedModel_GenericIO_LPHD1,
     (ModelNode*) &iedModel_GenericIO_LPHD1_PhyHealth,
     (ModelNode*) &iedModel_GenericIO_LPHD1_PhyNam_vendor,
@@ -430,7 +468,7 @@ DataAttribute iedModel_GenericIO_LPHD1_PhyNam_vendor = {
 
 DataObject iedModel_GenericIO_LPHD1_PhyHealth = {
     DataObjectModelType,
-    "PhyHealth",
+    "PhyHealth",											// Состояние работоспособности физического устройства
     (ModelNode*) &iedModel_GenericIO_LPHD1,
     (ModelNode*) &iedModel_GenericIO_LPHD1_Proxy,
     (ModelNode*) &iedModel_GenericIO_LPHD1_PhyHealth_stVal,
@@ -479,7 +517,7 @@ DataAttribute iedModel_GenericIO_LPHD1_PhyHealth_t = {
 
 DataObject iedModel_GenericIO_LPHD1_Proxy = {
     DataObjectModelType,
-    "Proxy",
+    "Proxy",													//Означает, служит ли данный LN посредником
     (ModelNode*) &iedModel_GenericIO_LPHD1,
     NULL,
     (ModelNode*) &iedModel_GenericIO_LPHD1_Proxy_stVal,
@@ -525,7 +563,18 @@ DataAttribute iedModel_GenericIO_LPHD1_Proxy_t = {
     TIMESTAMP,
     NULL
 };
-
+/*************************************************************************
+ * Логический узел LN
+ *
+ * 5.7.2 LN: Вход/выход для общих процессов. Имя: GGIO
+ *
+ * Описание данного логического узла (LN) приведено в МЭК 61850-5.
+ * Данный логический узел используется для моделирования общих способов
+ * выполнения устройствами процессов, которые не определены в группах S, Т, X, Y или Z.
+ * Все данные, перечисленные в разделе 6 настоящего стандарта,
+ * могут быть использованы для соответствующих приложений логического узла GGIO.
+ *
+ *************************************************************************/
 LogicalNode iedModel_GenericIO_GGIO1 = {
     LogicalNodeModelType,
     "GGIO1",
@@ -536,7 +585,7 @@ LogicalNode iedModel_GenericIO_GGIO1 = {
 
 DataObject iedModel_GenericIO_GGIO1_Mod = {
     DataObjectModelType,
-    "Mod",
+    "Mod",													// Режим
     (ModelNode*) &iedModel_GenericIO_GGIO1,
     (ModelNode*) &iedModel_GenericIO_GGIO1_Beh,
     (ModelNode*) &iedModel_GenericIO_GGIO1_Mod_q,
@@ -1891,15 +1940,15 @@ DataAttribute iedModel_GenericIO_GGIO1_Ind4_t = {
 };
 
 static DataSetEntry ds_GenericIO_LLN0_Events_fcda0 = {
-  "simpleIOGenericIO",
-  "GGIO1$ST$SPCSO1$stVal",
+  "MR801",														// имя LD
+  "GGIO1$ST$SPCSO1$stVal",										// имя переменной
   -1,
   NULL,
   NULL
 };
 
 static DataSetEntry ds_GenericIO_LLN0_Events_fcda1 = {
-  "simpleIOGenericIO",
+  "MR801",
   "GGIO1$ST$SPCSO2$stVal",
   -1,
   NULL,
@@ -1907,7 +1956,7 @@ static DataSetEntry ds_GenericIO_LLN0_Events_fcda1 = {
 };
 
 static DataSetEntry ds_GenericIO_LLN0_Events_fcda2 = {
-  "simpleIOGenericIO",
+  "MR801",
   "GGIO1$ST$SPCSO3$stVal",
   -1,
   NULL,
@@ -1915,7 +1964,7 @@ static DataSetEntry ds_GenericIO_LLN0_Events_fcda2 = {
 };
 
 static DataSetEntry ds_GenericIO_LLN0_Events_fcda3 = {
-  "simpleIOGenericIO",
+  "MR801",
   "GGIO1$ST$SPCSO4$stVal",
   -1,
   NULL,
@@ -1930,18 +1979,33 @@ static DataSetEntry* ds_GenericIO_LLN0_Events_elements[4] = {
 };
 
 static DataSet ds_GenericIO_LLN0_Events = {
-  "simpleIOGenericIO",
+  "MR801",
   "LLN0$Events",
   4,
   ds_GenericIO_LLN0_Events_elements
 };
 
+// datasets
 static DataSet* datasets[] = {
   &ds_GenericIO_LLN0_Events,
   NULL,
 };
-static ReportControlBlock iedModel_GenericIO_LLN0_report0 = {&iedModel_GenericIO_LLN0, "EventsRCB", "Events", false, "Events", 1, 16, 111, 50, 1000};
 
+// iedModel_GenericIO_LLN0_report0
+static ReportControlBlock iedModel_GenericIO_LLN0_report0 = {
+	&iedModel_GenericIO_LLN0,
+	"EventsRCB",
+	"Events",
+	false,				// UNBUFFERED REPORT CONTROL BLOCK(URCB)
+	"Events",
+	1,					// ревизия конфигурации
+	16,					// условия включения
+	111,				// OptFlds
+	50,					// BufTm буферное время
+	1000				// IntPrd - период целостности
+};
+
+// reportControlBlocks
 static ReportControlBlock* reportControlBlocks[] = {
     &iedModel_GenericIO_LLN0_report0,
     NULL
@@ -1953,11 +2017,14 @@ static GSEControlBlock* gseControlBlocks[] = {
 };
 
 
-static void
-initializeValues()
+/*************************************************************************
+ * DataObject_hasFCData
+ *
+ *************************************************************************/
+static void		initializeValues()
 {
 
-iedModel_GenericIO_LLN0_Mod_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(0);
+iedModel_GenericIO_LLN0_Mod_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(0);			// создадим переменную LLN0_Mod_ctl (int32_t) = 0
 
 iedModel_GenericIO_GGIO1_Mod_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(0);
 

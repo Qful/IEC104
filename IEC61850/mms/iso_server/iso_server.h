@@ -54,8 +54,7 @@ struct sIsoServerCallbacks {
 	void (*clientConnected) (IsoConnection connection);
 } IsoServerCallbacks;
 
-typedef void (*ConnectionIndicationHandler) (IsoConnectionIndication indication,
-		void* parameter, IsoConnection connection);
+typedef void (*ConnectionIndicationHandler) (IsoConnectionIndication indication, void* parameter, IsoConnection connection);
 
 typedef void (*MessageReceivedHandler) (void* parameter, ByteBuffer* message, ByteBuffer* response);
 
@@ -67,9 +66,7 @@ IsoConnection_getPeerAddress(IsoConnection self);
 void
 IsoConnection_close(IsoConnection self);
 
-void
-IsoConnection_installListener(IsoConnection self, MessageReceivedHandler handler,
-		void* parameter);
+void	IsoConnection_installListener(IsoConnection self, MessageReceivedHandler handler, void* parameter);
 
 void
 IsoConnection_sendMessage(IsoConnection self, ByteBuffer* message);

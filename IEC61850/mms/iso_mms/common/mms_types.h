@@ -87,28 +87,31 @@ struct sMmsTypeSpecification {
     char* name;
     union uMmsTypeSpecification
     {
-        struct sMmsArray {
-            int elementCount; /* number of array elements */
+        struct sMmsArray {								// массив элементов
+            int elementCount; 							// Количество элементов массива
             MmsTypeSpecification* elementTypeSpec;
         } array;
+
         struct sMmsStructure {
             int elementCount;
             MmsTypeSpecification** elements;
         } structure;
-        int boolean; /* dummy - not required */
-        int integer; /* size of integer in bits */
-        int unsignedInteger; /* size of integer in bits */
+
+        int boolean; 			/* dummy - not required */
+        int integer; 			/* size of integer in bits */
+        int unsignedInteger; 	/* size of integer in bits */
         struct sMmsFloat
         {
             uint8_t exponentWidth;
             uint8_t formatWidth;
         } floatingpoint;
-        int bitString; /* Number of bits in bitstring */
-        int octetString; /* Number of octets in octet string */
-        int visibleString; /* Maximum size of string */
+
+        int bitString; 			/* Number of bits in bitstring */
+        int octetString; 		/* Number of octets in octet string */
+        int visibleString; 		/* Maximum size of string */
         int mmsString;
-        int utctime; /* dummy - not required */
-        int binaryTime; /* size: either 4 or 6 */
+        int utctime; 			/* dummy - not required */
+        int binaryTime; 		/* size: either 4 or 6 */
     } typeSpec;
 };
 

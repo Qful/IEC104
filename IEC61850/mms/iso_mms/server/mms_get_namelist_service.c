@@ -24,6 +24,7 @@
 #include "mms_server_internal.h"
 #include "ber_encoder.h"
 
+#include "main.h"
 
 /**********************************************************************************************
  * MMS GetNameList Service
@@ -264,10 +265,9 @@ createNameListResponse(
 
     confirmedResponsePDUSize = confirmedServiceResponseSize + invokeIdSize;
 
-    if (DEBUG) printf("maxPduLength: %i\n", maxPduSize);
+    USART_TRACE("maxPduLength: %i\n", maxPduSize);
 
-    if (DEBUG) printf("mmsPduLength: %i (count = %i : more %i)\n",
-            mmsPduLength, nameCount, moreFollows);
+    USART_TRACE("mmsPduLength: %i (count = %i : more %i)\n", mmsPduLength, nameCount, moreFollows);
 
     /* encode response */
     element = startElement;
@@ -368,7 +368,7 @@ mmsServer_handleGetNameListRequest(
 		}
 #endif
 		else {
-			if (DEBUG) printf("mms_server: getNameList objectClass %li not supported!\n", objectClass);
+			USART_TRACE_RED("mms_server: getNameList objectClass %li not supported!\n", objectClass);
 
 			mmsServer_createConfirmedErrorPdu(invokeId, response, MMS_ERROR_TYPE_OBJECT_ACCESS_UNSUPPORTED);
 		}
@@ -399,7 +399,7 @@ mmsServer_handleGetNameListRequest(
 	}
 #endif
 	else {
-		if (DEBUG) printf("mms_server: getNameList(%li) not supported!\n", objectScope);
+		USART_TRACE_RED("mms_server: getNameList(%li) not supported!\n", objectScope);
 		mmsServer_createConfirmedErrorPdu(invokeId, response, MMS_ERROR_TYPE_OBJECT_ACCESS_UNSUPPORTED);
 	}
 

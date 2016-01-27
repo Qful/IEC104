@@ -35,13 +35,13 @@
 #define BACKLOG 	10
 
 struct sIsoServer {
-    IsoServerState state;
-    ConnectionIndicationHandler connectionHandler;
-    void* connectionHandlerParameter;
-    AcseAuthenticationParameter authParameter;
-    Thread serverThread;
-    Socket serverSocket;
-    int tcpPort;
+    IsoServerState 					state;							// статус работы сервера ISO  (	ISO_SVR_STATE_IDLE,ISO_SVR_STATE_RUNNING,ISO_SVR_STATE_STOPPED,ISO_SVR_STATE_ERROR)
+    ConnectionIndicationHandler 	connectionHandler;
+    void* 							connectionHandlerParameter;
+    AcseAuthenticationParameter 	authParameter;					// параметры парольного доступа к серверу
+    Thread 							serverThread;
+    Socket 							serverSocket;					// TCP/IP стек
+    int 							tcpPort;						// порт сервера
 };
 
 
@@ -49,60 +49,90 @@ static void		isoServerThread(void* isoServerParam)
 {
 
 }
-
+/*************************************************************************
+ * IsoServer_create
+ * state = ISO_SVR_STATE_IDLE
+ * tcpPort = TCP_PORT
+ *************************************************************************/
 IsoServer	IsoServer_create()
 {
+    IsoServer self = calloc(1, sizeof(struct sIsoServer));
 
+    self->state = ISO_SVR_STATE_IDLE;
+    self->tcpPort = TCP_PORT;
+
+    return self;
 }
 
-void
-IsoServer_setTcpPort(IsoServer self, int port)
+/*************************************************************************
+ * IsoServer_setTcpPort
+ *
+ *************************************************************************/
+void	IsoServer_setTcpPort(IsoServer self, int port)
 {
     self->tcpPort = port;
 }
 
-IsoServerState
-IsoServer_getState(IsoServer self)
+IsoServerState	IsoServer_getState(IsoServer self)
 {
-
+    return self->state;
+}
+/*************************************************************************
+ * IsoServer_setAuthenticationParameter
+ * включаем парольный доступ к серверу
+ *************************************************************************/
+void	IsoServer_setAuthenticationParameter(IsoServer self, AcseAuthenticationParameter authParameter)
+{
+    self->authParameter = authParameter;
+}
+/*************************************************************************
+ * IsoServer_getAuthenticationParameter
+ * узнаем парольный ли доступ к серверу ??
+ *************************************************************************/
+AcseAuthenticationParameter		IsoServer_getAuthenticationParameter(IsoServer self)
+{
+    return self->authParameter;
 }
 
-void
-IsoServer_setAuthenticationParameter(IsoServer self, AcseAuthenticationParameter authParameter)
+/*************************************************************************
+ * IsoServer_startListening
+ * не рабоча€ функци€
+ *************************************************************************/
+void	IsoServer_startListening(IsoServer self)
 {
-;
+	// Thread пустые функции
+    self->serverThread = Thread_create(isoServerThread, self, false);
+
+    Thread_start(self->serverThread);
+
+    while (self->state == ISO_SVR_STATE_IDLE)	Thread_sleep(1);
+
+    USART_TRACE("IsoServer_startListening не работает, нужно дописать старт сервера.\n");
+
 }
-
-AcseAuthenticationParameter
-IsoServer_getAuthenticationParameter(IsoServer self)
+/*************************************************************************
+ * IsoServer_stopListening
+ *
+ *************************************************************************/
+void	IsoServer_stopListening(IsoServer self)
 {
-
-}
-
-void
-IsoServer_startListening(IsoServer self)
-{
-
-}
-
-void
-IsoServer_stopListening(IsoServer self)
-{
-
+    self->state = ISO_SVR_STATE_STOPPED;
 }
 
 void
 IsoServer_closeConnection(IsoServer self, IsoConnection isoConnection)
 {
-    self->connectionHandler(ISO_CONNECTION_CLOSED, self->connectionHandlerParameter,
-            isoConnection);
+    self->connectionHandler(ISO_CONNECTION_CLOSED, self->connectionHandlerParameter, isoConnection);
 
     //IsoConnection_close(isoConnection);
     //IsoConnection_destroy(isoConnection);
 }
 
-void
-IsoServer_setConnectionHandler(IsoServer self, ConnectionIndicationHandler handler, void* parameter)
+/*************************************************************************
+ * IsoServer_setConnectionHandler
+ *
+ *************************************************************************/
+void	IsoServer_setConnectionHandler(IsoServer self, ConnectionIndicationHandler handler, void* parameter)
 {
     self->connectionHandler = handler;
     self->connectionHandlerParameter = parameter;

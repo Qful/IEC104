@@ -24,21 +24,29 @@
 #ifndef IEC61850_COMMON_H_
 #define IEC61850_COMMON_H_
 
+/*
+ * Функциональная связь (FC) должна быть свойством атрибута данных DataAttribute,
+ * характеризующим конкретное использование DataAttribute. Функциональная связь (FC)
+ * использована в определении данных DATA (содержащихся в логических узлах LN) и
+ * в различных блоках управления (например, BRCB).
+ */
+
+// Функциональные связи (Functional constraints)
 typedef enum eFunctionalConstraint {
     // FCs according to IEC 61850-7-2:
-    ST, /** Status information */
-    MX, /** Measurands - analog values */
-    SP, /** Setpoint */
-    SV, /** Substitution */
-    CF, /** Configuration */
-    DC, /** Description */
-    SG, /** Setting group */
-    SE, /** Setting group editable */
+    ST, /** Status information */						// Информация о состоянии
+    MX, /** Measurands - analog values */				// Измеряемые величины (аналоговые значения)
+    SP, /** Setpoint */									// Уставка
+    SV, /** Substitution */								// Подстановка
+    CF, /** Configuration */							// Конфигурация
+    DC, /** Description */								// Описание
+    SG, /** Setting group */							// Группа настроек
+    SE, /** Setting group editable */					// Редактируемая группа настроек
     SR, /** Service response / Service tracking */
     OR, /** Operate received */
     BL, /** Blocking */
-    EX, /** Extended definition */
-    CO  /** Control */
+    EX, /** Extended definition */						// Расширенное определение
+    CO  /** Control */									// Управление
 } FunctionalConstraint;
 
 char*

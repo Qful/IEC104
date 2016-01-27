@@ -25,8 +25,11 @@
 
 #include "libiec61850_platform_includes.h"
 
-char*
-FunctionalConstrained_toString(FunctionalConstraint fc) {
+/*************************************************************************
+ * FunctionalConstrained_toString
+ * преобразуем FC в строку
+ *************************************************************************/
+char*	FunctionalConstrained_toString(FunctionalConstraint fc) {
     switch (fc) {
     case ST:
         return "ST";

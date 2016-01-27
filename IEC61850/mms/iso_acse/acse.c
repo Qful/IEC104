@@ -58,8 +58,11 @@ checkAuthMechanismName(AcseConnection* self, uint8_t* authMechanism, int authMec
         return false;
 }
 
-static bool
-checkAuthenticationValue(AcseConnection* self, uint8_t* authValue, int authValueLen)
+/*************************************************************************
+ * checkAuthenticationValue
+ * проверка совпадения пароля
+ *************************************************************************/
+static bool		checkAuthenticationValue(AcseConnection* self, uint8_t* authValue, int authValueLen)
 {
     if (authValue == NULL )
         return false;
@@ -77,10 +80,14 @@ checkAuthenticationValue(AcseConnection* self, uint8_t* authValue, int authValue
     return false;
 }
 
-static bool
-checkAuthentication(AcseConnection* self, uint8_t* authMechanism, int authMechLen, uint8_t* authValue, int authValueLen)
+/*************************************************************************
+ * checkAuthentication
+ * проверка парольности доступа
+ *************************************************************************/
+static bool	checkAuthentication(AcseConnection* self, uint8_t* authMechanism, int authMechLen, uint8_t* authValue, int authValueLen)
 {
     if (self->authentication != NULL ) {
+    	USART_TRACE("проверка парольности доступа\n");
         if (!checkAuthMechanismName(self, authMechanism, authMechLen))
             return false;
 
@@ -91,9 +98,11 @@ checkAuthentication(AcseConnection* self, uint8_t* authMechanism, int authMechLe
 }
 
 
-
-static int
-parseUserInformation(AcseConnection* self, uint8_t* buffer, int bufPos, int maxBufPos, bool* userInfoValid)
+/*************************************************************************
+ * parseUserInformation
+ *
+ *************************************************************************/
+static int	parseUserInformation(AcseConnection* self, uint8_t* buffer, int bufPos, int maxBufPos, bool* userInfoValid)
 {
 	bool hasindirectReference = false;
 	bool isBer = false;
@@ -111,10 +120,16 @@ parseUserInformation(AcseConnection* self, uint8_t* buffer, int bufPos, int maxB
 		switch (tag) {
 		case 0x06: /* direct-reference */
 
+			USART_TRACE("%.2X: direct-reference. len = %u \n",tag,len);
+
 			if (len == 2) {
 				if (memcmp(buffer + bufPos, berOid, 2) == 0) {
 					isBer = true;
+					USART_TRACE_GREEN("len = %.2X, isBer = true \n",len);
+				} else {
+					USART_TRACE_RED("berOid error compare : %.2X %.2X \n",buffer[bufPos],buffer[bufPos+1]);
 				}
+
 			}
 
 			bufPos += len;
@@ -122,22 +137,31 @@ parseUserInformation(AcseConnection* self, uint8_t* buffer, int bufPos, int maxB
 			break;
 
 		case 0x02: /* indirect-reference */
+			USART_TRACE("%.2X: indirect-reference\n",tag);
+
 			self->nextReference = BerDecoder_decodeUint32(buffer, len, bufPos);
 			bufPos += len;
 			hasindirectReference = true;
+			USART_TRACE_GREEN("hasindirectReference = true \n");
 			break;
 
 		case 0xa0: /* encoding */
+			USART_TRACE("%.2X: encoding\n",tag);
+
 			isDataValid = true;
 
 			self->userDataBufferSize = len;
 			self->userDataBuffer = buffer + bufPos;
+
+			USART_TRACE_GREEN("userDataBufferSiz = %u isDataValid = true \n",self->userDataBufferSize);
 
 			bufPos += len;
 
 			break;
 
 		default: /* ignore unknown tag */
+			USART_TRACE_RED("%.2X: ignore unknown tag\n",tag);
+
 			bufPos += len;
 			//break;
 		}
@@ -163,7 +187,7 @@ parseAarePdu(AcseConnection* self, uint8_t* buffer, int bufPos, int maxBufPos)
 
 	uint32_t result = 99;
 
-    if (DEBUG) printf("ACSE: parse AARE PDU\n");
+	USART_TRACE("ACSE: parse AARE PDU\n");
 
 	while (bufPos < maxBufPos) {
 		uint8_t tag = buffer[bufPos++];
@@ -191,7 +215,7 @@ parseAarePdu(AcseConnection* self, uint8_t* buffer, int bufPos, int maxBufPos)
 
 		case 0xbe: /* user information */
 			if (buffer[bufPos]  != 0x28) {
-				if (DEBUG) printf("ACSE: invalid user info\n");
+				USART_TRACE("ACSE: invalid user info\n");
 				bufPos += len;
 			}
 			else {
@@ -218,8 +242,11 @@ parseAarePdu(AcseConnection* self, uint8_t* buffer, int bufPos, int maxBufPos)
     return ACSE_ASSOCIATE;
 }
 
-static
-AcseIndication	parseAarqPdu(AcseConnection* self, uint8_t* buffer, int bufPos, int maxBufPos)
+/*************************************************************************
+ * parseAarqPdu
+ *
+ *************************************************************************/
+static	AcseIndication	parseAarqPdu(AcseConnection* self, uint8_t* buffer, int bufPos, int maxBufPos)
 {
 	uint8_t tag;
 	int len;
@@ -238,31 +265,38 @@ AcseIndication	parseAarqPdu(AcseConnection* self, uint8_t* buffer, int bufPos, i
 
 		switch (tag) {
 		case 0xa1: /* application context name */
+			USART_TRACE("%.2X: application context name\n",tag);
 			bufPos += len;
 			break;
 
 		case 0xa2: /* called AP title */
+			USART_TRACE("%.2X: called AP title\n",tag);
 			bufPos += len;
 			break;
 		case 0xa3: /* called AE qualifier */
+			USART_TRACE("%.2X: called AE qualifier\n",tag);
 			bufPos += len;
 			break;
 
 		case 0xa6: /* calling AP title */
+			USART_TRACE("%.2X: calling AP title\n",tag);
 			bufPos += len;
 			break;
 
 		case 0xa7: /* calling AE qualifier */
+			USART_TRACE("%.2X: calling AE qualifier\n",tag);
 			bufPos += len;
 			break;
 
 		case 0x8a: /* sender ACSE requirements */
+			USART_TRACE("%.2X: sender ACSE requirements\n",tag);
 			bufPos += len;
 			break;
 
 		case 0x8b: /* (authentication) mechanism name */
 			authMechLen = len;
 			authMechanism = buffer + bufPos;
+			USART_TRACE("%.2X: (authentication) mechanism name : len:%u\n",tag,authMechLen);
 			bufPos += len;
 			break;
 
@@ -271,6 +305,8 @@ AcseIndication	parseAarqPdu(AcseConnection* self, uint8_t* buffer, int bufPos, i
 			bufPos = BerDecoder_decodeLength(buffer, &len, bufPos, maxBufPos);
 			authValueLen = len;
 			authValue = buffer + bufPos;
+
+			USART_TRACE("%.2X: authentication value: %u \n",tag,len);
 			bufPos += len;
 			break;
 
@@ -280,6 +316,7 @@ AcseIndication	parseAarqPdu(AcseConnection* self, uint8_t* buffer, int bufPos, i
 				bufPos += len;
 			}
 			else {
+				USART_TRACE("%.2X: user information\n",tag);
 				bufPos++;
 
 				bufPos = BerDecoder_decodeLength(buffer, &len, bufPos, maxBufPos);
@@ -289,16 +326,21 @@ AcseIndication	parseAarqPdu(AcseConnection* self, uint8_t* buffer, int bufPos, i
 			break;
 
 		default: /* ignore unknown tag */
+			USART_TRACE_RED("%.2X: ignore unknown tag\n",tag);
 			bufPos += len;
 			break;
 		}
 	}
-
-    if (checkAuthentication(self, authMechanism, authMechLen, authValue, authValueLen) == false)
+	// проверка пароля если он установлен
+    if (checkAuthentication(self, authMechanism, authMechLen, authValue, authValueLen) == false){
+    	USART_TRACE_RED("Ошибка проверки пароля\n");
         return ACSE_ASSOCIATE_FAILED;
+    }
 
-    if (userInfoValid == false)
+    if (userInfoValid == false){
+    	USART_TRACE_RED("UserInformation invalid\n");
     	return ACSE_ASSOCIATE_FAILED;
+    }
 
     return ACSE_ASSOCIATE;
 }
@@ -313,8 +355,7 @@ AcseConnection_init(AcseConnection* self)
     self->authentication = NULL;
 }
 
-void
-AcseConnection_setAuthenticationParameter(AcseConnection* self, AcseAuthenticationParameter auth)
+void	AcseConnection_setAuthenticationParameter(AcseConnection* self, AcseAuthenticationParameter auth)
 {
     self->authentication = auth;
 }
@@ -323,9 +364,11 @@ void
 AcseConnection_destroy(AcseConnection* connection)
 {
 }
-
-AcseIndication
-AcseConnection_parseMessage(AcseConnection* self, ByteBuffer* message)
+/*************************************************************************
+ * AcseConnection_parseMessage
+ *
+ *************************************************************************/
+AcseIndication	AcseConnection_parseMessage(AcseConnection* self, ByteBuffer* message)
 {
     AcseIndication indication;
 

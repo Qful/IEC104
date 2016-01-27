@@ -37,8 +37,11 @@ copySubString(char* startPos, char* endPos)
 	return newString;
 }
 
-char*
-copyString(char* string)
+/*************************************************************************
+ * copyString
+ * копирование строк
+ *************************************************************************/
+char*	copyString(char* string)
 {
 	int newStringLength = strlen(string) + 1;
 

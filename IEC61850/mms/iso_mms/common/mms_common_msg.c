@@ -27,6 +27,8 @@
 #include "stack_config.h"
 #include "string_utilities.h"
 
+#include "main.h"
+
 void
 memcpyReverseByteOrder(uint8_t* dst, uint8_t* src, int size)
 {
@@ -371,8 +373,7 @@ mmsMsg_addResultToResultList(AccessResult_t* accessResult, MmsValue* value)
 
         asn_long2INTEGER(&accessResult->choice.failure, DataAccessError_objectnonexistent);
 
-        if (DEBUG)
-            printf("ACCESS ERROR\n");
+        USART_TRACE_RED("ACCESS ERROR\n");
     }
     else {
         switch (value->type) {

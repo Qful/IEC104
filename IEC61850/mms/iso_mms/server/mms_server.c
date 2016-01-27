@@ -55,17 +55,21 @@ createValueCachesForDomains(MmsDevice* device)
 
     return valueCaches;
 }
-
-MmsServer
-MmsServer_create(IsoServer isoServer, MmsDevice* device)
+/*************************************************************************
+ * MmsServer_create
+ * создадим
+ *************************************************************************/
+MmsServer	MmsServer_create(IsoServer isoServer, MmsDevice* device)
 {
     MmsServer self = calloc(1, sizeof(struct sMmsServer));
 
     self->isoServer = isoServer;
     self->device = device;
+
     self->openConnections = Map_create();
     self->valueCaches = createValueCachesForDomains(device);
     self->isLocked = false;
+//TODO Semaphore_create пустой
     self->modelMutex = Semaphore_create(1);
 
     return self;
@@ -203,40 +207,40 @@ MmsServer_setDevice(MmsServer server, MmsDevice* device)
 }
 
 static void /* will be called by ISO server stack */
-isoConnectionIndicationHandler(IsoConnectionIndication indication,
-		void* parameter, IsoConnection connection)
+isoConnectionIndicationHandler(IsoConnectionIndication indication, void* parameter, IsoConnection connection)
 {
     MmsServer mmsServer = (MmsServer) parameter;
 
     if (indication == ISO_CONNECTION_OPENED) {
-        MmsServerConnection* mmsCon = MmsServerConnection_init(0, mmsServer,
-                connection);
+        MmsServerConnection* mmsCon = MmsServerConnection_init(0, mmsServer, connection);
         Map_addEntry(mmsServer->openConnections, connection, mmsCon);
 
         if (mmsServer->connectionHandler != NULL)
-            mmsServer->connectionHandler(mmsServer->connectionHandlerParameter,
-                    mmsCon, MMS_SERVER_NEW_CONNECTION);
+            mmsServer->connectionHandler(mmsServer->connectionHandlerParameter, mmsCon, MMS_SERVER_NEW_CONNECTION);
+
     } else if (indication == ISO_CONNECTION_CLOSED) {
-        MmsServerConnection* mmsCon = (MmsServerConnection*) Map_removeEntry(
-                mmsServer->openConnections, connection, false);
+        MmsServerConnection* mmsCon = (MmsServerConnection*) Map_removeEntry( mmsServer->openConnections, connection, false);
 
         if (mmsServer->connectionHandler != NULL)
-            mmsServer->connectionHandler(mmsServer->connectionHandlerParameter,
-                    mmsCon, MMS_SERVER_CONNECTION_CLOSED);
+            mmsServer->connectionHandler(mmsServer->connectionHandlerParameter, mmsCon, MMS_SERVER_CONNECTION_CLOSED);
 
         if (mmsCon != NULL)
             MmsServerConnection_destroy(mmsCon);
     }
 }
 
-void
-MmsServer_startListening(MmsServer server, int tcpPort)
+/*************************************************************************
+ * MmsServer_startListening
+ *
+ *************************************************************************/
+void	MmsServer_startListening(MmsServer server, int tcpPort)
 {
 	// привяжем функцию
     IsoServer_setConnectionHandler(server->isoServer, isoConnectionIndicationHandler, (void*) server);
     // назначим порт TCP
-    IsoServer_setTcpPort(server->isoServer, tcpPort);
-    IsoServer_startListening(server->isoServer);
+    IsoServer_setTcpPort(server->isoServer, tcpPort);		// назначим порт ISO серверу
+//TODO: IsoServer_startListening не рабочая
+  //  IsoServer_startListening(server->isoServer);
 }
 
 void

@@ -37,6 +37,8 @@
 #include "iec61850_server.h"
 #include "static_model.h"
 
+#include "mms_server_connection.h"
+
 //#include "MmsPdu.h"
 
 /*Modbus includes ------------------------------------------------------------*/
@@ -71,6 +73,7 @@ struct sIsoConnection {
     uint8_t* 		send_buf_2;
     Socket			socket;
     MessageReceivedHandler msgRcvdHandler;
+    IsoServer 		isoServer;
     void* 			msgRcvdHandlerParameter;
     int 			state;							// статус разобранного сообщения		ISO_CON_STATE_STOPPED/ISO_CON_STATE_RUNNING
     IsoSession* 	session;
@@ -91,6 +94,7 @@ void 			sigint_handler(int signalId);
  * StartIEC850Task
  *************************************************************************/
 void StartIEC850Task(void const * argument){
+
 
 	struct netbuf *buf850;
 	err_t accept_err850;
@@ -139,7 +143,21 @@ void StartIEC850Task(void const * argument){
 
 		//IedServer_observeDataAttribute(iedServer, IEDMODEL_GenericIO_GGIO1_NamPlt_vendor,observerCallback);
 
-		//signal(SIGINT, sigint_handler);
+		// временно чтобы понять как анализировать
+		iedServer = IedServer_create(&iedModel);
+
+
+
+		// включаем парольный доступ
+		//AcseAuthenticationParameter auth = calloc(1, sizeof(struct sAcseAuthenticationParameter));
+		//auth->mechanism = AUTH_PASSWORD;	// 0x52 0x03 0x01 см. acse.с auth_mech_password_oid[]
+		//auth->value.password.string = "testpw";						//пароль
+		IsoServer isoServer = IedServer_getIsoServer(iedServer);
+		//IsoServer_setAuthenticationParameter(isoServer, auth);
+		//USART_TRACE("включили парольный доступ, пароль: %s механизм: 0x52, 0x03, 0x01 \n",auth->value.password.string);
+
+		// MMS сервер начинает слушать клиентов
+		IedServer_start(iedServer, 102);			// функция не нужна, сервер запускаю отдельно САМ
 		// -------------------------------------------------------------------------------------------------------------------
 		// -------------------------------------------------------------------------------------------------------------------
 		// -------------------------------------------------------------------------------------------------------------------
@@ -150,9 +168,15 @@ void StartIEC850Task(void const * argument){
         	if (accept_err850 == ERR_OK){											// если приняли, то обработаем его
         		USART_TRACE("a new connection has been received...\n");
 
+        		Port_On(LED1);
 
         		Connection_create(newconn850,self,data);							// настроим структуру для работы
         		AcseConnection_init(&acseConnection);
+        		AcseConnection_setAuthenticationParameter(&acseConnection, IsoServer_getAuthenticationParameter(isoServer));
+
+        		MmsServerConnection* mmsCon = MmsServerConnection_init(0,IedServer_getMmsServer(iedServer), self);
+
+
 
         		while (netconn_recv(newconn850, &buf850) == ERR_OK)					// принимаем данные в буфер
                 {
@@ -177,6 +201,7 @@ void StartIEC850Task(void const * argument){
 
                         case DATA_INDICATION:
                         {
+                    		Port_On(LED2);
                         	USART_TRACE("ISO 8073 COTP data indication\n");
 
                             ByteBuffer* 			cotpPayload = CotpConnection_getPayload(self->cotpConnection);		// получаем адрес сообщения
@@ -213,19 +238,23 @@ void StartIEC850Task(void const * argument){
                             				// Получили запрос Request, нужно его проанализировать и сформировать ответ Response
 //TODO: Нужна функция анализа Request и формирования Response.
 
-                            				//ByteBuffer_setcurrPos(&responseBuffer,0);
-                            				//self->msgRcvdHandler(self->msgRcvdHandlerParameter, &mmsRequest, &responseBuffer);							// та самая фунцция подготовки данных для ответа
+                            				//MmsServerConnection	mmsServercon;
+                            				//iedServer->mmsServer->isoServer->connectionHandler(iedServer->mmsServer->isoServer->connectionHandlerParameter);
+
+                            				//isoConnectionIndicationHandler();
+
+                            				ByteBuffer_setcurrPos(&responseBuffer,0);
+                                        	MmsServerConnection_parseMessage(mmsCon,  &mmsRequest, &responseBuffer);
+
+                            				//mmsRequest.buffer[0]++;	//ответим response
 
 
-                            				mmsRequest.buffer[0]++;	//ответим response
-
-
-                            				if (mmsRequest.currPos > 0) {
-                            					USART_TRACE("iso_connection: application payload size: %i\n", mmsRequest.currPos);
+                            				if (responseBuffer.currPos > 0) {
+                            					USART_TRACE("iso_connection: application payload size: %i\n", responseBuffer.currPos);
 
 
                             					// пишем в writeBuffer заголовок ISO 8650-1 (AARQ 24 байта) + содержимое mmsRequest (user infirmation = MMS)
-                            					AcseConnection_createAssociateResponseMessage(&acseConnection,ACSE_RESULT_ACCEPT, self->cotpConnection->writeBuffer, &mmsRequest);
+                            					AcseConnection_createAssociateResponseMessage(&acseConnection,ACSE_RESULT_ACCEPT, self->cotpConnection->writeBuffer, &responseBuffer);
                             					USART_TRACE("add ISO 8650-1(AARQ) total size: %i\n", self->cotpConnection->writeBuffer->currPos);
 
                             					//  пишем в payload ISO 8823 + содержимое writeBuffer (AARQ + user infirmation)
@@ -283,12 +312,13 @@ void StartIEC850Task(void const * argument){
 
                         				// Получили запрос Request, нужно его проанализировать и сформировать ответ Response
 //TODO: Нужна функция анализа Request и формирования Response.
-                                    	//self->msgRcvdHandler(self->msgRcvdHandlerParameter, mmsRequest, &responseBuffer);					// та самая фунцция подготовки данных для ответа
 
-                                    	mmsRequest->buffer[0]++;	//ответим response
+                            			ByteBuffer_setcurrPos(&responseBuffer,0);
+                                        MmsServerConnection_parseMessage(mmsCon,  mmsRequest, &responseBuffer);
+
 
                                     	// создадим MMS сообщение в буфере writeBuffer с юзерданными из payload
-                                    	IsoPresentation_createUserData(self->presentation,self->cotpConnection->writeBuffer, mmsRequest);
+                                    	IsoPresentation_createUserData(self->presentation,self->cotpConnection->writeBuffer, &responseBuffer);
 
                                     	ByteBuffer_setcurrPos(&responseBuffer,0);						// обнулим укозатель для формирования
 
@@ -317,11 +347,13 @@ void StartIEC850Task(void const * argument){
                             		break;
 
                             	case SESSION_ERROR:
+                            		Port_On(LED4);
                             		USART_TRACE_RED("iso_connection: session error\n");
                             		self->state = ISO_CON_STATE_STOPPED;
                             		break;
 
                             }// switch (sIndication)
+                    	Port_Off(LED2);
                         }// DATA_INDICATION
                         break;
 
@@ -336,7 +368,6 @@ void StartIEC850Task(void const * argument){
                         break;
                     }
 
-                	Port_Toggle(LED1);
                     }while (netbuf_next(buf850) >= 0);
 
                     //free(self->send_buf_1);										// освободим память
@@ -345,6 +376,7 @@ void StartIEC850Task(void const * argument){
                 netbuf_delete(buf850);
                 USART_TRACE_GREEN("netbuf_delete ...\n");
                 }
+        	Port_Off(LED1);
             }
         	USART_TRACE_GREEN("Close netconn connection ...\n");
             netconn_close(newconn850);											// закрываем соединение

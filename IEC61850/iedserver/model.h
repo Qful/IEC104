@@ -81,21 +81,21 @@ typedef struct GSEControlBlock* GSEControBlockPtr;
 
 // модель IED (intellegent electronic device) электронное устройство
 struct sIedModel {
-	char* name;								// им€ устройства
-	LogicalDevice* firstChild;
-	DataSetPtr* dataSets;
-	ReportControlBlockPtr* rcbs;
-	GSEControBlockPtr* gseCBs;
+	char* 					name;					// им€ электронного устройства
+	LogicalDevice* 			firstChild;				// первое логическое устройство LD в реальном IED
+	DataSetPtr* 			dataSets;
+	ReportControlBlockPtr* 	rcbs;
+	GSEControBlockPtr* 		gseCBs;
 	void (*initializer) ();
 };
 // модель LD (logical device) логическое устройство
 struct sLogicalDevice {
 	char* name;								// им€ устройства
-	LogicalDevice* sibling;
+	LogicalDevice* sibling;					// одноранговый следующий узел
 	LogicalNode* firstChild;				// первый LN(логический узел)
 	MmsDomain* mmsDomain;
 };
-
+// модель LN (logical node) логического узла
 struct sModelNode {
 	ModelNodeType modelType;
 	char* name;
@@ -105,42 +105,42 @@ struct sModelNode {
 };
 // модель LN (logical node) логического узла
 struct sLogicalNode {
-	ModelNodeType modelType;				// тип модели : LogicalNode,DataObject,DataAttribute
-	char* name;								// им€ узла
-	LogicalDevice* parent;					// родитель узла (LD (logical device))
-	ModelNode* sibling;
-	ModelNode* firstChild;
+	ModelNodeType modelType;			// тип : LogicalNode,DataObject,DataAttribute
+	char* name;							// им€ узла
+	LogicalDevice* parent;				// родитель узла (LD (logical device))
+	ModelNode* sibling;					// одноранговый следующий узел
+	ModelNode* firstChild;				// первый наследник
 };
 
 struct sDataObject {
-	ModelNodeType modelType;
-	char* name;
-	ModelNode* parent;
-	ModelNode* sibling;
-	ModelNode* firstChild;
+	ModelNodeType modelType;			// тип : LogicalNode,DataObject,DataAttribute
+	char* name;							// им€ узла
+	ModelNode* parent;					// родитель  LN
+	ModelNode* sibling;					// одноранговый следующий узел
+	ModelNode* firstChild;				// первый наследник
 
-	int observerCount; /* Number of observers currently monitoring this node */
-	int elementCount;  /* > 0 if this is an array */
+	int observerCount; 					// количество наблюдателей в текущий момент смотр€т за этим узлом
+	int elementCount;  					// если > 0 если массив
 
 	//MmsTypeSpecification* typeSpec;
 	//MmsValue* mmsValue;
 };
 
 struct sDataAttribute {
-	ModelNodeType modelType;
-	char* name;
-	ModelNode* parent;
-	ModelNode* sibling;
-	ModelNode* firstChild;
+	ModelNodeType modelType;			// тип модели (LogicalNode,DataObject,DataAttribute)
+	char* name;							// им€
+	ModelNode* parent;					// родитель
+	ModelNode* sibling;					// одноранговый
+	ModelNode* firstChild;				// первый наследник
 
-	int observerCount; /* Number of observers currently monitoring this node */
-	int elementCount;  /* > 0 if this is an array */
+	int observerCount; 					// количество наблюдателей в текущий момент смотр€т за этим узлом
+	int elementCount;  					// если > 0 если массив
 
-	FunctionalConstraint fc;
-	DataAttributeType type;
+	FunctionalConstraint fc;			// ‘ункциональные св€зи
+	DataAttributeType type;				// тип переменной
 
 	//MmsTypeSpecification* typeSpec;
-	MmsValue* mmsValue;
+	MmsValue* mmsValue;					//
 };
 
 typedef struct {
@@ -158,18 +158,19 @@ typedef struct {
 	DataSetEntry** fcda;
 } DataSet;
 
+// ћодель класса REPORTCONTROLBLOCK
 typedef struct {
 	LogicalNode* parent;
-	char* name;
-	char* rptId;
-	bool buffered;
-	char* dataSetName; /* pre loaded with relative name in logical node */
+	char* name;							// 14.2.2.2 им€	блока буферизованного управлени€ отчетом
+	char* rptId;						// 14.2.2.4 јтрибут RptID идентификатор	отчета
+	bool buffered;						// BUFFEREDREPORTCONTROLBLOCK(BRCB) или UNBUFFEREDREPORTCONTROLBLOCK(URCB)
+	char* dataSetName; 					// 14.2.2.6 јтрибут DatSet ссылка набора данных /* pre loaded with relative name in logical node */
 
-	uint32_t confRef;    /* ConfRef - configuration revision */
-	uint8_t trgOps;      /* TrgOps - trigger conditions */
-	uint8_t options;     /* OptFlds */
-	uint32_t bufferTime; /* BufTm - time to buffer events until a report is generated */
-	uint32_t intPeriod;  /* IntPrd - integrity period */
+	uint32_t confRef;    				// 14.2.2.7 јтрибут ConfRev ревизи€ конфигурации /* ConfRef - configuration revision */
+	uint8_t trgOps;      				/* TrgOps - trigger conditions */
+	uint8_t options;     				// 14.2.2.8 јтрибут OptFlds опциональные пол€, включаемые в отчет /* OptFlds */
+	uint32_t bufferTime; 				// 14.2.2.9 јтрибут BufTm буферное врем€ /* BufTm - time to buffer events until a report is generated */
+	uint32_t intPeriod;  				/* IntPrd - период целостности */
 
 	//char* owner;
 } ReportControlBlock;

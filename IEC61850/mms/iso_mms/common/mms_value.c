@@ -574,9 +574,11 @@ MmsValue_getUtcTimeInMs(MmsValue* self)
 }
 
 
-
-MmsValue*
-MmsValue_newIntegerFromInt32(int32_t integer)
+/*************************************************************************
+ * MmsValue_newIntegerFromInt32
+ * создаем переменную MmsValue
+ *************************************************************************/
+MmsValue*	MmsValue_newIntegerFromInt32(int32_t integer)
 {
 	MmsValue* value = malloc(sizeof(MmsValue));
 

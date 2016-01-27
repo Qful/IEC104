@@ -57,10 +57,10 @@ typedef enum
 typedef struct sMmsDomain MmsDomain;
 
 typedef struct sMmsAccessSpecifier {
-    MmsDomain* domain;
-    char* variableName;
-    int arrayIndex; /* -1 --> no index present / ignore index */
-    char* componentName;
+    MmsDomain* 		domain;
+    char* 			variableName;
+    int 			arrayIndex; /* -1 --> no index present / ignore index */
+    char* 			componentName;
 } MmsAccessSpecifier;
 
 typedef struct sMmsNamedVariableList* MmsNamedVariableList;

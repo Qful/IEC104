@@ -23,6 +23,8 @@
 
 #include "mms_server_internal.h"
 
+#include "main.h"
+
 /**********************************************************************************************
  * MMS GetVariableAccessAttributes Service
  *********************************************************************************************/
@@ -223,14 +225,14 @@ createVariableAccessAttributesResponse(
     asn_enc_rval_t rval;
 
 	if (domain == NULL) {
-		if (DEBUG) printf("mms_server: domain %s not known\n", domainId);
+		USART_TRACE_RED("mms_server: domain %s not known\n", domainId);
 		return -1;
 	}
 
 	namedVariable = MmsDomain_getNamedVariable(domain, nameId);
 
 	if (namedVariable == NULL) {
-		if (DEBUG) printf("mms_server: named variable %s not known\n", nameId);
+		USART_TRACE_RED("mms_server: named variable %s not known\n", nameId);
 		return -1;
 	}
 
@@ -258,21 +260,24 @@ createVariableAccessAttributesResponse(
 	return 0;
 }
 
-int
-mmsServer_handleGetVariableAccessAttributesRequest(
+/**********************************************************************************************
+ * mmsServer_handleGetVariableAccessAttributesRequest
+ *
+ *********************************************************************************************/
+int		mmsServer_handleGetVariableAccessAttributesRequest(
 		MmsServerConnection* connection,
 		GetVariableAccessAttributesRequest_t* request,
 		int invokeId,
 		ByteBuffer* response)
 {
 	if (request->present == GetVariableAccessAttributesRequest_PR_name) {
-		if (request->choice.name.present == ObjectName_PR_domainspecific) {
+		if (request->choice.name.present == ObjectName_PR_domainspecific) {						//
 			Identifier_t domainId = request->choice.name.choice.domainspecific.domainId;
 			Identifier_t nameId = request->choice.name.choice.domainspecific.itemId;
 
 			char* domainIdStr = createStringFromBuffer(domainId.buf, domainId.size);
 			char* nameIdStr = createStringFromBuffer(nameId.buf, nameId.size);
-			if (DEBUG) printf("getVariableAccessAttributes domainId: %s nameId: %s\n", domainIdStr, nameIdStr);
+			USART_TRACE("getVariableAccessAttributes domainId: %s nameId: %s\n", domainIdStr, nameIdStr);
 
 			createVariableAccessAttributesResponse(connection, domainIdStr, nameIdStr, invokeId, response);
 
@@ -280,12 +285,12 @@ mmsServer_handleGetVariableAccessAttributesRequest(
 			free(nameIdStr);
 		}
 		else {
-			if (DEBUG) printf("GetVariableAccessAttributesRequest with name other than domainspecific is not supported!\n");
+			USART_TRACE_RED("GetVariableAccessAttributesRequest with name other than domainspecific is not supported!\n");
 			return -1;
 		}
 	}
 	else {
-		if (DEBUG) printf("GetVariableAccessAttributesRequest with address not supported!\n");
+		USART_TRACE_RED("GetVariableAccessAttributesRequest with address not supported!\n");
 		return -1;
 	}
 

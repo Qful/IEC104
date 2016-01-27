@@ -26,8 +26,11 @@
 #include "mms_domain.h"
 #include "mms_device.h"
 
-MmsDevice*
-MmsDevice_create(char* deviceName)
+/*************************************************************************
+ * MmsDevice_create
+ * создадим MMS устройство и дадим ему имя deviceName
+ *************************************************************************/
+MmsDevice*	MmsDevice_create(char* deviceName)
 {
 	MmsDevice* self = calloc(1, sizeof(MmsDevice));
 	self->deviceName = deviceName;

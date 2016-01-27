@@ -24,23 +24,23 @@
 
 #include "model.h"
 
-
-int
-IedModel_getLogicalDeviceCount(IedModel* iedModel)
+/*************************************************************************
+ * IedModel_getLogicalDeviceCount
+ * получим количество LD логических устройств в нашем IED реальном электронное устройство
+ *************************************************************************/
+int	IedModel_getLogicalDeviceCount(IedModel* iedModel)
 {
-	if (iedModel->firstChild == NULL)
-		return 0;
+	if (iedModel->firstChild == NULL)	return 0;
 
-	LogicalDevice* logicalDevice = iedModel->firstChild;
+	LogicalDevice* logicalDevice = iedModel->firstChild;		// первое логическое устройство LD
 
 	int ldCount = 1;
 
-	while (logicalDevice->sibling != NULL) {
+	while (logicalDevice->sibling != NULL) {					// посчитаем все наследуемые LD
 		logicalDevice = logicalDevice->sibling;
 		ldCount++;
 	}
-
-	return ldCount;
+	return ldCount;												// вернем чило
 }
 
 DataSet*
@@ -70,34 +70,40 @@ IedModel_lookupDataSet(IedModel* model, char* dataSetReference  /* e.g. ied1Inve
 	return NULL;
 }
 
-bool
-DataObject_hasFCData(DataObject* dataObject, FunctionalConstraint fc)
+/*************************************************************************
+ * DataObject_hasFCData
+ *
+ *************************************************************************/
+bool	DataObject_hasFCData(DataObject* dataObject, FunctionalConstraint fc)
 {
 	ModelNode* modelNode = dataObject->firstChild;
 
 	while (modelNode != NULL) {
 
-		if (modelNode->modelType == DataAttributeModelType) {
+		if (modelNode->modelType == DataAttributeModelType) {				// если тип modelType == DataAttribute
 			DataAttribute* dataAttribute = (DataAttribute*) modelNode;
 
-			if (dataAttribute->fc == fc)
-				return true;
+			if (dataAttribute ->fc == fc)									// то присвоим ‘ункциональную св€зь
+				return true;												// и вернЄмс€
 		}
-		else if (modelNode->modelType == DataObjectModelType) {
+		else if (modelNode->modelType == DataObjectModelType) {				// если тип modelType == DataObject
 			DataObject* dataObject = (DataObject*) modelNode;
 
 			if (DataObject_hasFCData(dataObject, fc))
 				return true;
 		}
 
-		modelNode = modelNode->sibling;
+		modelNode = modelNode->sibling;										// следующий
 	}
 
 	return false;
 }
 
-bool
-LogicalNode_hasFCData(LogicalNode* node, FunctionalConstraint fc)
+/*************************************************************************
+ * LogicalNode_hasFCData
+ *
+ *************************************************************************/
+bool		LogicalNode_hasFCData(LogicalNode* node, FunctionalConstraint fc)
 {
 	DataObject* dataObject = node->firstChild;
 
@@ -111,8 +117,11 @@ LogicalNode_hasFCData(LogicalNode* node, FunctionalConstraint fc)
 	return false;
 }
 
-int
-LogicalDevice_getLogicalNodeCount(LogicalDevice* logicalDevice)
+/*************************************************************************
+ * LogicalDevice_getLogicalNodeCount
+ * сосчитаем число логических узлов LN в LD лог. устройстве
+ *************************************************************************/
+int	LogicalDevice_getLogicalNodeCount(LogicalDevice* logicalDevice)
 {
 	int lnCount = 0;
 

@@ -195,7 +195,7 @@ void FREERTOS_Init(void) {
   fre = xPortGetFreeHeapSize();			// размер кучи
   USART_TRACE("FreeHeap:%u\n",fre);
 
-  osThreadDef(IEC850, StartIEC850Task, osPriorityAboveNormal,0, 1524);//1024
+  osThreadDef(IEC850, StartIEC850Task, osPriorityAboveNormal,0, 1500);//1024
   defaultTaskHandle = osThreadCreate(osThread(IEC850), NULL);
   fre = xPortGetFreeHeapSize();
   USART_TRACE("FreeHeap(IEC850):%u\n",fre);
@@ -310,7 +310,7 @@ void StartIEC104Task(void const * argument)
 		     			USART_TRACE("netconn_accept ... ok \n");
 		                 while (netconn_recv(newconn, &buf) == ERR_OK)				// принимаем данные в буфер
 		                 {
-		                	 Port_Off(LED1);
+		                	 Port_On(LED1);
 		                     do
 		                     {
 		                        netbuf_data(buf,(void *)&data, &len);				// указатель получил адрес вх. данных
@@ -354,7 +354,7 @@ void StartIEC104Task(void const * argument)
 		                     while (netbuf_next(buf) >= 0);
 		                     netbuf_delete(buf);
 
-		  		           Port_On(LED1);
+		  		           Port_Off(LED1);
 		                 }
 		         TCPCLOSE:
 		         	 	 USART_TRACE("netconn_close TCPCLOSE:\n");

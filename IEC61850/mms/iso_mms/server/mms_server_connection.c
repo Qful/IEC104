@@ -30,6 +30,8 @@
 #include "mms_server_internal.h"
 #include "iso_server.h"
 
+#include "main.h"
+
 #define REJECT_UNRECOGNIZED_SERVICE 1
 #define REJECT_UNKNOWN_PDU_TYPE 2
 
@@ -142,15 +144,12 @@ static InitiateResponsePdu_t		createInitiateResponsePdu(MmsServerConnection* sel
 	response.localDetailCalled = calloc(1, sizeof(Integer32_t));
 	*(response.localDetailCalled) = self->maxPduSize;
 
-	response.negotiatedMaxServOutstandingCalled =
-			self->maxServOutstandingCalled;
+	response.negotiatedMaxServOutstandingCalled =	self->maxServOutstandingCalled;
 
-	response.negotiatedMaxServOutstandingCalling =
-			self->maxServOutstandingCalling;
+	response.negotiatedMaxServOutstandingCalling =	self->maxServOutstandingCalling;
 
 	response.negotiatedDataStructureNestingLevel = calloc(1, sizeof(Integer8_t));
-	*(response.negotiatedDataStructureNestingLevel) =
-			self->dataStructureNestingLevel;
+	*(response.negotiatedDataStructureNestingLevel) =	self->dataStructureNestingLevel;
 
 	response.mmsInitResponseDetail.negotiatedVersionNumber = 1;
 
@@ -178,8 +177,7 @@ static int	createInitiateResponse(MmsServerConnection* self, ByteBuffer* writeBu
 
 	mmsPdu->choice.initiateResponsePdu = createInitiateResponsePdu(self);
 
-	rval = der_encode(&asn_DEF_MmsPdu, mmsPdu,
-	            mmsServer_write_out, (void*) writeBuffer);
+	rval = der_encode(&asn_DEF_MmsPdu, mmsPdu, mmsServer_write_out, (void*) writeBuffer);
 
 	if (DEBUG) xer_fprint(stdout, &asn_DEF_MmsPdu, mmsPdu);
 
@@ -193,10 +191,8 @@ static int	createInitiateResponse(MmsServerConnection* self, ByteBuffer* writeBu
  *********************************************************************************************/
 void	parseInitiateRequestPdu(MmsServerConnection* self, const InitiateRequestPdu_t* request)
 {
-	self->maxServOutstandingCalled =
-			request->proposedMaxServOutstandingCalled;
-	self->maxServOutstandingCalling =
-			request->proposedMaxServOutstandingCalling;
+	self->maxServOutstandingCalled = request->proposedMaxServOutstandingCalled;
+	self->maxServOutstandingCalling = request->proposedMaxServOutstandingCalling;
 
 	if (request->localDetailCalling == 0) {
 		self->maxPduSize = MMS_MAXIMUM_PDU_SIZE;
@@ -209,11 +205,9 @@ void	parseInitiateRequestPdu(MmsServerConnection* self, const InitiateRequestPdu
 	}
 
 	if (request->proposedDataStructureNestingLevel == 0)
-		self->dataStructureNestingLevel =
-				DEFAULT_DATA_STRUCTURE_NESTING_LEVEL;
+		self->dataStructureNestingLevel =	DEFAULT_DATA_STRUCTURE_NESTING_LEVEL;
 	else
-		self->dataStructureNestingLevel =
-				*(request->proposedDataStructureNestingLevel);
+		self->dataStructureNestingLevel =	*(request->proposedDataStructureNestingLevel);
 }
 /**********************************************************************************************
  * handleInitiateRequestPdu
@@ -248,40 +242,29 @@ static int	handleConfirmedRequestPdu(
 
 	invokeId = (int32_t) invokeIdLong;
 
-	if (DEBUG) printf("invokeId: %i\n", invokeId);
+	USART_TRACE("invokeId: %i\n", invokeId);
 
 	switch(request->confirmedServiceRequest.present) {
 	case ConfirmedServiceRequest_PR_getNameList:
-		mmsServer_handleGetNameListRequest(self, &(request->confirmedServiceRequest.choice.getNameList),
-				invokeId, response);
+		mmsServer_handleGetNameListRequest(self, &(request->confirmedServiceRequest.choice.getNameList), invokeId, response);
 		break;
 	case ConfirmedServiceRequest_PR_read:
-		mmsServer_handleReadRequest(self, &(request->confirmedServiceRequest.choice.read),
-				invokeId, response);
+		mmsServer_handleReadRequest(self, &(request->confirmedServiceRequest.choice.read), invokeId, response);
 		break;
 	case ConfirmedServiceRequest_PR_write:
-		mmsServer_handleWriteRequest(self, &(request->confirmedServiceRequest.choice.write),
-						invokeId, response);
+		mmsServer_handleWriteRequest(self, &(request->confirmedServiceRequest.choice.write), invokeId, response);
 		break;
 	case ConfirmedServiceRequest_PR_getVariableAccessAttributes:
-		mmsServer_handleGetVariableAccessAttributesRequest(self,
-				&(request->confirmedServiceRequest.choice.getVariableAccessAttributes),
-				invokeId, response);
+		mmsServer_handleGetVariableAccessAttributesRequest(self, &(request->confirmedServiceRequest.choice.getVariableAccessAttributes), invokeId, response);
 		break;
 	case ConfirmedServiceRequest_PR_defineNamedVariableList:
-		mmsServer_handleDefineNamedVariableListRequest(self,
-				&(request->confirmedServiceRequest.choice.defineNamedVariableList),
-				invokeId, response);
+		mmsServer_handleDefineNamedVariableListRequest(self, &(request->confirmedServiceRequest.choice.defineNamedVariableList), invokeId, response);
 		break;
 	case ConfirmedServiceRequest_PR_getNamedVariableListAttributes:
-		mmsServer_handleGetNamedVariableListAttributesRequest(self,
-				&(request->confirmedServiceRequest.choice.getNamedVariableListAttributes),
-				invokeId, response);
+		mmsServer_handleGetNamedVariableListAttributesRequest(self, &(request->confirmedServiceRequest.choice.getNamedVariableListAttributes), invokeId, response);
 		break;
 	case ConfirmedServiceRequest_PR_deleteNamedVariableList:
-		mmsServer_handleDeleteNamedVariableListRequest(self,
-				&(request->confirmedServiceRequest.choice.deleteNamedVariableList),
-				invokeId, response);
+		mmsServer_handleDeleteNamedVariableListRequest(self, &(request->confirmedServiceRequest.choice.deleteNamedVariableList),invokeId, response);
 		break;
 	default:
 		writeMmsRejectPdu(&invokeId, REJECT_UNRECOGNIZED_SERVICE, response);
@@ -289,9 +272,11 @@ static int	handleConfirmedRequestPdu(
 	}
 }
 
-
-static inline MmsIndication
-parseMmsPdu(MmsServerConnection* self, ByteBuffer* message, ByteBuffer* response)
+/**********************************************************************************************
+ * parseMmsPdu
+ * парсит MMS PDU
+ *********************************************************************************************/
+static inline MmsIndication	parseMmsPdu(MmsServerConnection* self, ByteBuffer* message, ByteBuffer* response)
 {
 	MmsPdu_t* mmsPdu = 0; /* allow asn1c to allocate structure */
 	MmsIndication retVal;
@@ -332,8 +317,11 @@ parseMmsPdu_exit:
 	return retVal;
 }
 
-static void /* will be called by IsoConnection */
-messageReceived(void* parameter, ByteBuffer* message, ByteBuffer* response)
+/**********************************************************************************************
+ * messageReceived
+ * парсит принятые данные и готовит ответ
+ *********************************************************************************************/
+static void 	messageReceived(void* parameter, ByteBuffer* message, ByteBuffer* response)
 {
 	MmsServerConnection* self = (MmsServerConnection*) parameter;
 
@@ -343,17 +331,13 @@ messageReceived(void* parameter, ByteBuffer* message, ByteBuffer* response)
 /**********************************************************************************************
  * MMS server connection public API functions
  *********************************************************************************************/
-
-MmsServerConnection*
-MmsServerConnection_init(MmsServerConnection* connection, MmsServer server, IsoConnection isoCon)
+MmsServerConnection*	MmsServerConnection_init(MmsServerConnection* connection, MmsServer server, IsoConnection isoCon)
 {
-	/*
+
 	MmsServerConnection* self;
 
-	if (connection == NULL)
-		self = calloc(1, sizeof(MmsServerConnection));
-	else
-		self = connection;
+	if (connection == NULL)		self = calloc(1, sizeof(MmsServerConnection));
+	else						self = connection;
 
 	self->maxServOutstandingCalled = 0;
 	self->maxServOutstandingCalling = 0;
@@ -363,17 +347,16 @@ MmsServerConnection_init(MmsServerConnection* connection, MmsServer server, IsoC
 	self->isoConnection = isoCon;
 	self->namedVariableLists = LinkedList_create();
 
-	IsoConnection_installListener(isoCon, messageReceived, (void*) self);
+	//IsoConnection_installListener(isoCon, messageReceived, (void*) self);
 
 	return self;
-*/
+
 }
 
-void
-MmsServerConnection_destroy(MmsServerConnection* self)
+void	MmsServerConnection_destroy(MmsServerConnection* self)
 {
-//	LinkedList_destroyDeep(self->namedVariableLists, MmsNamedVariableList_destroy);
-//	free(self);
+	LinkedList_destroyDeep(self->namedVariableLists, MmsNamedVariableList_destroy);
+	free(self);
 }
 
 bool
@@ -426,6 +409,10 @@ MmsServerConnection_getNamedVariableLists(MmsServerConnection* self)
 	return self->namedVariableLists;
 }
 
+/*************************************************************************
+ * MmsServerConnection_parseMessage
+ * парсим запрос и готовим ответ, используя MmsServerConnection
+ *************************************************************************/
 MmsIndication		MmsServerConnection_parseMessage(MmsServerConnection* self, ByteBuffer* message, ByteBuffer* response)
 {
 	return parseMmsPdu(self, message, response);

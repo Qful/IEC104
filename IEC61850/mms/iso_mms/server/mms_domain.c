@@ -94,17 +94,20 @@ freeNamedVariables(MmsTypeSpecification** variables, int variablesCount)
 		free(variables[i]);
 	}
 }
-
-MmsDomain*
-MmsDomain_create(char* domainName)
+/*************************************************************************
+ * MmsDomain_create
+ * создадим Домен
+ *************************************************************************/
+MmsDomain*	MmsDomain_create(char* domainName)
 {
-	MmsDomain* self = calloc(1, sizeof(MmsDomain));
+	MmsDomain* self = calloc(1, sizeof(MmsDomain));			// Выделим память для структуры домена
 
-	self->domainName = copyString(domainName);
-	self->namedVariableLists = LinkedList_create();
+	self->domainName = copyString(domainName);				// дадим имя
+	self->namedVariableLists = LinkedList_create();			// создадим первый элемент списка переменных
 
 	return self;
 }
+
 
 void	MmsDomain_destroy(MmsDomain* self)
 {

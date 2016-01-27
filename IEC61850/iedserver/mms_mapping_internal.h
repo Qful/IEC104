@@ -30,15 +30,15 @@
 #include "linked_list.h"
 
 struct sMmsMapping {
-    IedModel* model;
-    MmsDevice* mmsDevice;
-    MmsServer mmsServer;
-    LinkedList reportControls;
-    LinkedList gseControls;
-    LinkedList controlObjects;
-    LinkedList observedObjects;
-    bool reportThreadRunning;
-    Thread reportWorkerThread;
+    IedModel* 	model;
+    MmsDevice* 	mmsDevice;
+    MmsServer 	mmsServer;
+    LinkedList 	reportControls;
+    LinkedList 	gseControls;
+    LinkedList 	controlObjects;
+    LinkedList 	observedObjects;
+    bool 		reportThreadRunning;
+    Thread 		reportWorkerThread;
 };
 
 #endif /* MMS_MAPPING_INTERNAL_H_ */
