@@ -34,6 +34,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "FreeRTOS.h"
 #include "task.h"
+#include "port.h"
 #include "cmsis_os.h"
 #include "queue.h"
 
@@ -55,16 +56,40 @@
 
 // IEC 61850
 #include "iec850.h"
+#include "iec61850_server.h"
+#include "static_model.h"
+
+// терминал дл€ отладки
+#include "DebugConsole.h"
 /*Modbus includes ------------------------------------------------------------*/
 #include "mb.h"
 #include "mb_m.h"
 #include "mbport.h"
 #include "modbus.h"
 
-// пам€ть SPI
+/*пам€ть SPI -----------------------------------------------------------------*/
 #include "at45db161d.h"
+
+/*консольный дебагер на USART ------------------------------------------------*/
+#include "DebugConsole.h"
+
+
+/* define --------------------------------------------------------------------*/
+#define DEBUG_CONSOLE_STACK_SIZE		( configMINIMAL_STACK_SIZE * 6 )		// configMINIMAL_STACK_SIZE * 4 * N = 3072байта			// * 4 потому как 32 бита €дро
+#define DEBUG_CONSOLE_TASK_PRIORITY		osPriorityNormal
+
+#define IEC850_STACK_SIZE				( configMINIMAL_STACK_SIZE * 6 )		// 3072байта
+#define IEC850Task__PRIORITY			osPriorityAboveNormal
+
+#define	MODBUSTask_STACK_SIZE			( configMINIMAL_STACK_SIZE * 2 )		// 1024байта
+#define MODBUSTask__PRIORITY			osPriorityNormal
+
 /* Variables -----------------------------------------------------------------*/
 
+// мьютексы -----------------------------
+static xSemaphoreHandle xConsoleMutex = NULL;			// мьютекс печати в консоль
+
+extern IedServer iedServer;
 
 // переделать структуру под формат данных запроса MODBUS
 	typedef struct					// дл€ передачи через очереди структур.
@@ -73,18 +98,11 @@
 	  uint8_t 	Source;
 	} xData;
 
-
-//extern xQueueHandle 	  xQueueMODBUS;				//дл€ сохранени€ ссылки на очередь
-
 osThreadId defaultTaskHandle;
 
 extern osMessageQId xQueueMODBUSHandle;
 
-extern RTC_HandleTypeDef hrtc;
-extern RTC_TimeTypeDef sTime;
-extern RTC_DateTypeDef sDate;
-
-extern UART_HandleTypeDef MODBUS;
+extern 	RTC_HandleTypeDef hrtc;
 
 //  --------------------------------------------------------------------------------
 //Master mode: хранилище дискретных входов
@@ -116,6 +134,11 @@ struct netif 	first_gnetif,second_gnetif;
 struct ip_addr 	first_ipaddr,second_ipaddr;
 struct ip_addr 	netmask;
 struct ip_addr 	gw;
+
+/* Semaphore to signal Ethernet Link state update */
+osSemaphoreId Netif_LinkSemaphore = NULL;
+/* Ethernet link thread Argument */
+struct link_str link_arg;
 
 struct iechooks default_hooks;
 struct iecsock 	*s;
@@ -166,6 +189,7 @@ static inline char * uframe_func_to_string(enum uframe_func func);
 
 void FREERTOS_Init(void);
 
+extern void vRegisterDEBUGCommands( void );
 
 /* Hook prototypes */
 
@@ -174,13 +198,15 @@ void FREERTOS_Init(void);
  * FREERTOS_Init
  *************************************************************************/
 void FREERTOS_Init(void) {
- size_t	fre;
+ size_t	fre,fre_pr;
   /* USER CODE BEGIN Init */
        
   /* USER CODE END Init */
 
   /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
+	// —оздадим мьютекс дл€ блокировки доступа к консоли
+	xConsoleMutex = xSemaphoreCreateMutex();
+
   /* USER CODE END RTOS_MUTEX */
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
@@ -191,14 +217,16 @@ void FREERTOS_Init(void) {
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
 
+	fre = xPortGetFreeHeapSize();			// размер кучи
+	fre_pr = fre;
+	USART_TRACE("—тартовый размер кучи:%u байт\n",fre);
 
-  fre = xPortGetFreeHeapSize();			// размер кучи
-  USART_TRACE("FreeHeap:%u\n",fre);
+   osThreadDef(IEC850, StartIEC850Task,IEC850Task__PRIORITY,0, IEC850_STACK_SIZE);//1024		//1500 работало
+   defaultTaskHandle = osThreadCreate(osThread(IEC850), NULL);
 
-  osThreadDef(IEC850, StartIEC850Task, osPriorityAboveNormal,0, 1500);//1024
-  defaultTaskHandle = osThreadCreate(osThread(IEC850), NULL);
-  fre = xPortGetFreeHeapSize();
-  USART_TRACE("FreeHeap(IEC850):%u\n",fre);
+   fre = xPortGetFreeHeapSize();
+   USART_TRACE("стек задачи IEC850:%u байт\n",fre_pr - fre);
+   fre_pr = fre;
 
 /*
   osThreadDef(IEC104, StartIEC104Task, osPriorityAboveNormal,0, 640);//1024
@@ -216,11 +244,22 @@ void FREERTOS_Init(void) {
 	  USART_TRACE("FreeHeap(Timers):%u\n",fre);
   }
 */
-  osThreadDef(MBUS, StartMODBUSTask, osPriorityNormal,0, 128);//256
+  osThreadDef(MBUS, StartMODBUSTask, MODBUSTask__PRIORITY ,0, MODBUSTask_STACK_SIZE);//256
   defaultTaskHandle = osThreadCreate(osThread(MBUS), NULL);
 
   fre = xPortGetFreeHeapSize();
-  USART_TRACE("FreeHeap(MBUS):%u\n",fre);
+  USART_TRACE("стек задачи  MBUS:%u байт\n",fre_pr - fre);
+  fre_pr = fre;
+
+  // —оздаЄм задачу, котора€ реализует консоль с помощью USART порта.
+   osThreadDef(CONSOLE, DEBUGConsoleTask, DEBUG_CONSOLE_TASK_PRIORITY ,0, DEBUG_CONSOLE_STACK_SIZE);//256
+   defaultTaskHandle = osThreadCreate(osThread(CONSOLE), NULL);
+   // регистрируем команды консоли
+   vRegisterDEBUGCommands();
+
+   fre = xPortGetFreeHeapSize();			// размер кучи
+   USART_TRACE("стек задачи CONSOLE:%u байт\n",fre_pr - fre);
+   fre_pr = fre;
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -234,7 +273,7 @@ void FREERTOS_Init(void) {
 //  xQueueMODBUSHandle = osMessageCreate(osMessageQ(xQueueMODBUS), NULL);
 
    fre = xPortGetFreeHeapSize();
-   USART_TRACE("FreeHeap(Queue):%u\n",fre);
+   USART_TRACE("осталось в куче :%u байт\n",fre);
 
   /* USER CODE END RTOS_QUEUES */
 }
@@ -388,13 +427,24 @@ void StartTimersTask(void const * argument)
         taskYIELD();							// отпустим задачу.
 	  }
 }
+
 /*************************************************************************
  * StartMODBUSTask
  *************************************************************************/
 void StartMODBUSTask(void const * argument)
 {
+	RTC_TimeTypeDef sTime;
+	RTC_DateTypeDef sDate;
+
+//static	uint8_t 	Modbus_DataRX[255];		// буфер приЄмника Modbus
+//static	uint8_t		Modbus_SizeRX;			// размер ожидаемого ответа от MODBUS.
+
+
+	bool	DiscrTemp = 0;
+
 	uint32_t	TimerReadMB;
 	uint8_t		ReadNmb=0;
+	uint32_t	tm;
 
 	eMBMasterInit(MB_RTU, 4, 115200,  MB_PAR_NONE);
 	eMBMasterEnable();
@@ -402,11 +452,24 @@ void StartMODBUSTask(void const * argument)
 	TimerReadMB = HAL_GetTick();
 	for(;;)
 	{
+ //		IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO1, (ControlHandler)controlListener, IEDMODEL_GenericIO_GGIO1_SPCSO1);
+
 		if ((HAL_GetTick()-TimerReadMB)>100){					// периодический опрос дискретов
 			TimerReadMB = HAL_GetTick();
 			ReadNmb++; if (ReadNmb>1) ReadNmb = 0;
 	   	   	if (ReadNmb==0) eMBMasterReqReadCoils(MB_Slaveaddr,MB_StartDiscreetaddr,MB_NumbDiscreet,RT_WAITING_FOREVER);
 	   		if (ReadNmb==1) eMBMasterReqReadHoldingRegister(MB_Slaveaddr,MB_StartAnalogINaddr,MB_NumbAnalogIN,RT_WAITING_FOREVER);
+
+
+	   		uint64_t currentTime = Hal_getTimeInMs();
+            IedServer_lockDataModel(iedServer);																	// захватываем управление mmsServer'ом
+
+            if (ucMDiscInBuf[0][0] & 1) DiscrTemp = true; else DiscrTemp = false;
+            IedServer_updateBooleanAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_Ind1_stVal, DiscrTemp);
+    	    IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_Ind1_t, currentTime);
+
+    	    IedServer_unlockDataModel(iedServer);																// отдаЄм управление mmsServer'ом
+
 		}
 
 		eMBMasterPoll();						// мониторим событи€ от MODBUS.
@@ -773,6 +836,8 @@ void disconnect_hook(struct iecsock *s, short reason)
  *************************************************************************/
 void data_received_hook(struct iecsock *s, struct iec_buf *b)
 {
+	RTC_TimeTypeDef sTime;
+	RTC_DateTypeDef sDate;
 
 //	struct netconn *newconn;
 	struct iec_object obj[IEC_OBJECT_MAX];
@@ -1084,3 +1149,7 @@ static inline char * uframe_func_to_string(enum uframe_func func)
 		return "UNKNOWN";
 	}
 }
+
+/*************************************************************************
+ *
+ *************************************************************************/

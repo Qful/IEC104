@@ -57,6 +57,9 @@ static void		isoServerThread(void* isoServerParam)
 IsoServer	IsoServer_create()
 {
     IsoServer self = calloc(1, sizeof(struct sIsoServer));
+//    IsoServer self =  pvPortMalloc(sizeof(struct sIsoServer));
+
+	USART_TRACE("IedServer->isoServer  - Выделили память для структуры по адресу:0x%X размером:%u\n",&self,sizeof(struct sIsoServer));
 
     self->state = ISO_SVR_STATE_IDLE;
     self->tcpPort = TCP_PORT;

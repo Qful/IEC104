@@ -102,8 +102,11 @@ addSubNamedVaribleNamesToList(LinkedList nameList, char* prefix, MmsTypeSpecific
 	return listElement;
 }
 
-static LinkedList
-getNameListDomainSpecific(MmsServerConnection* connection, char* domainName) {
+/*************************************************************************
+ * getNameListDomainSpecific
+ * Возвращает список LN узлов из LD (домена) в виде структуры LinkedList
+ *************************************************************************/
+static LinkedList	getNameListDomainSpecific(MmsServerConnection* connection, char* domainName) {
 	MmsDevice* device = MmsServer_getDevice(connection->server);
 
 	LinkedList nameList = NULL;
@@ -153,9 +156,11 @@ createStringsFromNamedVariableList(LinkedList nameList, LinkedList variableLists
 	}
 	return nameList;
 }
-
-static LinkedList
-getNamedVariableListDomainSpecific(MmsServerConnection* connection, char* domainName)
+/*************************************************************************
+ * getNamedVariableListDomainSpecific
+ * Возвращает список переменных  в узле LN узлов в виде структуры LinkedList
+ *************************************************************************/
+static LinkedList		getNamedVariableListDomainSpecific(MmsServerConnection* connection, char* domainName)
 {
 	MmsDevice* device = MmsServer_getDevice(connection->server);
 
@@ -184,14 +189,12 @@ getNamedVariableListAssociationSpecific(MmsServerConnection* connection)
 	return nameList;
 }
 #endif
-
-static void
-createNameListResponse(
-        MmsServerConnection* connection,
-        int invokeId,
-        LinkedList nameList,
-        ByteBuffer* response,
-        char* continueAfter)
+/*************************************************************************
+ * createNameListResponse
+ *
+ *************************************************************************/
+#define	overheadsizeofPDU		40
+static void		createNameListResponse( MmsServerConnection* connection, int invokeId, LinkedList nameList, ByteBuffer* response, char* continueAfter)
 {
     LinkedList startElement = NULL;
     int nameCount;
@@ -210,7 +213,7 @@ createNameListResponse(
     int i = 0;
 
     if (continueAfter != NULL) {
-        LinkedList element = nameList;
+        element = nameList;
 
         while ((element = LinkedList_getNext(element)) != NULL) {
             if (strcmp((char*) (element->data), continueAfter) == 0) {
@@ -226,12 +229,11 @@ createNameListResponse(
     }
 
     /* determine number of identifiers to include in response */
-    if (startElement == NULL)
-        startElement = nameList;
+    if (startElement == NULL)	startElement = nameList;
 
     nameCount = 0;
-    mmsPduLength = 25; /* estimated overhead size of PDU encoding */
-    maxPduSize = connection->maxPduSize;
+    mmsPduLength = overheadsizeofPDU;//25; 													// запас размера для дополнения заголовка	/* 25 estimated overhead size of PDU encoding */
+    maxPduSize = connection->maxPduSize;								// максимальный размер буфера
 
     moreFollows = false;
 
@@ -242,7 +244,7 @@ createNameListResponse(
 
         elementLength = BerEncoder_determineEncodedStringSize((char*) element->data);
 
-        if ((mmsPduLength + elementLength) > maxPduSize) {
+        if ((mmsPduLength + elementLength) > maxPduSize) {				// если размер списка с текущим элементом больше размера буфура то рубис на несколько пакетов
             moreFollows = true;
             break;
         }
@@ -253,7 +255,7 @@ createNameListResponse(
 
     }
 
-    identifierListSize = mmsPduLength - 25;
+    identifierListSize = mmsPduLength - overheadsizeofPDU;
 
     listOfIdentifierSize = 1 + BerEncoder_determineLengthSize(identifierListSize) + identifierListSize;
 
@@ -265,9 +267,9 @@ createNameListResponse(
 
     confirmedResponsePDUSize = confirmedServiceResponseSize + invokeIdSize;
 
-    USART_TRACE("maxPduLength: %i\n", maxPduSize);
 
-    USART_TRACE("mmsPduLength: %i (count = %i : more %i)\n", mmsPduLength, nameCount, moreFollows);
+    USART_TRACE("createNameListResponse - максимальный размер Pdu: %i\n", maxPduSize);
+    USART_TRACE("createNameListResponse - размер фрейма Pdu: %i (имён:%i , Фреймов:%i)\n", mmsPduLength, nameCount, moreFollows);
 
     /* encode response */
     element = startElement;
@@ -284,13 +286,14 @@ createNameListResponse(
     bufPos = BerEncoder_encodeTL(0xa0, identifierListSize, buffer, bufPos);
 
     i = 0;
-    while ((element = LinkedList_getNext(element)) != NULL) {
-        bufPos = BerEncoder_encodeStringWithTag(0x1a, (char*) element->data, buffer, bufPos);
 
+    while ((element = LinkedList_getNext(element)) != NULL) {
+
+        USART_TRACE("добавлен элемент N%i: %s\n",i, element->data);
+        bufPos = BerEncoder_encodeStringWithTag(0x1a, (char*) element->data, buffer, bufPos);
         i++;
 
-        if (i == nameCount)
-            break;
+        if (i == nameCount)	break;
     }
 
     bufPos = BerEncoder_encodeBoolean(0x81, moreFollows, buffer, bufPos);
@@ -298,17 +301,18 @@ createNameListResponse(
     response->currPos = bufPos;
 }
 
-void
-mmsServer_handleGetNameListRequest(
-		MmsServerConnection* connection,
-		GetNameListRequest_t* getNameList,
-		int invokeId,
-		ByteBuffer* response)
+/*************************************************************************
+ * mmsServer_handleGetNameListRequest
+ * получаем список имён переменных для передачи
+ *************************************************************************/
+void	mmsServer_handleGetNameListRequest(	MmsServerConnection* connection, GetNameListRequest_t* getNameList,	int invokeId, ByteBuffer* response)
 {
 	long objectClass;
     char* continueAfter;
     long objectScope;
     char* domainSpecificName;
+
+    LinkedList nameList;
 
 	asn_INTEGER2long(&getNameList->objectClass.choice.basicObjectClass, &objectClass);
 
@@ -344,23 +348,27 @@ mmsServer_handleGetNameListRequest(
 
 	if (objectScope == 2) {
 
-		domainSpecificName = createStringFromBuffer(
-				getNameList->objectScope.choice.domainSpecific.buf,
-				getNameList->objectScope.choice.domainSpecific.size);
+		domainSpecificName = createStringFromBuffer( getNameList->objectScope.choice.domainSpecific.buf, getNameList->objectScope.choice.domainSpecific.size);
 
 		if (objectClass == ObjectClass__basicObjectClass_namedVariable) {
-			LinkedList nameList = getNameListDomainSpecific(connection, domainSpecificName);
 
-			if (nameList == NULL)
+			nameList = getNameListDomainSpecific(connection, domainSpecificName);
+
+			if (nameList == NULL)	{
 				mmsServer_createConfirmedErrorPdu(invokeId, response, MMS_ERROR_TYPE_OBJECT_NON_EXISTENT);
+			}
 			else {
+				USART_TRACE("mms_server: Создаём ответ со списком имён\n");
 				createNameListResponse(connection, invokeId, nameList, response, continueAfter);
 				LinkedList_destroy(nameList);
 			}
 		}
-#ifdef MMS_DATA_SET_SERVICE 1
+#ifdef MMS_DATA_SET_SERVICE
 		else if (objectClass == ObjectClass__basicObjectClass_namedVariableList) {
-			LinkedList nameList = getNamedVariableListDomainSpecific(connection, domainSpecificName);
+
+		    LinkedList nList = getNamedVariableListDomainSpecific(connection, domainSpecificName);
+
+			nameList = getNamedVariableListDomainSpecific(connection, domainSpecificName);
 
 			createNameListResponse(connection, invokeId, nameList, response, continueAfter);
 
@@ -378,7 +386,7 @@ mmsServer_handleGetNameListRequest(
 
 	else if (objectScope == 1) {
 
-		LinkedList nameList = getNameListVMDSpecific(connection);
+		nameList = getNameListVMDSpecific(connection);
 
 		createNameListResponse(connection, invokeId, nameList, response, continueAfter);
 
@@ -388,7 +396,7 @@ mmsServer_handleGetNameListRequest(
 	else if (objectScope == 3) {
 
 		if (objectClass == ObjectClass__basicObjectClass_namedVariableList) {
-			LinkedList nameList = getNamedVariableListAssociationSpecific(connection);
+			nameList = getNamedVariableListAssociationSpecific(connection);
 
 			createNameListResponse(connection, invokeId, nameList, response, continueAfter);
 

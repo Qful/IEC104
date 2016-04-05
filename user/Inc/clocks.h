@@ -8,6 +8,6 @@
 #ifndef CLOCKS_H_
 #define CLOCKS_H_
 
-void Clocks_Init(void);
+void 				Clocks_Init(void);
 
 #endif /* CLOCKS_H_ */

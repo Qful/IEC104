@@ -211,6 +211,11 @@ CotpIndication	CotpConnection_sendDataMessage(CotpConnection* self, ByteBuffer* 
             lastUnit = 1;												// признак EOT в TPDU
         }
 
+        // ту наверное нужно обнулить указатель позиции буфера дл€ очередного фрагмента
+        // или сместить до нужной позиции в блоке чтобы не нарушить целостность
+        self->writeBuffer->currPos = 0;
+
+
         // заголовок каждого сегмента
         if (writeRfc1006Header(self, 7 + (currentLimit - currentBufPos)) == ERR) return ERR;	// 4 байта с указанием размера сегмента
         if (writeDataTpduHeader(self, lastUnit) == ERR)		return ERR;							// 3 байта с указанием признака последнего такета (EOT)
@@ -240,7 +245,7 @@ static void		allocateWriteBuffer(CotpConnection* self)
     }
 }
 /*************************************************************************
- * allocateWriteBuffer(CotpConnection* self)
+ * allocatePayloadBuffer(CotpConnection* self)
  * выдел€ет буфер в пам€ти и указываем его потоку
  *************************************************************************/
 static void		allocatePayloadBuffer(CotpConnection* self)
@@ -304,7 +309,7 @@ CotpIndication		CotpConnection_sendConnectionRequestMessage(CotpConnection* self
 }
 /*************************************************************************
  * CotpConnection_sendConnectionResponseMessage(CotpConnection* self)
- * client side
+ * ѕосылаем ответ серверу.
  *************************************************************************/
 CotpIndication	CotpConnection_sendConnectionResponseMessage(CotpConnection* self)
 {
@@ -321,7 +326,7 @@ CotpIndication	CotpConnection_sendConnectionResponseMessage(CotpConnection* self
     	USART_TRACE("ERR sending buffer\n");
         return ERR;
     }
-
+    //CotpConnection_destroy(self);		// удалим self->writeBuffer из пам€ти
     return OK;
 }
 /*************************************************************************

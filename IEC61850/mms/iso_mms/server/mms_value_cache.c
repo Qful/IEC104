@@ -115,8 +115,11 @@ searchCacheForValue(MmsValueCache self, char* itemId, char* parentId)
 	return value;
 }
 
-MmsValue*
-MmsValueCache_lookupValue(MmsValueCache self, char* itemId)
+/*************************************************************************
+ * MmsValueCache_lookupValue
+ * достаём пременную из кэш в виде указателя на MmsValue*
+ *************************************************************************/
+MmsValue*	MmsValueCache_lookupValue(MmsValueCache self, char* itemId)
 {
 	// get value for first matching key substring!
 	// Then iterate the value for the exact value.

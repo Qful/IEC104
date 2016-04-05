@@ -30,7 +30,7 @@ static uint8_t appContextNameMms[] = { 0x28, 0xca, 0x22, 0x02, 0x03 };
 
 static uint8_t apTitle_1_1_1_999_1[] = { 0x29, 0x01, 0x87, 0x67, 0x01 };
 
-static uint8_t berOid[2] = { 0x01, 0x51  };	// { 0x51, 0x01 }; это я исправил
+static uint8_t berOid[2] = { 0x51, 0x01  };	// { 0x51, 0x01 }; это я исправил
 
 static uint8_t auth_mech_password_oid[] = { 0x52, 0x03, 0x01 };
 
@@ -105,7 +105,7 @@ static bool	checkAuthentication(AcseConnection* self, uint8_t* authMechanism, in
 static int	parseUserInformation(AcseConnection* self, uint8_t* buffer, int bufPos, int maxBufPos, bool* userInfoValid)
 {
 	bool hasindirectReference = false;
-	bool isBer = false;
+	bool isBer = true;
 	bool isDataValid = false;
 	int len;
 	uint8_t tag;
@@ -119,6 +119,7 @@ static int	parseUserInformation(AcseConnection* self, uint8_t* buffer, int bufPo
 
 		switch (tag) {
 		case 0x06: /* direct-reference */
+			isBer = false;
 
 			USART_TRACE("%.2X: direct-reference. len = %u \n",tag,len);
 

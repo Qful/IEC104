@@ -34,19 +34,19 @@
 // Функциональные связи (Functional constraints)
 typedef enum eFunctionalConstraint {
     // FCs according to IEC 61850-7-2:
-    ST, /** Status information */						// Информация о состоянии
-    MX, /** Measurands - analog values */				// Измеряемые величины (аналоговые значения)
-    SP, /** Setpoint */									// Уставка
-    SV, /** Substitution */								// Подстановка
-    CF, /** Configuration */							// Конфигурация
-    DC, /** Description */								// Описание
-    SG, /** Setting group */							// Группа настроек
-    SE, /** Setting group editable */					// Редактируемая группа настроек
+    ST, /** Status information */						// Информация о состоянии							ТОЛЬКО ЧТЕНИЕ
+    MX, /** Measurands - analog values */				// Измеряемые величины (аналоговые значения)		ТОЛЬКО ЧТЕНИЕ
+    SP, /** Setpoint */									// Уставка											МОЖЕТ БЫТЬ ЗАПИСАНО И СЧИТАНО
+    SV, /** Substitution */								// Подстановка										МОЖЕТ БЫТЬ ЗАПИСАНО И СЧИТАНО
+    CF, /** Configuration */							// Конфигурация										МОЖЕТ БЫТЬ ЗАПИСАНО И СЧИТАНО
+    DC, /** Description */								// Описание											МОЖЕТ БЫТЬ ЗАПИСАНО И СЧИТАНО
+    SG, /** Setting group */							// Группа настроек									НЕ ПЕРЕЗАПИСЫВАЕМОЕ
+    SE, /** Setting group editable */					// Редактируемая группа настроек					МОЖЕТ БЫТЬ ИЗМЕНЁМ СЕРВИСАМИ SGCB
     SR, /** Service response / Service tracking */
     OR, /** Operate received */
-    BL, /** Blocking */
-    EX, /** Extended definition */						// Расширенное определение
-    CO  /** Control */									// Управление
+    BL, /** Blocking */									// Блокировка
+    EX, /** Extended definition */						// Расширенное определение							НЕ ПЕРЕЗАПИСЫВАЕМОЕ
+    CO  /** Control */									// Управление										МОЖЕТ БЫТЬ СЧИТАНО
 } FunctionalConstraint;
 
 char*

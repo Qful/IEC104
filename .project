@@ -3,6 +3,8 @@
 	<name>SmI_IEC104</name>
 	<comment></comment>
 	<projects>
+		<project>FreeRTOS</project>
+		<project>LwIP</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -79,4 +81,11 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>FreeRTOSConfig.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/FreeRTOS/FreeRTOSConfig.h</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>

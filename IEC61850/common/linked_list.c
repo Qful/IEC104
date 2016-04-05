@@ -21,6 +21,8 @@
  *	See COPYING file for the complete license text.
  */
 
+#include "FreeRTOS.h"
+
 #include "libiec61850_platform_includes.h"
 #include "linked_list.h"
 
@@ -35,13 +37,15 @@ LinkedList_getLastElement(LinkedList list)
 
 /*************************************************************************
  * LinkedList_create
- * выделяем память на элемент списка
+ * выделяем память только для структуры элемента списка
  *************************************************************************/
 LinkedList	LinkedList_create()
 {
 	LinkedList newList;
 
 	newList = malloc(sizeof(struct sLinkedList));
+	//newList = pvPortMalloc(sizeof(struct sLinkedList));
+
 	newList->data = NULL;
 	newList->next = NULL;
 
@@ -71,6 +75,7 @@ void
 LinkedList_destroy(LinkedList list)
 {
 	LinkedList_destroyDeep(list, free);
+//	LinkedList_destroyDeep(list, vPortFree);
 }
 
 /**

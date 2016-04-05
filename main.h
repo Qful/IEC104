@@ -9,6 +9,7 @@
 #define MAIN_H_
 
 #include "stdint.h"
+#include "clocks.h"
 
 // Enable/Disable tracing using LED outputs
 #define LED_TRACE_ENABLE            1
@@ -37,7 +38,7 @@ print '\033[1;48mHighlighted Crimson like Chianti\033[1;m'
  */
 #if (USART_TRACE_ENABLE)
 
-#define  USART_TRACE(...)   printf("\033[1;mDBG: ") ;\
+#define  USART_TRACE(...)	printf("\033[1;mDBG: ") ;\
                             printf(__VA_ARGS__);
                             //printf("\n");
 
@@ -78,14 +79,16 @@ print '\033[1;48mHighlighted Crimson like Chianti\033[1;m'
 #define IEC104_Port		2404		/* 2404 is the port used for IEC 60870-5-104 protocol */
 #define IEC850_Port		102			/* 102 is the port used for IEC 61850 protocol */
 
+// часовой пояс для временных данных по UTC
+#define	Timezone	+3
 
 /*MAC ADDRESS */
-#define MAC_ADDR0   01
-#define MAC_ADDR1   02
-#define MAC_ADDR2   03
-#define MAC_ADDR3   04
-#define MAC_ADDR4   05
-#define MAC_ADDR5   06
+#define MAC_ADDR0   0x20
+#define MAC_ADDR1   0x64
+#define MAC_ADDR2   0x32
+#define MAC_ADDR3   0x32
+#define MAC_ADDR4   0xD4
+#define MAC_ADDR5   0x41
 
 /*Static IP ADDRESS for first*/
 #define first_IP_ADDR0   192
@@ -96,7 +99,7 @@ print '\033[1;48mHighlighted Crimson like Chianti\033[1;m'
 #define second_IP_ADDR0   192
 #define second_IP_ADDR1   168
 #define second_IP_ADDR2   0
-#define second_IP_ADDR3   253
+#define second_IP_ADDR3   252
 /*NETMASK*/
 #define NETMASK_ADDR0   255
 #define NETMASK_ADDR1   255
@@ -120,11 +123,26 @@ print '\033[1;48mHighlighted Crimson like Chianti\033[1;m'
 #define MB_StartDateNaddr   	0x0200
 #define MB_NumbDate		   		7
 
+
+// размер буфера для работы DEBUG USART
+#define		BOOT_BUF_MAX_OUTPUT_SIZE		250//150
+
+
+/* Converts a time in milliseconds to a time in ticks. */
+#define pdMS_TO_TICKS( xTimeInMs ) ( ( TickType_t ) ( ( ( TickType_t ) ( xTimeInMs ) * ( TickType_t ) configTICK_RATE_HZ ) / ( TickType_t ) 1000 ) )
+
+
 #include "ConfBoard.h"
+
+/* FatFs includes component */
+#include "ff_gen_drv.h"
+#include "spimem_diskio.h"
 
 extern void Port_Init(Port_TypeDef Port,uint32_t mode);
 extern void Port_On(Port_TypeDef Port);
 extern void Port_Off(Port_TypeDef Port);
 extern void Port_Toggle(Port_TypeDef Port);
+
+void vOutputDEBUG( char *pcMessage );
 
 #endif /* MAIN_H_ */

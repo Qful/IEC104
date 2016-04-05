@@ -10,12 +10,12 @@
 #define STACK_CONFIG_H_
 
 /* print debugging information with printf */
-#define DEBUG 				1
+#define DEBUG 				0
 
 #define STATIC_MODEL 		1
 
 /* Maximum MMS PDU SIZE - default is 65000 */
-#define MMS_MAXIMUM_PDU_SIZE 2048
+#define MMS_MAXIMUM_PDU_SIZE 1200//4096//8192//2048
 
 /* number of data sets per LN if static option is set */
 #define MMS_ALLOW_CLIENTS_TO_CREATE_ASSOCIATION_SPECIFIC_DATASETS 0
@@ -96,7 +96,7 @@
 #define MMS_READ_SERVICE 1
 #define MMS_WRITE_SERVICE 1
 #define MMS_GET_NAME_LIST 1
-#define MMS_GET_VARIABLE_ACCESS_ATTRIBUTES 1
+#define MMS_GET_VARIABLE_ACCESS_ATTRIBUTES 0
 #define MMS_DATA_SET_SERVICE 1
 #endif /* MMS_DEFAULT_PROFILE */
 

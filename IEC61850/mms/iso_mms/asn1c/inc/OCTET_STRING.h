@@ -12,8 +12,8 @@ extern "C" {
 #endif
 
 typedef struct OCTET_STRING {
-	uint8_t *buf;	/* Buffer with consecutive OCTET_STRING bits */
-	int size;	/* Size of the buffer */
+	uint8_t *buf;				/* Buffer with consecutive OCTET_STRING bits */
+	int size;					/* Size of the buffer */
 
 	asn_struct_ctx_t _asn_ctx;	/* Parsing across buffer boundaries */
 } OCTET_STRING_t;

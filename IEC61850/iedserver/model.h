@@ -36,6 +36,9 @@ typedef struct sDataAttribute DataAttribute;
 typedef struct sLogicalDevice LogicalDevice;
 typedef struct sIedModel IedModel;
 
+typedef uint16_t Quality;
+typedef uint16_t Validity;
+
 
 typedef enum eDataAttributeType {
 	BOOLEAN,/* int */
@@ -83,10 +86,10 @@ typedef struct GSEControlBlock* GSEControBlockPtr;
 struct sIedModel {
 	char* 					name;					// имя электронного устройства
 	LogicalDevice* 			firstChild;				// первое логическое устройство LD в реальном IED
-	DataSetPtr* 			dataSets;
-	ReportControlBlockPtr* 	rcbs;
-	GSEControBlockPtr* 		gseCBs;
-	void (*initializer) ();
+	DataSetPtr* 			dataSets;				//
+	ReportControlBlockPtr* 	rcbs;					// указатель на структуру отчетов
+	GSEControBlockPtr* 		gseCBs;					//
+	void (*initializer) ();							// указатель на функцию перфичной инициализации данных
 };
 // модель LD (logical device) логическое устройство
 struct sLogicalDevice {
@@ -111,7 +114,7 @@ struct sLogicalNode {
 	ModelNode* sibling;					// одноранговый следующий узел
 	ModelNode* firstChild;				// первый наследник
 };
-
+// модель DO (DataObject) объект данных
 struct sDataObject {
 	ModelNodeType modelType;			// тип : LogicalNode,DataObject,DataAttribute
 	char* name;							// имя узла
@@ -152,15 +155,15 @@ typedef struct {
 } DataSetEntry;
 
 typedef struct {
-	char* logicalDeviceName;
-	char* name; /* eg. MMXU1$dataset1 */
-	int elementCount;
-	DataSetEntry** fcda;
+	char* logicalDeviceName;			// имя LD
+	char* name; 						// eg. MMXU1$dataset1
+	int elementCount;					// число элементов
+	DataSetEntry** fcda;				// Указатель на массив элементов
 } DataSet;
 
 // Модель класса REPORTCONTROLBLOCK
 typedef struct {
-	LogicalNode* parent;
+	LogicalNode* parent;				// указатель на LN
 	char* name;							// 14.2.2.2 имя	блока буферизованного управления отчетом
 	char* rptId;						// 14.2.2.4 Атрибут RptID идентификатор	отчета
 	bool buffered;						// BUFFEREDREPORTCONTROLBLOCK(BRCB) или UNBUFFEREDREPORTCONTROLBLOCK(URCB)

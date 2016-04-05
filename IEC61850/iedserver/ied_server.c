@@ -22,6 +22,7 @@
  */
 
 #include "main.h"
+#include "iec850.h"
 
 #include "iec61850_server.h"
 #include "mms_mapping.h"
@@ -31,13 +32,59 @@
 #include "mms_server.h"
 
 struct sIedServer {
-	IedModel* model;
-	MmsDevice* mmsDevice;
-	MmsServer mmsServer;
-	IsoServer isoServer;
-	MmsMapping* mmsMapping;
+	IedModel* 		model;				// модель IED (intellegent electronic device) электронное устройство
+	MmsDevice* 		mmsDevice;			// MMS устройство.
+	MmsServer 		mmsServer;			// MMS сервер, содержимое, TCP параметры, указатели на функции чтения и записи переменных.
+	IsoServer 		isoServer;			//  статус сервера ISO, настройка парольности, указатель на функцию коннекта клиента.
+	MmsMapping* 	mmsMapping;
 };
 
+/*************************************************************************
+ * checkForUpdateTrigger
+ *  если включен сервис отчетов, то MmsMapping->reportControls->data добавим инфу
+ *  об обновлении данных. REPORT_CONTROL_VALUE_UPDATE
+ *************************************************************************/
+static inline void	checkForUpdateTrigger(IedServer self, DataAttribute* dataAttribute)
+{
+#if (CONFIG_IEC61850_REPORT_SERVICE== 1)
+    if (dataAttribute->triggerOptions & TRG_OPT_DATA_UPDATE) {
+        MmsMapping_triggerReportObservers(self->mmsMapping, dataAttribute->mmsValue, REPORT_CONTROL_VALUE_UPDATE);
+    }
+#endif
+}
+/*************************************************************************
+ * checkForChangedTriggers
+ *  если включен сервис отчетов, то MmsMapping->reportControls->data добавим инфу
+ *  о изменении данных. REPORT_CONTROL_VALUE_CHANGED
+ *************************************************************************/
+static inline void	checkForChangedTriggers(IedServer self, DataAttribute* dataAttribute)
+{
+#if (CONFIG_IEC61850_REPORT_SERVICE == 1) || (CONFIG_INCLUDE_GOOSE_SUPPORT == 1)
+    if (dataAttribute->triggerOptions & TRG_OPT_DATA_CHANGED) {
+
+#if (CONFIG_INCLUDE_GOOSE_SUPPORT == 1)
+        MmsMapping_triggerGooseObservers(self->mmsMapping, dataAttribute->mmsValue);
+#endif
+
+#if (CONFIG_IEC61850_REPORT_SERVICE == 1)
+        MmsMapping_triggerReportObservers(self->mmsMapping, dataAttribute->mmsValue, REPORT_CONTROL_VALUE_CHANGED);
+#endif
+    }
+
+    else if (dataAttribute->triggerOptions & TRG_OPT_QUALITY_CHANGED) {
+
+#if (CONFIG_INCLUDE_GOOSE_SUPPORT == 1)
+        MmsMapping_triggerGooseObservers(self->mmsMapping, dataAttribute->mmsValue);
+#endif
+
+#if (CONFIG_IEC61850_REPORT_SERVICE == 1)
+        MmsMapping_triggerReportObservers(self->mmsMapping, dataAttribute->mmsValue, REPORT_CONTROL_QUALITY_CHANGED);
+#endif
+    }
+#endif /* (CONFIG_IEC61850_REPORT_SERVICE== 1) || (CONFIG_INCLUDE_GOOSE_SUPPORT == 1) */
+
+
+}
 /*************************************************************************
  * createControlObjects
  *
@@ -130,27 +177,28 @@ static void		createMmsServerCache(IedServer self)
 
 				    createControlObjects(self, logicalDevice, lnName, fcSpec);
 				}
-				else if ((strcmp(fcName, "BR") != 0) && (strcmp(fcName, "RP") != 0)
-				        && (strcmp(fcName, "GO") != 0))
+				else if ((strcmp(fcName, "BR") != 0) && (strcmp(fcName, "RP") != 0) && (strcmp(fcName, "GO") != 0))
 				{
 
 					char* variableName = createString(3, lnName, "$", fcName);
 
 					MmsValue* defaultValue = MmsValue_newDefaultValue(fcSpec);
 
-					USART_TRACE("Добавим в КЭШ сервера %s - %s\n", logicalDevice->domainName, variableName);
+					USART_TRACE("		IedServer->mmsServer->valueCaches = %s - %s\n",logicalDevice->domainName,  variableName);
 
 					MmsServer_insertIntoCache(self->mmsServer, logicalDevice, variableName, defaultValue);
 
 					free(variableName);
 				}
-			}
+			}// !for (j = 0; j < fcCount; j++) {
 		}
 	}
 }
-
-static void		installDefaultValuesForDataAttribute(IedServer self, DataAttribute* dataAttribute,
-		char* objectReference, int position)
+/*************************************************************************
+ * installDefaultValuesForDataAttribute
+ *
+ *************************************************************************/
+static void		installDefaultValuesForDataAttribute(IedServer self, DataAttribute* dataAttribute, char* objectReference, int position)
 {
 	sprintf(objectReference + position, ".%s", dataAttribute->name);
 
@@ -186,6 +234,8 @@ static void		installDefaultValuesForDataAttribute(IedServer self, DataAttribute*
 	while (subDataAttribute != NULL) {
 		installDefaultValuesForDataAttribute(self, subDataAttribute, objectReference, childPosition);
 
+		USART_TRACE("					атрибут: %s \n", objectReference);
+
 		subDataAttribute = subDataAttribute->sibling;
 	}
 }
@@ -194,9 +244,9 @@ static void		installDefaultValuesForDataAttribute(IedServer self, DataAttribute*
  * installDefaultValuesForDataObject
  *
  *************************************************************************/
-static void		installDefaultValuesForDataObject(IedServer self, DataObject* dataObject,
-		char* objectReference, int position)
+static void		installDefaultValuesForDataObject(IedServer self, DataObject* dataObject, char* objectReference, int position)
 {
+
 	sprintf(objectReference + position, ".%s", dataObject->name);
 
 	ModelNode* childNode = dataObject->firstChild;
@@ -210,7 +260,7 @@ static void		installDefaultValuesForDataObject(IedServer self, DataObject* dataO
 		else if (childNode->modelType == DataAttributeModelType) {
 			installDefaultValuesForDataAttribute(self, childNode, objectReference, childPosition);
 		}
-
+		USART_TRACE("				данные: %s \n", objectReference);
 		childNode = childNode->sibling;
 	}
 }
@@ -220,15 +270,22 @@ static void		installDefaultValuesForDataObject(IedServer self, DataObject* dataO
  *************************************************************************/
 static void	installDefaultValuesInCache(IedServer self)
 {
-	IedModel* model = self->model;
+	IedModel* model = self->model;												// модель IED в сервере IedServer
+
+	USART_TRACE("\n");
+	USART_TRACE(" ------------- installDefaultValuesInCache --------------- \n");
+	USART_TRACE(" IedServer->model-> \n");
+	USART_TRACE("модель IED: %s \n", model->name);
 
 	char objectReference[255]; // TODO check for optimal buffer size;
 
 	LogicalDevice* logicalDevice = model->firstChild;
 
+
 	while (logicalDevice != NULL) {
 		sprintf(objectReference, "%s", logicalDevice->name);
 
+		USART_TRACE("	логическое устройство LD: %s \n", objectReference);
 		LogicalNode* logicalNode = logicalDevice->firstChild;
 
 		char* nodeReference = objectReference + strlen(objectReference);
@@ -236,11 +293,13 @@ static void	installDefaultValuesInCache(IedServer self)
 		while (logicalNode != NULL) {
 			sprintf(nodeReference, "/%s", logicalNode->name);
 
+			USART_TRACE("		логический узел LN: %s \n", nodeReference);
 			DataObject* dataObject = logicalNode->firstChild;
 
 			int refPosition = strlen(objectReference);
 
 			while (dataObject != NULL) {
+				USART_TRACE("			объект данных: %s \n", dataObject->name);
 				installDefaultValuesForDataObject(self, dataObject, objectReference, refPosition);
 
 				dataObject = dataObject->sibling;
@@ -255,24 +314,35 @@ static void	installDefaultValuesInCache(IedServer self)
 
 /*************************************************************************
  * updateDataSetsWithCachedValues
- *
+ * Помоему отсюда беруться данные дискреты, АЦП
  *************************************************************************/
 static void		updateDataSetsWithCachedValues(IedServer self)
 {
 	DataSet** dataSets = self->model->dataSets;
 
+	USART_TRACE("\n");
+	USART_TRACE(" ------------- updateDataSetsWithCachedValues --------------- \n");
 	int i = 0;
 	while (dataSets[i] != NULL) {
 
+
 		int fcdaCount = dataSets[i]->elementCount;
+		USART_TRACE("\n");
+		USART_TRACE("dataSets[%u]->elementCount: %u \n",i,fcdaCount);
 
 		int j = 0;
 
 		for (j = 0; j < fcdaCount; j++) {
+			USART_TRACE("\n");
+			USART_TRACE("dataSets[%u]->fcda[%u]->logicalDeviceName: %s \n",i,j, dataSets[i]->fcda[j]->logicalDeviceName);
+			USART_TRACE("dataSets[%u]->fcda[%u]->variableName: %s \n",i,j, dataSets[i]->fcda[j]->variableName);
 
 			MmsDomain* domain = MmsDevice_getDomain(self->mmsDevice, dataSets[i]->fcda[j]->logicalDeviceName);
 
 			MmsValue* value = MmsServer_getValueFromCache(self->mmsServer, domain, dataSets[i]->fcda[j]->variableName);
+
+			USART_TRACE("dataSets[%u]->fcda[%u]->value->type: %u \n",i,j,value->type);
+			USART_TRACE("dataSets[%u]->fcda[%u]->value->value: %u \n",i,j,value->value);
 
 			if (value == NULL)
 				printf("error cannot get value from cache!\n");
@@ -283,6 +353,8 @@ static void		updateDataSetsWithCachedValues(IedServer self)
 
 		i++;
 	}
+USART_TRACE("!updateDataSetsWithCachedValues -------------- \n");
+
 }
 /*************************************************************************
  * IedServer_create
@@ -297,36 +369,36 @@ static void		updateDataSetsWithCachedValues(IedServer self)
 IedServer	IedServer_create(IedModel* iedModel)
 {
 	IedServer self = calloc(1, sizeof(struct sIedServer));
+//	IedServer self = pvPortMalloc(sizeof(struct sIedServer));
 
-	self->model = iedModel;
+//	USART_TRACE("\n");
+//	USART_TRACE("--------------------------------------------------------------------\n");
+//	USART_TRACE("Выделили память для структуры IedServer сервера по адресу:0x%X размером %u\n",&self,sizeof(struct sIedServer));
 
-	USART_TRACE("-> IedServer_create -> MmsMapping_create(iedModel);\n");
+	self->model 		= iedModel;														// модель IED
+	self->mmsMapping 	= MmsMapping_create(iedModel);									//
+	self->mmsDevice 	= MmsMapping_getMmsDeviceModel(self->mmsMapping);				//
+	self->isoServer 	= IsoServer_create();											// установим ISO_SVR_STATE_IDLE и укажем номер порта
+	self->mmsServer 	= MmsServer_create(self->isoServer, self->mmsDevice);			//
 
-	self->mmsMapping = MmsMapping_create(iedModel);
-	self->mmsDevice = MmsMapping_getMmsDeviceModel(self->mmsMapping);
+	MmsMapping_setMmsServer(self->mmsMapping, self->mmsServer);							// self->mmsMapping->mmsServer = self->mmsServer;
+	MmsMapping_installHandlers(self->mmsMapping);										// Привяжем функции чтения и записи переменных.
 
-	USART_TRACE("-> IedServer_create -> IsoServer_create();\n");
-
-	self->isoServer = IsoServer_create();								// установим ISO_SVR_STATE_IDLE и укажем номер порта
-
-
-	USART_TRACE("-> IedServer_create -> MmsServer_create(self->isoServer, self->mmsDevice);\n");
-
-	self->mmsServer = MmsServer_create(self->isoServer, self->mmsDevice);
-
-	MmsMapping_setMmsServer(self->mmsMapping, self->mmsServer);
-	MmsMapping_installHandlers(self->mmsMapping);
+	//MmsMapping_setIedServer(self->mmsMapping, self);
 
 	USART_TRACE("-> IedServer_create -> createMmsServerCache(self);\n");
 	createMmsServerCache(self);
 
-	USART_TRACE("-> IedServer_create -> iedModel->initializer();\n");
-	iedModel->initializer();											// добавим переменные в кэш. static_model.c
+	USART_TRACE("-> IedServer_create -> iedModel->initializer();   добавим переменные(константы) в кэш см. static_model.c \n");
+	iedModel->initializer();														// добавим переменные в кэш. static_model.c
 
-	installDefaultValuesInCache(self); 									// This will also connect cached MmsValues to DataAttributes
+	installDefaultValuesInCache(self); 												// This will also connect cached MmsValues to DataAttributes
 
 	updateDataSetsWithCachedValues(self);
+//	USART_TRACE("updateDataSetsWithCachedValues(self);\n");
 
+	USART_TRACE("IedServer_create\n");
+	USART_TRACE("--------------------------------------------------------------------\n");
 	return self;
 }
 /*************************************************************************
@@ -387,38 +459,49 @@ void	IedServer_stop(IedServer self)
 {
 	MmsServer_stopListening(self->mmsServer);
 }
-
-void
-IedServer_lockDataModel(IedServer self)
+/*************************************************************************
+ * IedServer_lockDataModel
+ * захватываем управление mmsServer'ом (через семафоры)
+ *************************************************************************/
+void	IedServer_lockDataModel(IedServer self)
 {
 	MmsServer_lockModel(self->mmsServer);
 }
-
-void
-IedServer_unlockDataModel(IedServer self)
+/*************************************************************************
+ * IedServer_lockDataModel
+ * отдаём управление mmsServer'ом (через семафоры)
+ *************************************************************************/
+void	IedServer_unlockDataModel(IedServer self)
 {
 	MmsServer_unlockModel(self->mmsServer);
 }
 
-MmsDomain*
-IedServer_getDomain(IedServer self, char* logicalDeviceName)
+/*************************************************************************
+ * IedServer_getDomain
+ * Ищем в mmsDevice логическое устройство (logicalDeviceName) которое
+ * в физическом протоколе MMS представляет собой ДОМЕН. и возвращаем
+ * указатель на этот домен. self->mmsDevice->domains[i]
+ *************************************************************************/
+MmsDomain*	IedServer_getDomain(IedServer self, char* logicalDeviceName)
 {
 	return MmsDevice_getDomain(self->mmsDevice, logicalDeviceName);
 }
-
-MmsValue*
-IedServer_getValue(IedServer self, MmsDomain* domain, char* mmsItemId)
+/*************************************************************************
+ * IedServer_getValue
+ *
+ *************************************************************************/
+MmsValue*	IedServer_getValue(IedServer self, MmsDomain* domain, char* mmsItemId)
 {
 	return MmsServer_getValueFromCache(self->mmsServer, domain, mmsItemId);
 }
-
-void
-IedServer_setControlHandler(
-        IedServer self,
-        DataObject* node,
-        ControlHandler listener,
-        void* parameter)
+/*************************************************************************
+ * IedServer_setControlHandler
+ * Установить обработчик управления для контролируемого объекта данных
+ *
+ *************************************************************************/
+void	IedServer_setControlHandler(IedServer self, DataObject* node, ControlHandler listener, void* parameter)
 {
+
     char* objectReference[129];
 
     ModelNode_getObjectReference(node, objectReference);
@@ -444,24 +527,45 @@ IedServer_setControlHandler(
 
     ControlObject* controlObject = MmsMapping_getControlObject(self->mmsMapping, domain, lnName, objectName);
 
-    if (controlObject != NULL)
-        ControlObject_installListener(controlObject, listener, parameter);
+    if (controlObject != NULL)	ControlObject_installListener(controlObject, listener, parameter);
 }
 
-void
-IedServer_updateAttributeValue(IedServer self, DataAttribute* node, MmsValue* value)
+MmsValue*	IedServer_getAttributeValue(IedServer self, DataAttribute* dataAttribute)
+{
+    return dataAttribute->mmsValue;
+}
+
+/*************************************************************************
+ * IedServer_updateBooleanAttributeValue
+ * Обновление значения (bool)value в dataAttribute
+ *************************************************************************/
+void	IedServer_updateBooleanAttributeValue(IedServer self, DataAttribute* dataAttribute, bool value)
+{
+    bool currentValue = MmsValue_getBoolean(dataAttribute->mmsValue);		// читаем текущее значение из хранилища
+
+    if (currentValue == value) {											// если значение такое как и было, то добавим инфу в структуру отчетов об обновлении.
+        checkForUpdateTrigger(self, dataAttribute);
+    }
+    else {																	// если значение отличается, то установим новое значение.
+        MmsValue_setBoolean(dataAttribute->mmsValue, value);
+        checkForChangedTriggers(self, dataAttribute);						// добавим инфу в структуру отчетов об изменении данных.
+    }
+}
+/*************************************************************************
+ * IedServer_updateAttributeValue
+ * Обновление значения (MmsValue*)value в DataAttribute
+ *************************************************************************/
+void	IedServer_updateAttributeValue(IedServer self, DataAttribute* node, MmsValue* value)
 {
 	if (node->modelType == DataAttributeModelType) {
 		DataAttribute* dataAttribute = (DataAttribute*) node;
 
 		if (MmsValue_isEqual(dataAttribute->mmsValue, value)) {
-		    MmsMapping_triggerReportObservers(self->mmsMapping, dataAttribute->mmsValue,
-		            REPORT_CONTROL_VALUE_UPDATE);
+		    MmsMapping_triggerReportObservers(self->mmsMapping, dataAttribute->mmsValue, REPORT_CONTROL_VALUE_UPDATE);
 		}
 		else {
 		    MmsValue_update(dataAttribute->mmsValue, value);
-		    MmsMapping_triggerReportObservers(self->mmsMapping, dataAttribute->mmsValue,
-		            REPORT_CONTROL_VALUE_CHANGED);
+		    MmsMapping_triggerReportObservers(self->mmsMapping, dataAttribute->mmsValue, REPORT_CONTROL_VALUE_CHANGED);
 
 		    if (CONFIG_INCLUDE_GOOSE_SUPPORT)
 		        MmsMapping_triggerGooseObservers(self->mmsMapping, dataAttribute->mmsValue);
@@ -476,8 +580,7 @@ IedServer_attributeQualityChanged(IedServer self, ModelNode* node)
     if (node->modelType == DataAttributeModelType) {
         DataAttribute* dataAttribute = (DataAttribute*) node;
 
-        MmsMapping_triggerReportObservers(self->mmsMapping, dataAttribute->mmsValue,
-                   REPORT_CONTROL_QUALITY_CHANGED);
+        MmsMapping_triggerReportObservers(self->mmsMapping, dataAttribute->mmsValue, REPORT_CONTROL_QUALITY_CHANGED);
     }
 }
 
@@ -487,8 +590,72 @@ IedServer_enableGoosePublishing(IedServer self)
     MmsMapping_enableGoosePublishing(self->mmsMapping);
 }
 
-void
-IedServer_observeDataAttribute(IedServer self, DataAttribute* dataAttribute, AttributeChangedHandler handler)
+
+/*************************************************************************
+ * IedServer_observeDataAttribute
+ * Установить наблюдателя для атрибута данных
+ * dataAttribute 	- атрибут для наблюдения.
+ * handler			- Колбэк функция для вызова при изменении атрибута
+ *************************************************************************/
+void	IedServer_observeDataAttribute(IedServer self, DataAttribute* dataAttribute, AttributeChangedHandler handler)
 {
     MmsMapping_addObservedAttribute(self->mmsMapping, dataAttribute, handler);
+}
+
+/*************************************************************************
+ * IedServer_updateUTCTimeAttributeValue
+ * Установим новое значение (UtcTimeMs)value в объект dataAttribute->mmsValue
+ *************************************************************************/
+void	IedServer_updateUTCTimeAttributeValue(IedServer self, DataAttribute* dataAttribute, uint64_t value)
+{
+    uint64_t currentValue = MmsValue_getUtcTimeInMs(dataAttribute->mmsValue);
+
+    if (currentValue == value) {
+        checkForUpdateTrigger(self, dataAttribute);
+    }
+    else {
+        MmsValue_setUtcTimeMs(dataAttribute->mmsValue, value);
+        checkForChangedTriggers(self, dataAttribute);
+    }
+}
+
+/*************************************************************************
+ * IedServer_updateFloatAttributeValue
+ * Установим новое значение (float)value в объект dataAttribute->mmsValue
+ *************************************************************************/
+void	IedServer_updateFloatAttributeValue(IedServer self, DataAttribute* dataAttribute, float value)
+{
+    float currentValue = MmsValue_toFloat(dataAttribute->mmsValue);
+
+    if (currentValue == value) {
+        checkForUpdateTrigger(self, dataAttribute);
+    }
+    else {
+        MmsValue_setFloat(dataAttribute->mmsValue, value);
+        checkForChangedTriggers(self, dataAttribute);
+    }
+}
+/*************************************************************************
+ * IedServer_updateQuality
+ * Установим новое значение качества
+ *************************************************************************/
+void	IedServer_updateQuality(IedServer self, DataAttribute* dataAttribute, Quality quality)
+{
+    uint32_t oldQuality = MmsValue_getBitStringAsInteger(dataAttribute->mmsValue);
+
+    if (oldQuality != (uint32_t) quality) {
+        MmsValue_setBitStringFromInteger(dataAttribute->mmsValue, (uint32_t) quality);
+
+#if (CONFIG_INCLUDE_GOOSE_SUPPORT == 1)
+        MmsMapping_triggerGooseObservers(self->mmsMapping, dataAttribute->mmsValue);
+#endif
+
+#if (CONFIG_IEC61850_REPORT_SERVICE == 1)
+        if (dataAttribute->triggerOptions & TRG_OPT_QUALITY_CHANGED)
+            MmsMapping_triggerReportObservers(self->mmsMapping, dataAttribute->mmsValue,
+                                REPORT_CONTROL_QUALITY_CHANGED);
+#endif
+    }
+
+
 }

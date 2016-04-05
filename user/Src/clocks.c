@@ -12,30 +12,20 @@
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_rcc_ex.h"
 
-RTC_TimeTypeDef sTime;
-RTC_DateTypeDef sDate;
-RTC_HandleTypeDef hrtc;
 
+extern RTC_HandleTypeDef 	hrtc;
 
 void Clocks_Init(void)
 {
-    RCC_PeriphCLKInitTypeDef PeriphClkInitStruct;
-
-    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
-//TODO: на реальном приборе кварц не 8 а 25 ћ√ц. исправить делитель
-#ifdef STM32F407xx
-    PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_HSE_DIV8;		// RTCCLK = 1MHz
-#endif
-#ifdef STM32F417xx			// HSE = 25MHz
-    PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_HSE_DIV25;		// RTCCLK = 1MHz
-#endif
-
-    HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct);
-
-    __HAL_RCC_RTC_ENABLE();
+	RTC_TimeTypeDef sTime;
+	RTC_DateTypeDef sDate;
 
     hrtc.Instance = RTC;
     hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
+
+    //#define RTC_ASYNCH_PREDIV    0x7F				LSI
+	//#define RTC_SYNCH_PREDIV     0x0130
+
     hrtc.Init.AsynchPrediv = 124;
     hrtc.Init.SynchPrediv = 7999;
     hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
@@ -43,18 +33,20 @@ void Clocks_Init(void)
     hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
     HAL_RTC_Init(&hrtc);
 
-    sTime.Hours = 1;
-    sTime.Minutes = 1;
-    sTime.Seconds = 1;
+    sDate.WeekDay = RTC_WEEKDAY_SUNDAY;
+    sDate.Month = RTC_MONTH_FEBRUARY;
+    sDate.Date = 28;
+    sDate.Year = 16;								//от 2000 года 1970
+    HAL_RTC_SetDate(&hrtc, &sDate, FORMAT_BIN);
+
+    sTime.Hours = 23;
+    sTime.Minutes = 58;
+    sTime.Seconds = 15;
     sTime.SubSeconds = 0;
     sTime.TimeFormat = RTC_HOURFORMAT_24;
     sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
     sTime.StoreOperation = RTC_STOREOPERATION_RESET;
-    HAL_RTC_SetTime(&hrtc, &sTime, FORMAT_BCD);
+    HAL_RTC_SetTime(&hrtc, &sTime, FORMAT_BIN);
 
-    sDate.WeekDay = RTC_WEEKDAY_MONDAY;
-    sDate.Month = RTC_MONTH_JANUARY;
-    sDate.Date = 1;
-    sDate.Year = 0;
-    HAL_RTC_SetDate(&hrtc, &sDate, FORMAT_BCD);
+    HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR0, 0x32F2);
 }

@@ -67,7 +67,7 @@
 struct sMmsDomain {
 	char* 									domainName;				// имя домена
 	int 									namedVariablesCount;	// количество именованных переменных
-	MmsTypeSpecification** 					namedVariables;			//
+	MmsTypeSpecification** 					namedVariables;			// тип переменных
 	LinkedList /*<MmsNamedVariableList>*/ 	namedVariableLists;		// список переменных
 };
 

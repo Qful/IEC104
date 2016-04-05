@@ -352,7 +352,7 @@ IsoSessionIndication		IsoSession_parseMessage(IsoSession* session, ByteBuffer* m
 	if (message->currPos > 1) {
 		id = buffer[0];
 		length = buffer[1];
-		USART_TRACE("iso_session.c: id: %u length: %u\n",id,length);
+//		USART_TRACE("iso_session.c: id: %u length: %u\n",id,length);
 	}
 	else {
 		USART_TRACE_RED("iso_session.c: message->currPos == 0 \n");

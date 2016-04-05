@@ -445,6 +445,10 @@ countGSEControlBlocksForLogicalNode(MmsMapping* self, LogicalNode* logicalNode)
 static MmsTypeSpecification*	createNamedVariableFromLogicalNode(MmsMapping* self, MmsDomain* domain, LogicalNode* logicalNode)
 {
     MmsTypeSpecification* namedVariable = malloc(sizeof(MmsTypeSpecification));
+    USART_TRACE("0x%X:\n",namedVariable);
+
+    USART_TRACE("создадим из логических узлов(LN) переменные(namedVariables)\n");
+
 
     namedVariable->name = copyString(logicalNode->name);							// имя MMS именованной переменной = имя LN
     namedVariable->type = MMS_STRUCTURE;											// тип переменной = MMS_STRUCTURE
@@ -452,7 +456,7 @@ static MmsTypeSpecification*	createNamedVariableFromLogicalNode(MmsMapping* self
     int componentCount = determineLogicalNodeComponentCount(logicalNode);			// создадим функциональные связи возвратили число FC компонентов
 
 //    USART_TRACE("LogicalNode %s has %i fc components\n", logicalNode->name,componentCount);
-    USART_TRACE("Логический узел(LN) %s имеет %i функциональные связи (fc components)\n", logicalNode->name,componentCount);
+    USART_TRACE("	Логический узел(LN) %s имеет %i функциональные связи (fc components)\n", logicalNode->name,componentCount);
 
     int brcbCount = countReportControlBlocksForLogicalNode(self, logicalNode, true); // посчитаем количество блок управления отчетом BRCB(true) в LN
 
@@ -577,11 +581,19 @@ static MmsDomain*	createMmsDomainFromIedDevice(MmsMapping* self, LogicalDevice* 
 {
     MmsDomain* domain = MmsDomain_create(logicalDevice->name);						// создадим Домен с именем logicalDevice->name
 
+USART_TRACE("\n");
+USART_TRACE("-------------------------------------------------------------\n");
+USART_TRACE("создадим Домен из логического устройства LD\n");
+USART_TRACE("-------------------------------------------------------------\n");
     int nodesCount = LogicalDevice_getLogicalNodeCount(logicalDevice);				// получим число логических узлов LN в логическом устройстве LD.
 
     // LN первый элемент списка
     domain->namedVariablesCount = nodesCount;										// количество узлов LN
     domain->namedVariables = malloc(nodesCount * sizeof(MmsTypeSpecification*));	// выделим память для всех элементов списка LN
+
+    USART_TRACE("	число логических узлов LN они же (namedVariables): %u\n",nodesCount);
+
+    USART_TRACE("память для них:0x%X\n",domain->namedVariables);
 
     LogicalNode* logicalNode = logicalDevice->firstChild;
 
@@ -593,6 +605,8 @@ static MmsDomain*	createMmsDomainFromIedDevice(MmsMapping* self, LogicalDevice* 
         i++;
     }
 
+    USART_TRACE("-------------------------------------------------------------\n");
+    USART_TRACE("\n");
     return domain;
 }
 
@@ -654,7 +668,7 @@ static void	createDataSets(MmsDevice* mmsDevice, IedModel* iedModel)
 }
 /*************************************************************************
  * createMmsModelFromIedModel
- * создадим MMS из IED
+ * создадим MMS устройство из IED реального устройства
  *************************************************************************/
 static MmsDevice*	createMmsModelFromIedModel(MmsMapping* self, IedModel* iedModel)
 {
@@ -675,23 +689,34 @@ static MmsDevice*	createMmsModelFromIedModel(MmsMapping* self, IedModel* iedMode
 }
 /*************************************************************************
  * MmsMapping_create
- * создадим структуру
+ * создадим структуру с именем model->name
  *************************************************************************/
 MmsMapping*	MmsMapping_create(IedModel* model)
 {
+
     MmsMapping* self = calloc(1, sizeof(struct sMmsMapping));
+   // MmsMapping* self = pvPortMalloc(sizeof(struct sMmsMapping));
+
+	USART_TRACE("IedServer->MmsMapping  -  Выделили память для структуры по адресу:0x%X\n",self);
 
     self->model = model;
 
     self->reportControls = LinkedList_create();					//
+	USART_TRACE("	MmsMapping->reportControls - Выделили память для структуры по адресу:0x%X\n",self->reportControls);
+
 
     if (CONFIG_INCLUDE_GOOSE_SUPPORT)							// если будем использовать GOOSE протокол
         self->gseControls = LinkedList_create();
 
     self->controlObjects = LinkedList_create();					//
-    self->observedObjects = LinkedList_create();				//
+	USART_TRACE("	MmsMapping->controlObjects - Выделили память для структуры  по адресу:0x%X\n",self->controlObjects);
 
-    self->mmsDevice = createMmsModelFromIedModel(self, model);	// Создадим MMS модель из Ied сервера
+    self->observedObjects = LinkedList_create();				//
+	USART_TRACE("	MmsMapping->observedObjects - Выделили память для структуры по адресу:0x%X\n",self->observedObjects);
+
+    self->mmsDevice = createMmsModelFromIedModel(self, model);	// Создадим MMS модель из Ied реального устройства
+	USART_TRACE("	MmsMapping->mmsDevice -  Создали MMS модель из IED модели по адресу:0x%X\n",self->mmsDevice);
+
 
     return self;
 }
@@ -916,37 +941,46 @@ checkIfValueBelongsToModelNode(DataAttribute* dataAttribute, MmsValue* value)
     return false;
 }
 
-static MmsValueIndication
-mmsWriteHandler(void* parameter, MmsDomain* domain,
-        char* variableId, MmsValue* value, MmsServerConnection* connection)
+/*************************************************************************
+ * mmsWriteHandler
+ * Функция записи данных принятых от клиента.
+ * variableId - переменная в которую пишем данные
+ * value - данные для записи в виде структуры
+ *************************************************************************/
+static MmsValueIndication	mmsWriteHandler(void* parameter, MmsDomain* domain, char* variableId, MmsValue* value, MmsServerConnection* connection)
 {
     MmsMapping* self = (MmsMapping*) parameter;
 
     if (DEBUG) printf("Write requested %s\n", variableId);
 
+    USART_TRACE_RED("Write requested: %s\n", variableId);
+
     int variableIdLen = strlen(variableId);
 
     /* Access control based on functional constraint */
 
-    char* separator = strchr(variableId, '$');
+    char* separator = strchr(variableId, '$');					// ищем первый $
 
-    if (separator == NULL )
-        return MMS_VALUE_ACCESS_DENIED;
+    USART_TRACE("функция: %.3s\n",separator);
 
-    /* Controllable objects - CO */
+    if (separator == NULL )   return MMS_VALUE_ACCESS_DENIED;	// если нет его то отказываем в доступе
+
+    /* Controllable objects - CO */								// проверяем функциии CO - управление
     if (isControllable(separator)) {
+    	USART_TRACE_BLUE("функциии CO - управление: %u \n", value->value);
         return Control_writeAccessControlObject(self, domain, variableId, value);
     }
 
-    /* Goose control block - GO */
+    /* Goose control block - GO */								// проверяем функциии GO - управление
     if (CONFIG_INCLUDE_GOOSE_SUPPORT) {
         if (isGooseControlBlock(separator)) {
             return writeAccessGooseControlBlock(self, domain, variableId, value);
         }
     }
 
-    /* Report control blocks - BR, RP */
+    /* Report control blocks - BR, RP */						// проверяем функциии BR, RP - отчеты
     if (isReportControlBlock(separator)) {
+    	USART_TRACE_BLUE("функциии BR, RP - отчеты\n");
 
         LinkedList reportControls = self->reportControls;
 
@@ -965,16 +999,23 @@ mmsWriteHandler(void* parameter, MmsDomain* domain,
         return MMS_VALUE_ACCESS_DENIED;
     }
 
-    /* writable data model elements - SP, SV, CF, DC */
+    /* writable data model elements - SP, SV, CF, DC */			// проверяем функциии SP, SV, CF, DC записываемые
     if (isWritableFC(separator)) {
+
+    	USART_TRACE_BLUE("функциии SP, SV, CF, DC записываемые\n");
 
         MmsValue* cachedValue;
 
-        cachedValue = MmsServer_getValueFromCache(self->mmsServer, domain,
-                variableId);
+        cachedValue = MmsServer_getValueFromCache(self->mmsServer, domain, variableId);
 
-        if (cachedValue != NULL ) {
-            MmsValue_update(cachedValue, value);
+
+
+        if (cachedValue != NULL ) {								// если есть такое имя переменной в домене, то пишем
+
+        	USART_TRACE_BLUE("есть переменная в домене, обновим данные.\n");
+           	USART_TRACE_BLUE("value->type: %u, value: %s\n",value->type,value->value);
+
+        	MmsValue_update(cachedValue, value);				// пишем переменную value  в структуру cachedValue
 
             LinkedList element = LinkedList_getNext(self->observedObjects);
 
@@ -983,15 +1024,18 @@ mmsWriteHandler(void* parameter, MmsDomain* domain,
                 DataAttribute* dataAttribute = observer->attribute;
 
                 if (checkIfValueBelongsToModelNode(dataAttribute, cachedValue)) {
-                   observer->handler(dataAttribute);
+                   observer->handler(dataAttribute);								// вызываем callback функцию если включен на неё монитор. см. observerCallback
                 }
 
                 element = LinkedList_getNext(element);
             }
 
             return MMS_VALUE_OK;
-        } else
-            return MMS_VALUE_VALUE_INVALID;
+        } else{
+           	USART_TRACE_BLUE("не такой переменной в домене!!!\n");
+
+            return MMS_VALUE_VALUE_INVALID;						// если нет такого имени переменной в домене, то нет
+        }
     }
 
     return MMS_VALUE_ACCESS_DENIED;
@@ -1001,6 +1045,7 @@ void
 MmsMapping_addObservedAttribute(MmsMapping* self, DataAttribute* dataAttribute, void* handler)
 {
     AttributeObserver* observer = malloc(sizeof(struct sAttributeObserver));
+    //AttributeObserver* observer = pvPortMalloc(sizeof(struct sAttributeObserver));
 
     observer->attribute = dataAttribute;
     observer->handler = handler;
@@ -1055,15 +1100,21 @@ readAccessGooseControlBlock(MmsMapping* self, MmsDomain* domain, char* variableI
 
 #endif
 
-static MmsValue*
-mmsReadHandler(void* parameter, MmsDomain* domain, char* variableId)
+/*************************************************************************
+ * mmsReadHandler
+ * Функция чтения данных из кэша сервера.
+ *************************************************************************/
+static MmsValue*	mmsReadHandler(void* parameter, MmsDomain* domain, char* variableId)
 {
     MmsMapping* self = (MmsMapping*) parameter;
 
     if (DEBUG)
         printf("Requested %s\n", variableId);
+    USART_TRACE_RED("Read Requested %s\n", variableId);
 
     char* separator = strchr(variableId, '$');
+
+    USART_TRACE("функция: %.3s\n",separator);
 
     if (separator == NULL )
         return NULL;
@@ -1164,9 +1215,14 @@ mmsConnectionHandler (void* parameter, MmsServerConnection* connection, MmsServe
 
 void MmsMapping_installHandlers(MmsMapping* self)
 {
-    MmsServer_installReadHandler(self->mmsServer, mmsReadHandler, (void*) self);
-    MmsServer_installWriteHandler(self->mmsServer, mmsWriteHandler, (void*) self);
+    MmsServer_installReadHandler(self->mmsServer, mmsReadHandler, (void*) self);					// чтения данных из кэша сервера.
+    MmsServer_installWriteHandler(self->mmsServer, mmsWriteHandler, (void*) self);					// Функция записи данных принятых от клиента.
     MmsServer_installConnectionHandler(self->mmsServer, mmsConnectionHandler, (void*) self);
+
+	USART_TRACE("mmsMapping->mmsServer->mmsReadHandler			укажем Хэндлер на функцию Read\n");
+	USART_TRACE("mmsMapping->mmsServer->mmsWriteHandler			укажем Хэндлер на функцию Write\n");
+	USART_TRACE("mmsMapping->mmsServer->mmsConnectionHandler	укажем Хэндлер на функцию Connection\n");
+
 }
 
 

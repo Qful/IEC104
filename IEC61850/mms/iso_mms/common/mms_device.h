@@ -25,9 +25,9 @@
 #define MMS_DEVICE_H_
 
 typedef struct {
-	char* deviceName;
-	int domainCount;
-	MmsDomain** domains;
+	char* 		deviceName;				// имя MMS устройства
+	int 		domainCount;			// число доменов в устройстве
+	MmsDomain** domains;				// сами домены (Структура данных с инфой для MMS домена (логического устройства))
 } MmsDevice;
 
 /** \addtogroup mms_server_api_group

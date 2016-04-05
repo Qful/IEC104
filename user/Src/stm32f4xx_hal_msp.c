@@ -41,6 +41,7 @@
 #include "stm32f4xx_hal.h"
 
 #include "at45db161d.h"
+#include "ConfBoard.h"
 /** @addtogroup STM32F4xx_HAL_Driver
   * @{
   */
@@ -56,6 +57,67 @@
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
+
+/**
+  * @brief RTC MSP Initialization
+  *        This function configures the hardware resources used in this example
+  * @param hrtc: RTC handle pointer
+  *
+  * @note  Care must be taken when HAL_RCCEx_PeriphCLKConfig() is used to select
+  *        the RTC clock source; in this case the Backup domain will be reset in
+  *        order to modify the RTC Clock source, as consequence RTC registers (including
+  *        the backup registers) and RCC_BDCR register are set to their reset values.
+  *
+  * @retval None
+  */
+void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc)
+{
+
+  RCC_OscInitTypeDef        RCC_OscInitStruct;
+  RCC_PeriphCLKInitTypeDef  PeriphClkInitStruct;
+
+
+  __HAL_RCC_PWR_CLK_ENABLE();
+  HAL_PWR_EnableBkUpAccess();
+
+  /*##-2- Configure LSE as RTC clock source ###################################*/
+  //RCC_OscInitStruct.OscillatorType =  RCC_OSCILLATORTYPE_LSI;
+  //RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  //RCC_OscInitStruct.LSIState = RCC_LSI_ON;
+  //HAL_RCC_OscConfig(&RCC_OscInitStruct);
+
+
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
+//TODO: на реальном приборе кварц не 8 а 25 ћ√ц. исправить делитель
+#ifdef STM32F407xx
+  PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_HSE_DIV8;//RCC_RTCCLKSOURCE_HSE_DIV8;		// RTCCLK = 1MHz
+#endif
+#ifdef STM32F417xx			// HSE = 25MHz
+  PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_HSE_DIV25;//RCC_RTCCLKSOURCE_HSE_DIV25;		// RTCCLK = 1MHz
+#endif
+  HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct);
+
+  __HAL_RCC_RTC_ENABLE();
+
+}
+
+/**
+  * @brief RTC MSP De-Initialization
+  *        This function frees the hardware resources used in this example:
+  *          - Disable the Peripheral's clock
+  * @param hrtc: RTC handle pointer
+  * @retval None
+  */
+void HAL_RTC_MspDeInit(RTC_HandleTypeDef *hrtc)
+{
+  /*##-1- Reset peripherals ##################################################*/
+  __HAL_RCC_RTC_DISABLE();
+
+  /*##-2- Disables the PWR Clock and Disables access to the backup domain ###################################*/
+  HAL_PWR_DisableBkUpAccess();
+  __HAL_RCC_PWR_CLK_DISABLE();
+
+}
 
 
 /**
@@ -75,6 +137,16 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
 static  DMA_HandleTypeDef hdma_spi1_rx;
 static  DMA_HandleTypeDef hdma_spi1_tx;
 
+db161d_CS_GPIO_CLK_ENABLE();
+
+GPIO_InitStruct.Pin = db161d_CS_PIN;
+GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+GPIO_InitStruct.Pull = GPIO_PULLUP;
+GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+
+HAL_GPIO_Init(db161d_CS_GPIO_PORT, &GPIO_InitStruct);
+
+
   if(hspi->Instance==SPI1)
   {
 	  /* Enable GPIO TX/RX clock */
@@ -93,7 +165,7 @@ static  DMA_HandleTypeDef hdma_spi1_tx;
     PA6     ------> SPI1_MISO
     PB5     ------> SPI1_MOSI
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6;
+    GPIO_InitStruct.Pin = /*GPIO_PIN_4|*/GPIO_PIN_5|GPIO_PIN_6;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
@@ -166,7 +238,7 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi)
     PA6     ------> SPI1_MISO
     PB5     ------> SPI1_MOSI
     */
-    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6);
+    HAL_GPIO_DeInit(GPIOA, /*GPIO_PIN_4|*/GPIO_PIN_5|GPIO_PIN_6);
 
     HAL_GPIO_DeInit(GPIOB, GPIO_PIN_5);
 
@@ -185,12 +257,15 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi)
 
 void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
 {
-	  USART_TRACE("HAL_SPI_RxCpltCallback\n");
+//	MEM_Chipselect(GPIO_PIN_SET);				// выключим CS
+//	USART_0TRACE("\n");
+//	USART_TRACE_BLUE("int---HAL_SPI_RxCpltCallback---\n");
 }
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 {
-	  USART_TRACE("HAL_SPI_TxCpltCallback\n");
-
+//	MEM_Chipselect(GPIO_PIN_SET);				// выключим CS
+//	USART_0TRACE("\n");
+//	USART_TRACE_BLUE("int---HAL_SPI_TxCpltCallback---\n");
 }
 void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
 {
@@ -199,6 +274,9 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
 
  void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi)
 {
+	USART_0TRACE("\n");
+	USART_TRACE_RED("int---HAL_SPI_ErrorCallback---\n");
+
 }
 
 

@@ -170,8 +170,12 @@ MmsValue_isEqual(MmsValue* self, MmsValue* otherValue)
         return false;
 }
 
-bool
-MmsValue_update(MmsValue* self, MmsValue* update)
+/*************************************************************************
+ * MmsValue_update
+ * Функция записи данных в структуру self из структуры update
+ * т.е. переписываем переменную и её тип, или сстроку как в структуре MmsValue
+ *************************************************************************/
+bool	MmsValue_update(MmsValue* self, MmsValue* update)
 {
 	if (self->type == update->type) {
 		switch (self->type) {
@@ -221,7 +225,7 @@ MmsValue_update(MmsValue* self, MmsValue* update)
 			else return false;
 			break;
 		case MMS_VISIBLE_STRING:
-			MmsValue_setVisibleString(self, update->value.visibleString);
+			MmsValue_setVisibleString(self, update->value.visibleString);					// если MMS_VISIBLE_STRING то переносим в self
 			break;
 		case MMS_STRING:
 			MmsValue_setMmsString(self, update->value.mmsString);
@@ -375,9 +379,13 @@ MmsValue_getBitStringBit(MmsValue* self, int bitPos)
 }
 
 
-
-MmsValue*
-MmsValue_newFloat(float variable)
+/*************************************************************************
+ * MmsValue_newFloat
+ * создаем переменную MmsValue
+ * тип: MMS_FLOAT
+ * входное значение : float
+ *************************************************************************/
+MmsValue*	MmsValue_newFloat(float variable)
 {
 	MmsValue* value = malloc(sizeof(MmsValue));
 
@@ -416,9 +424,13 @@ MmsValue_setDouble(MmsValue* value, double newFloatValue)
 		}
 	}
 }
-
-MmsValue*
-MmsValue_newDouble(double variable)
+/*************************************************************************
+ * MmsValue_newDouble
+ * создаем переменную MmsValue
+ * тип: MMS_FLOAT
+ * входное значение : double
+ *************************************************************************/
+MmsValue*	MmsValue_newDouble(double variable)
 {
 	MmsValue* value = malloc(sizeof(MmsValue));
 
@@ -476,22 +488,25 @@ MmsValue_setUint8(MmsValue* value, uint8_t integer)
 
 }
 
-
-void
-MmsValue_setBoolean(MmsValue* value, bool boolValue)
+/*************************************************************************
+ * MmsValue_setBoolean
+ * установим значение bool в MmsValue->value.boolean
+ *************************************************************************/
+void	MmsValue_setBoolean(MmsValue* value, bool boolValue)
 {
 	value->value.boolean = boolValue;
 }
-
-bool
-MmsValue_getBoolean(MmsValue* value)
+/*************************************************************************
+ * MmsValue_getBoolean
+ * получаем значение bool из MmsValue*
+ *************************************************************************/
+bool	MmsValue_getBoolean(MmsValue* value)
 {
     return value->value.boolean;
 }
 
 
-MmsValue*
-MmsValue_setUtcTime(MmsValue* value, uint32_t timeval)
+MmsValue*	MmsValue_setUtcTime(MmsValue* value, uint32_t timeval)
 {
 	uint8_t* timeArray = (uint8_t*) &timeval;
 	uint8_t* valueArray = value->value.utcTime;
@@ -505,9 +520,10 @@ MmsValue_setUtcTime(MmsValue* value, uint32_t timeval)
 	return value;
 }
 
-
-MmsValue*
-MmsValue_setUtcTimeMs(MmsValue* self, uint64_t timeval)
+/*************************************************************************
+ * MmsValue_setUtcTimeMs
+ *************************************************************************/
+MmsValue*	MmsValue_setUtcTimeMs(MmsValue* self, uint64_t timeval)
 {
 	uint32_t timeval32 = (uint32_t)(timeval / 1000LL);
 
@@ -577,6 +593,8 @@ MmsValue_getUtcTimeInMs(MmsValue* self)
 /*************************************************************************
  * MmsValue_newIntegerFromInt32
  * создаем переменную MmsValue
+ * тип: MMS_INTEGER
+ * входное значение : Int32
  *************************************************************************/
 MmsValue*	MmsValue_newIntegerFromInt32(int32_t integer)
 {
@@ -587,9 +605,13 @@ MmsValue*	MmsValue_newIntegerFromInt32(int32_t integer)
 
 	return value;
 }
-
-MmsValue*
-MmsValue_newUnsignedFromUint32(uint32_t integer)
+/*************************************************************************
+ * MmsValue_newUnsignedFromUint32
+ * создаем переменную MmsValue
+ * тип: MMS_UNSIGNED
+ * входное значение : Uint32
+ *************************************************************************/
+MmsValue*	MmsValue_newUnsignedFromUint32(uint32_t integer)
 {
 	MmsValue* value = malloc(sizeof(MmsValue));
 
@@ -598,9 +620,13 @@ MmsValue_newUnsignedFromUint32(uint32_t integer)
 
 	return value;
 }
-
-MmsValue*
-MmsValue_newIntegerFromInt64(int64_t integer)
+/*************************************************************************
+ * MmsValue_newIntegerFromInt64
+ * создаем переменную MmsValue
+ * тип: MMS_INTEGER
+ * входное значение : int64_t
+ *************************************************************************/
+MmsValue*	MmsValue_newIntegerFromInt64(int64_t integer)
 {
 	MmsValue* value = malloc(sizeof(MmsValue));
 
@@ -874,8 +900,7 @@ MmsValue_newUnsigned(int size /*integer size in bits*/)
 	return value;
 }
 
-MmsValue*
-MmsValue_newBoolean(bool boolean)
+MmsValue*	MmsValue_newBoolean(bool boolean)
 {
 	MmsValue* self = calloc(1, sizeof(MmsValue));
 	self->type = MMS_BOOLEAN;
@@ -1149,8 +1174,11 @@ MmsValue_newVisibleStringFromByteArray(uint8_t* byteArray, int size)
 	return value;
 }
 
-void
-MmsValue_setVisibleString(MmsValue* value, char* string)
+/*************************************************************************
+ * MmsValue_setVisibleString
+ * Функция записи в структуру переменной value, строковой переменной с типом MMS_VISIBLE_STRING
+ *************************************************************************/
+void	MmsValue_setVisibleString(MmsValue* value, char* string)
 {
 	if (value->type == MMS_VISIBLE_STRING) {
 		if (value->value.visibleString != NULL)
@@ -1293,4 +1321,37 @@ MmsType
 MmsValue_getType(MmsValue* value)
 {
 	return value->type;
+}
+/*************************************************************************
+ * MmsValue_setBitStringFromInteger
+ *************************************************************************/
+void	MmsValue_setBitStringFromInteger(MmsValue* self, uint32_t intValue)
+{
+    int bitPos;
+
+    for (bitPos = 0; bitPos < self->value.bitString.size; bitPos++) {
+        if ((intValue & 1) == 1)
+            MmsValue_setBitStringBit(self, bitPos, true);
+        else
+            MmsValue_setBitStringBit(self, bitPos, false);
+
+        intValue = intValue >> 1;
+    }
+}
+/*************************************************************************
+ * MmsValue_getBitStringAsInteger
+ *************************************************************************/
+uint32_t	MmsValue_getBitStringAsInteger(const MmsValue* self)
+{
+    uint32_t value = 0;
+
+    int bitPos;
+
+    for (bitPos = 0; bitPos < self->value.bitString.size; bitPos++) {
+        if (MmsValue_getBitStringBit(self, bitPos)) {
+            value += (1 << bitPos);
+        }
+    }
+
+    return value;
 }

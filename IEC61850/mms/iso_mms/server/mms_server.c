@@ -27,23 +27,28 @@
 #include "map.h"
 #include "thread.h"
 
+#include "main.h"
+
 struct sMmsServer {
-    IsoServer isoServer;
-    MmsDevice* device;
-    ReadVariableHandler readHandler;
-    void* readHandlerParameter;
-    WriteVariableHandler writeHandler;
-    void* writeHandlerParameter;
-    MmsConnectionHandler connectionHandler;
-    void* connectionHandlerParameter;
-    Map openConnections;
-    Map valueCaches;
-    bool isLocked;
-    Semaphore modelMutex;
+    IsoServer 				isoServer;							// параметры сервера, состояние работы, TCP порт, стек.....
+    MmsDevice* 				device;								// MMS устройство, и содержимое
+    ReadVariableHandler 	readHandler;						// Функция чтения переменных
+    void* 					readHandlerParameter;
+    WriteVariableHandler 	writeHandler;						// Функция записи переменных
+    void* 					writeHandlerParameter;
+    MmsConnectionHandler 	connectionHandler;
+    void* 					connectionHandlerParameter;
+    Map 					openConnections;
+    Map 					valueCaches;
+    bool 					isLocked;
+    Semaphore 				modelMutex;							// Семафор для передачи управления MmsServer'ом
 };
 
-static Map
-createValueCachesForDomains(MmsDevice* device)
+/*************************************************************************
+ * createValueCachesForDomains
+ * создадим
+ *************************************************************************/
+static Map		createValueCachesForDomains(MmsDevice* device)
 {
     Map valueCaches = Map_create();
 
@@ -62,6 +67,7 @@ createValueCachesForDomains(MmsDevice* device)
 MmsServer	MmsServer_create(IsoServer isoServer, MmsDevice* device)
 {
     MmsServer self = calloc(1, sizeof(struct sMmsServer));
+	USART_TRACE("IedServer->mmsServer  - Выделили память для структуры по адресу:0x%X размером:%u\n",&self,sizeof(struct sMmsServer));
 
     self->isoServer = isoServer;
     self->device = device;
@@ -75,14 +81,19 @@ MmsServer	MmsServer_create(IsoServer isoServer, MmsDevice* device)
     return self;
 }
 
-void
-MmsServer_lockModel(MmsServer self)
+/*************************************************************************
+ * MmsServer_lockModel
+ * захватываем управление моделью (забираем семафор)
+ *************************************************************************/
+void	MmsServer_lockModel(MmsServer self)
 {
     Semaphore_wait(self->modelMutex);
 }
-
-void
-MmsServer_unlockModel(MmsServer self)
+/*************************************************************************
+ * MmsServer_unlockModel
+ * отдаём управление моделью (отдаём семафор)
+ *************************************************************************/
+void	MmsServer_unlockModel(MmsServer self)
 {
     Semaphore_post(self->modelMutex);
 }
@@ -132,25 +143,36 @@ MmsServer_destroy(MmsServer self)
     free(self);
 }
 
-MmsValue*
-MmsServer_getValueFromCache(MmsServer self, MmsDomain* domain, char* itemId)
+/*************************************************************************
+ * MmsServer_getValueFromCache
+ * достаём пременную из кэш в виде указателя на MmsValue*
+ *************************************************************************/
+MmsValue*	MmsServer_getValueFromCache(MmsServer self, MmsDomain* domain, char* itemId)
 {
     MmsValueCache cache = Map_getEntry(self->valueCaches, domain);
 
     if (cache != NULL) {
+ //       USART_TRACE_GREEN("		MmsServer_getValueFromCache();\n");
         return MmsValueCache_lookupValue(cache, itemId);
+    } else{
+        USART_TRACE_RED("		MmsServer_getValueFromCache(); = NULL\n");
     }
 
     return NULL ;
 }
-
-void
-MmsServer_insertIntoCache(MmsServer self, MmsDomain* domain, char* itemId, MmsValue* value)
+/*************************************************************************
+ * MmsServer_insertIntoCache
+ * Заносим переменную в кэш
+ *************************************************************************/
+void		MmsServer_insertIntoCache(MmsServer self, MmsDomain* domain, char* itemId, MmsValue* value)
 {
     MmsValueCache cache = Map_getEntry(self->valueCaches, domain);
 
     if (cache != NULL) {
+  //      USART_TRACE_GREEN("		MmsValueCache_insertValue();\n");
         MmsValueCache_insertValue(cache, itemId, value);
+    } else{
+    	USART_TRACE_RED("		MmsValueCache_insertValue(); = NULL\n");
     }
 }
 

@@ -29,11 +29,15 @@
  * MMS GetVariableAccessAttributes Service
  *********************************************************************************************/
 
-static int
-createTypeSpecification (
-		MmsTypeSpecification* namedVariable,
-		TypeSpecification_t* typeSpec)
+/**********************************************************************************************
+ * createTypeSpecification
+ * тут виснет
+ * TODO: починить
+ *********************************************************************************************/
+static int	createTypeSpecification ( MmsTypeSpecification* namedVariable, TypeSpecification_t* typeSpec)
 {
+    int componentCount;
+    int i;
 
 	if (namedVariable->type == MMS_ARRAY) {
 		typeSpec->present = TypeSpecification_PR_array;
@@ -49,8 +53,6 @@ createTypeSpecification (
 				typeSpec->choice.array.elementType);
 	}
 	else if (namedVariable->type == MMS_STRUCTURE) {
-        int componentCount;
-        int i;
 		typeSpec->present = TypeSpecification_PR_structure;
 
 		componentCount = namedVariable->typeSpec.structure.elementCount;
@@ -63,23 +65,15 @@ createTypeSpecification (
 
 		for (i = 0; i < componentCount; i++) {
 
-			typeSpec->choice.structure.components.list.array[i] =
-					calloc(1, sizeof(StructComponent_t));
+			typeSpec->choice.structure.components.list.array[i] = calloc(1, sizeof(StructComponent_t));
+			typeSpec->choice.structure.components.list.array[i]->componentName = calloc(1, sizeof(Identifier_t));
+			typeSpec->choice.structure.components.list.array[i]->componentName->buf = copyString(namedVariable->typeSpec.structure.elements[i]->name);
+			typeSpec->choice.structure.components.list.array[i]->componentName->size = strlen(namedVariable->typeSpec.structure.elements[i]->name);
+			typeSpec->choice.structure.components.list.array[i]->componentType = calloc(1, sizeof(TypeSpecification_t));
 
-			typeSpec->choice.structure.components.list.array[i]->componentName =
-					calloc(1, sizeof(Identifier_t));
+			USART_TRACE("componentName: %s numb: %u of %u\n",typeSpec->choice.structure.components.list.array[i]->componentName->buf,i,componentCount);
 
-			typeSpec->choice.structure.components.list.array[i]->componentName->buf =
-			        copyString(namedVariable->typeSpec.structure.elements[i]->name);
-
-			typeSpec->choice.structure.components.list.array[i]->componentName->size =
-					strlen(namedVariable->typeSpec.structure.elements[i]->name);
-
-			typeSpec->choice.structure.components.list.array[i]->componentType =
-					calloc(1, sizeof(TypeSpecification_t));
-
-			createTypeSpecification(namedVariable->typeSpec.structure.elements[i],
-					typeSpec->choice.structure.components.list.array[i]->componentType);
+			createTypeSpecification(namedVariable->typeSpec.structure.elements[i], typeSpec->choice.structure.components.list.array[i]->componentType);
 		}
 	}
 	else {
@@ -208,17 +202,15 @@ deleteVariableAccessAttributesResponse( GetVariableAccessAttributesResponse_t* g
 	}
 }
 
-static int
-createVariableAccessAttributesResponse(
-		MmsServerConnection* connection,
-		char* domainId,
-		char* nameId,
-		int invokeId,
-		ByteBuffer* response)
+/*************************************************************************
+ * createVariableAccessAttributesResponse
+ *
+ *************************************************************************/
+static int		createVariableAccessAttributesResponse( MmsServerConnection* connection, char* domainId, char* nameId, int invokeId, ByteBuffer* response)
 {
-	MmsDevice* device = MmsServer_getDevice(connection->server);
+	MmsDevice* device = MmsServer_getDevice(connection->server);						// получим Устройство
 
-	MmsDomain* domain = MmsDevice_getDomain(device, domainId);
+	MmsDomain* domain = MmsDevice_getDomain(device, domainId);							// получим домен
     MmsTypeSpecification* namedVariable;
     MmsPdu_t* mmsPdu;
     GetVariableAccessAttributesResponse_t* getVarAccessAttr;
@@ -229,7 +221,7 @@ createVariableAccessAttributesResponse(
 		return -1;
 	}
 
-	namedVariable = MmsDomain_getNamedVariable(domain, nameId);
+	namedVariable = MmsDomain_getNamedVariable(domain, nameId);							// получим у домена  именованные переменные (логические узлы LN)
 
 	if (namedVariable == NULL) {
 		USART_TRACE_RED("mms_server: named variable %s not known\n", nameId);
@@ -238,18 +230,15 @@ createVariableAccessAttributesResponse(
 
 	mmsPdu = mmsServer_createConfirmedResponse(invokeId);
 
-	mmsPdu->choice.confirmedResponsePdu.confirmedServiceResponse.present =
-			ConfirmedServiceResponse_PR_getVariableAccessAttributes;
+	mmsPdu->choice.confirmedResponsePdu.confirmedServiceResponse.present = ConfirmedServiceResponse_PR_getVariableAccessAttributes;
 
-	getVarAccessAttr = &(mmsPdu->choice.confirmedResponsePdu.
-			confirmedServiceResponse.choice.getVariableAccessAttributes);
+	getVarAccessAttr = &(mmsPdu->choice.confirmedResponsePdu. confirmedServiceResponse.choice.getVariableAccessAttributes);
 
 	getVarAccessAttr->mmsDeletable = 0;
 
 	createTypeSpecification(namedVariable, &getVarAccessAttr->typeSpecification);
 
-	rval = der_encode(&asn_DEF_MmsPdu, mmsPdu,
-			mmsServer_write_out, (void*) response);
+	rval = der_encode(&asn_DEF_MmsPdu, mmsPdu, mmsServer_write_out, (void*) response);
 
 	if (DEBUG) xer_fprint(stdout, &asn_DEF_MmsPdu, mmsPdu);
 
@@ -271,20 +260,36 @@ int		mmsServer_handleGetVariableAccessAttributesRequest(
 		ByteBuffer* response)
 {
 	if (request->present == GetVariableAccessAttributesRequest_PR_name) {
-		if (request->choice.name.present == ObjectName_PR_domainspecific) {						//
+
+		if (request->choice.name.present == ObjectName_PR_domainspecific) {
+
 			Identifier_t domainId = request->choice.name.choice.domainspecific.domainId;
 			Identifier_t nameId = request->choice.name.choice.domainspecific.itemId;
 
 			char* domainIdStr = createStringFromBuffer(domainId.buf, domainId.size);
 			char* nameIdStr = createStringFromBuffer(nameId.buf, nameId.size);
-			USART_TRACE("getVariableAccessAttributes domainId: %s nameId: %s\n", domainIdStr, nameIdStr);
+			USART_TRACE_BLUE("addrMem:%X getVariableAccessAttributes domainId: %s nameId: %s\n",&domainIdStr, domainIdStr, nameIdStr);
 
 			createVariableAccessAttributesResponse(connection, domainIdStr, nameIdStr, invokeId, response);
 
 			free(domainIdStr);
 			free(nameIdStr);
 		}
-		else {
+		else
+		if (request->choice.name.present == ObjectName_PR_vmdspecific) {
+
+			Identifier_t vmdId = request->choice.name.choice.vmdspecific;
+
+			char* vmdIdStr = createStringFromBuffer(vmdId.buf, vmdId.size);
+			USART_TRACE_BLUE("getVariableAccessAttributes vmdIdStr: %s\n", vmdIdStr);
+
+			createVariableAccessAttributesResponse(connection, vmdIdStr, vmdIdStr, invokeId, response);
+
+			free(vmdIdStr);
+
+		}
+		else
+		{
 			USART_TRACE_RED("GetVariableAccessAttributesRequest with name other than domainspecific is not supported!\n");
 			return -1;
 		}

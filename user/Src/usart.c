@@ -30,9 +30,9 @@ void BOOT_UART_Init(uint32_t BaudRate)
   BOOT_UART.Init.WordLength = UART_WORDLENGTH_8B;
   BOOT_UART.Init.StopBits = UART_STOPBITS_1;
   BOOT_UART.Init.Parity = UART_PARITY_NONE;
-  BOOT_UART.Init.Mode = UART_MODE_TX;
+  BOOT_UART.Init.Mode = UART_MODE_TX_RX;
   BOOT_UART.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  BOOT_UART.Init.OverSampling = UART_OVERSAMPLING_16;
+  BOOT_UART.Init.OverSampling = UART_OVERSAMPLING_8;
   HAL_UART_Init(&BOOT_UART);
 
 }
@@ -82,8 +82,18 @@ void RS485_2_UART_Init(uint32_t BaudRate)
 void HAL_UART_MspInit(UART_HandleTypeDef* huart)
 {
   GPIO_InitTypeDef GPIO_InitStruct;
-static  DMA_HandleTypeDef hdma_rx;
-static  DMA_HandleTypeDef hdma_tx;
+static  DMA_HandleTypeDef hdma_rx_MODBUS;
+static  DMA_HandleTypeDef hdma_tx_MODBUS;
+
+static  DMA_HandleTypeDef hdma_rx_DEBUG;
+static  DMA_HandleTypeDef hdma_tx_DEBUG;
+
+static  DMA_HandleTypeDef hdma_rx_RS485_1;
+static  DMA_HandleTypeDef hdma_tx_RS485_1;
+
+static  DMA_HandleTypeDef hdma_rx_RS485_2;
+static  DMA_HandleTypeDef hdma_tx_RS485_2;
+
 
   // ---------------------------- MODBUS ---------------------------------
   if(huart->Instance==UART4)
@@ -102,51 +112,51 @@ static  DMA_HandleTypeDef hdma_tx;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
     // Configure the DMA handler for Transmission process
-    hdma_tx.Instance                 = UART4_TX_DMA_STREAM;
+    hdma_tx_MODBUS.Instance                 = UART4_TX_DMA_STREAM;
 
-    hdma_tx.Init.Channel             = UART4_TX_DMA_CHANNEL;
-    hdma_tx.Init.Direction           = DMA_MEMORY_TO_PERIPH;
-    hdma_tx.Init.PeriphInc           = DMA_PINC_DISABLE;
-    hdma_tx.Init.MemInc              = DMA_MINC_ENABLE;
-    hdma_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-    hdma_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-    hdma_tx.Init.Mode                = DMA_NORMAL;
-    hdma_tx.Init.Priority            = DMA_PRIORITY_MEDIUM;
-    hdma_tx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
-    hdma_tx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-    hdma_tx.Init.MemBurst            = DMA_MBURST_INC4;
-    hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
-    HAL_DMA_Init(&hdma_tx);
+    hdma_tx_MODBUS.Init.Channel             = UART4_TX_DMA_CHANNEL;
+    hdma_tx_MODBUS.Init.Direction           = DMA_MEMORY_TO_PERIPH;
+    hdma_tx_MODBUS.Init.PeriphInc           = DMA_PINC_DISABLE;
+    hdma_tx_MODBUS.Init.MemInc              = DMA_MINC_ENABLE;
+    hdma_tx_MODBUS.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_tx_MODBUS.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+    hdma_tx_MODBUS.Init.Mode                = DMA_NORMAL;
+    hdma_tx_MODBUS.Init.Priority            = DMA_PRIORITY_MEDIUM;
+    hdma_tx_MODBUS.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+    hdma_tx_MODBUS.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+    hdma_tx_MODBUS.Init.MemBurst            = DMA_MBURST_INC4;
+    hdma_tx_MODBUS.Init.PeriphBurst         = DMA_PBURST_INC4;
+    HAL_DMA_Init(&hdma_tx_MODBUS);
     // Associate the initialized DMA handle to the UART handle
-    __HAL_LINKDMA(huart, hdmatx, hdma_tx);
+    __HAL_LINKDMA(huart, hdmatx, hdma_tx_MODBUS);
 
     // Configure the DMA handler for reception process
-    hdma_rx.Instance                 = UART4_RX_DMA_STREAM;
+    hdma_rx_MODBUS.Instance                 = UART4_RX_DMA_STREAM;
 
-    hdma_rx.Init.Channel             = UART4_RX_DMA_CHANNEL;
-    hdma_rx.Init.Direction           = DMA_PERIPH_TO_MEMORY;
-    hdma_rx.Init.PeriphInc           = DMA_PINC_DISABLE;
-    hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
-    hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-    hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-    hdma_rx.Init.Mode                = DMA_NORMAL;//DMA_CIRCULAR;//DMA_NORMAL;
-    hdma_rx.Init.Priority            = DMA_PRIORITY_MEDIUM;
-    hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
-    hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-    hdma_rx.Init.MemBurst            = DMA_MBURST_INC4;
-    hdma_rx.Init.PeriphBurst         = DMA_PBURST_INC4;
+    hdma_rx_MODBUS.Init.Channel             = UART4_RX_DMA_CHANNEL;
+    hdma_rx_MODBUS.Init.Direction           = DMA_PERIPH_TO_MEMORY;
+    hdma_rx_MODBUS.Init.PeriphInc           = DMA_PINC_DISABLE;
+    hdma_rx_MODBUS.Init.MemInc              = DMA_MINC_ENABLE;
+    hdma_rx_MODBUS.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_rx_MODBUS.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+    hdma_rx_MODBUS.Init.Mode                = DMA_NORMAL;//DMA_CIRCULAR;//DMA_NORMAL;
+    hdma_rx_MODBUS.Init.Priority            = DMA_PRIORITY_MEDIUM;
+    hdma_rx_MODBUS.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+    hdma_rx_MODBUS.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+    hdma_rx_MODBUS.Init.MemBurst            = DMA_MBURST_INC4;
+    hdma_rx_MODBUS.Init.PeriphBurst         = DMA_PBURST_INC4;
 
-    HAL_DMA_Init(&hdma_rx);
+    HAL_DMA_Init(&hdma_rx_MODBUS);
     // Associate the initialized DMA handle to the UART handle
-    __HAL_LINKDMA(huart, hdmarx, hdma_rx);
+    __HAL_LINKDMA(huart, hdmarx, hdma_rx_MODBUS);
 
-    HAL_NVIC_SetPriority(UART4_DMA_TX_IRQn, 1, 0);	//0,1
+    HAL_NVIC_SetPriority(UART4_DMA_TX_IRQn, 6, 0);	//0,1
     HAL_NVIC_EnableIRQ(UART4_DMA_TX_IRQn);
 
-    HAL_NVIC_SetPriority(UART4_DMA_RX_IRQn, 1, 0);	//0,0
+    HAL_NVIC_SetPriority(UART4_DMA_RX_IRQn, 6, 0);	//0,0
     HAL_NVIC_EnableIRQ(UART4_DMA_RX_IRQn);
 
-    HAL_NVIC_SetPriority(UART4_IRQn, 1, 0);
+    HAL_NVIC_SetPriority(UART4_IRQn, 6, 0);
     HAL_NVIC_EnableIRQ(UART4_IRQn);
 
   }
@@ -168,28 +178,54 @@ static  DMA_HandleTypeDef hdma_tx;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     // Configure the DMA handler for Transmission process
-    hdma_tx.Instance                 = USART1_TX_DMA_STREAM;
-    hdma_tx.Init.Channel             = USART1_TX_DMA_CHANNEL;
-    hdma_tx.Init.Direction           = DMA_MEMORY_TO_PERIPH;
-    hdma_tx.Init.PeriphInc           = DMA_PINC_DISABLE;
-    hdma_tx.Init.MemInc              = DMA_MINC_ENABLE;
-    hdma_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-    hdma_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-    hdma_tx.Init.Mode                = DMA_NORMAL;
-    hdma_tx.Init.Priority            = DMA_PRIORITY_LOW;
-    hdma_tx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
-    hdma_tx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-    hdma_tx.Init.MemBurst            = DMA_MBURST_INC4;
-    hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
-    HAL_DMA_Init(&hdma_tx);
+    hdma_tx_DEBUG.Instance                 = USART1_TX_DMA_STREAM;
+    hdma_tx_DEBUG.Init.Channel             = USART1_TX_DMA_CHANNEL;
+    hdma_tx_DEBUG.Init.Direction           = DMA_MEMORY_TO_PERIPH;
+    hdma_tx_DEBUG.Init.PeriphInc           = DMA_PINC_DISABLE;
+    hdma_tx_DEBUG.Init.MemInc              = DMA_MINC_ENABLE;
+    hdma_tx_DEBUG.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_tx_DEBUG.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+    hdma_tx_DEBUG.Init.Mode                = DMA_NORMAL;
+    hdma_tx_DEBUG.Init.Priority            = DMA_PRIORITY_LOW;
+    hdma_tx_DEBUG.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+    hdma_tx_DEBUG.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+    hdma_tx_DEBUG.Init.MemBurst            = DMA_MBURST_INC4;
+    hdma_tx_DEBUG.Init.PeriphBurst         = DMA_PBURST_INC4;
     // Associate the initialized DMA handle to the UART handle
-    __HAL_LINKDMA(huart, hdmatx, hdma_tx);
+    __HAL_LINKDMA(huart, hdmatx, hdma_tx_DEBUG);
+
+    HAL_DMA_DeInit(&hdma_tx_DEBUG);
+    HAL_DMA_Init(&hdma_tx_DEBUG);
+
+    // Configure the DMA handler for reception process
+    hdma_rx_DEBUG.Instance                 = USART1_RX_DMA_STREAM;
+    hdma_rx_DEBUG.Init.Channel             = USART1_RX_DMA_CHANNEL;
+    hdma_rx_DEBUG.Init.Direction           = DMA_PERIPH_TO_MEMORY;
+    hdma_rx_DEBUG.Init.PeriphInc           = DMA_PINC_DISABLE;
+    hdma_rx_DEBUG.Init.MemInc              = DMA_MINC_ENABLE;
+    hdma_rx_DEBUG.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_rx_DEBUG.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+    hdma_rx_DEBUG.Init.Mode                = DMA_NORMAL;//DMA_CIRCULAR;//DMA_NORMAL;
+    hdma_rx_DEBUG.Init.Priority            = DMA_PRIORITY_MEDIUM;
+    hdma_rx_DEBUG.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+    hdma_rx_DEBUG.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+    hdma_rx_DEBUG.Init.MemBurst            = DMA_MBURST_INC4;
+    hdma_rx_DEBUG.Init.PeriphBurst         = DMA_PBURST_INC4;
+
+    // Associate the initialized DMA handle to the UART handle
+    __HAL_LINKDMA(huart, hdmarx, hdma_rx_DEBUG);
+
+    HAL_DMA_DeInit(&hdma_rx_DEBUG);
+    HAL_DMA_Init(&hdma_rx_DEBUG);
 
     // NVIC configuration for DMA transfer complete interrupt (USARTx_TX)
-    HAL_NVIC_SetPriority(USART1_DMA_TX_IRQn, 6, 1);	//0,1
+    HAL_NVIC_SetPriority(USART1_DMA_TX_IRQn, 6, 0);	//0,1
     HAL_NVIC_EnableIRQ(USART1_DMA_TX_IRQn);
 
-    HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(USART1_DMA_RX_IRQn, 6, 0);	//0,1
+    HAL_NVIC_EnableIRQ(USART1_DMA_RX_IRQn);
+
+    HAL_NVIC_SetPriority(USART1_IRQn, 6, 0);
     HAL_NVIC_EnableIRQ(USART1_IRQn);
 
   }
@@ -213,40 +249,40 @@ static  DMA_HandleTypeDef hdma_tx;
     HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
     // Configure the DMA handler for Transmission process
-    hdma_tx.Instance                 = USART2_TX_DMA_STREAM;
-    hdma_tx.Init.Channel             = USART2_TX_DMA_CHANNEL;
-    hdma_tx.Init.Direction           = DMA_MEMORY_TO_PERIPH;
-    hdma_tx.Init.PeriphInc           = DMA_PINC_DISABLE;
-    hdma_tx.Init.MemInc              = DMA_MINC_ENABLE;
-    hdma_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-    hdma_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-    hdma_tx.Init.Mode                = DMA_NORMAL;//DMA_NORMAL;
-    hdma_tx.Init.Priority            = DMA_PRIORITY_LOW;//DMA_PRIORITY_LOW;
-    hdma_tx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;//DMA_FIFOMODE_DISABLE;
-    hdma_tx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-    hdma_tx.Init.MemBurst            = DMA_MBURST_INC4;
-    hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
-    HAL_DMA_Init(&hdma_tx);
+    hdma_tx_RS485_1.Instance                 = USART2_TX_DMA_STREAM;
+    hdma_tx_RS485_1.Init.Channel             = USART2_TX_DMA_CHANNEL;
+    hdma_tx_RS485_1.Init.Direction           = DMA_MEMORY_TO_PERIPH;
+    hdma_tx_RS485_1.Init.PeriphInc           = DMA_PINC_DISABLE;
+    hdma_tx_RS485_1.Init.MemInc              = DMA_MINC_ENABLE;
+    hdma_tx_RS485_1.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_tx_RS485_1.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+    hdma_tx_RS485_1.Init.Mode                = DMA_NORMAL;//DMA_NORMAL;
+    hdma_tx_RS485_1.Init.Priority            = DMA_PRIORITY_LOW;//DMA_PRIORITY_LOW;
+    hdma_tx_RS485_1.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;//DMA_FIFOMODE_DISABLE;
+    hdma_tx_RS485_1.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+    hdma_tx_RS485_1.Init.MemBurst            = DMA_MBURST_INC4;
+    hdma_tx_RS485_1.Init.PeriphBurst         = DMA_PBURST_INC4;
+    HAL_DMA_Init(&hdma_tx_RS485_1);
     // Associate the initialized DMA handle to the UART handle
-    __HAL_LINKDMA(huart, hdmatx, hdma_tx);
+    __HAL_LINKDMA(huart, hdmatx, hdma_tx_RS485_1);
 
     // Configure the DMA handler for reception process
-    hdma_rx.Instance                 = USART2_RX_DMA_STREAM;
-    hdma_rx.Init.Channel             = USART2_RX_DMA_CHANNEL;
-    hdma_rx.Init.Direction           = DMA_PERIPH_TO_MEMORY;
-    hdma_rx.Init.PeriphInc           = DMA_PINC_DISABLE;
-    hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
-    hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-    hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-    hdma_rx.Init.Mode                = DMA_NORMAL;
-    hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
-    hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
-    hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-    hdma_rx.Init.MemBurst            = DMA_MBURST_INC4;
-    hdma_rx.Init.PeriphBurst         = DMA_PBURST_INC4;
-    HAL_DMA_Init(&hdma_rx);
+    hdma_rx_RS485_1.Instance                 = USART2_RX_DMA_STREAM;
+    hdma_rx_RS485_1.Init.Channel             = USART2_RX_DMA_CHANNEL;
+    hdma_rx_RS485_1.Init.Direction           = DMA_PERIPH_TO_MEMORY;
+    hdma_rx_RS485_1.Init.PeriphInc           = DMA_PINC_DISABLE;
+    hdma_rx_RS485_1.Init.MemInc              = DMA_MINC_ENABLE;
+    hdma_rx_RS485_1.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_rx_RS485_1.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+    hdma_rx_RS485_1.Init.Mode                = DMA_NORMAL;
+    hdma_rx_RS485_1.Init.Priority            = DMA_PRIORITY_HIGH;
+    hdma_rx_RS485_1.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+    hdma_rx_RS485_1.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+    hdma_rx_RS485_1.Init.MemBurst            = DMA_MBURST_INC4;
+    hdma_rx_RS485_1.Init.PeriphBurst         = DMA_PBURST_INC4;
+    HAL_DMA_Init(&hdma_rx_RS485_1);
     // Associate the initialized DMA handle to the the UART handle
-    __HAL_LINKDMA(huart, hdmarx, hdma_rx);
+    __HAL_LINKDMA(huart, hdmarx, hdma_rx_RS485_1);
 
     // NVIC configuration for DMA transfer complete interrupt (USARTx_TX)
     HAL_NVIC_SetPriority(USART2_DMA_TX_IRQn, 6, 1);	//0,1
@@ -278,40 +314,40 @@ static  DMA_HandleTypeDef hdma_tx;
     HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
     // Configure the DMA handler for Transmission process
-    hdma_tx.Instance                 = USART3_TX_DMA_STREAM;
-    hdma_tx.Init.Channel             = USART3_TX_DMA_CHANNEL;
-    hdma_tx.Init.Direction           = DMA_MEMORY_TO_PERIPH;
-    hdma_tx.Init.PeriphInc           = DMA_PINC_DISABLE;
-    hdma_tx.Init.MemInc              = DMA_MINC_ENABLE;
-    hdma_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-    hdma_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-    hdma_tx.Init.Mode                = DMA_NORMAL;//DMA_NORMAL;
-    hdma_tx.Init.Priority            = DMA_PRIORITY_LOW;//DMA_PRIORITY_LOW;
-    hdma_tx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;//DMA_FIFOMODE_DISABLE;
-    hdma_tx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-    hdma_tx.Init.MemBurst            = DMA_MBURST_INC4;
-    hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
-    HAL_DMA_Init(&hdma_tx);
+    hdma_tx_RS485_2.Instance                 = USART3_TX_DMA_STREAM;
+    hdma_tx_RS485_2.Init.Channel             = USART3_TX_DMA_CHANNEL;
+    hdma_tx_RS485_2.Init.Direction           = DMA_MEMORY_TO_PERIPH;
+    hdma_tx_RS485_2.Init.PeriphInc           = DMA_PINC_DISABLE;
+    hdma_tx_RS485_2.Init.MemInc              = DMA_MINC_ENABLE;
+    hdma_tx_RS485_2.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_tx_RS485_2.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+    hdma_tx_RS485_2.Init.Mode                = DMA_NORMAL;//DMA_NORMAL;
+    hdma_tx_RS485_2.Init.Priority            = DMA_PRIORITY_LOW;//DMA_PRIORITY_LOW;
+    hdma_tx_RS485_2.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;//DMA_FIFOMODE_DISABLE;
+    hdma_tx_RS485_2.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+    hdma_tx_RS485_2.Init.MemBurst            = DMA_MBURST_INC4;
+    hdma_tx_RS485_2.Init.PeriphBurst         = DMA_PBURST_INC4;
+    HAL_DMA_Init(&hdma_tx_RS485_2);
     // Associate the initialized DMA handle to the UART handle
-    __HAL_LINKDMA(huart, hdmatx, hdma_tx);
+    __HAL_LINKDMA(huart, hdmatx, hdma_tx_RS485_2);
 
     // Configure the DMA handler for reception process
-    hdma_rx.Instance                 = USART3_RX_DMA_STREAM;
-    hdma_rx.Init.Channel             = USART3_RX_DMA_CHANNEL;
-    hdma_rx.Init.Direction           = DMA_PERIPH_TO_MEMORY;
-    hdma_rx.Init.PeriphInc           = DMA_PINC_DISABLE;
-    hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
-    hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-    hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-    hdma_rx.Init.Mode                = DMA_NORMAL;
-    hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
-    hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
-    hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-    hdma_rx.Init.MemBurst            = DMA_MBURST_INC4;
-    hdma_rx.Init.PeriphBurst         = DMA_PBURST_INC4;
-    HAL_DMA_Init(&hdma_rx);
+    hdma_rx_RS485_2.Instance                 = USART3_RX_DMA_STREAM;
+    hdma_rx_RS485_2.Init.Channel             = USART3_RX_DMA_CHANNEL;
+    hdma_rx_RS485_2.Init.Direction           = DMA_PERIPH_TO_MEMORY;
+    hdma_rx_RS485_2.Init.PeriphInc           = DMA_PINC_DISABLE;
+    hdma_rx_RS485_2.Init.MemInc              = DMA_MINC_ENABLE;
+    hdma_rx_RS485_2.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_rx_RS485_2.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+    hdma_rx_RS485_2.Init.Mode                = DMA_NORMAL;
+    hdma_rx_RS485_2.Init.Priority            = DMA_PRIORITY_HIGH;
+    hdma_rx_RS485_2.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+    hdma_rx_RS485_2.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+    hdma_rx_RS485_2.Init.MemBurst            = DMA_MBURST_INC4;
+    hdma_rx_RS485_2.Init.PeriphBurst         = DMA_PBURST_INC4;
+    HAL_DMA_Init(&hdma_rx_RS485_2);
     // Associate the initialized DMA handle to the the UART handle
-    __HAL_LINKDMA(huart, hdmarx, hdma_rx);
+    __HAL_LINKDMA(huart, hdmarx, hdma_rx_RS485_2);
 
 
     HAL_NVIC_SetPriority(USART3_DMA_TX_IRQn, 6, 1);	//0,1
@@ -331,8 +367,17 @@ static  DMA_HandleTypeDef hdma_tx;
 **************************************************************************/
 void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
 {
-static DMA_HandleTypeDef hdma_tx;
-static DMA_HandleTypeDef hdma_rx;
+	static  DMA_HandleTypeDef hdma_rx_MODBUS;
+	static  DMA_HandleTypeDef hdma_tx_MODBUS;
+
+	static  DMA_HandleTypeDef hdma_rx_DEBUG;
+	static  DMA_HandleTypeDef hdma_tx_DEBUG;
+
+	static  DMA_HandleTypeDef hdma_rx_RS485_1;
+	static  DMA_HandleTypeDef hdma_tx_RS485_1;
+
+	static  DMA_HandleTypeDef hdma_rx_RS485_2;
+	static  DMA_HandleTypeDef hdma_tx_RS485_2;
 
   if(huart->Instance==UART4)
   {
@@ -344,9 +389,8 @@ static DMA_HandleTypeDef hdma_rx;
     */
     HAL_GPIO_DeInit(GPIOC, GPIO_PIN_10|GPIO_PIN_11);
 
-    HAL_DMA_DeInit(&hdma_tx);
-    HAL_DMA_DeInit(&hdma_rx);
-
+    HAL_DMA_DeInit(&hdma_tx_MODBUS);
+    HAL_DMA_DeInit(&hdma_rx_MODBUS);
     HAL_NVIC_DisableIRQ(UART4_DMA_TX_IRQn);
     HAL_NVIC_DisableIRQ(UART4_DMA_RX_IRQn);
   }
@@ -360,6 +404,11 @@ static DMA_HandleTypeDef hdma_rx;
     PA10     ------> USART1_RX 
     */
     HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9|GPIO_PIN_10);
+
+    HAL_DMA_DeInit(&hdma_tx_DEBUG);
+    HAL_DMA_DeInit(&hdma_rx_DEBUG);
+    HAL_NVIC_DisableIRQ(UART4_DMA_TX_IRQn);
+    HAL_NVIC_DisableIRQ(UART4_DMA_RX_IRQn);
 
   }
   else if(huart->Instance==USART2)

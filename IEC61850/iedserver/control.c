@@ -57,8 +57,7 @@ struct sControlObject {
 
 static MmsValue* emptyString = NULL;
 
-static void
-initialize(ControlObject* self)
+static void		initialize(ControlObject* self)
 {
     if (emptyString == NULL)
         emptyString = MmsValue_newVisibleString(NULL);
@@ -66,8 +65,7 @@ initialize(ControlObject* self)
     if (!(self->initialized)) {
         char* ctlModelName = createString(4, self->lnName, "$CF$", self->name, "$ctlModel");
 
-        MmsValue* ctlModel = MmsServer_getValueFromCache(self->mmsServer,
-                self->mmsDomain, ctlModelName);
+        MmsValue* ctlModel = MmsServer_getValueFromCache(self->mmsServer, self->mmsDomain, ctlModelName);
 
         free(ctlModelName);
 
@@ -83,8 +81,7 @@ initialize(ControlObject* self)
 
                 self->sbo = MmsValue_newVisibleString(controlObjectReference);
 
-                MmsValue* sboTimeout = MmsServer_getValueFromCache(self->mmsServer,
-                                self->mmsDomain, sboTimeoutName);
+                MmsValue* sboTimeout = MmsServer_getValueFromCache(self->mmsServer, self->mmsDomain, sboTimeoutName);
 
                 free(controlObjectReference);
                 free(sboTimeoutName);
@@ -377,8 +374,7 @@ Control_readAccessControlObject(MmsMapping* self, MmsDomain* domain, char* varia
 
 
 MmsValueIndication
-Control_writeAccessControlObject(MmsMapping* self, MmsDomain* domain, char* variableIdOrig,
-                         MmsValue* value)
+Control_writeAccessControlObject(MmsMapping* self, MmsDomain* domain, char* variableIdOrig,	MmsValue* value)
 {
     MmsValueIndication indication = MMS_VALUE_ACCESS_DENIED;
 

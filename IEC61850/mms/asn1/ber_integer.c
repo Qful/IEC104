@@ -26,8 +26,12 @@
 #include "ber_integer.h"
 #include "ber_encoder.h"
 
-static int
-setIntegerValue(Asn1PrimitiveValue* self, uint8_t* valueBuffer, int bufferSize)
+/*************************************************************************
+ * setIntegerValue
+ * пишем в self значение из valueBuffer, размером bufferSize
+ * На входе указатель на любую переменную и её sizeof размер.
+ *************************************************************************/
+static int		setIntegerValue(Asn1PrimitiveValue* self, uint8_t* valueBuffer, int bufferSize)
 {
     int size;
 	if (ORDER_LITTLE_ENDIAN)
@@ -43,9 +47,11 @@ setIntegerValue(Asn1PrimitiveValue* self, uint8_t* valueBuffer, int bufferSize)
 	else
 		return 0;
 }
-
-Asn1PrimitiveValue*
-BerInteger_createInt32()
+/*************************************************************************
+ * BerInteger_createInt32
+ * выделяем память под переменную пипа Int32
+ *************************************************************************/
+Asn1PrimitiveValue*		BerInteger_createInt32()
 {
 	return Asn1PrimitiveValue_create(4);
 }
@@ -73,18 +79,22 @@ BerInteger_setFromBerInteger(Asn1PrimitiveValue* self, Asn1PrimitiveValue* value
 	else
 		return 0;
 }
-
-int
-BerInteger_setInt32(Asn1PrimitiveValue* self, int32_t value)
+/*************************************************************************
+ * BerInteger_setInt32
+ * заносим в структуру self переменную типа int32_t
+ *************************************************************************/
+int		BerInteger_setInt32(Asn1PrimitiveValue* self, int32_t value)
 {
 	int32_t valueCopy = value;
 	uint8_t* valueBuffer = (uint8_t*) &valueCopy;
 
 	return setIntegerValue(self, valueBuffer, sizeof(value));
 }
-
-Asn1PrimitiveValue*
-BerInteger_createFromInt32(int32_t value)
+/*************************************************************************
+ * BerInteger_createFromInt32
+ * создаем переменную и заносим туда значение value
+ *************************************************************************/
+Asn1PrimitiveValue*		BerInteger_createFromInt32(int32_t value)
 {
 	Asn1PrimitiveValue* asn1Value = BerInteger_createInt32();
 	BerInteger_setInt32(asn1Value, value);
@@ -92,8 +102,13 @@ BerInteger_createFromInt32(int32_t value)
 	return asn1Value;
 }
 
-int
-BerInteger_setUint16(Asn1PrimitiveValue* self, uint16_t value)
+/*************************************************************************
+ * BerInteger_setUint8
+ * BerInteger_setUint16
+ * BerInteger_setUint32
+ * заносим в структуру self переменную типа uint8_t или uint16_t или uint32_t
+ *************************************************************************/
+int		BerInteger_setUint16(Asn1PrimitiveValue* self, uint16_t value)
 {
     uint16_t valueCopy = value;
     uint8_t* valueBuffer = (uint8_t*) &valueCopy;
@@ -101,8 +116,7 @@ BerInteger_setUint16(Asn1PrimitiveValue* self, uint16_t value)
     return setIntegerValue(self, valueBuffer, sizeof(value));
 }
 
-int
-BerInteger_setUint8(Asn1PrimitiveValue* self, uint8_t value)
+int		BerInteger_setUint8(Asn1PrimitiveValue* self, uint8_t value)
 {
     uint8_t valueCopy = value;
     uint8_t* valueBuffer = (uint8_t*) &valueCopy;
@@ -110,17 +124,18 @@ BerInteger_setUint8(Asn1PrimitiveValue* self, uint8_t value)
     return setIntegerValue(self, valueBuffer, sizeof(value));
 }
 
-int
-BerInteger_setUint32(Asn1PrimitiveValue* self, uint32_t value)
+int		BerInteger_setUint32(Asn1PrimitiveValue* self, uint32_t value)
 {
 	uint32_t valueCopy = value;
 	uint8_t* valueBuffer = (uint8_t*) &valueCopy;
 
 	return setIntegerValue(self, valueBuffer, sizeof(value));
 }
-
-Asn1PrimitiveValue*
-BerInteger_createFromUint32(uint32_t value)
+/*************************************************************************
+ * BerInteger_createFromUint32
+ * создаем переменную и заносим туда значение value
+ *************************************************************************/
+Asn1PrimitiveValue*		BerInteger_createFromUint32(uint32_t value)
 {
 	Asn1PrimitiveValue* asn1Value = BerInteger_createInt32();
 	BerInteger_setUint32(asn1Value, value);
@@ -128,14 +143,12 @@ BerInteger_createFromUint32(uint32_t value)
 	return asn1Value;
 }
 
-Asn1PrimitiveValue*
-BerInteger_createInt64()
+Asn1PrimitiveValue*	BerInteger_createInt64()
 {
 	return Asn1PrimitiveValue_create(64);
 }
-
-int
-BerInteger_setInt64(Asn1PrimitiveValue* self, int64_t value)
+/*************************************************************************/
+int		BerInteger_setInt64(Asn1PrimitiveValue* self, int64_t value)
 {
 	int64_t valueCopy = value;
 	uint8_t* valueBuffer = (uint8_t*) &valueCopy;
@@ -143,15 +156,14 @@ BerInteger_setInt64(Asn1PrimitiveValue* self, int64_t value)
 	return setIntegerValue(self, valueBuffer, sizeof(value));
 }
 
-Asn1PrimitiveValue*
-BerInteger_createFromInt64(int64_t value)
+Asn1PrimitiveValue*		BerInteger_createFromInt64(int64_t value)
 {
 	Asn1PrimitiveValue* asn1Value = BerInteger_createInt64();
 	BerInteger_setInt64(asn1Value, value);
 
 	return asn1Value;
 }
-
+/*************************************************************************/
 int /* 1 - if conversion is possible, 0 - out of range */
 BerInteger_toInt32(Asn1PrimitiveValue* self, int32_t* nativeValue)
 {

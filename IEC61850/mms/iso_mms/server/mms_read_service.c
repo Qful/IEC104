@@ -366,26 +366,27 @@ isSpecWithResult(ReadRequest_t* read)
 	return false;
 }
 
-static void	handleReadListOfVariablesRequest(
-		MmsServerConnection* connection,
-		ReadRequest_t* read,
-		int invokeId,
-		ByteBuffer* response)
+/*************************************************************************
+ * handleReadListOfVariablesRequest
+ * читаем переменные из списка для ответа
+ *************************************************************************/
+static void	handleReadListOfVariablesRequest(MmsServerConnection* connection,ReadRequest_t* read,int invokeId,ByteBuffer* response)
 {
+
+//    USART_TRACE_GREEN("		handleReadListOfVariablesRequest\n");
+
 	int variableCount = read->variableAccessSpecification.choice.listOfVariable.list.count;
 
 	MmsPdu_t* mmsPdu = createReadResponse(invokeId);
 
-	AccessResult_t** accessResultList =
-				mmsMsg_createAccessResultsList(mmsPdu, variableCount);
+	AccessResult_t** accessResultList = mmsMsg_createAccessResultsList(mmsPdu, variableCount);
 
 	LinkedList /*<MmsValue>*/ values = LinkedList_create();
     int i;
     asn_enc_rval_t rval;
 
 	if (isSpecWithResult(read)) { /* add specification to result */
-		mmsPdu->choice.confirmedResponsePdu.confirmedServiceResponse.choice.read.variableAccessSpecification
-			= &(read->variableAccessSpecification);
+		mmsPdu->choice.confirmedResponsePdu.confirmedServiceResponse.choice.read.variableAccessSpecification = &(read->variableAccessSpecification);
 	}
 
 	MmsServer_lockModel(connection->server);
@@ -393,20 +394,14 @@ static void	handleReadListOfVariablesRequest(
 	for (i = 0; i < variableCount; i++) {
 		AccessResult_t* resultListEntry = accessResultList[i];
 
-		VariableSpecification_t varSpec =
-			read->variableAccessSpecification.choice.listOfVariable.list.array[i]->variableSpecification;
-
-		AlternateAccess_t* alternateAccess =
-			read->variableAccessSpecification.choice.listOfVariable.list.array[i]->alternateAccess;
+		VariableSpecification_t varSpec = read->variableAccessSpecification.choice.listOfVariable.list.array[i]->variableSpecification;
+		AlternateAccess_t* alternateAccess = read->variableAccessSpecification.choice.listOfVariable.list.array[i]->alternateAccess;
 
 		if (varSpec.present == VariableSpecification_PR_name) {
 
 			if (varSpec.choice.name.present == ObjectName_PR_domainspecific) {
-				char* domainIdStr = mmsMsg_createStringFromAsnIdentifier(
-						varSpec.choice.name.choice.domainspecific.domainId);
-
-				char* nameIdStr = mmsMsg_createStringFromAsnIdentifier(
-						varSpec.choice.name.choice.domainspecific.itemId);
+				char* domainIdStr = mmsMsg_createStringFromAsnIdentifier( varSpec.choice.name.choice.domainspecific.domainId);
+				char* nameIdStr = mmsMsg_createStringFromAsnIdentifier( varSpec.choice.name.choice.domainspecific.itemId);
 
 				MmsDomain* domain = MmsDevice_getDomain(MmsServer_getDevice(connection->server), domainIdStr);
                 MmsTypeSpecification* namedVariable;
@@ -419,8 +414,7 @@ static void	handleReadListOfVariablesRequest(
 
 				namedVariable = MmsDomain_getNamedVariable(domain, nameIdStr);
 
-				addNamedVariableToResultList(namedVariable, domain, nameIdStr, resultListEntry,
-						values, connection, alternateAccess);
+				addNamedVariableToResultList(namedVariable, domain, nameIdStr, resultListEntry, values, connection, alternateAccess);
 
 				free(domainIdStr);
 				free(nameIdStr);
@@ -586,12 +580,10 @@ static void	handleReadNamedVariableListRequest(
 
 #endif /* MMS_DATA_SET_SERVICE == 1 */
 
-void
-mmsServer_handleReadRequest(
-		MmsServerConnection* connection,
-		ReadRequest_t* read,
-		int invokeId,
-		ByteBuffer* response)
+/**********************************************************************************************
+ * mmsServer_handleReadRequest
+ *********************************************************************************************/
+void	mmsServer_handleReadRequest(MmsServerConnection* connection, ReadRequest_t* read, int invokeId, ByteBuffer* response)
 {
 	if (read->variableAccessSpecification.present == VariableAccessSpecification_PR_listOfVariable) {
 		handleReadListOfVariablesRequest(connection, read, invokeId, response);

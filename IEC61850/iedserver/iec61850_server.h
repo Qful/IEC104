@@ -56,6 +56,11 @@
 
 typedef struct sIedServer* IedServer;
 
+void		IedServer_updateUTCTimeAttributeValue(IedServer self, DataAttribute* dataAttribute, uint64_t value);
+void		IedServer_updateBooleanAttributeValue(IedServer self, DataAttribute* dataAttribute, bool value);
+void		IedServer_updateFloatAttributeValue(IedServer self, DataAttribute* dataAttribute, float value);
+void		IedServer_updateQuality(IedServer self, DataAttribute* dataAttribute, Quality quality);
+
 /**
  * \brief Create a new IedServer instance
  *
@@ -63,16 +68,14 @@ typedef struct sIedServer* IedServer;
  *
  * \return the newly generated IedServer instance
  */
-IedServer
-IedServer_create(IedModel* iedModel);
+IedServer	IedServer_create(IedModel* iedModel);
 
 /**
  * \brief Destroy an IedServer instance and release all resources (memory, TCP sockets)
  *
  * \param self the instance of IedServer to operate on.
  */
-void
-IedServer_destroy(IedServer self);
+void		IedServer_destroy(IedServer self);
 
 /**
  * \brief Start handling client connections
@@ -80,16 +83,14 @@ IedServer_destroy(IedServer self);
  * \param self the instance of IedServer to operate on.
  * \param tcpPort the TCP port the server is listening
  */
-void
-IedServer_start(IedServer self, int tcpPort);
+void		IedServer_start(IedServer self, int tcpPort);
 
 /**
  * \brief Stop handling client connections
  *
  * \param self the instance of IedServer to operate on.
  */
-void
-IedServer_stop(IedServer self);
+void		IedServer_stop(IedServer self);
 
 /**
  * \brief Check if IedServer instance is listening for client connections
@@ -98,8 +99,7 @@ IedServer_stop(IedServer self);
  *
  * \return true if IedServer instance is listening for client connections
  */
-bool
-IedServer_isRunning(IedServer self);
+bool		IedServer_isRunning(IedServer self);
 
 /**
  * \brief Get data attribute value
@@ -113,8 +113,7 @@ IedServer_isRunning(IedServer self);
  *
  * \return MmsValue object of the MMS Named Variable or NULL if the value does not exist.
  */
-MmsValue*
-IedServer_getAttributeValue(IedServer self, ModelNode* node);
+MmsValue*	IedServer_getAttributeValue(IedServer self, DataAttribute* node);
 
 
 /**
@@ -131,8 +130,7 @@ IedServer_getAttributeValue(IedServer self, ModelNode* node);
  *
  * \return MmsValue object of the MMS Named Variable or NULL if the value does not exist.
  */
-void
-IedServer_updateAttributeValue(IedServer self, DataAttribute* node, MmsValue* value);
+void	IedServer_updateAttributeValue(IedServer self, DataAttribute* node, MmsValue* value);
 
 /**
  * \brief Inform the IEC 61850 stack that the quality of a data attribute has changed.
@@ -144,8 +142,7 @@ IedServer_updateAttributeValue(IedServer self, DataAttribute* node, MmsValue* va
  * \param self the instance of IedServer to operate on.
  * \param node the data attribute handle
  */
-void
-IedServer_attributeQualityChanged(IedServer self, ModelNode* node);
+void	IedServer_attributeQualityChanged(IedServer self, ModelNode* node);
 
 /**
  * User provided callback function for the control model. It will be invoked when
@@ -157,6 +154,7 @@ IedServer_attributeQualityChanged(IedServer self, ModelNode* node);
 typedef bool (*ControlHandler) (void* parameter, MmsValue* ctlVal);
 
 /**
+ * Установить обработчик управления для контролируемого объекта данных
  * \brief Set control handler for controllable data object
  *
  * This functions sets a user provided control handler for a data object. The data object
@@ -169,8 +167,7 @@ typedef bool (*ControlHandler) (void* parameter, MmsValue* ctlVal);
  * \param handler a callback function of type ControlHandler
  * \param parameter a user provided parameter that is passed to the control handler.
  */
-void
-IedServer_setControlHandler(IedServer self, DataObject* node, ControlHandler handler, void* parameter);
+void	IedServer_setControlHandler(IedServer self, DataObject* node, ControlHandler handler, void* parameter);
 
 /**
  * \brief Lock the MMS server data model.
@@ -179,16 +176,14 @@ IedServer_setControlHandler(IedServer self, DataObject* node, ControlHandler han
  *
  * \param self the instance of IedServer to operate on.
  */
-void
-IedServer_lockDataModel(IedServer self);
+void	IedServer_lockDataModel(IedServer self);
 
 /**
  * \brief Unlock the MMS server data model and process pending client requests.
  *
  * \param self the instance of IedServer to operate on.
  */
-void
-IedServer_unlockDataModel(IedServer self);
+void	IedServer_unlockDataModel(IedServer self);
 
 /**
  * \brief Enable all GOOSE control blocks.
@@ -200,10 +195,10 @@ IedServer_unlockDataModel(IedServer self);
  *
  * \param self the instance of IedServer to operate on.
  */
-void
-IedServer_enableGoosePublishing(IedServer self);
+void	IedServer_enableGoosePublishing(IedServer self);
 
 /**
+ *  Обработчик обратного вызова для контроля доступа клиента к атрибутам данных
  * \brief callback handler to monitor client access to data attributes
  *
  * User provided callback function to observe (monitor) MMS client access to
@@ -226,9 +221,7 @@ typedef void (*AttributeChangedHandler) (DataAttribute* dataAttribute);
  * \param handler the callback function that is invoked if a client has written to
  *        the monitored data attribute.
  */
-void
-IedServer_observeDataAttribute(IedServer self, DataAttribute* dataAttribute,
-        AttributeChangedHandler handler);
+void	IedServer_observeDataAttribute(IedServer self, DataAttribute* dataAttribute, AttributeChangedHandler handler);
 
 /**@}*/
 

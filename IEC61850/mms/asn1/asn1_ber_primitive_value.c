@@ -31,8 +31,12 @@
 
 #include "asn1_ber_primitive_value.h"
 
-Asn1PrimitiveValue*
-Asn1PrimitiveValue_create(int size)
+/*************************************************************************
+ * Asn1PrimitiveValue_create
+ * выделяем память под структуру Asn1PrimitiveValue с указанием размера size.
+ * + выделяем под сами данные octets
+ *************************************************************************/
+Asn1PrimitiveValue*		Asn1PrimitiveValue_create(int size)
 {
 	Asn1PrimitiveValue* self = malloc(sizeof(Asn1PrimitiveValue));
 
@@ -52,9 +56,11 @@ Asn1PrimitiveValue_create(int size)
 //    self->octets = malloc(1, bufferSize);
 //
 //}
-
-Asn1PrimitiveValue*
-Asn1PrimitiveValue_clone(Asn1PrimitiveValue* self)
+/*************************************************************************
+ * Asn1PrimitiveValue_clone
+ * клонировать переменную, возвращаем указатель на клон.
+ *************************************************************************/
+Asn1PrimitiveValue*		Asn1PrimitiveValue_clone(Asn1PrimitiveValue* self)
 {
 	Asn1PrimitiveValue* clone = malloc(sizeof(Asn1PrimitiveValue));
 
@@ -67,9 +73,11 @@ Asn1PrimitiveValue_clone(Asn1PrimitiveValue* self)
 
 	return clone;
 }
-
-bool
-Asn1PrimitivaValue_compare(Asn1PrimitiveValue* self, Asn1PrimitiveValue* otherValue)
+/*************************************************************************
+ * Asn1PrimitivaValue_compare
+ * сравнить 2 переменные
+ *************************************************************************/
+bool	Asn1PrimitivaValue_compare(Asn1PrimitiveValue* self, Asn1PrimitiveValue* otherValue)
 {
     if (self->size == otherValue->size) {
         if (memcmp(self->octets, otherValue->octets, self->size) == 0)
@@ -80,21 +88,27 @@ Asn1PrimitivaValue_compare(Asn1PrimitiveValue* self, Asn1PrimitiveValue* otherVa
     else
         return false;
 }
-
-int
-Asn1PrimitiveValue_getSize(Asn1PrimitiveValue* self)
+/*************************************************************************
+ * Asn1PrimitiveValue_getSize
+ * получить текущий разме переменной
+ *************************************************************************/
+int		Asn1PrimitiveValue_getSize(Asn1PrimitiveValue* self)
 {
 	return self->size;
 }
-
-int
-Asn1PrimitiveValue_getMaxSize(Asn1PrimitiveValue* self)
+/*************************************************************************
+ * Asn1PrimitiveValue_getMaxSize
+ * получить максимальный разме переменной
+ *************************************************************************/
+int		Asn1PrimitiveValue_getMaxSize(Asn1PrimitiveValue* self)
 {
 	return self->maxSize;
 }
-
-void
-Asn1PrimitiveValue_destroy(Asn1PrimitiveValue* self)
+/*************************************************************************
+ * Asn1PrimitiveValue_destroy
+ * удалить переменную из памяти
+ *************************************************************************/
+void	Asn1PrimitiveValue_destroy(Asn1PrimitiveValue* self)
 {
 	free(self->octets);
 	free(self);

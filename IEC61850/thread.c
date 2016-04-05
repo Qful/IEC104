@@ -34,10 +34,10 @@ struct sThread {
 	int state;
 	bool autodestroy;
 };
-/*
- * Создаём семафор
- *
- */
+/*************************************************************************
+ * Semaphore_create
+ * создаём семафор
+ *************************************************************************/
 Semaphore	Semaphore_create(int initialValue)
 {
 	Semaphore self = NULL;
@@ -47,52 +47,55 @@ Semaphore	Semaphore_create(int initialValue)
 }
 
 /* Wait until semaphore value is more than zero. Then decrease the semaphore value. */
-void
-Semaphore_wait(Semaphore self)
+/*************************************************************************
+ * Semaphore_wait
+ * захватываем семафор
+ *************************************************************************/
+void	Semaphore_wait(Semaphore self)
 {
 
 }
-
-void
-Semaphore_post(Semaphore self)
+/*************************************************************************
+ * Semaphore_post
+ * отдаём семафор
+ *************************************************************************/
+void	Semaphore_post(Semaphore self)
 {
 
 }
-
-void
-Semaphore_destroy(Semaphore self)
+/*************************************************************************
+ * Semaphore_destroy
+ * удаляем семафор
+ *************************************************************************/
+void	Semaphore_destroy(Semaphore self)
 {
 
 }
-
-Thread
-Thread_create(ThreadExecutionFunction function, void* parameter, bool autodestroy)
+/*************************************************************************
+ * Thread_create
+ * создаём поток
+ *************************************************************************/
+Thread	Thread_create(ThreadExecutionFunction function, void* parameter, bool autodestroy)
 {
-
-
 	return 0;
 }
 
-static void*
-destroyAutomaticThread(Thread thread)
+static void*	destroyAutomaticThread(Thread thread)
+{
+	return 0;
+}
+
+void	Thread_start(Thread thread)
 {
 
 }
 
-void
-Thread_start(Thread thread)
+void	Thread_destroy(Thread thread)
 {
 
 }
 
-void
-Thread_destroy(Thread thread)
-{
-
-}
-
-void
-Thread_sleep(int millies)
+void	Thread_sleep(int millies)
 {
 //	usleep(millies * 1000);
 }

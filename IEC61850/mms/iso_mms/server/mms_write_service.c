@@ -36,11 +36,9 @@ createMmsWriteResponse(MmsServerConnection* connection,
     WriteResponse_t* writeResponse;
     asn_enc_rval_t rval;
 
-	mmsPdu->choice.confirmedResponsePdu.confirmedServiceResponse.present =
-			ConfirmedServiceResponse_PR_write;
+	mmsPdu->choice.confirmedResponsePdu.confirmedServiceResponse.present = ConfirmedServiceResponse_PR_write;
 
-	writeResponse =
-			&(mmsPdu->choice.confirmedResponsePdu.confirmedServiceResponse.choice.write);
+	writeResponse =	&(mmsPdu->choice.confirmedResponsePdu.confirmedServiceResponse.choice.write);
 
 	writeResponse->list.count = 1;
 	writeResponse->list.size = 1;
@@ -54,15 +52,12 @@ createMmsWriteResponse(MmsServerConnection* connection,
 		writeResponse->list.array[0]->present = WriteResponse__Member_PR_failure;
 
 		if (indication == MMS_VALUE_VALUE_INVALID)
-			asn_long2INTEGER(&writeResponse->list.array[0]->choice.failure,
-					DataAccessError_objectvalueinvalid);
+			asn_long2INTEGER(&writeResponse->list.array[0]->choice.failure, DataAccessError_objectvalueinvalid);
 		else if (indication == MMS_VALUE_ACCESS_DENIED)
-			asn_long2INTEGER(&writeResponse->list.array[0]->choice.failure,
-					DataAccessError_objectaccessdenied);
+			asn_long2INTEGER(&writeResponse->list.array[0]->choice.failure, DataAccessError_objectaccessdenied);
 	}
 
-	rval = der_encode(&asn_DEF_MmsPdu, mmsPdu,
-				mmsServer_write_out, (void*) response);
+	rval = der_encode(&asn_DEF_MmsPdu, mmsPdu, mmsServer_write_out, (void*) response);
 
 	if (DEBUG) xer_fprint(stdout, &asn_DEF_MmsPdu, mmsPdu);
 
@@ -72,12 +67,11 @@ createMmsWriteResponse(MmsServerConnection* connection,
 }
 
 
-int /* MmsServiceError */
-mmsServer_handleWriteRequest(
-		MmsServerConnection* connection,
-		WriteRequest_t* writeRequest,
-		int invokeId,
-		ByteBuffer* response)
+/**********************************************************************************************
+ * mmsServer_handleWriteRequest
+ * возвращает MmsServiceError
+ *********************************************************************************************/
+int mmsServer_handleWriteRequest( MmsServerConnection* connection,	WriteRequest_t* writeRequest,	int invokeId, ByteBuffer* response)
 {
     ListOfVariableSeq_t* varSpec;
     Identifier_t domainId;
@@ -177,8 +171,7 @@ mmsServer_handleWriteRequest(
 
 	MmsServer_lockModel(connection->server);
 
-	valueIndication =
-			mmsServer_setValue(connection->server, domain, nameIdStr, value, connection);
+	valueIndication =	mmsServer_setValue(connection->server, domain, nameIdStr, value, connection);
 
 	MmsServer_unlockModel(connection->server);
 

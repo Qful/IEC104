@@ -365,20 +365,21 @@ mmsMsg_createDataElement(MmsValue* value)
     }
 }
 
-void
-mmsMsg_addResultToResultList(AccessResult_t* accessResult, MmsValue* value)
+void	mmsMsg_addResultToResultList(AccessResult_t* accessResult, MmsValue* value)
 {
     if (value == NULL) {
         accessResult->present = AccessResult_PR_failure;
 
         asn_long2INTEGER(&accessResult->choice.failure, DataAccessError_objectnonexistent);
 
-        USART_TRACE_RED("ACCESS ERROR\n");
+        USART_TRACE_RED("mmsMsg_addResultToResultList ... ACCESS ERROR\n");
     }
     else {
         switch (value->type) {
         case MMS_ARRAY:
             {
+                USART_TRACE("MMSValue->type: MMS_ARRAY\n");
+
             int i;
             int size = value->value.structure.size;
             accessResult->present = AccessResult_PR_array;
@@ -386,13 +387,14 @@ mmsMsg_addResultToResultList(AccessResult_t* accessResult, MmsValue* value)
             accessResult->choice.array.list.size = size;
             accessResult->choice.array.list.array = calloc(size, sizeof(Data_t*));
             for (i = 0; i < size; i++) {
-                accessResult->choice.array.list.array[i] =
-                        mmsMsg_createDataElement(value->value.structure.components[i]);
+                accessResult->choice.array.list.array[i] = mmsMsg_createDataElement(value->value.structure.components[i]);
             }
         }
             break;
         case MMS_STRUCTURE:
             {
+                USART_TRACE("MMSValue->type: MMS_STRUCTURE\n");
+
             int i;
             int size = value->value.structure.size;
             accessResult->present = AccessResult_PR_structure;
@@ -400,14 +402,15 @@ mmsMsg_addResultToResultList(AccessResult_t* accessResult, MmsValue* value)
             accessResult->choice.structure.list.size = size;
             accessResult->choice.structure.list.array = calloc(size, sizeof(Data_t*));
             for (i = 0; i < size; i++) {
-                accessResult->choice.structure.list.array[i] =
-                        mmsMsg_createDataElement(value->value.structure.components[i]);
+                accessResult->choice.structure.list.array[i] = mmsMsg_createDataElement(value->value.structure.components[i]);
             }
 
         }
             break;
         case MMS_BIT_STRING:
             {
+                USART_TRACE("MMSValue->type: MMS_BIT_STRING\n");
+
             int size;
             int unused;
             accessResult->present = AccessResult_PR_bitstring;
@@ -419,10 +422,14 @@ mmsMsg_addResultToResultList(AccessResult_t* accessResult, MmsValue* value)
             }
             break;
         case MMS_BOOLEAN:
+            USART_TRACE("MMSValue->type: MMS_BOOLEAN\n");
+
             accessResult->present = AccessResult_PR_boolean;
             accessResult->choice.boolean = value->value.boolean;
             break;
         case MMS_FLOAT:
+            USART_TRACE("MMSValue->type: MMS_FLOAT\n");
+
             accessResult->present = AccessResult_PR_floatingpoint;
 
             mmsMsg_createFloatData(value, &accessResult->choice.floatingpoint.size,
@@ -430,20 +437,28 @@ mmsMsg_addResultToResultList(AccessResult_t* accessResult, MmsValue* value)
 
             break;
         case MMS_UTC_TIME:
+            USART_TRACE("MMSValue->type: MMS_UTC_TIME\n");
+
             accessResult->present = AccessResult_PR_utctime;
             accessResult->choice.utctime.buf = malloc(8);
             memcpy(accessResult->choice.utctime.buf, value->value.utcTime, 8);
             accessResult->choice.utctime.size = 8;
             break;
         case MMS_INTEGER:
+            USART_TRACE("MMSValue->type: MMS_INTEGER\n");
+
             accessResult->present = AccessResult_PR_integer;
             asn_long2INTEGER(&accessResult->choice.integer, (long) MmsValue_toInt32(value));
             break;
         case MMS_UNSIGNED:
+            USART_TRACE("MMSValue->type: MMS_UNSIGNED\n");
+
             accessResult->present = AccessResult_PR_unsigned;
             asn_long2INTEGER(&accessResult->choice.Unsigned, (long) MmsValue_toInt32(value));
             break;
         case MMS_VISIBLE_STRING:
+            USART_TRACE("MMSValue->type: MMS_VISIBLE_STRING\n");
+
             accessResult->present = AccessResult_PR_visiblestring;
             if (value->value.visibleString == NULL )
                 accessResult->choice.visiblestring.size = 0;
@@ -454,6 +469,8 @@ mmsMsg_addResultToResultList(AccessResult_t* accessResult, MmsValue* value)
             break;
 
         case MMS_STRING:
+            USART_TRACE("MMSValue->type: MMS_STRING\n");
+
             accessResult->present = AccessResult_PR_mMSString;
             if (value->value.mmsString == NULL ) {
                 accessResult->choice.mMSString.size = 0;
@@ -465,12 +482,16 @@ mmsMsg_addResultToResultList(AccessResult_t* accessResult, MmsValue* value)
             break;
 
         case MMS_BINARY_TIME:
+            USART_TRACE("MMSValue->type: MMS_BINARY_TIME\n");
+
             accessResult->present = AccessResult_PR_binarytime;
             accessResult->choice.binarytime.size = value->value.binaryTime.size;
             accessResult->choice.binarytime.buf = value->value.binaryTime.buf;
             break;
 
         case MMS_OCTET_STRING:
+            USART_TRACE("MMSValue->type: MMS_OCTET_STRING\n");
+
             accessResult->present = AccessResult_PR_octetstring;
             if (value->value.octetString.buf != NULL ) {
                 accessResult->choice.octetstring.buf = value->value.octetString.buf;
@@ -486,7 +507,8 @@ mmsMsg_addResultToResultList(AccessResult_t* accessResult, MmsValue* value)
             asn_long2INTEGER(&accessResult->choice.failure, DataAccessError_typeinconsistent);
 
             if (1)
-                printf("MMS read: unknown value type %i in result\n", value->type);
+                USART_TRACE_RED("MMS read: unknown value type %i in result\n", value->type);
+                //printf("MMS read: unknown value type %i in result\n", value->type);
             break;
         }
     }

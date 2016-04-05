@@ -35,26 +35,27 @@
 #define REJECT_UNRECOGNIZED_SERVICE 1
 #define REJECT_UNKNOWN_PDU_TYPE 2
 
-#define MMS_SERVICE_STATUS 0x80
-#define MMS_SERVICE_GET_NAME_LIST 0x40
-#define MMS_SERVICE_IDENTIFY 0x20
-#define MMS_SERVICE_RENAME 0x10
-#define MMS_SERVICE_READ 0x08
-#define MMS_SERVICE_WRITE 0x04
-#define MMS_SERVICE_GET_VARIABLE_ACCESS_ATTRIBUTES 0x02
-#define MMS_SERVICE_DEFINE_NAMED_VARIABLE 0x01
+#define MMS_SERVICE_STATUS 							0x80
+#define MMS_SERVICE_GET_NAME_LIST 					0x40
+#define MMS_SERVICE_IDENTIFY 						0x20
+#define MMS_SERVICE_RENAME 							0x10
+#define MMS_SERVICE_READ 							0x08
+#define MMS_SERVICE_WRITE 							0x04
+#define MMS_SERVICE_GET_VARIABLE_ACCESS_ATTRIBUTES 	0x02
+#define MMS_SERVICE_DEFINE_NAMED_VARIABLE 			0x01
 
-#define MMS_SERVICE_DEFINE_SCATTERED_ACCESS 0x80
+#define MMS_SERVICE_DEFINE_SCATTERED_ACCESS 		0x80
 #define MMS_SERVICE_GET_SCATTERED_ACCESS_ATTRIBUTES 0x40
-#define MMS_SERVICE_DELETE_VARIABLE_ACCESS 0x20
-#define MMS_SERVICE_DEFINE_NAMED_VARIABLE_LIST 0x10
+#define MMS_SERVICE_DELETE_VARIABLE_ACCESS 			0x20
+#define MMS_SERVICE_DEFINE_NAMED_VARIABLE_LIST 		0x10
 #define MMS_SERVICE_GET_NAMED_VARIABLE_LIST_ATTRIBUTES 0x08
-#define MMS_SERVICE_DELETE_NAMED_VARIABLE_LIST 0x04
-#define MMS_SERVICE_DEFINE_NAMED_TYPE 0x02
-#define MMS_SERVICE_GET_NAMED_TYPE_ATTRIBUTES 0x01
+#define MMS_SERVICE_DELETE_NAMED_VARIABLE_LIST 		0x04
+#define MMS_SERVICE_DEFINE_NAMED_TYPE 				0x02
+#define MMS_SERVICE_GET_NAMED_TYPE_ATTRIBUTES 		0x01
 
 
 /* servicesSupported MMS bitstring */
+// сервисы которые будем поддерживать
 static uint8_t servicesSupported[] =
 {
 		0x00
@@ -244,7 +245,7 @@ static int	handleConfirmedRequestPdu(
 
 	USART_TRACE("invokeId: %i\n", invokeId);
 
-	switch(request->confirmedServiceRequest.present) {
+	switch(request->confirmedServiceRequest.present) {				// поддерживаемые сервисы
 	case ConfirmedServiceRequest_PR_getNameList:
 		mmsServer_handleGetNameListRequest(self, &(request->confirmedServiceRequest.choice.getNameList), invokeId, response);
 		break;

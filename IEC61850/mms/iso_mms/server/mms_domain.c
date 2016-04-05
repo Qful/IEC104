@@ -23,8 +23,7 @@
 
 #include "mms_device_model.h"
 
-static MmsTypeSpecification*
-getNamedVariableRecursive(MmsTypeSpecification* variable, char* nameId)
+static MmsTypeSpecification*	getNamedVariableRecursive(MmsTypeSpecification* variable, char* nameId)
 {
 	char* separator = strchr(nameId, '$');
 
@@ -75,8 +74,7 @@ getNamedVariableRecursive(MmsTypeSpecification* variable, char* nameId)
 	}
 }
 
-static void
-freeNamedVariables(MmsTypeSpecification** variables, int variablesCount)
+static void	freeNamedVariables(MmsTypeSpecification** variables, int variablesCount)
 {
 	int i;
 	for (i = 0; i < variablesCount; i++) {
@@ -162,20 +160,17 @@ MmsDomain_getNamedVariableList(MmsDomain* self, char* variableListName)
 	return variableList;
 }
 
-void
-MmsDomain_deleteNamedVariableList(MmsDomain* self, char* variableListName)
+void	MmsDomain_deleteNamedVariableList(MmsDomain* self, char* variableListName)
 {
 	mmsServer_deleteVariableList(self->namedVariableLists, variableListName);
 }
 
-LinkedList
-MmsDomain_getNamedVariableLists(MmsDomain* self)
+LinkedList	MmsDomain_getNamedVariableLists(MmsDomain* self)
 {
 	return self->namedVariableLists;
 }
 
-MmsTypeSpecification*
-MmsDomain_getNamedVariable(MmsDomain* self, char* nameId)
+MmsTypeSpecification*	MmsDomain_getNamedVariable(MmsDomain* self, char* nameId)
 {
 	if (self->namedVariables != NULL) {
 

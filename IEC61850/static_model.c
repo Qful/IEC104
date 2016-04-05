@@ -5,6 +5,7 @@
  */
 #include "stdlib.h"
 #include "model.h"
+#include "main.h"
 
 IedModel iedModel;
 static DataSet* datasets[];
@@ -19,6 +20,7 @@ LogicalNode   iedModel_GenericIO_LLN0;								// Логический нуль узла. Имя: LLN0
 DataObject    iedModel_GenericIO_LLN0_Mod;							// Mod - Режим
 DataAttribute iedModel_GenericIO_LLN0_Mod_q;
 DataAttribute iedModel_GenericIO_LLN0_Mod_t;
+DataAttribute iedModel_GenericIO_LLN0_Mod_stVal;
 DataAttribute iedModel_GenericIO_LLN0_Mod_ctlModel;
 
 DataObject    iedModel_GenericIO_LLN0_Beh;							// Beh - Режим работы
@@ -179,11 +181,71 @@ DataAttribute iedModel_GenericIO_GGIO1_Ind4_stVal;
 DataAttribute iedModel_GenericIO_GGIO1_Ind4_q;
 DataAttribute iedModel_GenericIO_GGIO1_Ind4_t;
 
+DataObject    iedModel_GenericIO_GGIO1_Ind5;
+DataAttribute iedModel_GenericIO_GGIO1_Ind5_stVal;
+DataAttribute iedModel_GenericIO_GGIO1_Ind5_q;
+DataAttribute iedModel_GenericIO_GGIO1_Ind5_t;
+
+DataObject    iedModel_GenericIO_GGIO1_Ind6;
+DataAttribute iedModel_GenericIO_GGIO1_Ind6_stVal;
+DataAttribute iedModel_GenericIO_GGIO1_Ind6_q;
+DataAttribute iedModel_GenericIO_GGIO1_Ind6_t;
+
+DataObject    iedModel_GenericIO_GGIO1_Ind7;
+DataAttribute iedModel_GenericIO_GGIO1_Ind7_stVal;
+DataAttribute iedModel_GenericIO_GGIO1_Ind7_q;
+DataAttribute iedModel_GenericIO_GGIO1_Ind7_t;
+
+DataObject    iedModel_GenericIO_GGIO1_Ind8;
+DataAttribute iedModel_GenericIO_GGIO1_Ind8_stVal;
+DataAttribute iedModel_GenericIO_GGIO1_Ind8_q;
+DataAttribute iedModel_GenericIO_GGIO1_Ind8_t;
+
+DataObject    iedModel_GenericIO_GGIO1_Ind9;
+DataAttribute iedModel_GenericIO_GGIO1_Ind9_stVal;
+DataAttribute iedModel_GenericIO_GGIO1_Ind9_q;
+DataAttribute iedModel_GenericIO_GGIO1_Ind9_t;
+
+DataObject    iedModel_GenericIO_GGIO1_Ind10;
+DataAttribute iedModel_GenericIO_GGIO1_Ind10_stVal;
+DataAttribute iedModel_GenericIO_GGIO1_Ind10_q;
+DataAttribute iedModel_GenericIO_GGIO1_Ind10_t;
+
+DataObject    iedModel_GenericIO_GGIO1_Ind11;
+DataAttribute iedModel_GenericIO_GGIO1_Ind11_stVal;
+DataAttribute iedModel_GenericIO_GGIO1_Ind11_q;
+DataAttribute iedModel_GenericIO_GGIO1_Ind11_t;
+
+DataObject    iedModel_GenericIO_GGIO1_Ind12;
+DataAttribute iedModel_GenericIO_GGIO1_Ind12_stVal;
+DataAttribute iedModel_GenericIO_GGIO1_Ind12_q;
+DataAttribute iedModel_GenericIO_GGIO1_Ind12_t;
+
+DataObject    iedModel_GenericIO_GGIO1_Ind13;
+DataAttribute iedModel_GenericIO_GGIO1_Ind13_stVal;
+DataAttribute iedModel_GenericIO_GGIO1_Ind13_q;
+DataAttribute iedModel_GenericIO_GGIO1_Ind13_t;
+
+DataObject    iedModel_GenericIO_GGIO1_Ind14;
+DataAttribute iedModel_GenericIO_GGIO1_Ind14_stVal;
+DataAttribute iedModel_GenericIO_GGIO1_Ind14_q;
+DataAttribute iedModel_GenericIO_GGIO1_Ind14_t;
+
+DataObject    iedModel_GenericIO_GGIO1_Ind15;
+DataAttribute iedModel_GenericIO_GGIO1_Ind15_stVal;
+DataAttribute iedModel_GenericIO_GGIO1_Ind15_q;
+DataAttribute iedModel_GenericIO_GGIO1_Ind15_t;
+
+DataObject    iedModel_GenericIO_GGIO1_Ind16;
+DataAttribute iedModel_GenericIO_GGIO1_Ind16_stVal;
+DataAttribute iedModel_GenericIO_GGIO1_Ind16_q;
+DataAttribute iedModel_GenericIO_GGIO1_Ind16_t;
+
 IedModel iedModel = {
-    "BEMN_Device",						// имя электронного устройства
+    "MR801",						// имя электронного устройства
     &iedModel_GenericIO,				// первое логическое устройство LD в IED
     datasets,
-    reportControlBlocks,
+    reportControlBlocks,				// блок отчетов
     gseControlBlocks,
     initializeValues
 };
@@ -195,7 +257,7 @@ IedModel iedModel = {
  *************************************************************************/
 LogicalDevice iedModel_GenericIO = {
     "MR801",								// имя нашего логического устройства		//"simpleIOGenericIO"
-    NULL,									// родитель
+    NULL,									// одноранговый следующий узел				// родитель
     &iedModel_GenericIO_LLN0				// первый LN(логический узел)
 };
 /*************************************************************************
@@ -237,12 +299,26 @@ DataAttribute iedModel_GenericIO_LLN0_Mod_t = {
     DataAttributeModelType,
     "t",
     (ModelNode*) &iedModel_GenericIO_LLN0_Mod,
-    (ModelNode*) &iedModel_GenericIO_LLN0_Mod_ctlModel,
+    (ModelNode*) &iedModel_GenericIO_LLN0_Mod_stVal,
     NULL,
     0,
     0,
     ST,
     TIMESTAMP,
+    NULL
+};
+
+
+DataAttribute iedModel_GenericIO_LLN0_Mod_stVal = {
+    DataAttributeModelType,
+    "stVal",
+    (ModelNode*) &iedModel_GenericIO_LLN0_Mod,
+    (ModelNode*) &iedModel_GenericIO_LLN0_Mod_ctlModel,
+    NULL,
+    0,
+    0,
+    ST,
+    INT32,
     NULL
 };
 
@@ -734,7 +810,7 @@ DataObject iedModel_GenericIO_GGIO1_NamPlt = {
     DataObjectModelType,
     "NamPlt",
     (ModelNode*) &iedModel_GenericIO_GGIO1,
-    (ModelNode*) &iedModel_GenericIO_GGIO1_AnIn1,
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind1,						// следующий
     (ModelNode*) &iedModel_GenericIO_GGIO1_NamPlt_vendor,
     0,
     0
@@ -783,7 +859,7 @@ DataObject iedModel_GenericIO_GGIO1_AnIn1 = {
     DataObjectModelType,
     "AnIn1",
     (ModelNode*) &iedModel_GenericIO_GGIO1,
-    (ModelNode*) &iedModel_GenericIO_GGIO1_AnIn2,
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind1, //iedModel_GenericIO_GGIO1_SPCSO1,//(ModelNode*) &iedModel_GenericIO_GGIO1_AnIn2,
     (ModelNode*) &iedModel_GenericIO_GGIO1_AnIn1_mag,
     0,
     0
@@ -845,7 +921,7 @@ DataObject iedModel_GenericIO_GGIO1_AnIn2 = {
     DataObjectModelType,
     "AnIn2",
     (ModelNode*) &iedModel_GenericIO_GGIO1,
-    (ModelNode*) &iedModel_GenericIO_GGIO1_AnIn3,
+    NULL,//(ModelNode*) &iedModel_GenericIO_GGIO1_AnIn3,
     (ModelNode*) &iedModel_GenericIO_GGIO1_AnIn2_mag,
     0,
     0
@@ -1031,7 +1107,7 @@ DataObject iedModel_GenericIO_GGIO1_SPCSO1 = {
     DataObjectModelType,
     "SPCSO1",
     (ModelNode*) &iedModel_GenericIO_GGIO1,
-    (ModelNode*) &iedModel_GenericIO_GGIO1_SPCSO2,
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind1,//(ModelNode*) &iedModel_GenericIO_GGIO1_SPCSO2,
     (ModelNode*) &iedModel_GenericIO_GGIO1_SPCSO1_stVal,
     0,
     0
@@ -1745,7 +1821,7 @@ DataAttribute iedModel_GenericIO_GGIO1_SPCSO4_t = {
 
 DataObject iedModel_GenericIO_GGIO1_Ind1 = {
     DataObjectModelType,
-    "Ind1",
+    "Discreet D1",
     (ModelNode*) &iedModel_GenericIO_GGIO1,
     (ModelNode*) &iedModel_GenericIO_GGIO1_Ind2,
     (ModelNode*) &iedModel_GenericIO_GGIO1_Ind1_stVal,
@@ -1794,7 +1870,7 @@ DataAttribute iedModel_GenericIO_GGIO1_Ind1_t = {
 
 DataObject iedModel_GenericIO_GGIO1_Ind2 = {
     DataObjectModelType,
-    "Ind2",
+    "Discreet D2",
     (ModelNode*) &iedModel_GenericIO_GGIO1,
     (ModelNode*) &iedModel_GenericIO_GGIO1_Ind3,
     (ModelNode*) &iedModel_GenericIO_GGIO1_Ind2_stVal,
@@ -1840,10 +1916,10 @@ DataAttribute iedModel_GenericIO_GGIO1_Ind2_t = {
     TIMESTAMP,
     NULL
 };
-
+// --------------------------------------------------------
 DataObject iedModel_GenericIO_GGIO1_Ind3 = {
     DataObjectModelType,
-    "Ind3",
+    "Discreet D3",
     (ModelNode*) &iedModel_GenericIO_GGIO1,
     (ModelNode*) &iedModel_GenericIO_GGIO1_Ind4,
     (ModelNode*) &iedModel_GenericIO_GGIO1_Ind3_stVal,
@@ -1889,12 +1965,12 @@ DataAttribute iedModel_GenericIO_GGIO1_Ind3_t = {
     TIMESTAMP,
     NULL
 };
-
+// --------------------------------------------------------
 DataObject iedModel_GenericIO_GGIO1_Ind4 = {
     DataObjectModelType,
-    "Ind4",
+    "Discreet D4",
     (ModelNode*) &iedModel_GenericIO_GGIO1,
-    NULL,
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind5,
     (ModelNode*) &iedModel_GenericIO_GGIO1_Ind4_stVal,
     0,
     0
@@ -1938,7 +2014,244 @@ DataAttribute iedModel_GenericIO_GGIO1_Ind4_t = {
     TIMESTAMP,
     NULL
 };
+// --------------------------------------------------------
+DataObject iedModel_GenericIO_GGIO1_Ind5 = {
+    DataObjectModelType,
+    "Discreet D5",
+    (ModelNode*) &iedModel_GenericIO_GGIO1,
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind6,
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind5_stVal,
+    0,
+    0
+};
 
+DataAttribute iedModel_GenericIO_GGIO1_Ind5_stVal = {
+    DataAttributeModelType,
+    "stVal",
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind5,
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind5_q,
+    NULL,
+    0,
+    0,
+    ST,
+    BOOLEAN,
+    NULL
+};
+
+DataAttribute iedModel_GenericIO_GGIO1_Ind5_q = {
+    DataAttributeModelType,
+    "q",
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind5,
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind5_t,
+    NULL,
+    0,
+    0,
+    ST,
+    QUALITY,
+    NULL
+};
+
+DataAttribute iedModel_GenericIO_GGIO1_Ind5_t = {
+    DataAttributeModelType,
+    "t",
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind5,
+    NULL,
+    NULL,
+    0,
+    0,
+    ST,
+    TIMESTAMP,
+    NULL
+};
+// --------------------------------------------------------
+DataObject iedModel_GenericIO_GGIO1_Ind6 = {
+    DataObjectModelType,
+    "Discreet D6",
+    (ModelNode*) &iedModel_GenericIO_GGIO1,
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind7,
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind6_stVal,
+    0,
+    0
+};
+
+DataAttribute iedModel_GenericIO_GGIO1_Ind6_stVal = {
+    DataAttributeModelType,
+    "stVal",
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind6,
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind6_q,
+    NULL,
+    0,
+    0,
+    ST,
+    BOOLEAN,
+    NULL
+};
+
+DataAttribute iedModel_GenericIO_GGIO1_Ind6_q = {
+    DataAttributeModelType,
+    "q",
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind6,
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind6_t,
+    NULL,
+    0,
+    0,
+    ST,
+    QUALITY,
+    NULL
+};
+
+DataAttribute iedModel_GenericIO_GGIO1_Ind6_t = {
+    DataAttributeModelType,
+    "t",
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind6,
+    NULL,
+    NULL,
+    0,
+    0,
+    ST,
+    TIMESTAMP,
+    NULL
+};
+// --------------------------------------------------------
+DataObject iedModel_GenericIO_GGIO1_Ind7 = {
+    DataObjectModelType,
+    "Discreet D7",
+    (ModelNode*) &iedModel_GenericIO_GGIO1,
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind8,
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind7_stVal,
+    0,
+    0
+};
+
+DataAttribute iedModel_GenericIO_GGIO1_Ind7_stVal = {
+    DataAttributeModelType,
+    "stVal",
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind7,
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind7_q,
+    NULL,
+    0,
+    0,
+    ST,
+    BOOLEAN,
+    NULL
+};
+
+DataAttribute iedModel_GenericIO_GGIO1_Ind7_q = {
+    DataAttributeModelType,
+    "q",
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind7,
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind7_t,
+    NULL,
+    0,
+    0,
+    ST,
+    QUALITY,
+    NULL
+};
+
+DataAttribute iedModel_GenericIO_GGIO1_Ind7_t = {
+    DataAttributeModelType,
+    "t",
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind7,
+    NULL,
+    NULL,
+    0,
+    0,
+    ST,
+    TIMESTAMP,
+    NULL
+};
+// --------------------------------------------------------
+DataObject iedModel_GenericIO_GGIO1_Ind8 = {
+    DataObjectModelType,
+    "Discreet D8",
+    (ModelNode*) &iedModel_GenericIO_GGIO1,
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind9,						// следующий
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind8_stVal,
+    0,
+    0
+};
+
+DataAttribute iedModel_GenericIO_GGIO1_Ind8_stVal = {
+    DataAttributeModelType,
+    "stVal",
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind8,
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind8_q,
+    NULL,
+    0,
+    0,
+    ST,
+    BOOLEAN,
+    NULL
+};
+
+DataAttribute iedModel_GenericIO_GGIO1_Ind8_q = {
+    DataAttributeModelType,
+    "q",
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind8,
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind8_t,
+    NULL,
+    0,
+    0,
+    ST,
+    QUALITY,
+    NULL
+};
+
+DataAttribute iedModel_GenericIO_GGIO1_Ind8_t = {
+    DataAttributeModelType,
+    "t",
+    (ModelNode*) &iedModel_GenericIO_GGIO1_Ind8,
+    NULL,
+    NULL,
+    0,
+    0,
+    ST,
+    TIMESTAMP,
+    NULL
+};
+// --------------------------------------------------------
+DataObject iedModel_GenericIO_GGIO1_Ind9 = { DataObjectModelType, "Discreet D9", (ModelNode*) &iedModel_GenericIO_GGIO1, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind10, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind9_stVal, 0, 0};
+DataAttribute iedModel_GenericIO_GGIO1_Ind9_stVal = { DataAttributeModelType, "stVal", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind9, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind9_q, NULL, 0, 0, ST, BOOLEAN, NULL};
+DataAttribute iedModel_GenericIO_GGIO1_Ind9_q = { DataAttributeModelType, "q", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind9, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind9_t, NULL, 0, 0, ST, QUALITY, NULL};
+DataAttribute iedModel_GenericIO_GGIO1_Ind9_t = { DataAttributeModelType, "t", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind9, NULL, NULL, 0, 0, ST, TIMESTAMP, NULL};
+// --------------------------------------------------------
+DataObject iedModel_GenericIO_GGIO1_Ind10 = { DataObjectModelType, "Discreet D10", (ModelNode*) &iedModel_GenericIO_GGIO1, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind11, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind10_stVal, 0, 0};
+DataAttribute iedModel_GenericIO_GGIO1_Ind10_stVal = { DataAttributeModelType, "stVal", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind10, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind10_q, NULL, 0, 0, ST, BOOLEAN, NULL};
+DataAttribute iedModel_GenericIO_GGIO1_Ind10_q = { DataAttributeModelType, "q", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind10, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind10_t, NULL, 0, 0, ST, QUALITY, NULL};
+DataAttribute iedModel_GenericIO_GGIO1_Ind10_t = { DataAttributeModelType, "t", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind10, NULL, NULL, 0, 0, ST, TIMESTAMP, NULL};
+// --------------------------------------------------------
+DataObject iedModel_GenericIO_GGIO1_Ind11 = { DataObjectModelType, "Discreet D11", (ModelNode*) &iedModel_GenericIO_GGIO1, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind12, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind11_stVal, 0, 0};
+DataAttribute iedModel_GenericIO_GGIO1_Ind11_stVal = { DataAttributeModelType, "stVal", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind11, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind11_q, NULL, 0, 0, ST, BOOLEAN, NULL};
+DataAttribute iedModel_GenericIO_GGIO1_Ind11_q = { DataAttributeModelType, "q", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind11, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind11_t, NULL, 0, 0, ST, QUALITY, NULL};
+DataAttribute iedModel_GenericIO_GGIO1_Ind11_t = { DataAttributeModelType, "t", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind11, NULL, NULL, 0, 0, ST, TIMESTAMP, NULL};
+// --------------------------------------------------------
+DataObject iedModel_GenericIO_GGIO1_Ind12 = { DataObjectModelType, "Discreet D12", (ModelNode*) &iedModel_GenericIO_GGIO1, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind13, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind12_stVal, 0, 0};
+DataAttribute iedModel_GenericIO_GGIO1_Ind12_stVal = { DataAttributeModelType, "stVal", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind12, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind12_q, NULL, 0, 0, ST, BOOLEAN, NULL};
+DataAttribute iedModel_GenericIO_GGIO1_Ind12_q = { DataAttributeModelType, "q", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind12, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind12_t, NULL, 0, 0, ST, QUALITY, NULL};
+DataAttribute iedModel_GenericIO_GGIO1_Ind12_t = { DataAttributeModelType, "t", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind12, NULL, NULL, 0, 0, ST, TIMESTAMP, NULL};
+// --------------------------------------------------------
+DataObject iedModel_GenericIO_GGIO1_Ind13 = { DataObjectModelType, "Discreet D13", (ModelNode*) &iedModel_GenericIO_GGIO1, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind14, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind13_stVal, 0, 0};
+DataAttribute iedModel_GenericIO_GGIO1_Ind13_stVal = { DataAttributeModelType, "stVal", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind13, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind13_q, NULL, 0, 0, ST, BOOLEAN, NULL};
+DataAttribute iedModel_GenericIO_GGIO1_Ind13_q = { DataAttributeModelType, "q", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind13, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind13_t, NULL, 0, 0, ST, QUALITY, NULL};
+DataAttribute iedModel_GenericIO_GGIO1_Ind13_t = { DataAttributeModelType, "t", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind13, NULL, NULL, 0, 0, ST, TIMESTAMP, NULL};
+// --------------------------------------------------------
+DataObject iedModel_GenericIO_GGIO1_Ind14 = { DataObjectModelType, "Discreet D14", (ModelNode*) &iedModel_GenericIO_GGIO1, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind15, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind14_stVal, 0, 0};
+DataAttribute iedModel_GenericIO_GGIO1_Ind14_stVal = { DataAttributeModelType, "stVal", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind14, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind14_q, NULL, 0, 0, ST, BOOLEAN, NULL};
+DataAttribute iedModel_GenericIO_GGIO1_Ind14_q = { DataAttributeModelType, "q", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind14, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind14_t, NULL, 0, 0, ST, QUALITY, NULL};
+DataAttribute iedModel_GenericIO_GGIO1_Ind14_t = { DataAttributeModelType, "t", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind14, NULL, NULL, 0, 0, ST, TIMESTAMP, NULL};
+// --------------------------------------------------------
+DataObject iedModel_GenericIO_GGIO1_Ind15 = { DataObjectModelType, "Discreet D15", (ModelNode*) &iedModel_GenericIO_GGIO1, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind16, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind15_stVal, 0, 0};
+DataAttribute iedModel_GenericIO_GGIO1_Ind15_stVal = { DataAttributeModelType, "stVal", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind15, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind15_q, NULL, 0, 0, ST, BOOLEAN, NULL};
+DataAttribute iedModel_GenericIO_GGIO1_Ind15_q = { DataAttributeModelType, "q", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind15, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind15_t, NULL, 0, 0, ST, QUALITY, NULL};
+DataAttribute iedModel_GenericIO_GGIO1_Ind15_t = { DataAttributeModelType, "t", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind15, NULL, NULL, 0, 0, ST, TIMESTAMP, NULL};
+// --------------------------------------------------------
+DataObject iedModel_GenericIO_GGIO1_Ind16 = { DataObjectModelType, "Discreet D16", (ModelNode*) &iedModel_GenericIO_GGIO1,NULL /*(ModelNode*) &iedModel_GenericIO_GGIO1_Ind16*/, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind16_stVal, 0, 0};
+DataAttribute iedModel_GenericIO_GGIO1_Ind16_stVal = { DataAttributeModelType, "stVal", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind16, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind16_q, NULL, 0, 0, ST, BOOLEAN, NULL};
+DataAttribute iedModel_GenericIO_GGIO1_Ind16_q = { DataAttributeModelType, "q", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind16, (ModelNode*) &iedModel_GenericIO_GGIO1_Ind16_t, NULL, 0, 0, ST, QUALITY, NULL};
+DataAttribute iedModel_GenericIO_GGIO1_Ind16_t = { DataAttributeModelType, "t", (ModelNode*) &iedModel_GenericIO_GGIO1_Ind16, NULL, NULL, 0, 0, ST, TIMESTAMP, NULL};
+
+// --------------------------------------------------------
 static DataSetEntry ds_GenericIO_LLN0_Events_fcda0 = {
   "MR801",														// имя LD
   "GGIO1$ST$SPCSO1$stVal",										// имя переменной
@@ -1971,17 +2284,17 @@ static DataSetEntry ds_GenericIO_LLN0_Events_fcda3 = {
   NULL
 };
 
-static DataSetEntry* ds_GenericIO_LLN0_Events_elements[4] = {
-  &ds_GenericIO_LLN0_Events_fcda0,
-  &ds_GenericIO_LLN0_Events_fcda1,
-  &ds_GenericIO_LLN0_Events_fcda2,
-  &ds_GenericIO_LLN0_Events_fcda3
+static DataSetEntry* ds_GenericIO_LLN0_Events_elements[1] = {
+  &ds_GenericIO_LLN0_Events_fcda0//,
+//  &ds_GenericIO_LLN0_Events_fcda1,
+//  &ds_GenericIO_LLN0_Events_fcda2,
+//  &ds_GenericIO_LLN0_Events_fcda3
 };
 
 static DataSet ds_GenericIO_LLN0_Events = {
   "MR801",
   "LLN0$Events",
-  4,
+  1,//4,
   ds_GenericIO_LLN0_Events_elements
 };
 
@@ -2007,7 +2320,7 @@ static ReportControlBlock iedModel_GenericIO_LLN0_report0 = {
 
 // reportControlBlocks
 static ReportControlBlock* reportControlBlocks[] = {
-    &iedModel_GenericIO_LLN0_report0,
+	&iedModel_GenericIO_LLN0_report0,
     NULL
 };
 
@@ -2024,15 +2337,36 @@ static GSEControlBlock* gseControlBlocks[] = {
 static void		initializeValues()
 {
 
-iedModel_GenericIO_LLN0_Mod_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(0);			// создадим переменную LLN0_Mod_ctl (int32_t) = 0
+USART_TRACE("\n");
+USART_TRACE("------------------------------------------------------------\n");
+USART_TRACE("initializeValues:\n");
 
-iedModel_GenericIO_GGIO1_Mod_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(0);
+iedModel_GenericIO_LLN0_Mod_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(12);			// создадим переменную LLN0_Mod_ctl (int32_t) = 0
 
-iedModel_GenericIO_GGIO1_SPCSO1_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(1);
+iedModel_GenericIO_LLN0_Mod_stVal.mmsValue = MmsValue_newIntegerFromInt32(72);
 
-iedModel_GenericIO_GGIO1_SPCSO2_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(1);
+iedModel_GenericIO_LLN0_Beh_stVal.mmsValue = MmsValue_newIntegerFromInt32(4352);			// создадим переменную
 
-iedModel_GenericIO_GGIO1_SPCSO3_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(1);
+iedModel_GenericIO_LPHD1_Proxy_stVal.mmsValue = MmsValue_newBoolean(false);					// не будет прокси
 
-iedModel_GenericIO_GGIO1_SPCSO4_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(1);
+iedModel_GenericIO_LLN0_NamPlt_vendor.mmsValue = MmsValue_newVisibleString("BEMN");
+iedModel_GenericIO_LLN0_NamPlt_swRev.mmsValue = MmsValue_newVisibleString("00.00");
+iedModel_GenericIO_LLN0_NamPlt_d.mmsValue = MmsValue_newVisibleString("00.00");
+iedModel_GenericIO_LLN0_NamPlt_configRev.mmsValue = MmsValue_newVisibleString("Config Rev.00");
+
+iedModel_GenericIO_LPHD1_PhyNam_vendor.mmsValue = MmsValue_newVisibleString("ОАО 'Белэлектромонтажналадка'");
+
+
+//iedModel_GenericIO_GGIO1_Mod_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(34);
+
+//iedModel_GenericIO_GGIO1_SPCSO1_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(56);
+
+//iedModel_GenericIO_GGIO1_SPCSO2_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(78);
+
+//iedModel_GenericIO_GGIO1_SPCSO3_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(910);
+
+//iedModel_GenericIO_GGIO1_SPCSO4_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(1112);
+
+USART_TRACE("------------------------------------------------------------\n");
+
 }

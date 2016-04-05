@@ -46,44 +46,30 @@ typedef enum {
 
 typedef struct sMmsMapping MmsMapping;
 
-MmsMapping*
-MmsMapping_create(IedModel* model);
+MmsMapping*	MmsMapping_create(IedModel* model);
 
-MmsDevice*
-MmsMapping_getMmsDeviceModel(MmsMapping* mapping);
+MmsDevice*	MmsMapping_getMmsDeviceModel(MmsMapping* mapping);
 
-void
-MmsMapping_setMmsServer(MmsMapping* self, MmsServer server);
+void		MmsMapping_setMmsServer(MmsMapping* self, MmsServer server);
 
-void
-MmsMapping_installHandlers(MmsMapping* self);
+void		MmsMapping_installHandlers(MmsMapping* self);
 
-void
-MmsMapping_destroy(MmsMapping* mapping);
+void		MmsMapping_destroy(MmsMapping* mapping);
 
-void
-MmsMapping_startEventWorkerThread(MmsMapping* self);
+void		MmsMapping_startEventWorkerThread(MmsMapping* self);
 
-void
-MmsMapping_triggerReportObservers(MmsMapping* self, MmsValue* value, ReportInclusionFlag flag);
+void		MmsMapping_triggerReportObservers(MmsMapping* self, MmsValue* value, ReportInclusionFlag flag);
 
-void
-MmsMapping_triggerGooseObservers(MmsMapping* self, MmsValue* value);
+void		MmsMapping_triggerGooseObservers(MmsMapping* self, MmsValue* value);
 
-void
-MmsMapping_enableGoosePublishing(MmsMapping* self);
+void		MmsMapping_enableGoosePublishing(MmsMapping* self);
 
-char*
-MmsMapping_getMmsDomainFromObjectReference(char* objectReference, char* buffer);
+char*		MmsMapping_getMmsDomainFromObjectReference(char* objectReference, char* buffer);
 
-void
-MmsMapping_addControlObject(MmsMapping* self, ControlObject* controlObject);
+void		MmsMapping_addControlObject(MmsMapping* self, ControlObject* controlObject);
 
-char*
-MmsMapping_createMmsVariableNameFromObjectReference(char* objectReference, FunctionalConstraint fc, char* buffer);
+char*		MmsMapping_createMmsVariableNameFromObjectReference(char* objectReference, FunctionalConstraint fc, char* buffer);
 
-void
-MmsMapping_addObservedAttribute(MmsMapping* self, DataAttribute* dataAttribute,
-        void* handler);
+void		MmsMapping_addObservedAttribute(MmsMapping* self, DataAttribute* dataAttribute, void* handler);
 
 #endif /* MMS_MAPPING_H_ */

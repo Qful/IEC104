@@ -38,10 +38,11 @@
 
 #define	RT_TICK_PER_SECOND		20000
 /* ----------------------- Variables ----------------------------------------*/
-extern UART_HandleTypeDef MODBUS;
+extern UART_HandleTypeDef 	MODBUS;
+extern UART_HandleTypeDef 	BOOT_UART;
 
-extern	uint8_t 	Modbus_DataRX[];		// буфер приёмника Modbus
-extern	uint8_t 	Modbus_SizeRX;			// размер ожидаемого ответа от MODBUS
+uint8_t 	Modbus_DataRX[];		// буфер приёмника Modbus
+uint8_t 	Modbus_SizeRX;			// размер ожидаемого ответа от MODBUS
 
 
 extern uint16_t	xMasterOsEvent;				// хранилище событий порта MODBUS
@@ -481,21 +482,28 @@ void vMBPortTimersDisable()
  *************************************************************************/
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 	uint8_t		size;
-//	Port_On(LED3);
 
-	HAL_UART_DMAStop(huart);									// остановим DMA после передачи фрейма
+	if (huart == &MODBUS) {
 
-	// Запускать на приём будем на заранее извесный размер буфера, т.к. в запросе уже есть инфа
-	//  флаг готовности будет по заполнению всего пакета. Ответы об ошибках будем анализировать по таймауту
-	//  на весь ответ. Размер буфера нужно вычислить в функциях подготовки запросов. Для каждого типа данных.
-	Modbus_DataRX[0] = 0;
-	Modbus_DataRX[1] = 0;
-	xModbus_Get_SizeAnswer(&size);
-	HAL_UART_Receive_DMA(huart, &Modbus_DataRX[0], size);		// запуск приёма по кольцу в DMA,
+			HAL_UART_DMAStop(huart);									// остановим DMA после передачи фрейма
 
-//	HAL_UART_Receive_DMA(&MODBUS, &Modbus_DataRX[0], size);		// запуск приёма по кольцу в DMA,
-	//если указать размер ожидаемых данных, то то приёму получим колбэк по заполнению.
-	pxMBMasterFrameCBTransmitterEmpty();						// скажем что закончили предачу
+			// Запускать на приём будем на заранее извесный размер буфера, т.к. в запросе уже есть инфа
+			//  флаг готовности будет по заполнению всего пакета. Ответы об ошибках будем анализировать по таймауту
+			//  на весь ответ. Размер буфера нужно вычислить в функциях подготовки запросов. Для каждого типа данных.
+			Modbus_DataRX[0] = 0;
+			Modbus_DataRX[1] = 0;
+			xModbus_Get_SizeAnswer(&size);
+			HAL_UART_Receive_DMA(huart, &Modbus_DataRX[0], size);		// запуск приёма по кольцу в DMA,
+
+		//	HAL_UART_Receive_DMA(&MODBUS, &Modbus_DataRX[0], size);		// запуск приёма по кольцу в DMA,
+			//если указать размер ожидаемых данных, то то приёму получим колбэк по заполнению.
+			pxMBMasterFrameCBTransmitterEmpty();						// скажем что закончили предачу
+	} else
+	if (huart == &BOOT_UART) {
+
+		xDEBUGRTUTransmitFSM();
+	}
+
 }
 
 /*************************************************************************
@@ -516,7 +524,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   * @retval None
  *************************************************************************/
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-	pxMBMasterFrameCBByteReceived();
+	if (huart == &MODBUS) {
+		pxMBMasterFrameCBByteReceived();
+	}
+	if (huart == &BOOT_UART) {
+		xDEBUGRTUReceiveFSM();
+	}
 }
 /*************************************************************************
   * @brief  Rx Transfer completed callback
