@@ -1,159 +1,123 @@
 /*
  *  byte_buffer.c
  *
- *  Copyright 2016 Alex Godulevich
+ *  Copyright 2013 Michael Zillgith
  *
- *  рабоа с буфером
+ *	This file is part of libIEC61850.
  *
+ *	libIEC61850 is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ *	the Free Software Foundation, either version 3 of the License, or
+ *	(at your option) any later version.
+ *
+ *	libIEC61850 is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
+ *
+ *	You should have received a copy of the GNU General Public License
+ *	along with libIEC61850.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *	See COPYING file for the complete license text.
  */
 
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdint.h>
-
-#include "ethernetif.h"
-#include "lwip/tcpip.h"
-#include "lwip/init.h"
-#include "lwip/netif.h"
-#include "lwip/api.h"
-#include "lwip/sys.h"
-
+#include "libiec61850_platform_includes.h"
 #include "byte_buffer.h"
 
-/*************************************************************************
- * ByteBuffer_create(ByteBuffer* self, int maxSize)
- * выделение памяти для буфера с размером maxSize
- *************************************************************************/
-ByteBuffer*	ByteBuffer_create(ByteBuffer* self, int maxSize)
+ByteBuffer*
+ByteBuffer_create(ByteBuffer* self, int maxSize)
 {
 	if (self == NULL) {
-		self = calloc(1, sizeof(ByteBuffer));
+		self = (ByteBuffer*) GLOBAL_CALLOC(1, sizeof(ByteBuffer));
 	}
 
-	self->buffer = calloc(maxSize, sizeof(uint8_t));
+	self->buffer = (uint8_t*) GLOBAL_CALLOC(maxSize, sizeof(uint8_t));
 	self->maxSize = maxSize;
-	self->currPos = 0;
+	self->size = 0;
 
 	return self;
 }
-/*************************************************************************
- * ByteBuffer_destroy(ByteBuffer* self)
- * освобождение памяти от буфера
- *************************************************************************/
-void	ByteBuffer_destroy(ByteBuffer* self)
+
+void
+ByteBuffer_destroy(ByteBuffer* self)
 {
-	free(self->buffer);
-	free(self);
+	GLOBAL_FREEMEM(self->buffer);
+	GLOBAL_FREEMEM(self);
 }
-/*************************************************************************
- * ByteBuffer_wrap(ByteBuffer* self, uint8_t* buf, int size, int maxSize)
- * конфиг буфера в структуре
- *************************************************************************/
-void	ByteBuffer_wrap(ByteBuffer* self, uint8_t* buf, int size, int maxSize)
+
+void
+ByteBuffer_wrap(ByteBuffer* self, uint8_t* buf, int size, int maxSize)
 {
 	self->buffer = buf;
-	self->currPos = size;
+	self->size = size;
 	self->maxSize = maxSize;
 }
-/*************************************************************************
- * ByteBuffer_append(ByteBuffer* self, uint8_t* data, int dataSize)
- * запись в буфер блока начиная с текущей позиции currPos размером dataSize
- *************************************************************************/
-int	ByteBuffer_append(ByteBuffer* self, uint8_t* data, int dataSize)
-{
-	if (self->currPos + dataSize <= self->maxSize) {
-		memcpy(self->buffer + self->currPos, data, dataSize);
-		self->currPos += dataSize;
-		return 1;
-	}
-	else
-		return 0;
-}
-/*************************************************************************
- * ByteBuffer_appendByte(ByteBuffer* self, uint8_t byte)
- * запись в буфер байта начиная с текущей позиции currPos
- *************************************************************************/
-int	ByteBuffer_appendByte(ByteBuffer* self, uint8_t byte)
-{
-	if (self->currPos  < self->maxSize) {
-		self->buffer[self->currPos] = byte;
-		self->currPos ++;
-		return 1;
-	}
-	else
-		return 0;
-}
-/*************************************************************************
- * ByteBuffer_readByteUint8(ByteBuffer* self, uint8_t* byte)
- * чтение из буфера байта начиная с текущей позиции currPos
- *************************************************************************/
-int	ByteBuffer_readByteUint8(ByteBuffer* self, uint8_t* byte)
-{
-	if (self->currPos  < self->maxSize) {
-		*byte = self->buffer[self->currPos];
-		self->currPos ++;
-		return 1;
-	}
-	else
-		return 0;
-}
-/*************************************************************************
- * ByteBuffer_readByteUint8(ByteBuffer* self, uint8_t* byte)
- * чтение из буфера слова начиная с текущей позиции currPos
- *************************************************************************/
-int	ByteBuffer_readByteUint16(ByteBuffer* self, uint16_t* word){
-	uint8_t	byte;
 
-	if ((self->currPos+1)  < self->maxSize) {
-		byte = self->buffer[self->currPos ++];
-		*word = (uint16_t)byte<<8;
-		byte = self->buffer[self->currPos ++];
-		*word += byte;//(uint16_t)byte<<8 + self->buffer[self->currPos];
-//		self->currPos ++;
-		return 2;
+int
+ByteBuffer_append(ByteBuffer* self, uint8_t* data, int dataSize)
+{
+	if (self->size + dataSize <= self->maxSize) {
+		memcpy(self->buffer + self->size, data, dataSize);
+		self->size += dataSize;
+		return dataSize;
 	}
 	else
-		if(self->currPos+1  == self->maxSize){
+		return -1;
+}
+
+int
+ByteBuffer_appendByte(ByteBuffer* self, uint8_t byte)
+{
+	if (self->size  < self->maxSize) {
+		self->buffer[self->size] = byte;
+		self->size ++;
 		return 1;
 	}
 	else
 		return 0;
 }
-/*************************************************************************
- * ByteBuffer_getBuffer(ByteBuffer* self)
- * получение адреса буфера
- *************************************************************************/
-uint8_t*	ByteBuffer_getBuffer(ByteBuffer* self)
+
+
+uint8_t*
+ByteBuffer_getBuffer(ByteBuffer* self)
 {
 	return self->buffer;
 }
-/*************************************************************************
- * ByteBuffer_getMaxSize(ByteBuffer* self)
- * получение размера буфера
- *************************************************************************/
-int	ByteBuffer_getMaxSize(ByteBuffer* self)
+
+int
+ByteBuffer_getMaxSize(ByteBuffer* self)
 {
 	return self->maxSize;
 }
-/*************************************************************************
- * ByteBuffer_getcurrPos(ByteBuffer* self)
- * получение текущей позиции
- *************************************************************************/
-int	ByteBuffer_getcurrPos(ByteBuffer* self)
+
+int
+ByteBuffer_getSize(ByteBuffer* self)
 {
-	return self->currPos;
+	return self->size;
 }
-/*************************************************************************
- * ByteBuffer_setSize(ByteBuffer* self, int size)
- * перевод каретки в позицию size
- *************************************************************************/
-int	ByteBuffer_setcurrPos(ByteBuffer* self, int size)
+
+int
+ByteBuffer_setSize(ByteBuffer* self, int size)
 {
 	if (size <= self->maxSize)
-		self->currPos = size;
+		self->size = size;
 
-	return self->currPos;
+	return self->size;
 }
+
+#if 0
+void
+ByteBuffer_print(ByteBuffer* self, char* message)
+{
+    printf("\n%s (size = %i):\n",  message, self->size);
+
+    int i;
+    for (i = 0; i < self->size; i++) {
+        printf("%02x ", self->buffer[i]);
+        if (((i + 1) % 16) == 0) printf("\n");
+        else if (((i + 1) % 8) == 0) printf("| ");
+
+    }
+    printf("\n");
+}
+#endif

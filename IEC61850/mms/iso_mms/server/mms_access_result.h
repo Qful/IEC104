@@ -26,7 +26,6 @@
 
 #include "mms_value.h"
 
-int
-mmsServer_encodeAccessResult(MmsValue* value, uint8_t* buffer, int bufPos, bool encode);
+//int	mmsServer_encodeAccessResult(MmsValue* value, uint8_t* buffer, int bufPos, bool encode);
 
 #endif /* MMS_ACCESS_RESULT_H_ */

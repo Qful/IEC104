@@ -9,22 +9,22 @@
 #define	_AccessResult_H_
 
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
 #include "DataAccessError.h"
 #include "DataSequence.h"
-#include "BOOLEAN.h"
-#include "BIT_STRING.h"
-#include "INTEGER.h"
+#include <BOOLEAN.h>
+#include <BIT_STRING.h>
+#include <INTEGER.h>
 #include "FloatingPoint.h"
-#include "OCTET_STRING.h"
-#include "VisibleString.h"
-#include "GeneralizedTime.h"
+#include <OCTET_STRING.h>
+#include <VisibleString.h>
+#include <GeneralizedTime.h>
 #include "TimeOfDay.h"
 #include "MMSString.h"
 #include "UtcTime.h"
-#include "constr_CHOICE.h"
+#include <constr_CHOICE.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -9,7 +9,7 @@
 #define	_ConfirmedServiceRequest_H_
 
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
 #include "GetNameListRequest.h"
@@ -19,7 +19,7 @@
 #include "DefineNamedVariableListRequest.h"
 #include "GetNamedVariableListAttributesRequest.h"
 #include "DeleteNamedVariableListRequest.h"
-#include "constr_CHOICE.h"
+#include <constr_CHOICE.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,13 +41,13 @@ typedef enum ConfirmedServiceRequest_PR {
 typedef struct ConfirmedServiceRequest {
 	ConfirmedServiceRequest_PR present;
 	union ConfirmedServiceRequest_u {
-		GetNameListRequest_t	 					getNameList;
-		ReadRequest_t	 							read;
-		WriteRequest_t	 							write;
-		GetVariableAccessAttributesRequest_t	 	getVariableAccessAttributes;
-		DefineNamedVariableListRequest_t	 		defineNamedVariableList;
-		GetNamedVariableListAttributesRequest_t	 	getNamedVariableListAttributes;
-		DeleteNamedVariableListRequest_t	 		deleteNamedVariableList;
+		GetNameListRequest_t	 getNameList;
+		ReadRequest_t	 read;
+		WriteRequest_t	 write;
+		GetVariableAccessAttributesRequest_t	 getVariableAccessAttributes;
+		DefineNamedVariableListRequest_t	 defineNamedVariableList;
+		GetNamedVariableListAttributesRequest_t	 getNamedVariableListAttributes;
+		DeleteNamedVariableListRequest_t	 deleteNamedVariableList;
 	} choice;
 	
 	/* Context for parsing across buffer boundaries */

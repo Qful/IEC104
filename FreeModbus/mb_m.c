@@ -34,7 +34,7 @@
 
 /* ----------------------- Platform includes --------------------------------*/
 #include "port.h"
-
+#include "main.h"
 /* ----------------------- Modbus includes ----------------------------------*/
 
 #include "mb.h"
@@ -65,9 +65,9 @@
 
 /* ----------------------- Static variables ---------------------------------*/
 
-static UCHAR    ucMBMasterDestAddress;
-static BOOL     xMBRunInMasterMode = FALSE;
-static eMBMasterErrorEventType eMBMasterCurErrorType;
+static UCHAR    				ucMBMasterDestAddress;
+static BOOL     				xMBRunInMasterMode = FALSE;
+static eMBMasterErrorEventType 	eMBMasterCurErrorType;
 
 static enum
 {
@@ -110,7 +110,7 @@ static xMBFunctionHandler xMasterFuncHandlers[MB_FUNC_HANDLERS_MAX] = {
     {MB_FUNC_READ_INPUT_REGISTER, eMBMasterFuncReadInputRegister},
 #endif
 #if MB_FUNC_READ_HOLDING_ENABLED > 0
-    {MB_FUNC_READ_HOLDING_REGISTER, eMBMasterFuncReadHoldingRegister},
+    {MB_FUNC_READ_HOLDING_REGISTER, eMBMasterFuncReadRegisters},							// чнение блокоф памяти из устройства
 #endif
 #if MB_FUNC_WRITE_MULTIPLE_HOLDING_ENABLED > 0
     {MB_FUNC_WRITE_MULTIPLE_REGISTERS, eMBMasterFuncWriteMultipleHoldingRegister},
@@ -267,16 +267,16 @@ eMBMasterDisable( void )
 eMBErrorCode
 eMBMasterPoll( void )
 {
-    static UCHAR   *ucMBFrame;
-    static UCHAR    ucRcvAddress;
-    UCHAR    ucFunctionCode;
-    static USHORT   usLength;
+    static UCHAR   		*ucMBFrame;
+    static UCHAR    	ucRcvAddress;
+    UCHAR    			ucFunctionCode;
+    static USHORT   	usLength;
     static eMBException eException;
 
-    int             i , j;
-    eMBErrorCode    eStatus = MB_ENOERR;
-    eMBMasterEventType    eEvent;
-    eMBMasterErrorEventType errorType;
+    int             			i , j;
+    eMBErrorCode    			eStatus = MB_ENOERR;
+    eMBMasterEventType    		eEvent;
+    eMBMasterErrorEventType 	errorType;
 
     if( eMBState != STATE_ENABLED )        return MB_EILLSTATE;	 	// проверим, готов ли модбас для работы
 
@@ -310,7 +310,9 @@ eMBMasterPoll( void )
 			break;
 
         case EV_MASTER_EXECUTE:																	// приняли правильный пакет, адресованный нам. УРА РАБОТАЕМ
-        	ucFunctionCode = ucMBFrame[MB_PDU_FUNC_OFF];
+ //       	USART_TRACE_GREEN("EXECUTE\n");
+
+        	ucFunctionCode = ucMBFrame[MB_PDU_FUNC_OFF];										// берём из ответа код функции
             eException = MB_EX_ILLEGAL_FUNCTION;
 
             if(ucFunctionCode >> 7) {															// Старший бит указывает на ответ об ошибке.
@@ -318,13 +320,18 @@ eMBMasterPoll( void )
             }
 			else																				// нормальный пакет принят.
 			{
-				for (i = 0; i < MB_FUNC_HANDLERS_MAX; i++)
+				for (i = 0; i < MB_FUNC_HANDLERS_MAX; i++)										// ищем функцию обработчик
 				{
 					if (xMasterFuncHandlers[i].ucFunctionCode == 0)		break;					// дальше нет обработчиков функций, выходим из поиска обработчика.
 
 
-					else if (xMasterFuncHandlers[i].ucFunctionCode == ucFunctionCode) {
+					else if (xMasterFuncHandlers[i].ucFunctionCode == ucFunctionCode) {			// проверяем есть ли для нашего кода функции обработчик
 						vMBMasterSetCBRunInMasterMode(TRUE);
+
+						// ----------------------------------------------------------------------------------------------
+						//  xMasterFuncHandlers[i].pxHandler(ucMBFrame, &usLength);	// обработчик для конкретной функции.
+						//  выбирается в зависимости от
+						// ----------------------------------------------------------------------------------------------
 
 						// If master request is broadcast, the master need execute function for all slave.
 						if ( xMBMasterRequestIsBroadcast() ) {
@@ -360,20 +367,22 @@ eMBMasterPoll( void )
              break;
 
         case EV_MASTER_ERROR_PROCESS:			// колбэки по ошибкам.
+        	Port_On(LED1);
 			errorType = eMBMasterGetErrorType();
 			vMBMasterGetPDUSndBuf( &ucMBFrame );
 			switch (errorType) {
 			case EV_ERROR_RESPOND_TIMEOUT:
-				vMBMasterErrorCBRespondTimeout(ucMBMasterGetDestAddress(),
-						ucMBFrame, usMBMasterGetPDUSndLength());
+	        	USART_TRACE_RED("MODBUS ERROR_RESPOND_TIMEOUT\n");
+				vMBMasterErrorCBRespondTimeout(ucMBMasterGetDestAddress(),	ucMBFrame, usMBMasterGetPDUSndLength());
+			    return	MB_ETIMEDOUT;
 				break;
 			case EV_ERROR_RECEIVE_DATA:
-				vMBMasterErrorCBReceiveData(ucMBMasterGetDestAddress(),
-						ucMBFrame, usMBMasterGetPDUSndLength());
+	        	USART_TRACE_RED("MODBUS ERROR_RECEIVE_DATA\n");
+				vMBMasterErrorCBReceiveData(ucMBMasterGetDestAddress(),	ucMBFrame, usMBMasterGetPDUSndLength());
 				break;
 			case EV_ERROR_EXECUTE_FUNCTION:
-				vMBMasterErrorCBExecuteFunction(ucMBMasterGetDestAddress(),
-						ucMBFrame, usMBMasterGetPDUSndLength());
+	        	USART_TRACE_RED("MODBUS ERROR_EXECUTE_FUNCTION:\n");
+				vMBMasterErrorCBExecuteFunction(ucMBMasterGetDestAddress(),	ucMBFrame, usMBMasterGetPDUSndLength());
 				break;
 			}
 			vMBMasterRunResRelease();
@@ -398,7 +407,7 @@ UCHAR ucMBMasterGetDestAddress( void )
 {
 	return ucMBMasterDestAddress;
 }
-/* Set Modbus Master send destination address. */
+// Set Modbus Master send destination address. адрес устройства '1'
 void vMBMasterSetDestAddress( UCHAR Address )
 {
 	ucMBMasterDestAddress = Address;

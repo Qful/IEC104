@@ -5,7 +5,7 @@
  * 	`asn1c -fskeletons-copy`
  */
 
-#include "asn_internal.h"
+#include <asn_internal.h>
 
 #include "UtcTime.h"
 
@@ -24,7 +24,7 @@ UtcTime_constraint(asn_TYPE_descriptor_t *td, const void *sptr,
 	
 	size = st->size;
 	
-	if((size == 8)) {
+	if (size == 8) {
 		/* Constraint check succeeded */
 		return 0;
 	} else {

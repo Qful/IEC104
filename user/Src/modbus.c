@@ -25,11 +25,18 @@
 #include "main.h"
 #include "usart.h"
 
+/* ----------------------- IEC 61850 ----------------------------------*/
+#include "iec850.h"
+#include "iec61850_server.h"
+#include "static_model.h"
+
 /* ----------------------- Modbus includes ----------------------------------*/
 #include "mb.h"
 #include "mb_m.h"
 #include "mbport.h"
 #include "mbconfig.h"
+
+#include "mbrtu.h"
 
 #include "modbus.h"
 /* ----------------------- Defines ------------------------------------------*/
@@ -38,14 +45,16 @@
 
 #define	RT_TICK_PER_SECOND		20000
 /* ----------------------- Variables ----------------------------------------*/
+extern 	RTC_HandleTypeDef hrtc;						// часы
+
 extern UART_HandleTypeDef 	MODBUS;
 extern UART_HandleTypeDef 	BOOT_UART;
 
-uint8_t 	Modbus_DataRX[];		// буфер приёмника Modbus
-uint8_t 	Modbus_SizeRX;			// размер ожидаемого ответа от MODBUS
+uint8_t 	Modbus_DataRX[250];						// буфер приёмника Modbus
+static volatile uint8_t 	Modbus_SizeRX;			// размер ожидаемого ответа от MODBUS
 
 
-extern uint16_t	xMasterOsEvent;				// хранилище событий порта MODBUS
+extern uint16_t	xMasterOsEvent;						// хранилище событий порта MODBUS
 
 static USHORT usT35TimeOut50us;
 
@@ -53,26 +62,26 @@ static USHORT usT35TimeOut50us;
 TIM_HandleTypeDef    TimHandle;
 
 
-//Master mode: хранилище дискретных входов
-USHORT   usMDiscInStart;
-#if      M_DISCRETE_INPUT_NDISCRETES%8
-extern  UCHAR    ucMDiscInBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_DISCRETE_INPUT_NDISCRETES/8+1];
-#else
-extern UCHAR    ucMDiscInBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_DISCRETE_INPUT_NDISCRETES/8];
+#if defined (MR771)
+extern uint16_t   usMDiscInStart;			// адрес
+extern volatile uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   usMAnalogInStart;
+extern volatile uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+
+extern uint16_t   usMConfigStartTrans;
+extern uint16_t   ucMConfigBufTrans[MB_Size_ConfTrans];
+extern uint16_t   usMConfigStartNaddr;
+extern uint16_t   ucMConfigNaddrBuf[MB_NumbConfigNaddr];
+#elif defined (MR5_700)
+
+extern uint16_t   usMDiscInStart;			// адрес
+extern volatile uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   usMAnalogInStart;
+extern volatile uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+
 #endif
-//Master mode:Coils variables
-USHORT   usMCoilStart;
-#if      M_COIL_NCOILS%8
-extern UCHAR    ucMCoilBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_COIL_NCOILS/8+1];
-#else
-extern UCHAR    ucMCoilBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_COIL_NCOILS/8];
-#endif
-//Master mode: хранилище входных регистров
-extern USHORT   usMRegInStart;
-extern USHORT   usMRegInBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_REG_INPUT_NREGS];
-//Master mode:хранилище выходных регистров
-extern USHORT   usMRegHoldStart;
-extern USHORT   usMRegHoldBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_REG_HOLDING_NREGS];
+
+extern osMutexId 	xIEC850StartMutex;		// мьютекс готовности к запуску TCP/IP
 
 /*************************************************************************
  * xMBMasterPortSerialInit
@@ -259,8 +268,9 @@ BOOL     xMBMasterPortSerialPutByte( CHAR ucByte )
  *************************************************************************/
 BOOL     xMBMasterPortSerialPutBUF( CHAR * putBuf, USHORT leng )
 {
-	if (HAL_UART_Transmit_DMA(&MODBUS, (uint8_t *)putBuf, leng) == HAL_OK)
+	if (HAL_UART_Transmit_DMA(&MODBUS, (uint8_t *)putBuf, leng) == HAL_OK){
 			return TRUE;
+	}
 	else	return FALSE;
 }
 /*************************************************************************
@@ -382,21 +392,25 @@ void            vMBMasterCBRequestScuuess( void )
  *************************************************************************/
 void            vMBMasterErrorCBExecuteFunction( UCHAR ucDestAddress, const UCHAR* pucPDUData, USHORT ucPDULength )
 {
-
+//	eMBMasterRTUStart();
+//	xMBMasterPortEventPost( EV_MASTER_READY );
 }
 /*************************************************************************
  * vMBMasterErrorCBRespondTimeout
  *************************************************************************/
 void            vMBMasterErrorCBRespondTimeout( UCHAR ucDestAddress, const UCHAR* pucPDUData, USHORT ucPDULength )
 {
-
+	eMBMasterRTUStart();
+	xMBMasterPortEventPost( EV_MASTER_READY );
 }
 /*************************************************************************
  * vMBMasterErrorCBReceiveData
  *************************************************************************/
 void            vMBMasterErrorCBReceiveData( UCHAR ucDestAddress, const UCHAR* pucPDUData, USHORT ucPDULength )
 {
-
+	vMBMODBUSPortRxDisable();
+	eMBMasterRTUStart();
+	xMBMasterPortEventPost( EV_MASTER_READY );
 }
 /*************************************************************************
  * vMBMasterRunResRelease
@@ -487,16 +501,16 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 
 			HAL_UART_DMAStop(huart);									// остановим DMA после передачи фрейма
 
+			HAL_UART_Receive(huart,Modbus_DataRX,1,0);					// вычитаем из порта байт, который после запуска DMA попадал в него и смещал данные в буфере
+
 			// Запускать на приём будем на заранее извесный размер буфера, т.к. в запросе уже есть инфа
 			//  флаг готовности будет по заполнению всего пакета. Ответы об ошибках будем анализировать по таймауту
 			//  на весь ответ. Размер буфера нужно вычислить в функциях подготовки запросов. Для каждого типа данных.
 			Modbus_DataRX[0] = 0;
 			Modbus_DataRX[1] = 0;
-			xModbus_Get_SizeAnswer(&size);
-			HAL_UART_Receive_DMA(huart, &Modbus_DataRX[0], size);		// запуск приёма по кольцу в DMA,
+			xModbus_Get_SizeAnswer((uint8_t *)&size);
+			HAL_UART_Receive_DMA(huart, Modbus_DataRX, size);		// запуск приёма  в DMA, укажем размер ожидаемых данных, получим колбэк по заполнению.
 
-		//	HAL_UART_Receive_DMA(&MODBUS, &Modbus_DataRX[0], size);		// запуск приёма по кольцу в DMA,
-			//если указать размер ожидаемых данных, то то приёму получим колбэк по заполнению.
 			pxMBMasterFrameCBTransmitterEmpty();						// скажем что закончили предачу
 	} else
 	if (huart == &BOOT_UART) {
@@ -516,7 +530,9 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
  *************************************************************************/
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-	(void) pxMBMasterPortCBTimerExpired();
+	if (pxMBMasterPortCBTimerExpired()){			// если изменилось состояние в xMasterOsEvent (хранилище событий порта MODBUS)
+
+	}
 }
 /*************************************************************************
   * @brief  Rx Transfer completed callback
@@ -604,10 +620,10 @@ eMBErrorCode eMBMasterRegInputCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT
     USHORT          REG_INPUT_NREGS;
     USHORT          usRegInStart;
 
-    pusRegInputBuf = usMRegInBuf[ucMBMasterGetDestAddress() - 1];
+    pusRegInputBuf = ucMDiscInBuf[ucMBMasterGetDestAddress() - 1];
     REG_INPUT_START = M_REG_INPUT_START;
     REG_INPUT_NREGS = M_REG_INPUT_NREGS;
-    usRegInStart = usMRegInStart;
+    usRegInStart = usMDiscInStart;
 
     /* it already plus one in modbus function method. */
     usAddress--;
@@ -632,63 +648,28 @@ eMBErrorCode eMBMasterRegInputCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT
     return eStatus;
 }
 
-/**
- * Modbus master holding register callback function.
- *
- * @param pucRegBuffer holding register buffer
- * @param usAddress holding register address
- * @param usNRegs holding register number
- * @param eMode read or write
- *
- * @return result
- */
-eMBErrorCode eMBMasterRegHoldingCB(UCHAR * pucRegBuffer, USHORT usAddress,
-        USHORT usNRegs, eMBRegisterMode eMode)
+/************************************************************************************************
+ * Сохраняем принятый данные в буфер базы данных дискретов
+************************************************************************************************/
+eMBErrorCode eMBMasterToMemDB(UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs, USHORT * pusRegHoldingBuf, USHORT BaseAddress, USHORT BaseNRegs )
 {
     eMBErrorCode    eStatus = MB_ENOERR;
     USHORT          iRegIndex;
-    USHORT *        pusRegHoldingBuf;
-    USHORT          REG_HOLDING_START;
-    USHORT          REG_HOLDING_NREGS;
-    USHORT          usRegHoldStart;
 
-    pusRegHoldingBuf = usMRegHoldBuf[ucMBMasterGetDestAddress() - 1];
-    REG_HOLDING_START = M_REG_HOLDING_START;
-    REG_HOLDING_NREGS = M_REG_HOLDING_NREGS;
-    usRegHoldStart = usMRegHoldStart;
-    /* if mode is read, the master will write the received date to buffer. */
-    eMode = MB_REG_WRITE;
-
-    /* it already plus one in modbus function method. */
     usAddress--;
 
-    if ((usAddress >= REG_HOLDING_START)
-            && (usAddress + usNRegs <= REG_HOLDING_START + REG_HOLDING_NREGS))
+    if ((usAddress >= BaseAddress) && (usAddress + usNRegs <= BaseAddress + BaseNRegs))
     {
-        iRegIndex = usAddress - usRegHoldStart;
-        switch (eMode)
-        {
-        /* read current register values from the protocol stack. */
-        case MB_REG_READ:
-            while (usNRegs > 0)
-            {
-                *pucRegBuffer++ = (UCHAR) (pusRegHoldingBuf[iRegIndex] >> 8);
-                *pucRegBuffer++ = (UCHAR) (pusRegHoldingBuf[iRegIndex] & 0xFF);
-                iRegIndex++;
-                usNRegs--;
-            }
-            break;
-        /* write current register values with new values from the protocol stack. */
-        case MB_REG_WRITE:
-            while (usNRegs > 0)
-            {
-                pusRegHoldingBuf[iRegIndex] = *pucRegBuffer++ << 8;
-                pusRegHoldingBuf[iRegIndex] |= *pucRegBuffer++;
-                iRegIndex++;
-                usNRegs--;
-            }
-            break;
-        }
+        iRegIndex = usAddress - BaseAddress;
+
+        // перепишем данные в хранилище
+		while (usNRegs > 0)
+		{
+			pusRegHoldingBuf[iRegIndex] = *pucRegBuffer++ << 8;
+			pusRegHoldingBuf[iRegIndex] |= *pucRegBuffer++;
+			iRegIndex++;
+			usNRegs--;
+		}
     }
     else
     {
@@ -707,86 +688,22 @@ eMBErrorCode eMBMasterRegHoldingCB(UCHAR * pucRegBuffer, USHORT usAddress,
  *
  * @return result
  */
-eMBErrorCode eMBMasterRegCoilsCB(UCHAR * pucRegBuffer, USHORT usAddress,
-        USHORT usNCoils, eMBRegisterMode eMode)
+eMBErrorCode eMBMasterRegCoilsCB(UCHAR * pucRegBuffer, USHORT usAddress,  USHORT usNCoils, eMBRegisterMode eMode)
 {
-    eMBErrorCode    eStatus = MB_ENOERR;
-    USHORT          iRegIndex , iRegBitIndex , iNReg;
-    UCHAR *         pucCoilBuf;
-    USHORT          COIL_START;
-    USHORT          COIL_NCOILS;
-    USHORT          usCoilStart;
-    iNReg =  usNCoils / 8 + 1;
 
-    pucCoilBuf = ucMCoilBuf[ucMBMasterGetDestAddress() - 1];
-    COIL_START = M_COIL_START;
-    COIL_NCOILS = M_COIL_NCOILS;
-    usCoilStart = usMCoilStart;
-
-    /* if mode is read,the master will write the received date to buffer. */
-    eMode = MB_REG_WRITE;
-
-    /* it already plus one in modbus function method. */
-    usAddress--;
-
-    if ((usAddress >= COIL_START)
-            && (usAddress + usNCoils <= COIL_START + COIL_NCOILS))
-    {
-        iRegIndex = (USHORT) (usAddress - usCoilStart) / 8;
-        iRegBitIndex = (USHORT) (usAddress - usCoilStart) % 8;
-        switch (eMode)
-        {
-         /* read current coil values from the protocol stack. */
-        case MB_REG_READ:
-            while (iNReg > 0)
-            {
-                *pucRegBuffer++ = xMBUtilGetBits(&pucCoilBuf[iRegIndex++],
-                        iRegBitIndex, 8);
-                iNReg--;
-            }
-            pucRegBuffer--;
-            /* last coils */
-            usNCoils = usNCoils % 8;
-            /* filling zero to high bit */
-            *pucRegBuffer = *pucRegBuffer << (8 - usNCoils);
-            *pucRegBuffer = *pucRegBuffer >> (8 - usNCoils);
-            break;
-
-        /* write current coil values with new values from the protocol stack. */
-        case MB_REG_WRITE:
-            while (iNReg > 1)
-            {
-                xMBUtilSetBits(&pucCoilBuf[iRegIndex++], iRegBitIndex, 8,
-                        *pucRegBuffer++);
-                iNReg--;
-            }
-            /* last coils */
-            usNCoils = usNCoils % 8;
-            /* xMBUtilSetBits has bug when ucNBits is zero */
-            if (usNCoils != 0)
-            {
-                xMBUtilSetBits(&pucCoilBuf[iRegIndex++], iRegBitIndex, usNCoils,
-                        *pucRegBuffer++);
-            }
-            break;
-        }
-    }
-    else
-    {
-        eStatus = MB_ENOREG;
-    }
-    return eStatus;
 }
 
-/**
- * Modbus master discrete callback function.
- *
+eMBErrorCode eMBMasterRegHoldingCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs, eMBRegisterMode eMode )
+{
+
+}
+/********************************************************************************************************
+ * Чтение базы данных дискрет( callback function)
  * @param pucRegBuffer discrete buffer
  * @param usAddress discrete address
  * @param usNDiscrete discrete number
- *
  * @return result
- */
+ *********************************************************************************************************/
 eMBErrorCode eMBMasterRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNDiscrete )
 {
     eMBErrorCode    eStatus = MB_ENOERR;
@@ -795,7 +712,7 @@ eMBErrorCode eMBMasterRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress, USH
     USHORT          DISCRETE_INPUT_START;
     USHORT          DISCRETE_INPUT_NDISCRETES;
     USHORT          usDiscreteInputStart;
-    iNReg =  usNDiscrete / 8 + 1;
+    iNReg =  		usNDiscrete / 8 + 1;
 
     pucDiscreteInputBuf = ucMDiscInBuf[ucMBMasterGetDestAddress() - 1];
     DISCRETE_INPUT_START = M_DISCRETE_INPUT_START;
@@ -813,8 +730,7 @@ eMBErrorCode eMBMasterRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress, USH
         /* write current discrete values with new values from the protocol stack. */
         while (iNReg > 1)
         {
-            xMBUtilSetBits(&pucDiscreteInputBuf[iRegIndex++], iRegBitIndex, 8,
-                    *pucRegBuffer++);
+            xMBUtilSetBits(&pucDiscreteInputBuf[iRegIndex++], iRegBitIndex, 8, *pucRegBuffer++);
             iNReg--;
         }
         /* last discrete */
@@ -822,8 +738,7 @@ eMBErrorCode eMBMasterRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress, USH
         /* xMBUtilSetBits has bug when ucNBits is zero */
         if (usNDiscrete != 0)
         {
-            xMBUtilSetBits(&pucDiscreteInputBuf[iRegIndex++], iRegBitIndex,
-                    usNDiscrete, *pucRegBuffer++);
+            xMBUtilSetBits(&pucDiscreteInputBuf[iRegIndex++], iRegBitIndex, usNDiscrete, *pucRegBuffer++);
         }
     }
     else
@@ -833,3 +748,87 @@ eMBErrorCode eMBMasterRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress, USH
 
     return eStatus;
 }
+
+/********************************************************************************************************
+ * Hal_setTimeFromMB_Date
+ * установка времени часов из буфера MODBUS
+ *********************************************************************************************************/
+BOOL	Hal_setTimeFromMB_Date( uint16_t * MDateBuf ){
+
+	RTC_TimeTypeDef sTime;
+	RTC_DateTypeDef sDate;
+
+	sTime.Hours =  MDateBuf[3];
+	sTime.Minutes =  MDateBuf[4];
+	sTime.Seconds =  MDateBuf[5];
+	// 	 ms = (1000 - (sTime.SubSeconds * 1000 / hrtc.Init.SynchPrediv));
+	sTime.SubSeconds = (1000 - MDateBuf[6]*10) * hrtc.Init.SynchPrediv / 1000;
+	//sTime.SubSeconds =  MDateBuf[6] * 1000;
+	HAL_RTC_SetTime(&hrtc, &sTime, FORMAT_BIN);
+
+	sDate.Year = MDateBuf[0];
+	sDate.Month =  MDateBuf[1];
+	sDate.Date =  MDateBuf[2];
+
+	HAL_RTC_SetDate(&hrtc, &sDate, FORMAT_BIN);
+
+	if 		(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0) == 0xFFFF)    HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR0, 1);		// первое чтение. RTC_BKP_DR0 пишем 1
+	else {
+		HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR0, HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0) + 1);						// если это уже не первый раз, пересинхронизация.
+		USART_TRACE_RED("RTC_BKP_DR0: %u\n",HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0));
+	}
+
+	return	TRUE;
+}
+/********************************************************************************************************
+ * Hal_setIPFromMB_Date
+ * установка IP адреса из буфера MODBUS
+ *********************************************************************************************************/
+BOOL	Hal_setIPFromMB_Date( uint16_t * MDateBuf ){
+extern uint8_t		IP_ADDR[4];
+
+
+	if (	MDateBuf[0] == 0xffff &&
+			MDateBuf[1] == 0xffff)	{
+		return	FALSE;
+	} else{
+		IP_ADDR[3] = MDateBuf[0] & 0xFF;
+		IP_ADDR[2] = MDateBuf[0]>>8 & 0xFF;
+		IP_ADDR[1] = MDateBuf[1] & 0xFF;
+		IP_ADDR[0] = MDateBuf[1]>>8 & 0xFF;
+
+		osMutexRelease(xIEC850StartMutex);
+	}
+	return	TRUE;
+}
+/********************************************************************************************************
+ * Hal_setConfSWFromMB_Date
+ * установка конфига выключателя в нужных узлах
+ *********************************************************************************************************/
+#if defined (MR771)
+BOOL	Hal_setConfSWFromMB_Date ( uint16_t * MDateBuf ){
+
+	uint64_t currentTime;
+	uint32_t	reg = 0;
+
+	currentTime = Hal_getTimeInMs();
+
+	if (MDateBuf[MB_rOffsetControlSW]<<MB_bControlSW_SDTU) {reg = STVALINT32_ON;} else
+	{reg = STVALINT32_OFF;}
+
+  	USART_TRACE_GREEN("stVal = %u\n",reg);
+
+
+//CSWI1_Mod
+	IedServer_updateInt32AttributeValue(iedServer, IEDMODEL_GenericIO_CSWI1_Mod_stVal, reg);
+	IedServer_updateQuality(iedServer,IEDMODEL_GenericIO_CSWI1_Mod_q,0);
+	IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_CSWI1_Mod_t, currentTime);
+//CSWI1_Beh
+	IedServer_updateInt32AttributeValue(iedServer, IEDMODEL_GenericIO_CSWI1_Beh_stVal, reg);
+	IedServer_updateQuality(iedServer,IEDMODEL_GenericIO_CSWI1_Beh_q,0);
+	IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_CSWI1_Beh_t, currentTime);
+	return	TRUE;
+}
+#elif defined (MR5_700)
+
+#endif

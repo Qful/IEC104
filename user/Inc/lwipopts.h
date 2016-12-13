@@ -1,114 +1,234 @@
-
 /**
   ******************************************************************************
-  * File Name          : lwipopts.h
-  * Description        : This file overrides LwIP stack default configuration
-  *                      done in opt.h file.
+  * @file    LwIP/LwIP_HTTP_Server_Socket_RTOS/Inc/lwipopts.h
+  * @author  MCD Application Team
+  * @version V1.2.2
+  * @date    25-May-2015
+  * @brief   lwIP Options Configuration.
   ******************************************************************************
+  * @attention
   *
-  * COPYRIGHT(c) 2015 STMicroelectronics
+  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
   *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
+  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  * You may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at:
   *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  *        http://www.st.com/software_license_agreement_liberty_v2
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
   *
   ******************************************************************************
   */
- 
-/* Define to prevent recursive inclusion --------------------------------------*/
-#ifndef __LWIPOPTS__H__
-#define __LWIPOPTS__H__
 
-//#include "stm32f4xx_hal.h"
+#ifndef __LWIPOPTS_H__
+#define __LWIPOPTS_H__
 
-/* Within 'USER CODE' section, code will be kept by default at each generation */
-/* USER CODE BEGIN 0 */
+/**
+ * SYS_LIGHTWEIGHT_PROT==1: if you want inter-task protection for certain
+ * critical regions during buffer allocation, deallocation and memory
+ * allocation and deallocation.
+ */
+#define SYS_LIGHTWEIGHT_PROT    0
 
-/* USER CODE END 0 */
+#define ETHARP_TRUST_IP_MAC     0
+#define IP_REASSEMBLY           0
+#define IP_FRAG                 0
+#define ARP_QUEUEING            0
+#define TCP_LISTEN_BACKLOG      1
 
-#ifdef __cplusplus
- extern "C" {
-#endif
+/**
+ * NO_SYS==1: Provides VERY minimal functionality. Otherwise,
+ * use lwIP facilities.
+ */
+#define NO_SYS                  0
 
-/* STM32CubeMX Specific Parameters (not defined in opt.h) ---------------------*/
-/* Parameters set in STM32CubeMX LwIP Configuration GUI -*/
-/*----- WITH_RTOS enabled (Since FREERTOS is set) -----*/
-#define WITH_RTOS 1
-/*----- CHECKSUM_BY_HARDWARE disabled -----*/
-#define CHECKSUM_BY_HARDWARE 0
-/*-----------------------------------------------------------------------------*/
+/* ---------- Memory options ---------- */
+/* MEM_ALIGNMENT: should be set to the alignment of the CPU for which
+   lwIP is compiled. 4 byte alignment -> define MEM_ALIGNMENT to 4, 2
+   byte alignment -> define MEM_ALIGNMENT to 2. */
+#define MEM_ALIGNMENT           4
 
-/* LwIP Stack Parameters (modified compared to initialization value in opt.h) -*/
-/* Parameters set in STM32CubeMX LwIP Configuration GUI -*/
-/*----- Value in opt.h for LWIP_DHCP: 0 -----*/
-#define LWIP_DHCP 0
-/*----- Value in opt.h for NO_SYS: 0 -----*/
-#define NO_SYS 0
-/*----- Value in opt.h for MEM_ALIGNMENT: 1 -----*/
-#define MEM_ALIGNMENT 4
-/*----- Value in opt.h for MEMP_NUM_SYS_TIMEOUT: (LWIP_TCP + IP_REASSEMBLY + LWIP_ARP + (2*LWIP_DHCP) + LWIP_AUTOIP + LWIP_IGMP + LWIP_DNS + PPP_SUPPORT) -*/
-#define MEMP_NUM_SYS_TIMEOUT 5
-/*----- Value in opt.h for LWIP_ETHERNET: (LWIP_ARP || PPPOE_SUPPORT) -*/
-#define LWIP_ETHERNET 1
-/*----- Value in opt.h for TCPIP_THREAD_STACKSIZE: 0 -----*/
-#define TCPIP_THREAD_STACKSIZE 1024
-/*----- Value in opt.h for TCPIP_THREAD_PRIO: 1 -----*/
-#define TCPIP_THREAD_PRIO 3
-/*----- Value in opt.h for DEFAULT_THREAD_STACKSIZE: 0 -----*/
-#define DEFAULT_THREAD_STACKSIZE 1024
-/*----- Value in opt.h for DEFAULT_THREAD_PRIO: 1 -----*/
-#define DEFAULT_THREAD_PRIO 3
-/*----- Value in opt.h for LWIP_NETCONN: 1 -----*/
-#define LWIP_NETCONN 1
-/*----- Value in opt.h for LWIP_SOCKET: 1 -----*/
-#define LWIP_SOCKET 1
-/*----- Value in opt.h for LWIP_STATS: 1 -----*/
+/* MEM_SIZE: the size of the heap memory. If the application will send
+a lot of data that needs to be copied, this should be set high. */
+#define MEM_SIZE                (10 *1024)
+
+/* MEMP_NUM_PBUF: the number of memp struct pbufs. If the application
+   sends a lot of data out of ROM (or other static memory), this
+   should be set high. */
+#define MEMP_NUM_PBUF           50
+/* MEMP_NUM_UDP_PCB: the number of UDP protocol control blocks. One
+   per active UDP "connection". */
+#define MEMP_NUM_UDP_PCB        6
+/* MEMP_NUM_TCP_PCB: the number of simulatenously active TCP
+   connections. */
+#define MEMP_NUM_TCP_PCB        10
+/* MEMP_NUM_TCP_PCB_LISTEN: the number of listening TCP
+   connections. */
+#define MEMP_NUM_TCP_PCB_LISTEN 5
+/* MEMP_NUM_TCP_SEG: the number of simultaneously queued TCP
+   segments. */
+#define MEMP_NUM_TCP_SEG        12
+/* MEMP_NUM_SYS_TIMEOUT: the number of simulateously active
+   timeouts. */
+#define MEMP_NUM_SYS_TIMEOUT    10
+
+
+/* ---------- Pbuf options ---------- */
+/* PBUF_POOL_SIZE: the number of buffers in the pbuf pool. */
+#define PBUF_POOL_SIZE          10
+
+/* PBUF_POOL_BUFSIZE: the size of each pbuf in the pbuf pool. */
+#define PBUF_POOL_BUFSIZE       1524
+
+
+/* ---------- TCP options ---------- */
+#define LWIP_TCP                1
+#define TCP_TTL                 255
+
+/* Controls if TCP should queue segments that arrive out of
+   order. Define to 0 if your device is low on memory. */
+#define TCP_QUEUE_OOSEQ         0
+
+/* TCP Maximum segment size. */
+#define TCP_MSS                 (1500 - 40)	  /* TCP_MSS = (Ethernet MTU - IP header size - TCP header size) */
+
+/* TCP sender buffer space (bytes). */
+#define TCP_SND_BUF             (4*TCP_MSS)
+
+/*  TCP_SND_QUEUELEN: TCP sender buffer space (pbufs). This must be at least
+  as much as (2 * TCP_SND_BUF/TCP_MSS) for things to work. */
+
+#define TCP_SND_QUEUELEN        (2* TCP_SND_BUF/TCP_MSS)
+
+/* TCP receive window. */
+#define TCP_WND                 (2*TCP_MSS)
+
+
+/* ---------- ICMP options ---------- */
+#define LWIP_ICMP                       1
+
+
+/* ---------- DHCP options ---------- */
+/* Define LWIP_DHCP to 1 if you want DHCP configuration of
+   interfaces. DHCP is not implemented in lwIP 0.5.1, however, so
+   turning this on does currently not work. */
+#define LWIP_DHCP               1
+
+
+/* ---------- UDP options ---------- */
+#define LWIP_UDP                1
+#define UDP_TTL                 255
+
+
+/* ---------- Statistics options ---------- */
 #define LWIP_STATS 0
-/*----- Value in opt.h for CHECKSUM_GEN_IP: 1 -----*/
-#define CHECKSUM_GEN_IP 0
-/*----- Value in opt.h for CHECKSUM_GEN_UDP: 1 -----*/
-#define CHECKSUM_GEN_UDP 0
-/*----- Value in opt.h for CHECKSUM_GEN_TCP: 1 -----*/
-#define CHECKSUM_GEN_TCP 0
-/*----- Value in opt.h for CHECKSUM_GEN_ICMP: 1 -----*/
-#define CHECKSUM_GEN_ICMP 0
-/*----- Value in opt.h for CHECKSUM_CHECK_IP: 1 -----*/
-#define CHECKSUM_CHECK_IP 0
-/*----- Value in opt.h for CHECKSUM_CHECK_UDP: 1 -----*/
-#define CHECKSUM_CHECK_UDP 0
-/*----- Value in opt.h for CHECKSUM_CHECK_TCP: 1 -----*/
-#define CHECKSUM_CHECK_TCP 0
-/*-----------------------------------------------------------------------------*/ 
- 
-/* Parameter(s) not set in STM32CubeMX LwIP Configuration GUI -*/
-/* LwIP Parameter(s) not in opt.h -----------------------------*/
-#define LWIP_PROVIDE_ERRNO  1
+#define LWIP_PROVIDE_ERRNO 1
 
-/* USER CODE BEGIN 1 */
+/* ---------- link callback options ---------- */
+/* LWIP_NETIF_LINK_CALLBACK==1: Support a callback function from an interface
+ * whenever the link changes (i.e., link down)
+ */
+#define LWIP_NETIF_LINK_CALLBACK        1
 
-/* USER CODE END 1 */
+/*
+   --------------------------------------
+   ---------- Checksum options ----------
+   --------------------------------------
+*/
 
-#ifdef __cplusplus
-}
+/*
+The STM32F4x7 allows computing and verifying the IP, UDP, TCP and ICMP checksums by hardware:
+ - To use this feature let the following define uncommented.
+ - To disable it and process by CPU comment the  the checksum.
+*/
+#define CHECKSUM_BY_HARDWARE
+
+
+#ifdef CHECKSUM_BY_HARDWARE
+  /* CHECKSUM_GEN_IP==0: Generate checksums by hardware for outgoing IP packets.*/
+  #define CHECKSUM_GEN_IP                 0
+  /* CHECKSUM_GEN_UDP==0: Generate checksums by hardware for outgoing UDP packets.*/
+  #define CHECKSUM_GEN_UDP                0
+  /* CHECKSUM_GEN_TCP==0: Generate checksums by hardware for outgoing TCP packets.*/
+  #define CHECKSUM_GEN_TCP                0
+  /* CHECKSUM_CHECK_IP==0: Check checksums by hardware for incoming IP packets.*/
+  #define CHECKSUM_CHECK_IP               0
+  /* CHECKSUM_CHECK_UDP==0: Check checksums by hardware for incoming UDP packets.*/
+  #define CHECKSUM_CHECK_UDP              0
+  /* CHECKSUM_CHECK_TCP==0: Check checksums by hardware for incoming TCP packets.*/
+  #define CHECKSUM_CHECK_TCP              0
+  /* CHECKSUM_CHECK_ICMP==0: Check checksums by hardware for incoming ICMP packets.*/
+  #define CHECKSUM_GEN_ICMP               0
+#else
+  /* CHECKSUM_GEN_IP==1: Generate checksums in software for outgoing IP packets.*/
+  #define CHECKSUM_GEN_IP                 1
+  /* CHECKSUM_GEN_UDP==1: Generate checksums in software for outgoing UDP packets.*/
+  #define CHECKSUM_GEN_UDP                1
+  /* CHECKSUM_GEN_TCP==1: Generate checksums in software for outgoing TCP packets.*/
+  #define CHECKSUM_GEN_TCP                1
+  /* CHECKSUM_CHECK_IP==1: Check checksums in software for incoming IP packets.*/
+  #define CHECKSUM_CHECK_IP               1
+  /* CHECKSUM_CHECK_UDP==1: Check checksums in software for incoming UDP packets.*/
+  #define CHECKSUM_CHECK_UDP              1
+  /* CHECKSUM_CHECK_TCP==1: Check checksums in software for incoming TCP packets.*/
+  #define CHECKSUM_CHECK_TCP              1
+  /* CHECKSUM_CHECK_ICMP==1: Check checksums by hardware for incoming ICMP packets.*/
+  #define CHECKSUM_GEN_ICMP               1
 #endif
-#endif /*__ LWIPOPTS__H_H */
 
-/************************* (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+
+/*
+   ----------------------------------------------
+   ---------- Sequential layer options ----------
+   ----------------------------------------------
+*/
+/**
+ * LWIP_NETCONN==1: Enable Netconn API (require to use api_lib.c)
+ */
+#define LWIP_NETCONN                    1
+
+/*
+   ------------------------------------
+   ---------- Socket options ----------
+   ------------------------------------
+*/
+/**
+ * LWIP_SOCKET==1: Enable Socket API (require to use sockets.c)
+ */
+#define LWIP_SOCKET                     1
+
+/*
+   -----------------------------------
+   ---------- DEBUG options ----------
+   -----------------------------------
+*/
+
+#define LWIP_DEBUG                      1
+
+
+/*
+   ---------------------------------
+   ---------- OS options ----------
+   ---------------------------------
+*/
+
+#define TCPIP_THREAD_NAME              "TCP/IP"
+#define TCPIP_THREAD_STACKSIZE          1000
+#define TCPIP_MBOX_SIZE                 5
+#define DEFAULT_UDP_RECVMBOX_SIZE       2000
+#define DEFAULT_TCP_RECVMBOX_SIZE       2000
+#define DEFAULT_ACCEPTMBOX_SIZE         2000
+#define DEFAULT_THREAD_STACKSIZE        500
+#define TCPIP_THREAD_PRIO               (configMAX_PRIORITIES - 2)
+#define LWIP_COMPAT_MUTEX               1
+
+
+
+#endif /* __LWIPOPTS_H__ */
+
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

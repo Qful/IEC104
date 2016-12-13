@@ -24,31 +24,24 @@
 #ifndef MMS_NAMED_VARIABLE_LIST_H_
 #define MMS_NAMED_VARIABLE_LIST_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \addtogroup mms_server_api_group
  *  @{
  */
 
-#include "libiec61850_platform_includes.h"
+#include "libiec61850_common_api.h"
 #include "linked_list.h"
-#include "string_utilities.h"
 #include "mms_common.h"
-
-//typedef struct sMmsDomain MmsDomain;
-//typedef struct sMmsNamedVariableList* MmsNamedVariableList;
-//typedef struct sMmsNamedVariableListEntry* MmsNamedVariableListEntry;
 
 struct sMmsNamedVariableList {
 	bool deletable;
+	MmsDomain* domain;
 	char* name;
 	LinkedList listOfVariables;
 };
-
-//struct sMmsNamedVariableListEntry {
-//	MmsDomain* domain;
-//	char* variableName;
-//	//int index;
-//	//char* componentName;
-//};
 
 MmsNamedVariableListEntry
 MmsNamedVariableListEntry_create(MmsAccessSpecifier accessSpecifier);
@@ -63,10 +56,13 @@ char*
 MmsNamedVariableListEntry_getVariableName(MmsNamedVariableListEntry self);
 
 MmsNamedVariableList
-MmsNamedVariableList_create(char* name, bool deletable);
+MmsNamedVariableList_create(MmsDomain* domain, char* name, bool deletable);
 
 char*
 MmsNamedVariableList_getName(MmsNamedVariableList self);
+
+MmsDomain*
+MmsNamedVariableList_getDomain(MmsNamedVariableList self);
 
 bool
 MmsNamedVariableList_isDeletable(MmsNamedVariableList self);
@@ -81,5 +77,9 @@ void
 MmsNamedVariableList_destroy(MmsNamedVariableList self);
 
 /**@}*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* MMS_NAMED_VARIABLE_LIST_H_ */

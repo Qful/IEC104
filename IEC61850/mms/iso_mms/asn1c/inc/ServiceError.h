@@ -9,13 +9,13 @@
 #define	_ServiceError_H_
 
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
-#include "INTEGER.h"
-#include "VisibleString.h"
-#include "constr_CHOICE.h"
-#include "constr_SEQUENCE.h"
+#include <INTEGER.h>
+#include <VisibleString.h>
+#include <constr_CHOICE.h>
+#include <constr_SEQUENCE.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -126,9 +126,7 @@ typedef enum ServiceError__errorClass__file {
 	ServiceError__errorClass__file_insufficientspaceinfilestore	= 9
 } e_ServiceError__errorClass__file;
 
-/* ServiceError */
-typedef struct ServiceError {
-	struct ServiceError__errorClass {
+struct ServiceError__errorClass {
 		ServiceError__errorClass_PR present;
 		union ServiceError__errorClass_u {
 			INTEGER_t	 vmdstate;
@@ -148,7 +146,11 @@ typedef struct ServiceError {
 		
 		/* Context for parsing across buffer boundaries */
 		asn_struct_ctx_t _asn_ctx;
-	} errorClass;
+	};
+
+/* ServiceError */
+typedef struct ServiceError {
+	struct ServiceError__errorClass errorClass;
 	INTEGER_t	*additionalCode	/* OPTIONAL */;
 	VisibleString_t	*additionalDescription	/* OPTIONAL */;
 	

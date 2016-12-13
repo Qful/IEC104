@@ -9,14 +9,14 @@
 #define	_InitiateResponsePdu_H_
 
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
 #include "Integer32.h"
 #include "Integer16.h"
 #include "Integer8.h"
 #include "InitResponseDetail.h"
-#include "constr_SEQUENCE.h"
+#include <constr_SEQUENCE.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,10 +24,10 @@ extern "C" {
 
 /* InitiateResponsePdu */
 typedef struct InitiateResponsePdu {
-	Integer32_t				*localDetailCalled	/* OPTIONAL */;
-	Integer16_t	 			negotiatedMaxServOutstandingCalling;
-	Integer16_t	 			negotiatedMaxServOutstandingCalled;
-	Integer8_t				*negotiatedDataStructureNestingLevel	/* OPTIONAL */;
+	Integer32_t	*localDetailCalled	/* OPTIONAL */;
+	Integer16_t	 negotiatedMaxServOutstandingCalling;
+	Integer16_t	 negotiatedMaxServOutstandingCalled;
+	Integer8_t	*negotiatedDataStructureNestingLevel	/* OPTIONAL */;
 	InitResponseDetail_t	 mmsInitResponseDetail;
 	
 	/* Context for parsing across buffer boundaries */

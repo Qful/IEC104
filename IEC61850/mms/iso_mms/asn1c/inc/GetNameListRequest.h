@@ -9,14 +9,14 @@
 #define	_GetNameListRequest_H_
 
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
 #include "ObjectClass.h"
 #include "Identifier.h"
-#include "NULL.h"
-#include "constr_CHOICE.h"
-#include "constr_SEQUENCE.h"
+#include <NULL.h>
+#include <constr_CHOICE.h>
+#include <constr_SEQUENCE.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -2,9 +2,9 @@
  * Copyright (c) 2003, 2004 Lev Walkin <vlm@lionet.info>. All rights reserved.
  * Redistribution and modifications are permitted subject to BSD license.
  */
-#include "asn_internal.h"
-#include "ber_tlv_tag.h"
-#include "errno.h"
+#include <asn_internal.h>
+#include <ber_tlv_tag.h>
+#include <errno.h>
 
 ssize_t
 ber_fetch_tag(const void *ptr, size_t size, ber_tlv_tag_t *tag_r) {
@@ -84,7 +84,7 @@ ber_tlv_tag_snprint(ber_tlv_tag_t tag, char *buf, size_t size) {
 	case ASN_TAG_CLASS_PRIVATE:	type = "PRIVATE ";	break;
 	}
 
-	ret = snprintf(buf, size, "[%s%u]", type, ((unsigned)tag) >> 2);
+	ret = snprintf(buf, size, "[%s%u](%02x)", type, ((unsigned)tag) >> 2, tag);
 	if(ret <= 0 && size) buf[0] = '\0';	/* against broken libc's */
 
 	return ret;

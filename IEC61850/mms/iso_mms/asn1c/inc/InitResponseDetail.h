@@ -9,14 +9,13 @@
 #define	_InitResponseDetail_H_
 
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
-
 #include "Integer16.h"
 #include "ParameterSupportOptions.h"
 #include "ServiceSupportOptions.h"
-#include "constr_SEQUENCE.h"
+#include <constr_SEQUENCE.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,9 +23,9 @@ extern "C" {
 
 /* InitResponseDetail */
 typedef struct InitResponseDetail {
-	int16_t	 						negotiatedVersionNumber;
-	ParameterSupportOptions_t	 	negotiatedParameterCBB;
-	ServiceSupportOptions_t	 		servicesSupportedCalled;
+	Integer16_t	 negotiatedVersionNumber;
+	ParameterSupportOptions_t	 negotiatedParameterCBB;
+	ServiceSupportOptions_t	 servicesSupportedCalled;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;

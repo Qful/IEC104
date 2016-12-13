@@ -1,7 +1,7 @@
 /*
  *  mms_types.h
  *
- *  Copyright 2013 Michael Zillgith
+ *  Copyright 2013, 2014 Michael Zillgith
  *
  *	This file is part of libIEC61850.
  *
@@ -24,94 +24,56 @@
 #ifndef MMS_TYPES_H_
 #define MMS_TYPES_H_
 
-#include "libiec61850_platform_includes.h"
+#include "libiec61850_common_api.h"
 
-#include "ber_integer.h"
-
-typedef enum {
+typedef enum ATTRIBUTE_PACKED {
+    MMS_VALUE_NO_RESPONSE,
 	MMS_VALUE_OK,
 	MMS_VALUE_ACCESS_DENIED,
-	MMS_VALUE_VALUE_INVALID
+	MMS_VALUE_VALUE_INVALID,
+	MMS_VALUE_TEMPORARILY_UNAVAILABLE,
+	MMS_VALUE_OBJECT_ACCESS_UNSUPPORTED
 } MmsValueIndication;
 
 /**
- * MmsValue - complex value type for MMS Client API
+ * \addtogroup MMS_VAR_SPEC
  */
-typedef struct sMmsValue MmsValue;
-
-struct sMmsValue {
-	MmsType type;
-	int deleteValue;
-	union uMmsValue {
-        struct {
-            uint32_t code;
-        } dataAccessError;
-		struct {
-			int size;
-			MmsValue** components;
-		} structure;
-		int boolean;
-		Asn1PrimitiveValue* integer;
-		Asn1PrimitiveValue* unsignedInteger;
-		struct {
-			uint8_t exponentWidth;
-			uint8_t formatWidth;
-			uint8_t* buf;
-		} floatingPoint;
-		struct {
-			uint16_t size;
-			uint16_t maxSize;
-			uint8_t* buf;
-		} octetString;
-		struct {
-			int size;     /* Number of bits */
-			uint8_t* buf;
-		} bitString;
-		char* mmsString;
-		char* visibleString;
-		uint8_t utcTime[8];
-		struct {
-			uint8_t size;
-			uint8_t buf[6];
-		} binaryTime;
-	} value;
-};
+/**@{*/
 
 /**
  * Type definition for MMS Named Variables
  */
-typedef struct sMmsTypeSpecification MmsTypeSpecification;
+typedef struct sMmsVariableSpecification MmsVariableSpecification;
 
-struct sMmsTypeSpecification {
+/**@}*/
+
+struct ATTRIBUTE_PACKED sMmsVariableSpecification {
     MmsType type;
     char* name;
     union uMmsTypeSpecification
     {
-        struct sMmsArray {								// массив элементов
-            int elementCount; 							// Количество элементов массива
-            MmsTypeSpecification* elementTypeSpec;
+        struct sMmsArray {
+            int elementCount; /* number of array elements */
+            MmsVariableSpecification* elementTypeSpec;
         } array;
-
         struct sMmsStructure {
             int elementCount;
-            MmsTypeSpecification** elements;
+            MmsVariableSpecification** elements;
         } structure;
-
-        int boolean; 			/* dummy - not required */
-        int integer; 			/* size of integer in bits */
-        int unsignedInteger; 	/* size of integer in bits */
+        int boolean; /* dummy - not required */
+        int integer; /* size of integer in bits */
+        int unsignedInteger; /* size of integer in bits */
         struct sMmsFloat
         {
             uint8_t exponentWidth;
             uint8_t formatWidth;
         } floatingpoint;
-
-        int bitString; 			/* Number of bits in bitstring */
-        int octetString; 		/* Number of octets in octet string */
-        int visibleString; 		/* Maximum size of string */
+        int bitString; /* Number of bits in bitstring */
+        int octetString; /* Number of octets in octet string */
+        int visibleString; /* Maximum size of string */
         int mmsString;
-        int utctime; 			/* dummy - not required */
-        int binaryTime; 		/* size: either 4 or 6 */
+        int utctime; /* dummy - not required */
+        int binaryTime; /* size: either 4 or 6 */
     } typeSpec;
 };
 

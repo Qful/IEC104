@@ -5,7 +5,7 @@
  * 	`asn1c -fskeletons-copy`
  */
 
-#include "asn_internal.h"
+#include <asn_internal.h>
 
 #include "Unsigned8.h"
 

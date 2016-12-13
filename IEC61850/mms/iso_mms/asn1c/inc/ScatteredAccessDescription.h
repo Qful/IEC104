@@ -9,13 +9,13 @@
 #define	_ScatteredAccessDescription_H_
 
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
-#include "asn_SEQUENCE_OF.h"
+#include <asn_SEQUENCE_OF.h>
 #include "Identifier.h"
-#include "constr_SEQUENCE.h"
-#include "constr_SEQUENCE_OF.h"
+#include <constr_SEQUENCE.h>
+#include <constr_SEQUENCE_OF.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,16 +25,20 @@ extern "C" {
 struct VariableSpecification;
 struct AlternateAccess;
 
-/* ScatteredAccessDescription */
-typedef struct ScatteredAccessDescription {
-	A_SEQUENCE_OF(struct ScatteredAccessDescription__Member {
+struct ScatteredAccessDescription__Member {
 		Identifier_t	*componentName	/* OPTIONAL */;
 		struct VariableSpecification	*variableSpecification;
 		struct AlternateAccess	*alternateAccess	/* OPTIONAL */;
 		
 		/* Context for parsing across buffer boundaries */
 		asn_struct_ctx_t _asn_ctx;
-	} ) list;
+	};
+
+
+
+/* ScatteredAccessDescription */
+typedef struct ScatteredAccessDescription {
+	A_SEQUENCE_OF(struct ScatteredAccessDescription__Member) list;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;

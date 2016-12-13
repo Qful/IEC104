@@ -21,16 +21,16 @@
  *  See COPYING file for the complete license text.
  */
 
+#include "libiec61850_platform_includes.h"
 #include "ber_decode.h"
-#include "platform_endian.h"
 
-int BerDecoder_decodeLength(uint8_t* buffer, int* length, int bufPos, int maxBufPos)
+int
+BerDecoder_decodeLength(uint8_t* buffer, int* length, int bufPos, int maxBufPos)
 {
-    uint8_t len1;
     if (bufPos >= maxBufPos)
         return -1;
 
-    len1 = buffer[bufPos++];
+    uint8_t len1 = buffer[bufPos++];
 
     if (len1 & 0x80) {
         int lenLength = len1 & 0x7f;
@@ -39,8 +39,9 @@ int BerDecoder_decodeLength(uint8_t* buffer, int* length, int bufPos, int maxBuf
             *length = -1;
         }
         else {
-            int i;
             *length = 0;
+
+            int i;
             for (i = 0; i < lenLength; i++) {
                 if (bufPos >= maxBufPos)
                     return -1;
@@ -61,7 +62,7 @@ int BerDecoder_decodeLength(uint8_t* buffer, int* length, int bufPos, int maxBuf
 char*
 BerDecoder_decodeString(uint8_t* buffer, int strlen, int bufPos, int maxBufPos)
 {
-    char* string = malloc(strlen + 1);
+    char* string = (char*) GLOBAL_MALLOC(strlen + 1);
     memcpy(string, buffer + bufPos, strlen);
     string[strlen] = 0;
 
@@ -85,13 +86,13 @@ float
 BerDecoder_decodeFloat(uint8_t* buffer, int bufPos)
 {
     float value;
-    uint8_t* valueBuf = (uint8_t*)&value;
+    uint8_t* valueBuf = (uint8_t*) &value;
 
     int i;
 
     bufPos += 1; /* skip exponentWidth field */
 
-#ifdef ORDER_LITTLE_ENDIAN
+#if (ORDER_LITTLE_ENDIAN == 1)
     for (i = 3; i >= 0; i--) {
         valueBuf[i] = buffer[bufPos++];
     }
@@ -108,13 +109,13 @@ double
 BerDecoder_decodeDouble(uint8_t* buffer, int bufPos)
 {
     double value;
-    uint8_t* valueBuf = (uint8_t*)&value;
+    uint8_t* valueBuf = (uint8_t*) &value;
 
     int i;
 
     bufPos += 1; /* skip exponentWidth field */
 
-#ifdef ORDER_LITTLE_ENDIAN
+#if (ORDER_LITTLE_ENDIAN == 1)
     for (i = 7; i >= 0; i--) {
         valueBuf[i] = buffer[bufPos++];
     }

@@ -12,8 +12,11 @@
 #include <time.h>
 #include "main.h"
 
+#include "stm32f4xx_hal.h"
+
 #include "iec104.h"
 
+#ifdef	IEC104Task
 /* 
  * iecasdu_parse_type() - Preprocessor macros for common parse procedure of ASDU
  */
@@ -659,3 +662,5 @@ void t3_timer_run(struct iecsock *s)
 	s->t3.evnt = 0;
 	s->t3.run = 0;
 }
+
+#endif

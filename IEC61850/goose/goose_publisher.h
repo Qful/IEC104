@@ -27,6 +27,10 @@
 #include "linked_list.h"
 #include "mms_value.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct sCommParameters {
     uint8_t vlanPriority;
     uint16_t vlanId;
@@ -37,7 +41,7 @@ typedef struct sCommParameters {
 typedef struct sGoosePublisher* GoosePublisher;
 
 GoosePublisher
-GoosePublisher_create(CommParameters* parameters, char* interfaceID);
+GoosePublisher_create(CommParameters* parameters, const char* interfaceID);
 
 void
 GoosePublisher_destroy(GoosePublisher self);
@@ -71,5 +75,9 @@ GoosePublisher_increaseStNum(GoosePublisher self);
 
 void
 GoosePublisher_reset(GoosePublisher self);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* GOOSE_PUBLISHER_H_ */

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>SmI_IEC104</name>
+	<name>MR771</name>
 	<comment></comment>
 	<projects>
 		<project>FreeRTOS</project>
 		<project>LwIP</project>
+		<project>STM32F4xx_HAL_Driver</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -81,11 +82,4 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>FreeRTOSConfig.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/FreeRTOS/FreeRTOSConfig.h</locationURI>
-		</link>
-	</linkedResources>
 </projectDescription>

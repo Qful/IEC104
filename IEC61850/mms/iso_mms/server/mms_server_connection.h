@@ -31,6 +31,7 @@
 #include "libiec61850_platform_includes.h"
 
 #include "mms_common.h"
+#include "mms_indication.h"
 #include "mms_device_model.h"
 #include "mms_value.h"
 #include "mms_server.h"
@@ -38,33 +39,64 @@
 #include "linked_list.h"
 #include "byte_buffer.h"
 
-
-
-MmsServerConnection*
-MmsServerConnection_init(MmsServerConnection* connection, MmsServer server, IsoConnection isoCon);
+MmsServerConnection
+MmsServerConnection_init(MmsServerConnection connection, MmsServer server, IsoConnection isoCon);
 
 void
-MmsServerConnection_destroy(MmsServerConnection* connection);
+MmsServerConnection_destroy(MmsServerConnection connection);
 
 bool
-MmsServerConnection_addNamedVariableList(MmsServerConnection* self, MmsNamedVariableList variableList);
+MmsServerConnection_addNamedVariableList(MmsServerConnection self, MmsNamedVariableList variableList);
 
 MmsNamedVariableList
-MmsServerConnection_getNamedVariableList(MmsServerConnection* self, char* variableListName);
+MmsServerConnection_getNamedVariableList(MmsServerConnection self, const char* variableListName);
 
 LinkedList
-MmsServerConnection_getNamedVariableLists(MmsServerConnection* self);
+MmsServerConnection_getNamedVariableLists(MmsServerConnection self);
 
 void
-MmsServerConnection_deleteNamedVariableList(MmsServerConnection* self, char* listName);
-
-char*
-MmsServerConnection_getClientAddress(MmsServerConnection* self);
+MmsServerConnection_deleteNamedVariableList(MmsServerConnection self, char* listName);
 
 MmsIndication
-MmsServerConnection_parseMessage
-(MmsServerConnection* connection, ByteBuffer* message, ByteBuffer* response);
+MmsServerConnection_parseMessage(MmsServerConnection connection, ByteBuffer* message, ByteBuffer* response);
+
+
+/** \brief send information report for a single VMD specific variable
+ *
+ *   \param handlerMode send this message in the context of a stack callback handler
+ */
+void
+MmsServerConnection_sendInformationReportSingleVariableVMDSpecific(MmsServerConnection self,
+		char* itemId, MmsValue* value, bool handlerMode);
+
+
+/** \brief send information report for a VMD specific named variable list
+ *
+ *   \param handlerMode send this message in the context of a stack callback handler
+ */
+void /* send information report for a VMD specific named variable list */
+MmsServerConnection_sendInformationReportVMDSpecific(MmsServerConnection self, char* itemId, LinkedList values
+        , bool handlerMode);
+
+/** \brief send information report for list of variables
+ *
+ *   \param handlerMode send this message in the context of a stack callback handler
+ */
+void
+MmsServerConnection_sendInformationReportListOfVariables(
+        MmsServerConnection self,
+        LinkedList /* MmsVariableAccessSpecification */ variableAccessDeclarations,
+        LinkedList /* MmsValue */ values,
+        bool handlerMode
+        );
+
+void
+MmsServerConnection_sendWriteResponse(MmsServerConnection self, uint32_t invokeId, MmsDataAccessError indication,
+        bool handlerMode);
+
+
+uint32_t
+MmsServerConnection_getLastInvokeId(MmsServerConnection self);
 
 #endif /* MMS_SERVER_CONNECTION_H_ */
-
 

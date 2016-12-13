@@ -16,7 +16,7 @@
    Replace 'stm32xxx' with your EVAL board name, ex: stm324x9i_eval_sd.h 
    */
 //#include "stm32xxx_eval_sd.h"
-#include "at45db161d.h"
+//#include "at45db161d.h"
 
 
 /*---------------------------------------------------------------------------/

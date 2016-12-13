@@ -9,12 +9,12 @@
 #define	_ConfirmedRequestPdu_H_
 
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
 #include "Unsigned32.h"
 #include "ConfirmedServiceRequest.h"
-#include "constr_SEQUENCE.h"
+#include <constr_SEQUENCE.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,8 +22,8 @@ extern "C" {
 
 /* ConfirmedRequestPdu */
 typedef struct ConfirmedRequestPdu {
-	Unsigned32_t	 				invokeID;
-	ConfirmedServiceRequest_t	 	confirmedServiceRequest;
+	Unsigned32_t	 invokeID;
+	ConfirmedServiceRequest_t	 confirmedServiceRequest;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;

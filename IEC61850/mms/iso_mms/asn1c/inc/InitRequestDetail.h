@@ -9,13 +9,13 @@
 #define	_InitRequestDetail_H_
 
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
 #include "Integer16.h"
 #include "ParameterSupportOptions.h"
 #include "ServiceSupportOptions.h"
-#include "constr_SEQUENCE.h"
+#include <constr_SEQUENCE.h>
 
 #ifdef __cplusplus
 extern "C" {

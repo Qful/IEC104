@@ -32,6 +32,7 @@
   ******************************************************************************
   */ 
 
+
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __STM32F4xx_HAL_CONF_H
 #define __STM32F4xx_HAL_CONF_H
@@ -42,7 +43,7 @@
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
-#include "main.h"
+//#include "main.h"
 /* ########################## Module Selection ############################## */
 /**
   * @brief This is the list of modules to be used in the HAL driver 
@@ -167,6 +168,8 @@
   */
 /* #define USE_FULL_ASSERT    1 */
 
+
+#ifndef KSZ8873
 /* ################## Ethernet peripheral configuration ##################### */
 
 /* Section 1 : Ethernet peripheral configuration */
@@ -184,8 +187,8 @@
 /* Definition of the Ethernet driver buffers size and count */   
 #define ETH_RX_BUF_SIZE                ETH_MAX_PACKET_SIZE /* buffer size for receive               */
 #define ETH_TX_BUF_SIZE                ETH_MAX_PACKET_SIZE /* buffer size for transmit              */
-#define ETH_RXBUFNB                    ((uint32_t)4)       /* 4 Rx buffers of size ETH_RX_BUF_SIZE  */
-#define ETH_TXBUFNB                    ((uint32_t)4)       /* 4 Tx buffers of size ETH_TX_BUF_SIZE  */
+#define ETH_RXBUFNB                    ((uint32_t)1)       /* 4 Rx buffers of size ETH_RX_BUF_SIZE  */	// тут было 4-е я уменьшил из-за нехватки памяти
+#define ETH_TXBUFNB                    ((uint32_t)1)       /* 4 Tx buffers of size ETH_TX_BUF_SIZE  */	// тут было 4-е я уменьшил из-за нехватки памяти
 
 /* Section 2: PHY configuration section */
 
@@ -234,6 +237,63 @@
 
 #define PHY_MISR_LINK_INT_EN            ((uint16_t)0x0020)  /*!< Enable Interrupt on change of link status       */
 #define PHY_LINK_INTERRUPT              ((uint16_t)0x2000)  /*!< PHY link status interrupt mask                  */
+
+#else
+ /* ################## Ethernet KSZ8873 configuration ##################### */
+#define  	PHY_RESET 			0
+#define 	PHY_SR 				0
+#define 	PHY_DUPLEX_STATUS	0
+#define 	PHY_SPEED_STATUS	0
+ /* Definition of the Ethernet driver buffers size and count */
+ #define ETH_RX_BUF_SIZE                ETH_MAX_PACKET_SIZE /* buffer size for receive               */
+ #define ETH_TX_BUF_SIZE                ETH_MAX_PACKET_SIZE /* buffer size for transmit              */
+ #define ETH_RXBUFNB                    ((uint32_t)4)       /* 4 Rx buffers of size ETH_RX_BUF_SIZE  */	// тут было 4-е я уменьшил из-за нехватки памяти
+ #define ETH_TXBUFNB                    ((uint32_t)4)       /* 4 Tx buffers of size ETH_TX_BUF_SIZE  */	// тут было 4-е я уменьшил из-за нехватки памяти
+
+ /* Section 2: PHY configuration section */
+
+#define KSZ8873_PHY1_ADDRESS            0x01
+#define KSZ8873_PHY2_ADDRESS            0x02
+
+#define PHY_RESET_DELAY                 ((uint32_t)0x000000FF)
+/* PHY Configuration delay */
+#define PHY_CONFIG_DELAY                ((uint32_t)0x00000FFF)
+
+#define PHY_READ_TO                     ((uint32_t)0x0000FFFF)
+#define PHY_WRITE_TO                    ((uint32_t)0x0000FFFF)
+
+/* Section 3: Common PHY Registers */
+
+#define PHY_BCR                         ((uint16_t)0x00)    /*!< Transceiver Basic Control Register   */
+#define PHY_BSR                         ((uint16_t)0x01)    /*!< Transceiver Basic Status Register    */
+
+
+// ----------------------- MII Basic Control -----------------------
+//#define PHY_RESET                       ((uint16_t)0x8000)  /*!< не использует */
+
+#define PHY_LOOPBACK                    ((uint16_t)0x4000)  /*!< Select loop-back mode */
+#define PHY_FULLDUPLEX_100M             ((uint16_t)0x2100)  /*!< Set the full-duplex mode at 100 Mb/s */
+#define PHY_HALFDUPLEX_100M             ((uint16_t)0x2000)  /*!< Set the half-duplex mode at 100 Mb/s */
+#define PHY_FULLDUPLEX_10M              ((uint16_t)0x0100)  /*!< Set the full-duplex mode at 10 Mb/s  */
+#define PHY_HALFDUPLEX_10M              ((uint16_t)0x0000)  /*!< Set the half-duplex mode at 10 Mb/s  */
+
+#define PHY_AUTONEGOTIATION             ((uint16_t)0x1000)  /*!< Enable auto-negotiation function     */
+#define PHY_POWERDOWN                   ((uint16_t)0x0800)  /*!< Select the power down mode           */
+
+#define PHY_RESTART_AUTONEGOTIATION     ((uint16_t)0x0200)  /*!< Restart auto-negotiation function    */
+//#define PHY_ISOLATE                     ((uint16_t)0x0400)  /*!< не использует */
+
+ // ----------------------- MII Basic Srtatus -----------------------
+
+#define PHY_AUTONEGO_COMPLETE           ((uint16_t)0x0020)  /*!< Auto-Negotiation process completed   */
+#define PHY_AUTONEGO_CAPABLE            ((uint16_t)0x0008)  /*!< Auto-Negotiation process completed   */
+#define PHY_LINKED_STATUS               ((uint16_t)0x0004)  /*!< Valid link established               */
+//#define PHY_JABBER_DETECTION            ((uint16_t)0x0002)  /*!< не использует           */
+
+ // ----------------------- PHYID -----------------------
+
+
+#endif
 
 /* Includes ------------------------------------------------------------------*/
 /**

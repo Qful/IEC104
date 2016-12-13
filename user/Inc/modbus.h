@@ -56,6 +56,8 @@
 #include "mbconfig.h"
 #include "mbframe.h"
 #include "mbutils.h"
+
+#include "stdbool.h"
 /* ----------------------- Defines ------------------------------------------*/
 
 #define	MB_SlaveAddres							1
@@ -69,6 +71,7 @@
 #define S_REG_INPUT_NREGS             100
 #define S_REG_HOLDING_START           0
 #define S_REG_HOLDING_NREGS           100
+
 /* salve mode: holding register's all address */
 #define          S_HD_RESERVE                     0
 #define          S_HD_CPU_USAGE_MAJOR             1
@@ -82,13 +85,15 @@
 
 /* -----------------------Master Defines -------------------------------------*/
 #define M_DISCRETE_INPUT_START        0
-#define M_DISCRETE_INPUT_NDISCRETES   53
+#define M_DISCRETE_INPUT_NDISCRETES   16
 #define M_COIL_START                  0
-#define M_COIL_NCOILS                 64
+#define M_COIL_NCOILS                 16
+
 #define M_REG_INPUT_START             0
-#define M_REG_INPUT_NREGS             100
+#define M_REG_INPUT_NREGS             0x1F					// входные регистры модбас
 #define M_REG_HOLDING_START           0
-#define M_REG_HOLDING_NREGS           100
+#define M_REG_HOLDING_NREGS           10					// выходные регистры модбас
+
 /* master mode: holding register's all address */
 #define          M_HD_RESERVE                     0
 /* master mode: input register's all address */
@@ -115,9 +120,19 @@ typedef struct					// для передачи через очереди структур.
 BOOL	xModbus_Set_SizeAnswer( uint8_t Size );
 BOOL	xModbus_Get_SizeAnswer( uint8_t * Size );
 
+BOOL	Hal_setTimeFromMB_Date( uint16_t *MDateBuf );		// функция установки часов из буфера модбас
+BOOL	Hal_setIPFromMB_Date( uint16_t * MDateBuf );		// функция установки IP адреса из буфера модбас
+BOOL	Hal_setConfSWFromMB_Date ( uint16_t * MDateBuf );	// функция установки конфига выключателя в нужных узлах из буфера модбас
+
 void     vMBMODBUSPortRxDisable( void );
 
 void Modbus_SendCmd(uint8_t MB_SlaveAddr, uint8_t MB_Funct, uint16_t addr, uint16_t numb, uint16_t *Data, uint16_t len);
+
+void	CSWI_Pos_Oper_Set(bool newState, uint64_t timeStamp);
+void	GGIO_LEDGGIO1_SPCSO1_Oper(bool newState, uint64_t timeStamp);
+void	GGIO_SPCSO1_Oper(bool newState, uint64_t timeStamp);
+void	GGIO_SPCSO2_Oper(bool newState, uint64_t timeStamp);
+void	GGIO_SPCSO3_Oper(bool newState, uint64_t timeStamp);
 
 
 #endif /* MODBUS_H_ */

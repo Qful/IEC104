@@ -9,14 +9,14 @@
 #define	_GetNameListResponse_H_
 
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
-#include "BOOLEAN.h"
+#include <BOOLEAN.h>
 #include "Identifier.h"
-#include "asn_SEQUENCE_OF.h"
-#include "constr_SEQUENCE_OF.h"
-#include "constr_SEQUENCE.h"
+#include <asn_SEQUENCE_OF.h>
+#include <constr_SEQUENCE_OF.h>
+#include <constr_SEQUENCE.h>
 
 #ifdef __cplusplus
 extern "C" {

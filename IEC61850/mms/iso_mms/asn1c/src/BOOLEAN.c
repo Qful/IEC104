@@ -2,9 +2,9 @@
  * Copyright (c) 2003, 2005 Lev Walkin <vlm@lionet.info>. All rights reserved.
  * Redistribution and modifications are permitted subject to BSD license.
  */
-#include "asn_internal.h"
-#include "asn_codecs_prim.h"
-#include "BOOLEAN.h"
+#include <asn_internal.h>
+#include <asn_codecs_prim.h>
+#include <BOOLEAN.h>
 
 /*
  * BOOLEAN basic type description.
@@ -117,7 +117,7 @@ BOOLEAN_encode_der(asn_TYPE_descriptor_t *td, void *sptr,
 	if(cb) {
 		uint8_t bool_value;
 
-		bool_value = *st ? 0xff : 0; /* 0xff mandated by DER */
+		bool_value = *st ? 0x01 : 0; /* 0xff mandated by DER - 0x01 required by some IEDs */
 
 		if(cb(&bool_value, 1, app_key) < 0) {
 			erval.encoded = -1;

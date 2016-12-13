@@ -100,9 +100,10 @@ eMBMasterReqReadInputRegister( UCHAR ucSndAddr, USHORT usRegAddr, USHORT usNRegs
     }
     return eErrStatus;
 }
-
-eMBException
-eMBMasterFuncReadInputRegister( UCHAR * pucFrame, USHORT * usLen )
+/*********************************************************************************
+ * 4 функция
+ *********************************************************************************/
+eMBException		eMBMasterFuncReadInputRegister( UCHAR * pucFrame, USHORT * usLen )
 {
     UCHAR          *ucMBFrame;
     USHORT          usRegAddress;

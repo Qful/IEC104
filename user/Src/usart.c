@@ -8,12 +8,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 
+#include "ConfBoard.h"
 #include "usart.h"
 #include "gpio.h"
 
-extern	uint8_t 	Modbus_DataRX[];			// буфер приёмника Modbus
-
-extern UART_HandleTypeDef MODBUS;				//UART4
 extern UART_HandleTypeDef BOOT_UART;			//USART1
 extern UART_HandleTypeDef RS485_1;				//USART2
 extern UART_HandleTypeDef RS485_2;				//USART3
@@ -173,7 +171,7 @@ static  DMA_HandleTypeDef hdma_tx_RS485_2;
     GPIO_InitStruct.Pin = GPIO_PIN_9|GPIO_PIN_10;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_MEDIUM;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
     GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -296,21 +294,28 @@ static  DMA_HandleTypeDef hdma_tx_RS485_2;
 
   }
   // ---------------------------- RS485_2 ---------------------------------
-  else if(huart->Instance==USART3)
+  else if(huart->Instance==UART5)
   {
 	__GPIOD_CLK_ENABLE();
-     __USART3_CLK_ENABLE();
+     __UART5_CLK_ENABLE();
     __DMA1_CLK_ENABLE();
 
-    //PD8     ------> USART3_TX
-    //PD9     ------> USART3_RX
-    //PD12     ------> USART3_RTS
+    //PC12     ------> USART5_TX
+    //PD2     ------> USART5_RX
+    //PD3     ------> USART5_RTS
 
-    GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9;
+    GPIO_InitStruct.Pin = GPIO_PIN_12;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
     GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF7_USART3;
+    GPIO_InitStruct.Alternate = GPIO_AF8_UART5;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = GPIO_PIN_2;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF8_UART5;
     HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
     // Configure the DMA handler for Transmission process

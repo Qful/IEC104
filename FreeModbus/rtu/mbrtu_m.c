@@ -71,8 +71,8 @@ typedef enum
 } eMBMasterSndState;
 
 /* ----------------------- Static variables ---------------------------------*/
-static volatile eMBMasterSndState eSndState;
-static volatile eMBMasterRcvState eRcvState;
+volatile eMBMasterSndState eSndState;
+volatile eMBMasterRcvState eRcvState;
 
 static volatile UCHAR  ucMasterRTUSndBuf[MB_PDU_SIZE_MAX];				// буфер для передачи в MODBUS
 static volatile UCHAR  ucMasterRTURcvBuf[MB_SER_PDU_SIZE_MAX];			// буфер для приёма из MODBUS
@@ -163,8 +163,7 @@ eMBMasterRTUStop( void )
  * eMBMasterRTUReceive
  * Функция приёма данных и проверка их целосности.
  *************************************************************************/
-eMBErrorCode
-eMBMasterRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USHORT * pusLength )
+eMBErrorCode		eMBMasterRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USHORT * pusLength )
 {
     eMBErrorCode    eStatus = MB_ENOERR;
 
@@ -251,7 +250,7 @@ xMBMasterRTUReceiveFSM( void )
 
     // переложили в рабочий буфер из приёмника
     for (ucByte = 0;ucByte < usMasterRcvBufferPos;ucByte++){
-    	( void )xMBMasterPortSerialGetBuf(ucByte, ( CHAR * ) & ucMasterRTURcvBuf[ucByte]);
+    	xMBMasterPortSerialGetBuf(ucByte, ( CHAR * ) & ucMasterRTURcvBuf[ucByte]);
     }
 
     switch ( eRcvState )

@@ -9,14 +9,14 @@
 #define	_InitiateRequestPdu_H_
 
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
 #include "Integer32.h"
 #include "Integer16.h"
 #include "Integer8.h"
 #include "InitRequestDetail.h"
-#include "constr_SEQUENCE.h"
+#include <constr_SEQUENCE.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,11 +24,11 @@ extern "C" {
 
 /* InitiateRequestPdu */
 typedef struct InitiateRequestPdu {
-	Integer32_t				*localDetailCalling	/* OPTIONAL */;
-	Integer16_t	 			proposedMaxServOutstandingCalling;
-	Integer16_t		 		proposedMaxServOutstandingCalled;
-	Integer8_t				*proposedDataStructureNestingLevel	/* OPTIONAL */;
-	InitRequestDetail_t	 	mmsInitRequestDetail;
+	Integer32_t	*localDetailCalling	/* OPTIONAL */;
+	Integer16_t	 proposedMaxServOutstandingCalling;
+	Integer16_t	 proposedMaxServOutstandingCalled;
+	Integer8_t	*proposedDataStructureNestingLevel	/* OPTIONAL */;
+	InitRequestDetail_t	 mmsInitRequestDetail;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;

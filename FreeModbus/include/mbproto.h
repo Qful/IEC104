@@ -73,8 +73,8 @@ typedef         eMBException( *pxMBFunctionHandler ) ( UCHAR * pucFrame, USHORT 
 
 typedef struct
 {
-    UCHAR           ucFunctionCode;
-    pxMBFunctionHandler pxHandler;
+    UCHAR           ucFunctionCode;					// код функции
+    pxMBFunctionHandler pxHandler;					// указатель на саму функцию обработчик
 } xMBFunctionHandler;
 
 #ifdef __cplusplus

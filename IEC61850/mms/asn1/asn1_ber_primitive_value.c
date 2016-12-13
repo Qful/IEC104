@@ -21,63 +21,39 @@
  *	See COPYING file for the complete license text.
  */
 
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdint.h>
-
+#include "libiec61850_platform_includes.h"
 
 #include "asn1_ber_primitive_value.h"
 
-/*************************************************************************
- * Asn1PrimitiveValue_create
- * выделяем память под структуру Asn1PrimitiveValue с указанием размера size.
- * + выделяем под сами данные octets
- *************************************************************************/
-Asn1PrimitiveValue*		Asn1PrimitiveValue_create(int size)
+Asn1PrimitiveValue*
+Asn1PrimitiveValue_create(int size)
 {
-	Asn1PrimitiveValue* self = malloc(sizeof(Asn1PrimitiveValue));
+	Asn1PrimitiveValue* self = (Asn1PrimitiveValue*) GLOBAL_MALLOC(sizeof(Asn1PrimitiveValue));
 
-	self->size = size;
+	self->size = 1;
 	self->maxSize = size;
-	self->octets = calloc(1, size);
+	self->octets = (uint8_t*) GLOBAL_CALLOC(1, size);
 
 	return self;
 }
 
-//Asn1PrimitiveValue*
-//Asn1PrimitiveValue_createFromBuffer(uint8_t buffer, int bufferSize)
-//{
-//    Asn1PrimitiveValue* self = malloc(sizeof(Asn1PrimitiveValue));
-//    self->size = bufferSize;
-//    self->maxSize = bufferSize;
-//    self->octets = malloc(1, bufferSize);
-//
-//}
-/*************************************************************************
- * Asn1PrimitiveValue_clone
- * клонировать переменную, возвращаем указатель на клон.
- *************************************************************************/
-Asn1PrimitiveValue*		Asn1PrimitiveValue_clone(Asn1PrimitiveValue* self)
+Asn1PrimitiveValue*
+Asn1PrimitiveValue_clone(Asn1PrimitiveValue* self)
 {
-	Asn1PrimitiveValue* clone = malloc(sizeof(Asn1PrimitiveValue));
+	Asn1PrimitiveValue* clone = (Asn1PrimitiveValue*) GLOBAL_MALLOC(sizeof(Asn1PrimitiveValue));
 
 	clone->size = self->size;
 	clone->maxSize = self->maxSize;
 
-	clone->octets = malloc(self->maxSize);
+	clone->octets = (uint8_t*) GLOBAL_MALLOC(self->maxSize);
 
 	memcpy(clone->octets, self->octets, clone->maxSize);
 
 	return clone;
 }
-/*************************************************************************
- * Asn1PrimitivaValue_compare
- * сравнить 2 переменные
- *************************************************************************/
-bool	Asn1PrimitivaValue_compare(Asn1PrimitiveValue* self, Asn1PrimitiveValue* otherValue)
+
+bool
+Asn1PrimitivaValue_compare(Asn1PrimitiveValue* self, Asn1PrimitiveValue* otherValue)
 {
     if (self->size == otherValue->size) {
         if (memcmp(self->octets, otherValue->octets, self->size) == 0)
@@ -88,28 +64,22 @@ bool	Asn1PrimitivaValue_compare(Asn1PrimitiveValue* self, Asn1PrimitiveValue* ot
     else
         return false;
 }
-/*************************************************************************
- * Asn1PrimitiveValue_getSize
- * получить текущий разме переменной
- *************************************************************************/
-int		Asn1PrimitiveValue_getSize(Asn1PrimitiveValue* self)
+
+int
+Asn1PrimitiveValue_getSize(Asn1PrimitiveValue* self)
 {
 	return self->size;
 }
-/*************************************************************************
- * Asn1PrimitiveValue_getMaxSize
- * получить максимальный разме переменной
- *************************************************************************/
-int		Asn1PrimitiveValue_getMaxSize(Asn1PrimitiveValue* self)
+
+int
+Asn1PrimitiveValue_getMaxSize(Asn1PrimitiveValue* self)
 {
 	return self->maxSize;
 }
-/*************************************************************************
- * Asn1PrimitiveValue_destroy
- * удалить переменную из памяти
- *************************************************************************/
-void	Asn1PrimitiveValue_destroy(Asn1PrimitiveValue* self)
+
+void
+Asn1PrimitiveValue_destroy(Asn1PrimitiveValue* self)
 {
-	free(self->octets);
-	free(self);
+    GLOBAL_FREEMEM(self->octets);
+    GLOBAL_FREEMEM(self);
 }

@@ -23,7 +23,6 @@
 
 #include "libiec61850_platform_includes.h"
 #include "mms_value_cache.h"
-#include "string_utilities.h"
 #include "string_map.h"
 #include "stack_config.h"
 
@@ -34,13 +33,13 @@ struct sMmsValueCache {
 
 typedef struct sMmsValueCacheEntry {
 	MmsValue* value;
-	MmsTypeSpecification* typeSpec;
+	MmsVariableSpecification* typeSpec;
 } MmsValueCacheEntry;
 
 MmsValueCache
 MmsValueCache_create(MmsDomain* domain)
 {
-	MmsValueCache self = calloc(1, sizeof(struct sMmsValueCache));
+	MmsValueCache self = (MmsValueCache) GLOBAL_CALLOC(1, sizeof(struct sMmsValueCache));
 
 	self->domain = domain;
 
@@ -52,10 +51,10 @@ MmsValueCache_create(MmsDomain* domain)
 void
 MmsValueCache_insertValue(MmsValueCache self, char* itemId, MmsValue* value)
 {
-	MmsTypeSpecification* typeSpec = MmsDomain_getNamedVariable(self->domain, itemId);
+	MmsVariableSpecification* typeSpec = MmsDomain_getNamedVariable(self->domain, itemId);
 
 	if (typeSpec != NULL) {
-		MmsValueCacheEntry* cacheEntry = malloc(sizeof(MmsValueCacheEntry));
+		MmsValueCacheEntry* cacheEntry = (MmsValueCacheEntry*) GLOBAL_MALLOC(sizeof(MmsValueCacheEntry));
 
 		cacheEntry->value = value;
 		cacheEntry->typeSpec = typeSpec;
@@ -108,18 +107,15 @@ searchCacheForValue(MmsValueCache self, char* itemId, char* parentId)
 
 		char* childId = getChildSubString(itemId, parentId);
 
-		MmsTypeSpecification* typeSpec = MmsDomain_getNamedVariable(self->domain, parentId);
-		value = MmsTypeSpecification_getChildValue(typeSpec, cacheEntry->value, childId);
+		MmsVariableSpecification* typeSpec = MmsDomain_getNamedVariable(self->domain, parentId);
+		value = MmsVariableSpecification_getChildValue(typeSpec, cacheEntry->value, childId);
 	}
 
 	return value;
 }
 
-/*************************************************************************
- * MmsValueCache_lookupValue
- * достаём пременную из кэш в виде указателя на MmsValue*
- *************************************************************************/
-MmsValue*	MmsValueCache_lookupValue(MmsValueCache self, char* itemId)
+MmsValue*
+MmsValueCache_lookupValue(MmsValueCache self, char* itemId)
 {
 	// get value for first matching key substring!
 	// Then iterate the value for the exact value.
@@ -138,7 +134,7 @@ MmsValue*	MmsValueCache_lookupValue(MmsValueCache self, char* itemId)
 			value = searchCacheForValue(self, itemId, parentItemId);
 		}
 
-		free(itemIdCopy);
+		GLOBAL_FREEMEM(itemIdCopy);
 	}
 
 	if (cacheEntry != NULL)
@@ -152,13 +148,13 @@ cacheEntryDelete(MmsValueCacheEntry* entry)
 {
 	if (entry != NULL) {
 		MmsValue_delete(entry->value);
-		free(entry);
+		GLOBAL_FREEMEM(entry);
 	}
 }
 
 void
 MmsValueCache_destroy(MmsValueCache self)
 {
-	Map_deleteDeep(self->map, true, cacheEntryDelete);
-	free(self);
+	Map_deleteDeep(self->map, true, (void (*) (void*)) cacheEntryDelete);
+	GLOBAL_FREEMEM(self);
 }

@@ -3,10 +3,10 @@
  * All rights reserved.
  * Redistribution and modifications are permitted subject to BSD license.
  */
-#include "asn_internal.h"
-#include "OCTET_STRING.h"
-#include "BIT_STRING.h"	/* for .bits_unused member */
-#include "errno.h"
+#include <asn_internal.h>
+#include <OCTET_STRING.h>
+#include <BIT_STRING.h>	/* for .bits_unused member */
+#include <errno.h>
 
 /*
  * OCTET STRING basic type description.
@@ -164,7 +164,7 @@ OS__add_stack_el(struct _stack *st) {
 }
 
 static struct _stack *
-_new_stack() {
+_new_stack(void) {
 	return (struct _stack *)CALLOC(1, sizeof(struct _stack));
 }
 

@@ -9,24 +9,20 @@
 #define	_MmsPdu_H_
 
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
-
 #include "ConfirmedRequestPdu.h"
 #include "ConfirmedResponsePdu.h"
 #include "ConfirmedErrorPDU.h"
 #include "UnconfirmedPDU.h"
-
+#include "RejectPDU.h"
 #include "InitiateRequestPdu.h"
 #include "InitiateResponsePdu.h"
 #include "InitiateErrorPdu.h"
-#include "RejectPDU.h"
-
 #include "ConcludeRequestPDU.h"
 #include "ConcludeResponsePDU.h"
-
-#include "constr_CHOICE.h"
+#include <constr_CHOICE.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,18 +47,16 @@ typedef enum MmsPdu_PR {
 typedef struct MmsPdu {
 	MmsPdu_PR present;
 	union MmsPdu_u {
-		ConfirmedRequestPdu_t	 	confirmedRequestPdu;
-		ConfirmedResponsePdu_t	 	confirmedResponsePdu;
-		ConfirmedErrorPDU_t	 		confirmedErrorPDU;
-		UnconfirmedPDU_t	 		unconfirmedPDU;
-
-		RejectPDU_t	 				rejectPDU;
-		InitiateRequestPdu_t	 	initiateRequestPdu;
-		InitiateResponsePdu_t	 	initiateResponsePdu;
-		InitiateErrorPdu_t	 		initiateErrorPdu;
-
-		ConcludeRequestPDU_t	 	concludeRequestPDU;
-		ConcludeResponsePDU_t	 	concludeResponsePDU;
+		ConfirmedRequestPdu_t	 confirmedRequestPdu;
+		ConfirmedResponsePdu_t	 confirmedResponsePdu;
+		ConfirmedErrorPDU_t	 confirmedErrorPDU;
+		UnconfirmedPDU_t	 unconfirmedPDU;
+		RejectPDU_t	 rejectPDU;
+		InitiateRequestPdu_t	 initiateRequestPdu;
+		InitiateResponsePdu_t	 initiateResponsePdu;
+		InitiateErrorPdu_t	 initiateErrorPdu;
+		ConcludeRequestPDU_t	 concludeRequestPDU;
+		ConcludeResponsePDU_t	 concludeResponsePDU;
 	} choice;
 	
 	/* Context for parsing across buffer boundaries */

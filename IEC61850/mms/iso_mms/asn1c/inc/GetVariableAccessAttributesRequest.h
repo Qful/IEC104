@@ -9,12 +9,12 @@
 #define	_GetVariableAccessAttributesRequest_H_
 
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
 #include "ObjectName.h"
 #include "Address.h"
-#include "constr_CHOICE.h"
+#include <constr_CHOICE.h>
 
 #ifdef __cplusplus
 extern "C" {

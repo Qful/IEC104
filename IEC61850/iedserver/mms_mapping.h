@@ -1,7 +1,7 @@
 /*
  *  mms_mapping.h
  *
- *  Copyright 2013 Michael Zillgith
+ *  Copyright 2013-2016 Michael Zillgith
  *
  *  This file is part of libIEC61850.
  *
@@ -24,18 +24,9 @@
 #ifndef MMS_MAPPING_H_
 #define MMS_MAPPING_H_
 
-#include "model.h"
-#include "mms_server_connection.h"
-
-//#include "mms_device_model.h"
-
-#include "libiec61850_platform_includes.h"
-#include "mms_domain.h"
-#include "mms_device.h"
-
+#include "iec61850_model.h"
+#include "mms_device_model.h"
 #include "control.h"
-
-#include "mms_mapping_internal.h"
 
 typedef enum {
     REPORT_CONTROL_NONE,
@@ -44,32 +35,132 @@ typedef enum {
     REPORT_CONTROL_QUALITY_CHANGED
 } ReportInclusionFlag;
 
+typedef enum {
+    LOG_CONTROL_NONE,
+    LOG_CONTROL_VALUE_UPDATE,
+    LOG_CONTROL_VALUE_CHANGED,
+    LOG_CONTROL_QUALITY_CHANGED
+} LogInclusionFlag;
+
 typedef struct sMmsMapping MmsMapping;
 
-MmsMapping*	MmsMapping_create(IedModel* model);
+MmsMapping*
+MmsMapping_create(IedModel* model);
 
-MmsDevice*	MmsMapping_getMmsDeviceModel(MmsMapping* mapping);
+MmsDevice*
+MmsMapping_getMmsDeviceModel(MmsMapping* mapping);
 
-void		MmsMapping_setMmsServer(MmsMapping* self, MmsServer server);
+void
+MmsMapping_configureSettingGroups(MmsMapping* self);
 
-void		MmsMapping_installHandlers(MmsMapping* self);
+void
+MmsMapping_checkForSettingGroupReservationTimeouts(MmsMapping* self, uint64_t currentTime);
 
-void		MmsMapping_destroy(MmsMapping* mapping);
+void
+MmsMapping_setSgChangedHandler(MmsMapping* self, SettingGroupControlBlock* sgcb,
+        ActiveSettingGroupChangedHandler handler, void* parameter);
 
-void		MmsMapping_startEventWorkerThread(MmsMapping* self);
+void
+MmsMapping_setEditSgChangedHandler(MmsMapping* self, SettingGroupControlBlock* sgcb,
+        EditSettingGroupChangedHandler handler, void* parameter);
 
-void		MmsMapping_triggerReportObservers(MmsMapping* self, MmsValue* value, ReportInclusionFlag flag);
+void
+MmsMapping_setConfirmEditSgHandler(MmsMapping* self, SettingGroupControlBlock* sgcb,
+        EditSettingGroupConfirmationHandler handler, void* parameter);
 
-void		MmsMapping_triggerGooseObservers(MmsMapping* self, MmsValue* value);
+void
+MmsMapping_changeActiveSettingGroup(MmsMapping* self, SettingGroupControlBlock* sgcb, uint8_t newActiveSg);
 
-void		MmsMapping_enableGoosePublishing(MmsMapping* self);
+void
+MmsMapping_setMmsServer(MmsMapping* self, MmsServer server);
 
-char*		MmsMapping_getMmsDomainFromObjectReference(char* objectReference, char* buffer);
+void
+MmsMapping_installHandlers(MmsMapping* self);
 
-void		MmsMapping_addControlObject(MmsMapping* self, ControlObject* controlObject);
+void
+MmsMapping_destroy(MmsMapping* mapping);
 
-char*		MmsMapping_createMmsVariableNameFromObjectReference(char* objectReference, FunctionalConstraint fc, char* buffer);
+void
+MmsMapping_startEventWorkerThread(MmsMapping* self);
 
-void		MmsMapping_addObservedAttribute(MmsMapping* self, DataAttribute* dataAttribute, void* handler);
+void
+MmsMapping_stopEventWorkerThread(MmsMapping* self);
+
+DataSet*
+MmsMapping_createDataSetByNamedVariableList(MmsMapping* self, MmsNamedVariableList variableList);
+
+void
+MmsMapping_triggerReportObservers(MmsMapping* self, MmsValue* value, ReportInclusionFlag flag);
+
+void
+MmsMapping_triggerLogging(MmsMapping* self, MmsValue* value, LogInclusionFlag flag);
+
+void
+MmsMapping_triggerGooseObservers(MmsMapping* self, MmsValue* value);
+
+void
+MmsMapping_enableGoosePublishing(MmsMapping* self);
+
+void
+MmsMapping_disableGoosePublishing(MmsMapping* self);
+
+char*
+MmsMapping_getMmsDomainFromObjectReference(const char* objectReference, char* buffer);
+
+void
+MmsMapping_addControlObject(MmsMapping* self, ControlObject* controlObject);
+
+char*
+MmsMapping_createMmsVariableNameFromObjectReference(const char* objectReference, FunctionalConstraint fc, char* buffer);
+
+void
+MmsMapping_addObservedAttribute(MmsMapping* self, DataAttribute* dataAttribute,
+        AttributeChangedHandler handler);
+
+char*
+MmsMapping_getNextNameElement(char* name);
+
+void /* Create PHYCOMADDR ACSI type instance */
+MmsMapping_createPhyComAddrStructure(MmsVariableSpecification* namedVariable);
+
+ControlObject*
+MmsMapping_getControlObject(MmsMapping* self, MmsDomain* domain, char* lnName, char* coName);
+
+MmsNamedVariableList
+MmsMapping_getDomainSpecificVariableList(MmsMapping* self, const char* variableListReference);
+
+DataSet*
+MmsMapping_getDomainSpecificDataSet(MmsMapping* self, const char* dataSetName);
+
+void
+MmsMapping_freeDynamicallyCreatedDataSet(DataSet* dataSet);
+
+MmsVariableAccessSpecification*
+MmsMapping_ObjectReferenceToVariableAccessSpec(char* objectReference);
+
+char*
+MmsMapping_varAccessSpecToObjectReference(MmsVariableAccessSpecification* varAccessSpec);
+
+void
+MmsMapping_setIedServer(MmsMapping* self, IedServer iedServer);
+
+void
+MmsMapping_setConnectionIndicationHandler(MmsMapping* self, IedConnectionIndicationHandler handler, void* parameter);
+
+void
+MmsMapping_setLogStorage(MmsMapping* self, const char* logRef, LogStorage logStorage);
+
+void
+MmsMapping_installWriteAccessHandler(MmsMapping* self, DataAttribute* dataAttribute, WriteAccessHandler handler, void* parameter);
+
+MmsDataAccessError
+Control_writeAccessControlObject(MmsMapping* self, MmsDomain* domain, char* variableIdOrig,
+                         MmsValue* value, MmsServerConnection connection);
+
+ControlObject*
+Control_lookupControlObject(MmsMapping* self, MmsDomain* domain, char* lnName, char* objectName);
+
+void
+Control_processControlActions(MmsMapping* self, uint64_t currentTimeInMs);
 
 #endif /* MMS_MAPPING_H_ */

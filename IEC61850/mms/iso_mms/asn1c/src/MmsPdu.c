@@ -5,7 +5,7 @@
  * 	`asn1c -fskeletons-copy`
  */
 
-#include "asn_internal.h"
+#include <asn_internal.h>
 
 #include "MmsPdu.h"
 
@@ -123,7 +123,6 @@ static asn_CHOICE_specifics_t asn_SPC_MmsPdu_specs_1 = {
 	0,
 	-1	/* Extensions start */
 };
-
 asn_TYPE_descriptor_t asn_DEF_MmsPdu = {
 	"MmsPdu",
 	"MmsPdu",
@@ -145,3 +144,4 @@ asn_TYPE_descriptor_t asn_DEF_MmsPdu = {
 	10,	/* Elements count */
 	&asn_SPC_MmsPdu_specs_1	/* Additional specs */
 };
+

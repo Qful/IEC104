@@ -5,15 +5,15 @@
 #ifndef	_OCTET_STRING_H_
 #define	_OCTET_STRING_H_
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct OCTET_STRING {
-	uint8_t *buf;				/* Buffer with consecutive OCTET_STRING bits */
-	int size;					/* Size of the buffer */
+	uint8_t *buf;	/* Buffer with consecutive OCTET_STRING bits */
+	int size;	/* Size of the buffer */
 
 	asn_struct_ctx_t _asn_ctx;	/* Parsing across buffer boundaries */
 } OCTET_STRING_t;

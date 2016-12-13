@@ -276,8 +276,7 @@ eMBErrorCode eMBMasterRegInputCB( UCHAR * pucRegBuffer, USHORT usAddress,
  *       within the requested address range. In this case a
  *       <b>ILLEGAL DATA ADDRESS</b> is sent as a response.
  */
-eMBErrorCode eMBMasterRegHoldingCB( UCHAR * pucRegBuffer, USHORT usAddress,
-		USHORT usNRegs, eMBRegisterMode eMode );
+eMBErrorCode eMBMasterRegHoldingCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs, eMBRegisterMode eMode );
 
 /*! \ingroup modbus_registers
  * \brief Callback function used if a <em>Coil Register</em> value is
@@ -328,70 +327,61 @@ eMBErrorCode eMBMasterRegCoilsCB( UCHAR * pucRegBuffer, USHORT usAddress,
  *       within the requested address range. In this case a
  *       <b>ILLEGAL DATA ADDRESS</b> is sent as a response.
  */
-eMBErrorCode eMBMasterRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress,
-		USHORT usNDiscrete );
+eMBErrorCode 			eMBMasterRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNDiscrete );
+
+/***************************************************************************
+ * запись базы данных дискрес в хранилище
+ * pucRegBuffer - принятые данные из приемного буфера
+ * usAddress	- адрес в конкретном хранилище (буфер памяти в зависимости от прочитанных данных. 0x1800, 0x1900 и т.д. )
+ * usNRegs		- число слов (16бит)
+ * pusRegHoldingBuf - адрес получателя данных
+ * eMBErrorCode - код ошибки выполнения функции.
+ ***************************************************************************/
+eMBErrorCode 			eMBMasterToMemDB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs, USHORT * pusRegHoldingBuf, USHORT BaseAddress, USHORT BaseNRegs);
 
 /*! \ingroup modbus
  *\brief These Modbus functions are called for user when Modbus run in Master Mode.
  */
-eMBMasterReqErrCode
-eMBMasterReqReadInputRegister( UCHAR ucSndAddr, USHORT usRegAddr, USHORT usNRegs, LONG lTimeOut );
-eMBMasterReqErrCode
-eMBMasterReqWriteHoldingRegister( UCHAR ucSndAddr, USHORT usRegAddr, USHORT usRegData, LONG lTimeOut );
-eMBMasterReqErrCode
-eMBMasterReqWriteMultipleHoldingRegister( UCHAR ucSndAddr, USHORT usRegAddr,
-		USHORT usNRegs, USHORT * pusDataBuffer, LONG lTimeOut );
-eMBMasterReqErrCode
-eMBMasterReqReadHoldingRegister( UCHAR ucSndAddr, USHORT usRegAddr, USHORT usNRegs, LONG lTimeOut );
-eMBMasterReqErrCode
-eMBMasterReqReadWriteMultipleHoldingRegister( UCHAR ucSndAddr,
-		USHORT usReadRegAddr, USHORT usNReadRegs, USHORT * pusDataBuffer,
-		USHORT usWriteRegAddr, USHORT usNWriteRegs, LONG lTimeOut );
-eMBMasterReqErrCode
-eMBMasterReqReadCoils( UCHAR ucSndAddr, USHORT usCoilAddr, USHORT usNCoils, LONG lTimeOut );
-eMBMasterReqErrCode
-eMBMasterReqWriteCoil( UCHAR ucSndAddr, USHORT usCoilAddr, USHORT usCoilData, LONG lTimeOut );
-eMBMasterReqErrCode
-eMBMasterReqWriteMultipleCoils( UCHAR ucSndAddr,
-		USHORT usCoilAddr, USHORT usNCoils, UCHAR * pucDataBuffer, LONG lTimeOut );
-eMBMasterReqErrCode
-eMBMasterReqReadDiscreteInputs( UCHAR ucSndAddr, USHORT usDiscreteAddr, USHORT usNDiscreteIn, LONG lTimeOut );
+eMBMasterReqErrCode		eMBMasterReqReadInputRegister( UCHAR ucSndAddr, USHORT usRegAddr, USHORT usNRegs, LONG lTimeOut );
+eMBMasterReqErrCode		eMBMasterReqWriteHoldingRegister( UCHAR ucSndAddr, USHORT usRegAddr, USHORT usRegData, LONG lTimeOut );
+eMBMasterReqErrCode		eMBMasterReqWriteMultipleHoldingRegister( UCHAR ucSndAddr, USHORT usRegAddr, USHORT usNRegs, USHORT * pusDataBuffer, LONG lTimeOut );
+eMBMasterReqErrCode		eMBMasterReqReadHoldingRegister( UCHAR ucSndAddr, USHORT usRegAddr, USHORT usNRegs, LONG lTimeOut );
+eMBMasterReqErrCode		eMBMasterReqReadWriteMultipleHoldingRegister( UCHAR ucSndAddr, USHORT usReadRegAddr, USHORT usNReadRegs, USHORT * pusDataBuffer, USHORT usWriteRegAddr, USHORT usNWriteRegs, LONG lTimeOut );
+eMBMasterReqErrCode		eMBMasterReqReadCoils( UCHAR ucSndAddr, USHORT usCoilAddr, USHORT usNCoils, LONG lTimeOut );
+eMBMasterReqErrCode		eMBMasterReqWriteCoil( UCHAR ucSndAddr, USHORT usCoilAddr, USHORT usCoilData, LONG lTimeOut );
+eMBMasterReqErrCode		eMBMasterReqWriteMultipleCoils( UCHAR ucSndAddr, USHORT usCoilAddr, USHORT usNCoils, UCHAR * pucDataBuffer, LONG lTimeOut );
+eMBMasterReqErrCode		eMBMasterReqReadDiscreteInputs( UCHAR ucSndAddr, USHORT usDiscreteAddr, USHORT usNDiscreteIn, LONG lTimeOut );
 
-eMBException
-eMBMasterFuncReportSlaveID( UCHAR * pucFrame, USHORT * usLen );
-eMBException
-eMBMasterFuncReadInputRegister( UCHAR * pucFrame, USHORT * usLen );
-eMBException
-eMBMasterFuncReadHoldingRegister( UCHAR * pucFrame, USHORT * usLen );
-eMBException
-eMBMasterFuncWriteHoldingRegister( UCHAR * pucFrame, USHORT * usLen );
-eMBException
-eMBMasterFuncWriteMultipleHoldingRegister( UCHAR * pucFrame, USHORT * usLen );
-eMBException
-eMBMasterFuncReadCoils( UCHAR * pucFrame, USHORT * usLen );
-eMBException
-eMBMasterFuncWriteCoil( UCHAR * pucFrame, USHORT * usLen );
-eMBException
-eMBMasterFuncWriteMultipleCoils( UCHAR * pucFrame, USHORT * usLen );
-eMBException
-eMBMasterFuncReadDiscreteInputs( UCHAR * pucFrame, USHORT * usLen );
-eMBException
-eMBMasterFuncReadWriteMultipleHoldingRegister( UCHAR * pucFrame, USHORT * usLen );
+eMBMasterReqErrCode		eMBMasterReqReadDataTimeW( UCHAR ucSndAddr, USHORT usTimeAddr, LONG lTimeOut );
+
+
+eMBException			eMBMasterFuncReportSlaveID( UCHAR * pucFrame, USHORT * usLen );
+eMBException			eMBMasterFuncReadInputRegister( UCHAR * pucFrame, USHORT * usLen );
+
+eMBException			eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen );
+
+eMBException			eMBMasterFuncWriteHoldingRegister( UCHAR * pucFrame, USHORT * usLen );
+eMBException			eMBMasterFuncWriteMultipleHoldingRegister( UCHAR * pucFrame, USHORT * usLen );
+eMBException			eMBMasterFuncReadCoils( UCHAR * pucFrame, USHORT * usLen );
+eMBException			eMBMasterFuncWriteCoil( UCHAR * pucFrame, USHORT * usLen );
+eMBException			eMBMasterFuncWriteMultipleCoils( UCHAR * pucFrame, USHORT * usLen );
+eMBException			eMBMasterFuncReadDiscreteInputs( UCHAR * pucFrame, USHORT * usLen );
+eMBException			eMBMasterFuncReadWriteMultipleHoldingRegister( UCHAR * pucFrame, USHORT * usLen );
 
 /*ЈЎ \ingroup modbus
  *\brief These functions are interface for Modbus Master
  */
-void vMBMasterGetPDUSndBuf( UCHAR ** pucFrame );
-UCHAR ucMBMasterGetDestAddress( void );
-void vMBMasterSetDestAddress( UCHAR Address );
-BOOL xMBMasterGetCBRunInMasterMode( void );
-void vMBMasterSetCBRunInMasterMode( BOOL IsMasterMode );
-USHORT usMBMasterGetPDUSndLength( void );
-void vMBMasterSetPDUSndLength( USHORT SendPDULength );
-void vMBMasterSetCurTimerMode( eMBMasterTimerMode eMBTimerMode );
-BOOL xMBMasterRequestIsBroadcast( void );
+void 	vMBMasterGetPDUSndBuf( UCHAR ** pucFrame );
+UCHAR 	ucMBMasterGetDestAddress( void );
+void 	vMBMasterSetDestAddress( UCHAR Address );
+BOOL 	xMBMasterGetCBRunInMasterMode( void );
+void 	vMBMasterSetCBRunInMasterMode( BOOL IsMasterMode );
+USHORT 	usMBMasterGetPDUSndLength( void );
+void 	vMBMasterSetPDUSndLength( USHORT SendPDULength );
+void 	vMBMasterSetCurTimerMode( eMBMasterTimerMode eMBTimerMode );
+BOOL 	xMBMasterRequestIsBroadcast( void );
 eMBMasterErrorEventType eMBMasterGetErrorType( void );
-void vMBMasterSetErrorType( eMBMasterErrorEventType errorType );
+void 	vMBMasterSetErrorType( eMBMasterErrorEventType errorType );
 eMBMasterReqErrCode eMBMasterWaitRequestFinish( void );
 
 /* ----------------------- Callback -----------------------------------------*/

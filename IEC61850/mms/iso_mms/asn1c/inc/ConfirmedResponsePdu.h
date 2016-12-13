@@ -9,12 +9,12 @@
 #define	_ConfirmedResponsePdu_H_
 
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
 #include "Unsigned32.h"
 #include "ConfirmedServiceResponse.h"
-#include "constr_SEQUENCE.h"
+#include <constr_SEQUENCE.h>
 
 #ifdef __cplusplus
 extern "C" {

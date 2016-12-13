@@ -9,10 +9,10 @@
 #define	_MMSString_H_
 
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
-#include "UTF8String.h"
+#include <UTF8String.h>
 
 #ifdef __cplusplus
 extern "C" {

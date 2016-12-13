@@ -4,24 +4,36 @@
  */
 #define	_POSIX_PTHREAD_SEMANTICS	/* for Sun */
 #define	_REENTRANT			/* for Sun */
-#include "asn_internal.h"
-#include "GeneralizedTime.h"
-#include "errno.h"
+#include <asn_internal.h>
+#include <GeneralizedTime.h>
+#include <errno.h>
 
 #ifdef	__CYGWIN__
 #include "/usr/include/time.h"
 #else
-#include "time.h"
+#include <time.h>
 #endif	/* __CYGWIN__ */
 
+#ifdef __IAR_SYSTEMS_ICC__
+
+static struct tm *localtime_r(const time_t *tloc, struct tm *result) {
+    struct tm *tm;
+    if((tm = localtime(tloc)))
+        return memcpy(result, tm, sizeof(struct tm));
+    return 0;
+}
+
+static struct tm *gmtime_r(const time_t *tloc, struct tm *result) {
+    struct tm *tm;
+    if((tm = gmtime(tloc)))
+        return memcpy(result, tm, sizeof(struct tm));
+    return 0;
+}
+#endif /* __IAR_SYSTEMS_ICC__ */
+
 #if	defined(WIN32)
-#pragma message( "PLEASE STOP AND READ!")
-#pragma message( "  localtime_r is implemented via localtime(), which may be not thread-safe.")
-#pragma message( "  gmtime_r is implemented via gmtime(), which may be not thread-safe.")
-#pragma message( "  ")
-#pragma message( "  You must fix the code by inserting appropriate locking")
-#pragma message( "  if you want to use asn_GT2time() or asn_UT2time().")
-#pragma message( "PLEASE STOP AND READ!")
+
+#ifdef __GNUC__
 
 static struct tm *localtime_r(const time_t *tloc, struct tm *result) {
 	struct tm *tm;
@@ -36,6 +48,36 @@ static struct tm *gmtime_r(const time_t *tloc, struct tm *result) {
 		return memcpy(result, tm, sizeof(struct tm));
 	return 0;
 }
+
+#else
+
+int
+localtime_s(struct tm* _tm, const time_t *time);
+
+int
+gmtime_s(struct tm* _tm, const time_t* time);
+
+
+
+static struct tm*
+localtime_r(const time_t *tloc, struct tm *result)
+{
+
+    if(localtime_s(result, tloc) == 0)
+        return result;
+    else
+        return 0;
+}
+
+static struct tm*
+gmtime_r(const time_t *tloc, struct tm *result)
+{
+    if(gmtime_s(result, tloc) == 0)
+        return result;
+    else
+        return 0;
+}
+#endif /* __GNUC__ */
 
 #define	tzset()	_tzset()
 #define	putenv(c)	_putenv(c)
@@ -66,16 +108,6 @@ static struct tm *gmtime_r(const time_t *tloc, struct tm *result) {
 #else	/* HAVE_TM_GMTOFF */
 #define	GMTOFF(tm)	(-timezone)
 #endif	/* HAVE_TM_GMTOFF */
-
-#if	(defined(_EMULATE_TIMEGM) || !defined(HAVE_TM_GMTOFF))
-// modify by sabin
-// #warning "PLEASE STOP AND READ!"
-// #warning "  timegm() is implemented via getenv(\"TZ\")/setenv(\"TZ\"), which may be not thread-safe."
-// #warning "  "
-// #warning "  You must fix the code by inserting appropriate locking"
-// #warning "  if you want to use asn_GT2time() or asn_UT2time()."
-// #warning "PLEASE STOP AND READ!"
-#endif	/* _EMULATE_TIMEGM */
 
 /*
  * Override our GMTOFF decision for other known platforms.
@@ -232,7 +264,7 @@ GeneralizedTime_encode_xer(asn_TYPE_descriptor_t *td, void *sptr,
 		asn_app_consume_bytes_f *cb, void *app_key) {
 
 	if(flags & XER_F_CANONICAL) {
-		GeneralizedTime_t *gt = NULL;
+		GeneralizedTime_t *gt = NULL; // modified MZ
 		asn_enc_rval_t rv;
 		int fv, fd;		/* fractional parts */
 		struct tm tm;
@@ -243,8 +275,7 @@ GeneralizedTime_encode_xer(asn_TYPE_descriptor_t *td, void *sptr,
 				&& errno != EPERM)
 			_ASN_ENCODE_FAILED;
 
-        // ??????
-		// gt = asn_time2GT_frac(0, &tm, fv, fd, 1);
+		//gt = asn_time2GT_frac(0, &tm, fv, fd, 1);
 		if(!gt) _ASN_ENCODE_FAILED;
 	
 		rv = OCTET_STRING_encode_xer_utf8(td, sptr, ilevel, flags,
@@ -333,7 +364,7 @@ asn_GT2time_frac(const GeneralizedTime_t *st, int *frac_value, int *frac_digits,
 	int offset_specified = 0;
 	int fvalue = 0;
 	int fdigits = 0;
-	time_t tloc;
+	time_t tloc = 0;
 
 	if(!st || !st->buf) {
 		errno = EINVAL;

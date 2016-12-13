@@ -9,15 +9,15 @@
 #define	_RejectPDU_H_
 
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
 #include "Unsigned32.h"
-#include "NativeInteger.h"
-#include "INTEGER.h"
-#include "NULL.h"
-#include "constr_CHOICE.h"
-#include "constr_SEQUENCE.h"
+#include <NativeInteger.h>
+#include <INTEGER.h>
+#include <NULL.h>
+#include <constr_CHOICE.h>
+#include <constr_SEQUENCE.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -90,10 +90,7 @@ typedef enum RejectPDU__rejectReason__concludeErrorPDU {
 	RejectPDU__rejectReason__concludeErrorPDU_valueOutOfRange	= 2
 } e_RejectPDU__rejectReason__concludeErrorPDU;
 
-/* RejectPDU */
-typedef struct RejectPDU {
-	Unsigned32_t	*originalInvokeID	/* OPTIONAL */;
-	struct RejectPDU__rejectReason {
+struct RejectPDU__rejectReason {
 		RejectPDU__rejectReason_PR present;
 		union RejectPDU__rejectReason_u {
 			long	 confirmedRequestPDU;
@@ -111,7 +108,12 @@ typedef struct RejectPDU {
 		
 		/* Context for parsing across buffer boundaries */
 		asn_struct_ctx_t _asn_ctx;
-	} rejectReason;
+	};
+
+/* RejectPDU */
+typedef struct RejectPDU {
+	Unsigned32_t	*originalInvokeID	/* OPTIONAL */;
+	struct RejectPDU__rejectReason rejectReason;
 	
 	/* Context for parsing across buffer boundaries */
 	asn_struct_ctx_t _asn_ctx;

@@ -24,13 +24,7 @@
 #ifndef BER_ENCODER_H_
 #define BER_ENCODER_H_
 
-#include "stdlib.h"
-#include "stdarg.h"
-#include "string.h"
-#include "stdio.h"
-#include "stdbool.h"
-#include "stdint.h"
-
+#include "libiec61850_platform_includes.h"
 #include "asn1_ber_primitive_value.h"
 
 /*
@@ -50,7 +44,7 @@ int
 BerEncoder_encodeBoolean(uint8_t tag, bool value, uint8_t* buffer, int bufPos);
 
 int
-BerEncoder_encodeStringWithTag(uint8_t tag, char* string, uint8_t* buffer, int bufPos);
+BerEncoder_encodeStringWithTag(uint8_t tag, const char* string, uint8_t* buffer, int bufPos);
 
 int
 BerEncoder_encodeOctetString(uint8_t tag, uint8_t* octetString, uint32_t octetStringSize, uint8_t* buffer, int bufPos);
@@ -85,7 +79,7 @@ int
 BerEncoder_determineLengthSize(uint32_t length);
 
 int
-BerEncoder_determineEncodedStringSize(char* string);
+BerEncoder_determineEncodedStringSize(const char* string);
 
 int
 BerEncoder_determineEncodedBitStringSize(int bitStringSize);
@@ -93,6 +87,9 @@ BerEncoder_determineEncodedBitStringSize(int bitStringSize);
 /*
  * helper functions
  */
+
+int
+BerEncoder_encodeOIDToBuffer(const char* oidString, uint8_t* buffer, int maxBufLen);
 
 void
 BerEncoder_revertByteOrder(uint8_t* octets, const int size);

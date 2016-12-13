@@ -2,9 +2,9 @@
  * Copyright (c) 2005, 2006 Lev Walkin <vlm@lionet.info>. All rights reserved.
  * Redistribution and modifications are permitted subject to BSD license.
  */
-#include "asn_system.h"
-#include "asn_internal.h"
-#include "per_support.h"
+#include <asn_system.h>
+#include <asn_internal.h>
+#include <per_support.h>
 
 /*
  * Extract a small number of bits (<= 31) from the specified PER data pointer.

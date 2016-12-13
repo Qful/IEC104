@@ -61,6 +61,30 @@
  *
  */
 
+// Атрибут STVALINT32 может иметь значения: ....
+#define STVALINT32_ON 				1
+#define STVALINT32_BLOCKED 			2
+#define STVALINT32_TEST 			3
+#define STVALINT32_TESTBLOCKED 		4
+#define STVALINT32_OFF 				5
+
+// Атрибут STVALINT32 может иметь значения: ....
+#define STVALINT32_OK 				1
+#define STVALINT32_Warning 			2
+#define STVALINT32_Alarm 			3
+
+// Атрибут STVALINT32 может иметь значения: ....
+#define STVALCODEDENUM_INTERMEDIATE		0
+#define STVALCODEDENUM_OFF 				1
+#define STVALCODEDENUM_ON 				2
+#define STVALCODEDENUM_BADSTATE			3
+
+// Атрибут ctlModelENUM может иметь значения: ....
+#define CTLMODELEDENUM_statusOnly						0
+#define CTLMODELEDENUM_DirectWithNormalSecurity 		1
+#define CTLMODELEDENUM_SboWithNormalSecurity 			2
+#define CTLMODELEDENUM_DirectWithEnhancedSecurity		3
+#define CTLMODELEDENUM_SboWithEnhancedSecurity			4
 
 void StartIEC850Task(void const * argument);
 uint64_t 		Hal_getTimeInMs (void);

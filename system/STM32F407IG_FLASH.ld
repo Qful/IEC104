@@ -31,36 +31,55 @@
 ENTRY(Reset_Handler)
 
 /* Highest address of the user mode stack */
-_estack = 0x2001FFFF;    /* end of RAM */
+//_estack = 0x2001FFFF;    /* end of RAM для внутренней памяти*/
+_estack = 0x600FFFFF;      /* end of RAM для внешней памяти AS6C8008 объем 8Мбит*/
 
 /* Generate a link error if heap and stack don't fit into RAM */
 _Min_Heap_Size = 0x200;      /* required amount of heap  */
-_Min_Stack_Size = 0x400; /* required amount of stack	было 0x400 */
+_Min_Stack_Size = 0x400; 	/* required amount of stack	было 0x400 */
 
 /* Specify the memory areas */
 MEMORY
 {
-FLASH (rx)      : ORIGIN = 0x8000000, LENGTH = 1024K
-RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 128K
-CCMRAM (rw)      : ORIGIN = 0x10000000, LENGTH = 64K
+FLASH (rx)      : ORIGIN = 0x08000000, LENGTH = 1024K
+RAM (xrw)       : ORIGIN = 0x60000000, LENGTH = 1024K
+RAMINT (xrw)    : ORIGIN = 0x20000000, LENGTH = 128K
+CFLASH (rx) 	: ORIGIN = 0x080F7FFF, LENGTH = 32K
+CCMRAM (rw)     : ORIGIN = 0x10000000, LENGTH = 64K
 }
 
 /* Define output sections */
 SECTIONS
 {
-  /* The startup code goes first into FLASH */
+	.ramint :
+	  {
+        . = ALIGN(4);
+	    *(.ramint)
+	    *(.ramint*)
+	    . = ALIGN(4);
+	  } >RAMINT
+  
+  /* Константы во FLASH */
+  .eb0rodata :
+  {
+    . = ALIGN(4);
+    KEEP(*(.eb0rodata))       
+    . = ALIGN(4);
+  } >CFLASH
+  
+  /* Код запуска идет сначала в FLASH */
   .isr_vector :
   {
     . = ALIGN(4);
-    KEEP(*(.isr_vector)) /* Startup code */
+    KEEP(*(.isr_vector)) /* Startup code */ 
     . = ALIGN(4);
   } >FLASH
 
-  /* The program code and other data goes into FLASH */
+  /* Программный код и другие данные во FLASH */
   .text :
   {
     . = ALIGN(4);
-    *(.text)           /* .text sections (code) */
+    *(.text)           /* .text — скомпилированный машинный код */
     *(.text*)          /* .text* sections (code) */
     *(.glue_7)         /* glue arm to thumb code */
     *(.glue_7t)        /* glue thumb to arm code */
@@ -73,7 +92,7 @@ SECTIONS
     _etext = .;        /* define a global symbols at end of code */
   } >FLASH
 
-  /* Constant data goes into FLASH */
+  /* Константы во FLASH */
   .rodata :
   {
     . = ALIGN(4);
@@ -114,6 +133,7 @@ SECTIONS
   _sidata = LOADADDR(.data);
 
   /* Initialized data sections goes into RAM, load LMA copy after code */
+  /* .data — глобальные и статические переменные */
   .data : 
   {
     . = ALIGN(4);
@@ -159,7 +179,7 @@ SECTIONS
     . = ALIGN(4);
     _ebss = .;         /* define a global symbol at bss end */
     __bss_end__ = _ebss;
-  } >RAM
+  } >RAM				/* RAM*/
 
   /* User_heap_stack section, used to check that there is enough RAM left */
   ._user_heap_stack :
@@ -170,7 +190,7 @@ SECTIONS
     . = . + _Min_Heap_Size;
     . = . + _Min_Stack_Size;
     . = ALIGN(4);
-  } >RAM
+  } >RAM				/* RAM*/
 
   
 

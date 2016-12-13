@@ -3,9 +3,9 @@
  * All rights reserved.
  * Redistribution and modifications are permitted subject to BSD license.
  */
-#include "asn_internal.h"
-#include "constr_SET_OF.h"
-#include "asn_SET_OF.h"
+#include <asn_internal.h>
+#include <constr_SET_OF.h>
+#include <asn_SET_OF.h>
 
 /*
  * Number of bytes left for this structure.
@@ -856,7 +856,7 @@ asn_dec_rval_t
 SET_OF_decode_uper(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td,
         asn_per_constraints_t *constraints, void **sptr, asn_per_data_t *pd) {
 	asn_dec_rval_t rv;
-    asn_SET_OF_specifics_t *specs = (asn_SET_OF_specifics_t *)td->specifics;
+        asn_SET_OF_specifics_t *specs = (asn_SET_OF_specifics_t *)td->specifics;
 	asn_TYPE_member_t *elm = td->elements;	/* Single one */
 	void *st = *sptr;
 	asn_anonymous_set_ *list;
@@ -903,8 +903,6 @@ SET_OF_decode_uper(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td,
 		if(nelems < 0) {
 			nelems = uper_get_length(pd,
 				ct ? ct->effective_bits : -1, &repeat);
-			ASN_DEBUG("Got to decode %d elements (eff %d)",
-				(int)nelems, (int)ct ? ct->effective_bits : -1);
 			if(nelems < 0) _ASN_DECODE_STARVED;
 		}
 
@@ -921,9 +919,6 @@ SET_OF_decode_uper(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td,
 				ASN_DEBUG("Failed to add element into %s",
 					td->name);
 				/* Fall through */
-                // modify by sabin
-                // rv.code == RC_FAIL;
-				rv.code = RC_FAIL;
 			} else {
 				ASN_DEBUG("Failed decoding %s of %s (SET OF)",
 					elm->type->name, td->name);

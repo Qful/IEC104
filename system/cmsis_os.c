@@ -24,6 +24,7 @@
 
 #include <string.h>
 #include "cmsis_os.h"
+#include "portmacro.h"
 
 extern void xPortSysTickHandler(void);
 

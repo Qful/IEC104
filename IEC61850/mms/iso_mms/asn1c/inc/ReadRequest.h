@@ -9,12 +9,12 @@
 #define	_ReadRequest_H_
 
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
-#include "BOOLEAN.h"
+#include <BOOLEAN.h>
 #include "VariableAccessSpecification.h"
-#include "constr_SEQUENCE.h"
+#include <constr_SEQUENCE.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,7 +1,7 @@
 /*
  *  cotp.h
  *
- *  Copyright 2013 Michael Zillgith
+ *  Copyright 2013, 2014 Michael Zillgith
  *
  *  This file is part of libIEC61850.
  *
@@ -24,66 +24,83 @@
 #ifndef COTP_H_
 #define COTP_H_
 
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdint.h>
-
+#include "libiec61850_platform_includes.h"
 #include "byte_buffer.h"
-#include "byte_stream.h"
-//#include "socket.h"
-
-/** Opaque reference for a client or connection socket instance */
-typedef struct netconn* Socket;
+#include "buffer_chain.h"
+#include "hal_socket.h"
+#include "iso_connection_parameters.h"
 
 typedef struct {
-    int32_t tsap_id_src;
-    int32_t tsap_id_dst;
-    uint8_t tpdu_size;
+    TSelector tSelSrc;
+    TSelector tSelDst;
+    uint8_t tpduSize;
 } CotpOptions;
 
 typedef struct {
-    int 		state;
-    int 		srcRef;
-    int 		dstRef;
-    int 		class;
+    int state;
+    int srcRef;
+    int dstRef;
+    int protocolClass;
+    Socket socket;
     CotpOptions options;
-    uint8_t 	eot;
-    ByteBuffer* payload;				// буфер принятых данных без COTP
-    ByteBuffer* readBuffer;				// принятые данные
-    ByteBuffer* writeBuffer;			// данные для передачи(ответа)
+    bool isLastDataUnit;
+    ByteBuffer* payload;
+    ByteBuffer* writeBuffer;  /* buffer to store TPKT packet to send */
+    ByteBuffer* readBuffer;   /* buffer to store received TPKT packet */
+    uint16_t packetSize;      /* size of the packet currently received */
 } CotpConnection;
 
 typedef enum {
-    OK, ERR, CONNECT_INDICATION, DATA_INDICATION, DISCONNECT_INDICATION
+    COTP_OK,
+    COTP_ERROR,
+    COTP_CONNECT_INDICATION,
+    COTP_DATA_INDICATION,
+    COTP_DISCONNECT_INDICATION,
+    COTP_MORE_FRAGMENTS_FOLLOW
 } CotpIndication;
 
-int  /* in byte */
+typedef enum {
+    TPKT_PACKET_COMPLETE = 0,
+    TPKT_WAITING = 1,
+    TPKT_ERROR = 2,
+    TPKT_CLOSE = 3
+} TpktState;
+
+int /* in byte */
 CotpConnection_getTpduSize(CotpConnection* self);
 
 void
 CotpConnection_setTpduSize(CotpConnection* self, int tpduSize /* in byte */);
 
-void	CotpConnection_init(CotpConnection* self, ByteBuffer* payloadBuffer);
-
-void	CotpConnection_destroy(CotpConnection* self);
-
-//void	ByteStream_setWriteBuffer(ByteStream self, ByteBuffer* writeBuffer);
+void
+CotpConnection_init(CotpConnection* self, Socket socket,
+        ByteBuffer* payloadBuffer, ByteBuffer* readBuffer, ByteBuffer* writeBuffer);
 
 CotpIndication
 CotpConnection_parseIncomingMessage(CotpConnection* self);
 
-CotpIndication
-CotpConnection_sendConnectionRequestMessage(CotpConnection* self);					// отправка запроса соединения
+void
+CotpConnection_resetPayload(CotpConnection* self);
+
+TpktState
+CotpConnection_readToTpktBuffer(CotpConnection* self);
 
 CotpIndication
-CotpConnection_sendConnectionResponseMessage(CotpConnection* self);					// отправка ответа на соединение
+CotpConnection_sendConnectionRequestMessage(CotpConnection* self, IsoConnectionParameters isoParameters);
 
 CotpIndication
-CotpConnection_sendDataMessage(CotpConnection* self, ByteBuffer* writeBuffer);
+CotpConnection_sendConnectionResponseMessage(CotpConnection* self);
 
-ByteBuffer*		CotpConnection_getreadBuffer(CotpConnection* self);
-ByteBuffer*		CotpConnection_getPayload(CotpConnection* self);
+CotpIndication
+CotpConnection_sendDataMessage(CotpConnection* self, BufferChain payload);
+
+ByteBuffer*
+CotpConnection_getPayload(CotpConnection* self);
+
+int
+CotpConnection_getSrcRef(CotpConnection* self);
+
+int
+CotpConnection_getDstRef(CotpConnection* self);
+
 #endif /* COTP_H_ */

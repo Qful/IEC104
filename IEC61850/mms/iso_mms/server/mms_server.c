@@ -1,7 +1,7 @@
 /*
  *  mms_server.c
  *
- *  Copyright 2013 Michael Zillgith
+ *  Copyright 2013, 2014, 2015 Michael Zillgith
  *
  *  This file is part of libIEC61850.
  *
@@ -21,34 +21,15 @@
  *  See COPYING file for the complete license text.
  */
 
+#include "libiec61850_platform_includes.h"
 #include "mms_server.h"
 #include "mms_server_connection.h"
 #include "mms_value_cache.h"
-#include "map.h"
-#include "thread.h"
+#include "mms_server_internal.h"
+#include "iso_server_private.h"
 
-#include "main.h"
-
-struct sMmsServer {
-    IsoServer 				isoServer;							// параметры сервера, состояние работы, TCP порт, стек.....
-    MmsDevice* 				device;								// MMS устройство, и содержимое
-    ReadVariableHandler 	readHandler;						// Функция чтения переменных
-    void* 					readHandlerParameter;
-    WriteVariableHandler 	writeHandler;						// Функция записи переменных
-    void* 					writeHandlerParameter;
-    MmsConnectionHandler 	connectionHandler;
-    void* 					connectionHandlerParameter;
-    Map 					openConnections;
-    Map 					valueCaches;
-    bool 					isLocked;
-    Semaphore 				modelMutex;							// Семафор для передачи управления MmsServer'ом
-};
-
-/*************************************************************************
- * createValueCachesForDomains
- * создадим
- *************************************************************************/
-static Map		createValueCachesForDomains(MmsDevice* device)
+static Map
+createValueCaches(MmsDevice* device)
 {
     Map valueCaches = Map_create();
 
@@ -58,55 +39,70 @@ static Map		createValueCachesForDomains(MmsDevice* device)
         Map_addEntry(valueCaches, device->domains[i], valueCache);
     }
 
+#if (CONFIG_MMS_SUPPORT_VMD_SCOPE_NAMED_VARIABLES == 1)
+    MmsValueCache valueCache = MmsValueCache_create((MmsDomain*) device);
+    Map_addEntry(valueCaches, (MmsDomain*) device, valueCache);
+#endif
+
     return valueCaches;
 }
-/*************************************************************************
- * MmsServer_create
- * создадим
- *************************************************************************/
-MmsServer	MmsServer_create(IsoServer isoServer, MmsDevice* device)
+
+MmsServer
+MmsServer_create(IsoServer isoServer, MmsDevice* device)
 {
-    MmsServer self = calloc(1, sizeof(struct sMmsServer));
-	USART_TRACE("IedServer->mmsServer  - Выделили память для структуры по адресу:0x%X размером:%u\n",&self,sizeof(struct sMmsServer));
+    MmsServer self = (MmsServer) GLOBAL_MALLOC(sizeof(struct sMmsServer));
+
+    memset(self, 0, sizeof(struct sMmsServer));
 
     self->isoServer = isoServer;
     self->device = device;
-
     self->openConnections = Map_create();
-    self->valueCaches = createValueCachesForDomains(device);
+    self->valueCaches = createValueCaches(device);
     self->isLocked = false;
-//TODO Semaphore_create пустой
+
+    self->reportBuffer = ByteBuffer_create(NULL, CONFIG_MMS_MAXIMUM_PDU_SIZE);
+
+#if (CONFIG_MMS_THREADLESS_STACK != 1)
     self->modelMutex = Semaphore_create(1);
+
+    IsoServer_setUserLock(isoServer, self->modelMutex);
+#endif
 
     return self;
 }
 
-/*************************************************************************
- * MmsServer_lockModel
- * захватываем управление моделью (забираем семафор)
- *************************************************************************/
-void	MmsServer_lockModel(MmsServer self)
+void
+MmsServer_lockModel(MmsServer self)
 {
+#if (CONFIG_MMS_THREADLESS_STACK != 1)
     Semaphore_wait(self->modelMutex);
-}
-/*************************************************************************
- * MmsServer_unlockModel
- * отдаём управление моделью (отдаём семафор)
- *************************************************************************/
-void	MmsServer_unlockModel(MmsServer self)
-{
-    Semaphore_post(self->modelMutex);
+#endif
 }
 
 void
-MmsServer_installReadHandler(MmsServer self, ReadVariableHandler readHandler, void* parameter)
+MmsServer_unlockModel(MmsServer self)
+{
+#if (CONFIG_MMS_THREADLESS_STACK != 1)
+    Semaphore_post(self->modelMutex);
+#endif
+}
+
+void
+MmsServer_installReadHandler(MmsServer self, MmsReadVariableHandler readHandler, void* parameter)
 {
     self->readHandler = readHandler;
     self->readHandlerParameter = parameter;
 }
 
 void
-MmsServer_installWriteHandler(MmsServer self, WriteVariableHandler writeHandler, void* parameter)
+MmsServer_installReadAccessHandler(MmsServer self, MmsReadAccessHandler readAccessHandler, void* parameter)
+{
+    self->readAccessHandler = readAccessHandler;
+    self->readAccessHandlerParameter = parameter;
+}
+
+void
+MmsServer_installWriteHandler(MmsServer self, MmsWriteVariableHandler writeHandler, void* parameter)
 {
     self->writeHandler = writeHandler;
     self->writeHandlerParameter = parameter;
@@ -119,11 +115,24 @@ MmsServer_installConnectionHandler(MmsServer self, MmsConnectionHandler connecti
     self->connectionHandlerParameter = parameter;
 }
 
+void
+MmsServer_installVariableListChangedHandler(MmsServer self, MmsNamedVariableListChangedHandler handler, void* parameter)
+{
+    self->variableListChangedHandler = handler;
+    self->variableListChangedHandlerParameter = parameter;
+}
+
+void
+MmsServer_setClientAuthenticator(MmsServer self, AcseAuthenticator authenticator, void* authenticatorParameter)
+{
+    IsoServer_setAuthenticator(self->isoServer, authenticator, authenticatorParameter);
+}
+
 
 static void
 closeConnection(void* con)
 {
-    MmsServerConnection* connection = (MmsServerConnection*) con;
+    MmsServerConnection connection = (MmsServerConnection) con;
 
     MmsServerConnection_destroy(connection);
 }
@@ -138,49 +147,43 @@ void
 MmsServer_destroy(MmsServer self)
 {
     Map_deleteDeep(self->openConnections, false, closeConnection);
-    Map_deleteDeep(self->valueCaches, false, deleteSingleCache);
+    Map_deleteDeep(self->valueCaches, false, (void (*) (void*)) deleteSingleCache);
+
+#if (CONFIG_MMS_THREADLESS_STACK != 1)
     Semaphore_destroy(self->modelMutex);
-    free(self);
+#endif
+
+    ByteBuffer_destroy(self->reportBuffer);
+
+    GLOBAL_FREEMEM(self);
 }
 
-/*************************************************************************
- * MmsServer_getValueFromCache
- * достаём пременную из кэш в виде указателя на MmsValue*
- *************************************************************************/
-MmsValue*	MmsServer_getValueFromCache(MmsServer self, MmsDomain* domain, char* itemId)
+MmsValue*
+MmsServer_getValueFromCache(MmsServer self, MmsDomain* domain, char* itemId)
 {
-    MmsValueCache cache = Map_getEntry(self->valueCaches, domain);
+    MmsValueCache cache = (MmsValueCache) Map_getEntry(self->valueCaches, domain);
 
-    if (cache != NULL) {
- //       USART_TRACE_GREEN("		MmsServer_getValueFromCache();\n");
+    if (cache != NULL)
         return MmsValueCache_lookupValue(cache, itemId);
-    } else{
-        USART_TRACE_RED("		MmsServer_getValueFromCache(); = NULL\n");
-    }
 
     return NULL ;
 }
-/*************************************************************************
- * MmsServer_insertIntoCache
- * Заносим переменную в кэш
- *************************************************************************/
-void		MmsServer_insertIntoCache(MmsServer self, MmsDomain* domain, char* itemId, MmsValue* value)
+
+void
+MmsServer_insertIntoCache(MmsServer self, MmsDomain* domain, char* itemId, MmsValue* value)
 {
-    MmsValueCache cache = Map_getEntry(self->valueCaches, domain);
+    MmsValueCache cache = (MmsValueCache) Map_getEntry(self->valueCaches, domain);
 
     if (cache != NULL) {
-  //      USART_TRACE_GREEN("		MmsValueCache_insertValue();\n");
         MmsValueCache_insertValue(cache, itemId, value);
-    } else{
-    	USART_TRACE_RED("		MmsValueCache_insertValue(); = NULL\n");
     }
 }
 
-MmsValueIndication
+MmsDataAccessError
 mmsServer_setValue(MmsServer self, MmsDomain* domain, char* itemId, MmsValue* value,
-        MmsServerConnection* connection)
+        MmsServerConnection connection)
 {
-    MmsValueIndication indication;
+    MmsDataAccessError indication;
 
     if (self->writeHandler != NULL) {
         indication = self->writeHandler(self->writeHandlerParameter, domain,
@@ -188,30 +191,46 @@ mmsServer_setValue(MmsServer self, MmsDomain* domain, char* itemId, MmsValue* va
     } else {
         MmsValue* cachedValue;
 
+        if (domain == NULL)
+            domain = (MmsDomain*) self->device;
+
         cachedValue = MmsServer_getValueFromCache(self, domain, itemId);
 
         if (cachedValue != NULL) {
             MmsValue_update(cachedValue, value);
-            indication = MMS_VALUE_OK;
+            indication = DATA_ACCESS_ERROR_SUCCESS;
         } else
-            indication = MMS_VALUE_ACCESS_DENIED;
+            indication = DATA_ACCESS_ERROR_OBJECT_VALUE_INVALID;
     }
 
     return indication;
 }
 
+
 MmsValue*
-mmsServer_getValue(MmsServer self, MmsDomain* domain, char* itemId)
+mmsServer_getValue(MmsServer self, MmsDomain* domain, char* itemId, MmsServerConnection connection)
 {
     MmsValue* value = NULL;
+
+    if (self->readAccessHandler != NULL) {
+        MmsDataAccessError accessError =
+                self->readAccessHandler(self->readAccessHandlerParameter, domain, itemId, connection);
+
+        if (accessError != DATA_ACCESS_ERROR_SUCCESS) {
+            value = MmsValue_newDataAccessError(accessError);
+            MmsValue_setDeletable(value);
+            goto exit_function;
+        }
+    }
 
     value = MmsServer_getValueFromCache(self, domain, itemId);
 
     if (value == NULL)
         if (self->readHandler != NULL)
             value = self->readHandler(self->readHandlerParameter, domain,
-                    itemId);
+                    itemId, connection);
 
+exit_function:
     return value;
 }
 
@@ -222,7 +241,7 @@ MmsServer_getDevice(MmsServer self)
     return self->device;
 }
 
-void
+inline void
 MmsServer_setDevice(MmsServer server, MmsDevice* device)
 {
     server->device = device;
@@ -234,14 +253,16 @@ isoConnectionIndicationHandler(IsoConnectionIndication indication, void* paramet
     MmsServer mmsServer = (MmsServer) parameter;
 
     if (indication == ISO_CONNECTION_OPENED) {
-        MmsServerConnection* mmsCon = MmsServerConnection_init(0, mmsServer, connection);
+        MmsServerConnection mmsCon = MmsServerConnection_init(0, mmsServer, connection);
+
         Map_addEntry(mmsServer->openConnections, connection, mmsCon);
 
         if (mmsServer->connectionHandler != NULL)
             mmsServer->connectionHandler(mmsServer->connectionHandlerParameter, mmsCon, MMS_SERVER_NEW_CONNECTION);
-
-    } else if (indication == ISO_CONNECTION_CLOSED) {
-        MmsServerConnection* mmsCon = (MmsServerConnection*) Map_removeEntry( mmsServer->openConnections, connection, false);
+    }
+    else if (indication == ISO_CONNECTION_CLOSED) {
+        MmsServerConnection mmsCon = (MmsServerConnection)
+                Map_removeEntry(mmsServer->openConnections, connection, false);
 
         if (mmsServer->connectionHandler != NULL)
             mmsServer->connectionHandler(mmsServer->connectionHandlerParameter, mmsCon, MMS_SERVER_CONNECTION_CLOSED);
@@ -251,22 +272,44 @@ isoConnectionIndicationHandler(IsoConnectionIndication indication, void* paramet
     }
 }
 
-/*************************************************************************
- * MmsServer_startListening
- *
- *************************************************************************/
-void	MmsServer_startListening(MmsServer server, int tcpPort)
+#if (CONFIG_MMS_THREADLESS_STACK != 1)
+void
+MmsServer_startListening(MmsServer server, int tcpPort)
 {
-	// привяжем функцию
     IsoServer_setConnectionHandler(server->isoServer, isoConnectionIndicationHandler, (void*) server);
-    // назначим порт TCP
-    IsoServer_setTcpPort(server->isoServer, tcpPort);		// назначим порт ISO серверу
-//TODO: IsoServer_startListening не рабочая
-  //  IsoServer_startListening(server->isoServer);
+    IsoServer_setTcpPort(server->isoServer, tcpPort);
+    IsoServer_startListening(server->isoServer);
 }
 
 void
 MmsServer_stopListening(MmsServer server)
 {
     IsoServer_stopListening(server->isoServer);
+}
+#endif /* (CONFIG_MMS_THREADLESS_STACK != 1)*/
+
+void
+MmsServer_startListeningThreadless(MmsServer self, int tcpPort)
+{
+    IsoServer_setConnectionHandler(self->isoServer, isoConnectionIndicationHandler, (void*) self);			// функция обработчик соединения к серверу
+    IsoServer_setTcpPort(self->isoServer, tcpPort);															// порт
+    IsoServer_startListeningThreadless(self->isoServer);													// начинаем слушать порт
+}
+
+int
+MmsServer_waitReady(MmsServer self, unsigned int timeoutMs)
+{
+   return IsoServer_waitReady(self->isoServer, timeoutMs);
+}
+
+void
+MmsServer_handleIncomingMessages(MmsServer self)
+{
+    IsoServer_processIncomingMessages(self->isoServer);
+}
+
+void
+MmsServer_stopListeningThreadless(MmsServer self)
+{
+    IsoServer_stopListeningThreadless(self->isoServer);
 }

@@ -21,61 +21,173 @@
  *  See COPYING file for the complete license text.
  */
 
-#include "ethernetif.h"
-#include "lwip/tcpip.h"
-#include "lwip/init.h"
-#include "lwip/netif.h"
-#include "lwip/api.h"
-#include "lwip/sys.h"
+#include <lwip/sockets.h>
+//#include <sys/ioctl.h>
+#include <linux/if_packet.h>
+#include <linux/if_ether.h>
+//#include <linux/if_arp.h>
+#include <linux/inet.h>
+#include <unistd.h>
 
-#include <stdint.h>
-#include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 
-#include "ethernet.h"
+#include "libiec61850_platform_includes.h"
+#include "hal_ethernet.h"
+
+#define ETH_ALEN		6		/* Octets in one ethernet addr	 */
+#define ETH_P_ALL	0x0003		/* Every packet (be careful!!!) */
+#define ETH_P_IP	0x0800		/* Internet Protocol packet	*/
+
+#define ARPHRD_ETHER 	1		/* Ethernet 10Mbps		*/
+
+#define	IFNAMSIZ		16
+#define	IFF_PROMISC	0x100		/* receive all packets		*/
+
+#define SIOCGIFINDEX	0x8933
+#define SIOCGIFFLAGS	0x8913
+#define SIOCGIFHWADDR	0x8927
+#define SIOCSIFFLAGS	0x8914
+
+#define AF_PACKET	17	/* Packet family		*/
+#define PF_PACKET	AF_PACKET
+
+
 
 struct sEthernetSocket {
     int rawSocket;
     bool isBind;
-  //  struct sockaddr_ll socketAddress;
+    struct sockaddr_ll socketAddress;
 };
 
-static int	getInterfaceIndex(int sock, char* deviceName)
+static int
+getInterfaceIndex(int sock, const char* deviceName)
 {
+	/*
+    struct ifreq ifr;
 
+    strncpy(ifr.ifr_name, deviceName, IFNAMSIZ);
+
+    if (ioctl(sock, SIOCGIFINDEX, &ifr) == -1) {
+        perror("ETHERNET_LINUX: Failed to get interface index -> exit");
+        exit(1);
+    }
+
+    int interfaceIndex = ifr.ifr_ifindex;
+
+    if (ioctl (sock, SIOCGIFFLAGS, &ifr) == -1)
+    {
+        perror ("ETHERNET_LINUX: Problem getting device flags -> exit");
+        exit (1);
+    }
+
+    ifr.ifr_flags |= IFF_PROMISC;
+    if (ioctl (sock, SIOCSIFFLAGS, &ifr) == -1)
+    {
+        perror ("ETHERNET_LINUX: Setting device to promiscuous mode failed -> exit");
+        exit (1);
+    }
+
+    return interfaceIndex;
+    */
 }
 
 
-void	Ethernet_getInterfaceMACAddress(char* interfaceId, uint8_t* addr)
+void
+Ethernet_getInterfaceMACAddress(const char* interfaceId, uint8_t* addr)
 {
+	/*
+    struct ifreq buffer;
 
+    int sock = socket(PF_INET, SOCK_DGRAM, 0);
+
+    memset(&buffer, 0x00, sizeof(buffer));
+
+    strcpy(buffer.ifr_name, interfaceId);
+
+    ioctl(sock, SIOCGIFHWADDR, &buffer);
+
+    close(sock);
+
+    int i;
+
+    for(i = 0; i < 6; i++ )
+    {
+        addr[i] = (unsigned char)buffer.ifr_hwaddr.sa_data[i];
+    }
+    */
 }
 
 
-EthernetSocket	Ethernet_createSocket(char* interfaceId, uint8_t* destAddress)
+EthernetSocket
+Ethernet_createSocket(const char* interfaceId, uint8_t* destAddress)
 {
+    EthernetSocket ethernetSocket = GLOBAL_CALLOC(1, sizeof(struct sEthernetSocket));
 
+    ethernetSocket->rawSocket = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+
+    if (ethernetSocket->rawSocket == -1) {
+        printf("Error creating raw socket!\n");
+        GLOBAL_FREEMEM(ethernetSocket);
+        return NULL;
+    }
+
+    ethernetSocket->socketAddress.sll_family = PF_PACKET;
+    ethernetSocket->socketAddress.sll_protocol = htons(ETH_P_IP);
+
+    ethernetSocket->socketAddress.sll_ifindex = getInterfaceIndex(ethernetSocket->rawSocket, interfaceId);
+
+    ethernetSocket->socketAddress.sll_hatype =  ARPHRD_ETHER;
+    ethernetSocket->socketAddress.sll_pkttype = PACKET_OTHERHOST;
+
+    ethernetSocket->socketAddress.sll_halen = ETH_ALEN;
+
+    memset(ethernetSocket->socketAddress.sll_addr, 0, 8);
+
+    if (destAddress != NULL)
+        memcpy(ethernetSocket->socketAddress.sll_addr, destAddress, 6);
+
+    ethernetSocket->isBind = false;
+
+    return ethernetSocket;
 }
 
-void	Ethernet_setProtocolFilter(EthernetSocket ethSocket, uint16_t etherType)
+void
+Ethernet_setProtocolFilter(EthernetSocket ethSocket, uint16_t etherType)
 {
-
+    ethSocket->socketAddress.sll_protocol = htons(etherType);
 }
 
 
 /* non-blocking receive */
-int	Ethernet_receivePacket(EthernetSocket self, uint8_t* buffer, int bufferSize)
+int
+Ethernet_receivePacket(EthernetSocket self, uint8_t* buffer, int bufferSize)
 {
+    if (self->isBind == false) {
+        if (bind(self->rawSocket, (struct sockaddr*) &self->socketAddress, sizeof(self->socketAddress)) == 0)
+            self->isBind = true;
+        else
+            return 0;
+    }
+
+    return recvfrom(self->rawSocket, buffer, bufferSize, MSG_DONTWAIT, 0, 0);
 }
 
-void	Ethernet_sendPacket(EthernetSocket ethSocket, uint8_t* buffer, int packetSize)
+void
+Ethernet_sendPacket(EthernetSocket ethSocket, uint8_t* buffer, int packetSize)
 {
-
+    sendto(ethSocket->rawSocket, buffer, packetSize,
+                0, (struct sockaddr*) &(ethSocket->socketAddress), sizeof(ethSocket->socketAddress));
 }
 
-void	Ethernet_destroySocket(EthernetSocket ethSocket)
+void
+Ethernet_destroySocket(EthernetSocket ethSocket)
 {
-
+    close(ethSocket->rawSocket);
+    GLOBAL_FREEMEM(ethSocket);
 }
 
+bool
+Ethernet_isSupported()
+{
+    return true;
+}

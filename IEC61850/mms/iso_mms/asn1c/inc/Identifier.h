@@ -9,13 +9,10 @@
 #define	_Identifier_H_
 
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
-#include "VisibleString.h"
-
-typedef OCTET_STRING_t VisibleString_t;  /* Implemented via OCTET STRING */
-
+#include <VisibleString.h>
 
 #ifdef __cplusplus
 extern "C" {

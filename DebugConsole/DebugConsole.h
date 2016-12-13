@@ -12,6 +12,7 @@ void	xDEBUGRTUReceiveFSM( void );			// колбэк прерывания по приему
 void	xDEBUGRTUTransmitFSM( void );			// колбэк прерывания по передаче
 
 void vOutputString( const char * const pcMessage );
+void vOutputTime (void);
 
 #endif /* DEBUG_CONSOLE_H */
 

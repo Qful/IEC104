@@ -3,8 +3,8 @@
  * All rights reserved.
  * Redistribution and modifications are permitted subject to BSD license.
  */
-#include "asn_internal.h"
-#include "constr_SEQUENCE.h"
+#include <asn_internal.h>
+#include <constr_SEQUENCE.h>
 
 /*
  * Number of bytes left for this structure.

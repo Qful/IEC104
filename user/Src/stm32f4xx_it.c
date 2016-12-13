@@ -38,6 +38,8 @@
 #include "iec104.h"
 
 #include "usart.h"
+
+#include "main.h"
 /* External variables --------------------------------------------------------*/
 //extern void xPortSysTickHandler(void);
 extern ETH_HandleTypeDef heth;
@@ -56,6 +58,50 @@ extern struct iecsock 	*s;
 /*            Cortex-M4 Processor Interruption and Exception Handlers         */ 
 /******************************************************************************/
 
+void NMI_Handler(void) {
+
+	USART_TRACE_RED("NMI_Handler.. ok\n");
+	NVIC_SystemReset();
+	  while(1);
+}
+void HardFault_Handler(void) {
+
+	USART_TRACE_RED("HardFault_Handler.. ok\n");
+	NVIC_SystemReset();
+	  while(1);
+}
+void MemManage_Handler(void) {
+
+	USART_TRACE_RED("MemManage_Handler.. ok\n");
+	NVIC_SystemReset();
+	  while(1);
+}
+void BusFault_Handler(void) {
+
+	USART_TRACE_RED("BusFault_Handler.. ok\n");
+	NVIC_SystemReset();
+	  while(1);
+}
+void UsageFault_Handler(void) {
+
+	USART_TRACE_RED("UsageFault_Handler.. ok\n");
+	NVIC_SystemReset();
+	  while(1);
+}
+/*
+void Default_Handler(void) {
+
+	USART_TRACE_RED("Default_Handler.. ok\n");
+	  while(1);
+}
+*/
+void DebugMon_Handler(void) {
+
+	USART_TRACE_RED("DebugMon_Handler.. ok\n");
+	NVIC_SystemReset();
+	  while(1);
+}
+
 /**
 * @brief This function handles System tick timer. 1 ms
 */
@@ -63,7 +109,9 @@ void SysTick_Handler(void)
 {
   HAL_IncTick();
   HAL_SYSTICK_IRQHandler();
+#ifdef	IEC104Task
   IEC104_IncTimers(s);
+#endif
   osSystickHandler();
 
 }

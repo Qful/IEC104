@@ -9,14 +9,14 @@
 #define	_AlternateAccessSelection_H_
 
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
 #include "Identifier.h"
 #include "Unsigned32.h"
-#include "NULL.h"
-#include "constr_SEQUENCE.h"
-#include "constr_CHOICE.h"
+#include <NULL.h>
+#include <constr_SEQUENCE.h>
+#include <constr_CHOICE.h>
 
 #ifdef __cplusplus
 extern "C" {

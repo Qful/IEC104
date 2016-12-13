@@ -21,22 +21,33 @@
  *  See COPYING file for the complete license text.
  */
 
-#include "mms_access_result.h"
+#include "libiec61850_platform_includes.h"
+//#include "mms_access_result.h"
 #include "mms_server_internal.h"
+#include "mms_value_internal.h"
 
-static int
-encodeArrayAccessResult(MmsValue* value, uint8_t* buffer, int bufPos, bool encode)
+#include "main.h"
+
+typedef struct sMmsValue MmsValue;
+
+/*************************************************************************
+ * encodeArrayAccessResult
+ *************************************************************************/
+static int	encodeArrayAccessResult(MmsValue* value, uint8_t* buffer, int bufPos, bool encode)
 {
-    int elementsSize = 0;
+    if (value == NULL) // TODO report internal error
+        return 0;
 
+    int elementsSize = 0;
     int i;
+    int size;
 
     int arraySize = MmsValue_getArraySize(value);
 
     for (i = 0; i < arraySize; i++) {
         MmsValue* element = MmsValue_getElement(value, i);
 
-        elementsSize += mmsServer_encodeAccessResult(element, NULL, 0, false);
+        elementsSize += MmsValue_encodeMmsData(element, NULL, 0, false);
     }
 
     if (encode) {
@@ -46,142 +57,146 @@ encodeArrayAccessResult(MmsValue* value, uint8_t* buffer, int bufPos, bool encod
         for (i = 0; i < arraySize; i++) {
             MmsValue* element = MmsValue_getElement(value, i);
 
-            bufPos = mmsServer_encodeAccessResult(element, buffer, bufPos, true);
+            bufPos = MmsValue_encodeMmsData(element, buffer, bufPos, true);
         }
 
-        return bufPos;
+        size = bufPos;
     }
     else {
-        int size = 1 + elementsSize + BerEncoder_determineLengthSize(elementsSize);
-
-        return size;
+        size = 1 + elementsSize + BerEncoder_determineLengthSize(elementsSize);
     }
-}
 
-static int
-encodeStructuredAccessResult(MmsValue* value, uint8_t* buffer, int bufPos, bool encode)
+    return size;
+}
+/*************************************************************************
+ * encodeStructuredAccessResult
+ *************************************************************************/
+static int	encodeStructuredAccessResult(MmsValue* value, uint8_t* buffer, int bufPos, bool encode)
 {
     int componentsSize = 0;
-
     int i;
+    int size;
 
-    int components = value->value.structure.size;
+    int componentCount = value->value.structure.size;
 
-    for (i = 0; i < components; i++) {
-        MmsValue* component = value->value.structure.components[i];
+    MmsValue** components = value->value.structure.components;
 
-        componentsSize += mmsServer_encodeAccessResult(component, NULL, 0, false);
-    }
+    for (i = 0; i < componentCount; i++)
+        componentsSize += MmsValue_encodeMmsData(components[i], NULL, 0, false);
 
     if (encode) {
         buffer[bufPos++] = 0xa2; /* tag for structure */
         bufPos = BerEncoder_encodeLength(componentsSize, buffer, bufPos);
 
-        for (i = 0; i < components; i++) {
-            MmsValue* component = value->value.structure.components[i];
+        for (i = 0; i < componentCount; i++)
+            bufPos = MmsValue_encodeMmsData(components[i], buffer, bufPos, true);
 
-            bufPos = mmsServer_encodeAccessResult(component, buffer, bufPos, true);
-        }
-
-        return bufPos;
+        size = bufPos;
     }
-    else {
-        int size = 1 + componentsSize + BerEncoder_determineLengthSize(componentsSize);
+    else
+        size = 1 + componentsSize + BerEncoder_determineLengthSize(componentsSize);
 
-        return size;
-    }
+    return size;
 }
 
-int
-mmsServer_encodeAccessResult(MmsValue* value, uint8_t* buffer, int bufPos, bool encode)
+/*************************************************************************
+ * MmsValue_encodeMmsData
+ *************************************************************************/
+int	MmsValue_encodeMmsData(MmsValue* self, uint8_t* buffer, int bufPos, bool encode)
 {
     int size;
 
-    switch (value->type) {
+    switch (self->type) {
+    case MMS_BOOLEAN:
+        if (encode)
+            bufPos = BerEncoder_encodeBoolean(0x83, self->value.boolean, buffer, bufPos);
+        else
+            size = 3;
+        break;
+
     case MMS_STRUCTURE:
         if (encode)
-            bufPos = encodeStructuredAccessResult(value, buffer, bufPos, true);
+            bufPos = encodeStructuredAccessResult(self, buffer, bufPos, true);
         else
-            size = encodeStructuredAccessResult(value, buffer, bufPos, false);
+            size = encodeStructuredAccessResult(self, buffer, bufPos, false);
 
         break;
 
     case MMS_ARRAY:
         if (encode)
-            bufPos = encodeArrayAccessResult(value, buffer, bufPos, true);
+            bufPos = encodeArrayAccessResult(self, buffer, bufPos, true);
         else
-            size = encodeArrayAccessResult(value, buffer, bufPos, false);
+            size = encodeArrayAccessResult(self, buffer, bufPos, false);
         break;
 
     case MMS_DATA_ACCESS_ERROR:
-        if (encode)
-            bufPos = BerEncoder_encodeUInt32(value->value.dataAccessError.code, buffer, bufPos);
+        if (encode) {
+            int length = BerEncoder_UInt32determineEncodedSize((uint32_t) self->value.dataAccessError);
+
+            bufPos = BerEncoder_encodeTL(0x80, length, buffer, bufPos);
+            bufPos = BerEncoder_encodeUInt32((uint32_t) self->value.dataAccessError, buffer, bufPos);
+        }
         else
-            size = 2 + BerEncoder_UInt32determineEncodedSize(value->value.dataAccessError.code);
+            size = 2 + BerEncoder_UInt32determineEncodedSize((uint32_t) self->value.dataAccessError);
         break;
 
     case MMS_VISIBLE_STRING:
         if (encode)
-            bufPos = BerEncoder_encodeStringWithTag(0x8a, value->value.visibleString, buffer, bufPos);
+            bufPos = BerEncoder_encodeStringWithTag(0x8a, self->value.visibleString.buf, buffer, bufPos);
         else
-            size = BerEncoder_determineEncodedStringSize(value->value.visibleString);
+            size = BerEncoder_determineEncodedStringSize(self->value.visibleString.buf);
         break;
     case MMS_UNSIGNED:
         if (encode)
-            bufPos = BerEncoder_encodeAsn1PrimitiveValue(0x86, value->value.unsignedInteger, buffer, bufPos);
+            bufPos = BerEncoder_encodeAsn1PrimitiveValue(0x86, self->value.integer, buffer, bufPos);
         else
-            size = 2 + value->value.unsignedInteger->size;
+            size = 2 + self->value.integer->size;
         break;
     case MMS_INTEGER:
         if (encode)
-            bufPos = BerEncoder_encodeAsn1PrimitiveValue(0x85, value->value.integer, buffer, bufPos);
+            bufPos = BerEncoder_encodeAsn1PrimitiveValue(0x85, self->value.integer, buffer, bufPos);
         else
-            size = 2 + value->value.integer->size;
+            size = 2 + self->value.integer->size;
         break;
     case MMS_UTC_TIME:
         if (encode)
-            bufPos = BerEncoder_encodeOctetString(0x91, value->value.utcTime, 8, buffer, bufPos);
+            bufPos = BerEncoder_encodeOctetString(0x91, self->value.utcTime, 8, buffer, bufPos);
         else
             size = 10;
         break;
     case MMS_BIT_STRING:
         if (encode)
-            bufPos = BerEncoder_encodeBitString(0x84, value->value.bitString.size,
-                    value->value.bitString.buf, buffer, bufPos);
+            bufPos = BerEncoder_encodeBitString(0x84, self->value.bitString.size,
+                    self->value.bitString.buf, buffer, bufPos);
         else
-            size = BerEncoder_determineEncodedBitStringSize(value->value.bitString.size);
+            size = BerEncoder_determineEncodedBitStringSize(self->value.bitString.size);
         break;
-    case MMS_BOOLEAN:
-        if (encode)
-            bufPos = BerEncoder_encodeBoolean(0x83, value->value.boolean, buffer, bufPos);
-        else
-            size = 3;
-        break;
+
     case MMS_BINARY_TIME:
         if (encode)
-            bufPos = BerEncoder_encodeOctetString(0x8c, value->value.binaryTime.buf,
-                    value->value.binaryTime.size, buffer, bufPos);
+            bufPos = BerEncoder_encodeOctetString(0x8c, self->value.binaryTime.buf,
+                    self->value.binaryTime.size, buffer, bufPos);
         else
-            size = 2 + value->value.binaryTime.size;
+            size = 2 + self->value.binaryTime.size;
         break;
     case MMS_OCTET_STRING:
         if (encode)
-            bufPos = BerEncoder_encodeOctetString(0x89, value->value.octetString.buf,
-                    value->value.octetString.size, buffer, bufPos);
+            bufPos = BerEncoder_encodeOctetString(0x89, self->value.octetString.buf,
+                    self->value.octetString.size, buffer, bufPos);
         else
-            size = 1 + BerEncoder_determineLengthSize(value->value.octetString.size)
-                        + value->value.octetString.size;
+            size = 1 + BerEncoder_determineLengthSize(self->value.octetString.size)
+                        + self->value.octetString.size;
         break;
 
     case MMS_FLOAT:
         {
-            int floatSize = (value->value.floatingPoint.formatWidth / 8) + 1;
+            int floatSize = (self->value.floatingPoint.formatWidth / 8) + 1;
 
             if (encode) {
                 bufPos = BerEncoder_encodeTL(0x87, floatSize, buffer, bufPos);
-                bufPos = BerEncoder_encodeFloat(value->value.floatingPoint.buf,
-                        value->value.floatingPoint.formatWidth,
-                        value->value.floatingPoint.exponentWidth,
+                bufPos = BerEncoder_encodeFloat(self->value.floatingPoint.buf,
+                        self->value.floatingPoint.formatWidth,
+                        self->value.floatingPoint.exponentWidth,
                         buffer, bufPos);
             }
             else
@@ -190,12 +205,13 @@ mmsServer_encodeAccessResult(MmsValue* value, uint8_t* buffer, int bufPos, bool 
         break;
     case MMS_STRING:
         if (encode)
-            bufPos = BerEncoder_encodeStringWithTag(0x90, value->value.mmsString, buffer, bufPos);
+            bufPos = BerEncoder_encodeStringWithTag(0x90, self->value.visibleString.buf, buffer, bufPos);
         else
-            size = BerEncoder_determineEncodedStringSize(value->value.mmsString);
+            size = BerEncoder_determineEncodedStringSize(self->value.visibleString.buf);
         break;
     default:
-        printf("encodeAccessResult: error unsupported type!\n");
+    	USART_TRACE_RED("encodeAccessResult: error unsupported type!\n");
+        size = 0;
         break;
     }
 
@@ -204,4 +220,3 @@ mmsServer_encodeAccessResult(MmsValue* value, uint8_t* buffer, int bufPos, bool 
     else
         return size;
 }
-

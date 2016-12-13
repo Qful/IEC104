@@ -24,15 +24,10 @@
 #ifndef BER_DECODER_H_
 #define BER_DECODER_H_
 
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdint.h>
+#include "libiec61850_platform_includes.h"
 
-
-int  BerDecoder_decodeLength(uint8_t* buffer, int* length, int bufPos, int maxBufPos);
+int
+BerDecoder_decodeLength(uint8_t* buffer, int* length, int bufPos, int maxBufPos);
 char*
 BerDecoder_decodeString(uint8_t* buffer, int strlen, int bufPos, int maxBufPos);
 

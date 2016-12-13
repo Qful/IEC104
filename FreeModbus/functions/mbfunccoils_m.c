@@ -75,6 +75,43 @@ eMBException    prveMBError2Exception( eMBErrorCode eErrorCode );
 #if MB_MASTER_RTU_ENABLED > 0 || MB_MASTER_ASCII_ENABLED > 0
 #if MB_FUNC_READ_COILS_ENABLED > 0
 
+/******************************************************************************
+ * чтение Даты и времени из МОДБАС
+ ******************************************************************************/
+eMBMasterReqErrCode		eMBMasterReqReadDataTimeW( UCHAR ucSndAddr, USHORT usTimeAddr, LONG lTimeOut ){
+
+    UCHAR                 *ucMBFrame;
+    USHORT 					usNRegs = 7;
+    uint8_t					SizeData;
+    uint8_t					SizeAnswer;
+    eMBMasterReqErrCode    eErrStatus = MB_MRE_NO_ERR;
+
+    if ( ucSndAddr > MB_MASTER_TOTAL_SLAVE_NUM ) eErrStatus = MB_MRE_ILL_ARG;
+    else if ( xMBMasterRunResTake( lTimeOut ) == FALSE ) eErrStatus = MB_MRE_MASTER_BUSY;
+    else
+    {
+    	SizeData = usNRegs << 1;
+    	SizeAnswer = SizeAddr+SizeFunct+1+SizeCRC+SizeData;
+
+		vMBMasterGetPDUSndBuf(&ucMBFrame);
+		vMBMasterSetDestAddress(ucSndAddr);
+
+		ucMBFrame[MB_PDU_FUNC_OFF]                 = MB_FUNC_READ_INPUT_REGISTER;
+		ucMBFrame[MB_PDU_REQ_READ_ADDR_OFF]       = usTimeAddr >> 8;
+		ucMBFrame[MB_PDU_REQ_READ_ADDR_OFF + 1]   = usTimeAddr;
+		ucMBFrame[MB_PDU_REQ_READ_COILCNT_OFF]     = usNRegs >> 8;
+		ucMBFrame[MB_PDU_REQ_READ_COILCNT_OFF + 1] = usNRegs;
+		vMBMasterSetPDUSndLength( MB_PDU_SIZE_MIN + MB_PDU_REQ_READ_SIZE );
+		xModbus_Set_SizeAnswer(SizeAnswer);
+		( void ) xMBMasterPortEventPost( EV_MASTER_FRAME_SENT );
+		eErrStatus = eMBMasterWaitRequestFinish( );
+
+    }
+    return eErrStatus;
+}
+/******************************************************************************
+ ******************************************************************************/
+
 /**
  * This function will request read coil.
  *
@@ -182,7 +219,7 @@ eMBMasterFuncReadCoils( UCHAR * pucFrame, USHORT * usLen )
 #if MB_FUNC_WRITE_COIL_ENABLED > 0
 
 /**
- * This function will request write one coil.
+ * This function will request write one coil. Запись одного бита
  *
  * @param ucSndAddr salve address
  * @param usCoilAddr coil start address

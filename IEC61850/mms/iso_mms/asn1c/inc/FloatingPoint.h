@@ -9,10 +9,10 @@
 #define	_FloatingPoint_H_
 
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
-#include "OCTET_STRING.h"
+#include <OCTET_STRING.h>
 
 #ifdef __cplusplus
 extern "C" {

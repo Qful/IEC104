@@ -37,7 +37,7 @@ static xSemaphoreHandle 	xNewDataSemaphore;
 static xSemaphoreHandle 	xDEBUGbusMutex;		//xCDCMutex
 
 /* Const messages output by the command console. */
-static const char * const pcWelcomeMessage = "Режим отладки IEC61850.\r\n\r\n>";
+//static const char * const pcWelcomeMessage = "Режим отладки IEC61850.\r\n\r\n>";
 static const char * const pcEndOfOutputMessage = "\r\nENTER\r\n>";
 static const char * const pcNewLine = "\r\n";
 
@@ -70,8 +70,8 @@ BaseType_t 	xReturned;
 	// добавим семафоры и мьютексы в очередь для просмотра ЯДРОМ (стейтмашиной)
 	//  API-функция vQueueAddToRegistry() не имеет другого предназначения, кроме как для целей отладки. Причем до-
 	// бавлять в реестр следует только те очереди, поведение которых необходимо выяснить в ходе отладки.
-	vQueueAddToRegistry( xDEBUGbusMutex, "DEBUGMu" );
-	vQueueAddToRegistry( xNewDataSemaphore, "DEBUGDat" );
+	vQueueAddToRegistry( xDEBUGbusMutex, "DBGMu" );
+	vQueueAddToRegistry( xNewDataSemaphore, "DBGDat" );
 
 
 	// Получим адрес выходного буфера.
@@ -81,7 +81,7 @@ BaseType_t 	xReturned;
 	BOOT_UART_Init(115200);
 
 	// отправим привет
-	HAL_UART_Transmit_DMA(&BOOT_UART, (uint8_t *)pcWelcomeMessage, strlen( pcWelcomeMessage ));
+	HAL_UART_Transmit_DMA(&BOOT_UART, (uint8_t *)"DBG->", strlen( "DBG->" ));
 
 	for( ;; )
 	{
@@ -226,4 +226,28 @@ void	xDEBUGRTUTransmitFSM( void ){
 
 	taskYIELD();
 }
-/*-----------------------------------------------------------*/
+/*************************************************************************
+ * xDEBUGRTUTransmitFSM
+ * колбэк передачи
+ *************************************************************************/
+
+void 	vOutputTime (void){
+	extern 	RTC_HandleTypeDef hrtc;
+	RTC_TimeTypeDef sTime;
+	RTC_DateTypeDef sDate;
+
+//	if( xSemaphoreTake( xDEBUGbusMutex, cmdMAX_MUTEX_WAIT ) == pdPASS )						// ждем семафор cmdMAX_MUTEX_WAIT иначе уходим
+//	{
+		HAL_RTC_GetTime(&hrtc, &sTime, FORMAT_BIN);			// Читаем время
+		HAL_RTC_GetDate(&hrtc, &sDate, FORMAT_BIN);			// читаем дату
+
+		char* WriteBuffer = pvPortMalloc(30);
+
+		sprintf( WriteBuffer, "[%d.%d.%d.%u] ",sTime.Hours,sTime.Minutes,sTime.Seconds,(uint16_t)(sTime.SubSeconds/2) );
+		USART_0TRACE(WriteBuffer);
+
+		vPortFree(WriteBuffer);
+//		xSemaphoreGive( xDEBUGbusMutex );													// вернём семафор
+//	}
+
+}

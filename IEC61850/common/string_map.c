@@ -24,9 +24,8 @@
 #include "libiec61850_platform_includes.h"
 #include "string_map.h"
 
-Map
-StringMap_create() {
-	Map map = Map_create();
-	map->compareKeys = strcmp;
+Map	StringMap_create() {
+	Map map 			= Map_create();
+	map->compareKeys 	= strcmp;					// Будем сравнивать строковые ключи
 	return map;
 }

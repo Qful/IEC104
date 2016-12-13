@@ -5,7 +5,7 @@
 #ifndef	ASN_CODECS_PRIM_H
 #define	ASN_CODECS_PRIM_H
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,10 +16,9 @@ typedef struct ASN__PRIMITIVE_TYPE_s {
 	int size;	/* Size of the buffer */
 } ASN__PRIMITIVE_TYPE_t;	/* Do not use this type directly! */
 
-
-asn_struct_free_f 	ASN__PRIMITIVE_TYPE_free;
-ber_type_decoder_f 	ber_decode_primitive;
-der_type_encoder_f 	der_encode_primitive;
+asn_struct_free_f ASN__PRIMITIVE_TYPE_free;
+ber_type_decoder_f ber_decode_primitive;
+der_type_encoder_f der_encode_primitive;
 
 /*
  * A callback specification for the xer_decode_primitive() function below.

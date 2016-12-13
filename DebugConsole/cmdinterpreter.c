@@ -34,7 +34,7 @@ of the list of registered commands. */
 static const CLI_Command_Definition_t xHelpCommand =
 {
 	"help",
-	"\r\nhelp:\r\nСписок команд\r\n*********************************************\r\n",
+	"\r\nhelp:\r\nСписок команд\r\n\r\n",
 	prvHelpCommand,
 	0
 };
@@ -138,7 +138,7 @@ size_t xCommandStringLength;
 	if( ( pxCommand != NULL ) && ( xReturn == pdFALSE ) )
 	{
 		// Команда была найдена, но число параметров команды было неправильным.
-		strncpy( pcWriteBuffer, "Incorrect command parameter(s).  Enter \"help\" to view a list of available commands.\r\n\r\n", xWriteBufferLen );
+		strncpy( pcWriteBuffer, "Incorrect command parameter(s).  Enter \"help\"\r\n\r\n", xWriteBufferLen );
 		pxCommand = NULL;
 	}
 	else if( pxCommand != NULL )
@@ -155,7 +155,7 @@ size_t xCommandStringLength;
 	else
 	{
 		// Команда небыла найдена
-		strncpy( pcWriteBuffer, "\033[1;31mне поддерживается. Help для получения списка команд.\033[1;m\r\n\r\n", xWriteBufferLen );
+		strncpy( pcWriteBuffer, "\033[1;31mне поддерживается.\033[1;m\r\n\r\n", xWriteBufferLen );
 		xReturn = pdFALSE;
 	}
 

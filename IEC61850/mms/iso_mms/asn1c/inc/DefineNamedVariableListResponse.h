@@ -9,10 +9,10 @@
 #define	_DefineNamedVariableListResponse_H_
 
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
-#include "NULL.h"
+#include <NULL.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -10,11 +10,12 @@
 #define	_ASN_INTERNAL_H_
 
 #include "asn_application.h"	/* Application-visible API */
-#include "asn_codecs.h"		/* for ASN.1 codecs specifics */
 
+//#include "libiec61850_platform_includes.h"
+#include "lib_memory.h"
 
 #ifndef	__NO_ASSERT_H__		/* Include assert.h only for internal use. */
-#include "assert.h"		/* for assert() macro */
+#include <assert.h>		/* for assert() macro */
 #endif
 
 #ifdef	__cplusplus
@@ -25,15 +26,29 @@ extern "C" {
 #define	ASN1C_ENVIRONMENT_VERSION	920	/* Compile-time version */
 int get_asn1c_environment_version(void);	/* Run-time version */
 
-#define	CALLOC(nmemb, size)			calloc(nmemb, size)
-#define	MALLOC(size)				malloc(size)
-#define	REALLOC(oldptr, size)		realloc(oldptr, size)
-#define	FREEMEM(ptr)				free(ptr)
+#if 0
+#ifndef CALLOC
+#define	CALLOC(nmemb, size)	calloc(nmemb, size)
+#endif
+
+#ifndef MALLOC
+#define	MALLOC(size)		malloc(size)
+#endif
+
+#ifndef REALLOC
+#define	REALLOC(oldptr, size)	realloc(oldptr, size)
+#endif
+
+#ifndef FREEMEM
+#define	FREEMEM(ptr)		free(ptr)
+#endif
+#endif
 
 /*
  * A macro for debugging the ASN.1 internals.
  * You may enable or override it.
  */
+
 #ifndef	ASN_DEBUG	/* If debugging code is not defined elsewhere... */
 #if	EMIT_ASN_DEBUG == 1	/* And it was asked to emit this code... */
 #ifdef	__GNUC__

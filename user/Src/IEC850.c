@@ -12,6 +12,8 @@
 #include "queue.h"
 #include "signal.h"
 
+#include "stm32f4xx_hal.h"
+
 #include "main.h"
 #include "time.h"
 #include "stdlib.h"
@@ -19,6 +21,7 @@
 
 #include "ethernetif.h"
 #include "lwip/tcpip.h"
+#include "lwip/tcp.h"
 #include "lwip/init.h"
 #include "lwip/netif.h"
 #include "lwip/api.h"
@@ -35,19 +38,26 @@
 /*iec850 includes ------------------------------------------------------------*/
 #include "iec850.h"
 
-#include "byte_stream.h"
+#include "byte_buffer.h"
+
 #include "cotp.h"
 #include "iso_session.h"
 #include "iso_presentation.h"
-#include "acse.h"
+#include "iso_connection_parameters.h"
+//#include "acse.h"
 #include "iso_server.h"
 #include "iec61850_server.h"
 #include "static_model.h"
+#include "mms_mapping.h"
+
+#include "iec61850_cdc.h"
+#include "hal_thread.h"
 
 #include "mms_server_connection.h"
 
 //#include "MmsPdu.h"
 
+#include "goose_receiver.h"
 /*Modbus includes ------------------------------------------------------------*/
 #include "mb.h"
 #include "mb_m.h"
@@ -55,20 +65,26 @@
 #include "modbus.h"
 
 
+#define WEBSERVER_THREAD_PRIO    ( tskIDLE_PRIORITY + 4 )
 /* Variables -----------------------------------------------------------------*/
-/* import IEC 61850 device model created from SCL-File */
-//extern IedModel iedModel;
+extern volatile uint8_t	MAC_ADDR[6];
+extern uint8_t		IP_ADDR[4];
+extern uint8_t		NETMASK_ADDR[4];
+extern uint8_t		GW_ADDR[4];
 
-extern IedServer iedServer;
+//extern IedServer iedServer;
+IedServer iedServer = NULL;
 
-//typedef void* Semaphore;
+static int running = 0;
 
-extern struct netconn *conn850,*newconn850;
 
-extern struct netif 	first_gnetif;
-extern struct ip_addr 	first_ipaddr;
-extern struct ip_addr 	netmask;
-extern struct ip_addr 	gw;
+extern struct netconn *newconn850;
+extern struct netif 	gnetif;
+
+
+extern osMutexId xIEC850StartMutex;
+extern osMutexId xIEC850ServerStartMutex;
+
 
 extern osSemaphoreId Netif_LinkSemaphore;
 extern struct link_str link_arg;
@@ -76,688 +92,426 @@ extern struct link_str link_arg;
 extern RTC_HandleTypeDef hrtc;
 /*  -----------------------------------------------------------------*/
 
-
 osThreadId defaultTaskHandle;
 
 /*  -----------------------------------------------------------------*/
-struct sIsoConnection {
-    uint8_t* 		receive_buf;					// буфер принятых данных
-    uint8_t* 		send_buf_1;						// буфер подготовки данных для передачи
-    uint8_t* 		send_buf_2;						// буфер подготовки данных для передачи
-    Socket			socket;
-    MessageReceivedHandler msgRcvdHandler;
-    IsoServer 		isoServer;
-    void* 			msgRcvdHandlerParameter;
-    int 			state;							// статус разобранного сообщения		ISO_CON_STATE_STOPPED/ISO_CON_STATE_RUNNING
-    IsoSession* 	session;
-    IsoPresentation* presentation;
-    CotpConnection* cotpConnection;					// COTP
-    char* 			clientAddress;					// // адрес клиента в виде строки 24 символа "Адрес[порт]"
-};
-
-typedef struct sIsoConnection* IsoConnection;
-
-
-IsoConnection	Connection_create(struct netconn *conn,IsoConnection self,uint8_t* Inbuffer);
-char*			Socket_getPeerAddress(struct netconn *conn);
 
 void			observerCallback(DataAttribute* dataAttribute);
-void			controlListener(void* parameter, MmsValue* value);
 void			controlHandlerForBinaryOutput(void* parameter, MmsValue* value, bool test);
 
 void 			sigint_handler(int signalId);
 
-//uint64_t 		Hal_getTimeInMs (void);
+static void 	Netif_Config(char* ipAddress,char* Mask, char* Gateway);
+
+
+
+static bool	activeSgChangedHandler (void* parameter, SettingGroupControlBlock* sgcb,	 uint8_t newActSg, ClientConnection connection);
+static bool	editSgChangedHandler (void* parameter, SettingGroupControlBlock* sgcb,  uint8_t newEditSg, ClientConnection connection);
+static void	editSgConfirmedHandler(void* parameter, SettingGroupControlBlock* sgcb,	uint8_t editSg);
+static void		loadActiveSgValues (int actSG);
+static void		loadEditSgValues (int editSG);
+
+/*************************************************************************
+ * sigint_handler
+ *************************************************************************/
+/* Фактически, сигнал — это асинхронное уведомление процесса о каком-либо событии.
+ * Когда сигнал послан процессу, операционная система прерывает выполнение процесса.
+ * Если процесс установил собственный обработчик сигнала, операционная система
+ * запускает этот обработчик, передав ему информацию о сигнале.
+ * Если процесс не установил обработчик, то выполняется обработчик по умолчанию.
+ */
+void
+sigint_handler(int signalId)
+{
+    running = 0;
+}
+/*************************************************************************
+ * gooseListener
+ *************************************************************************/
+void	gooseListener(GooseSubscriber subscriber, void* parameter)
+{
+    printf("GOOSE event:\n");
+    printf("  stNum: %u sqNum: %u\n", GooseSubscriber_getStNum(subscriber),
+            GooseSubscriber_getSqNum(subscriber));
+    printf("  timeToLive: %u\n", GooseSubscriber_getTimeAllowedToLive(subscriber));
+    printf("  timestamp: %"PRIu64"\n", GooseSubscriber_getTimestamp(subscriber));
+
+    MmsValue* values = GooseSubscriber_getDataSetValues(subscriber);
+
+    char buffer[1024];
+
+    MmsValue_printToBuffer(values, buffer, 1024);
+
+    printf("%s\n", buffer);
+}
+/*************************************************************************
+ * CheckHandlerResult
+ *************************************************************************/
+static CheckHandlerResult	checkHandler(void* parameter, MmsValue* ctlVal, bool test, bool interlockCheck, ClientConnection connection)
+{
+    printf("check handler called!\n");
+
+    if (interlockCheck)
+        printf("  with interlock check bit set!\n");
+
+    if (parameter == IEDMODEL_GGIO_INGGIO1_SPCSO1)
+        return CONTROL_ACCEPTED;
+
+    if (parameter == IEDMODEL_GGIO_INGGIO1_SPCSO2)
+        return CONTROL_ACCEPTED;
+
+    if (parameter == IEDMODEL_GGIO_INGGIO1_SPCSO3)
+        return CONTROL_ACCEPTED;
+
+    if (parameter == IEDMODEL_GGIO_INGGIO1_SPCSO4)
+        return CONTROL_ACCEPTED;
+
+    return CONTROL_OBJECT_UNDEFINED;
+}
+/*************************************************************************
+ * connectionHandler
+ *************************************************************************/
+static void	connectionHandler (IedServer self, ClientConnection connection, bool connected, void* parameter)
+{
+    if (connected){
+    	USART_TRACE_GREEN("Connection opened\n");
+    }
+    else{
+    	USART_TRACE_RED("Connection closed\n");
+    }
+}
+/*************************************************************************
+ * writeAccessHandler
+ *************************************************************************/
+static MmsDataAccessError	writeAccessHandler (DataAttribute* dataAttribute, MmsValue* value, ClientConnection connection, void* parameter)
+{
+	/*
+    if (dataAttribute == IEDMODEL_Inverter_ZINV1_OutVarSet_setMag_f) { //IEDMODEL_GenericIO_GGIO1_NamPlt_vendor
+
+        float newValue = MmsValue_toFloat(value);
+
+        printf("New value for OutVarSet_setMag_f = %f\n", newValue);
+
+        // Check if value is inside of valid range
+        if ((newValue >= 0.f) && (newValue <= 1000.1f))
+            return DATA_ACCESS_ERROR_SUCCESS;
+        else
+            return DATA_ACCESS_ERROR_OBJECT_VALUE_INVALID;
+
+    }
+*/
+    return DATA_ACCESS_ERROR_OBJECT_ACCESS_DENIED;
+}
 
 /*************************************************************************
  * StartIEC850Task
  *************************************************************************/
 void StartIEC850Task(void const * argument){
 
-	float t = 0.f;
-	bool	STvol = true;
-
-	struct netbuf 	*buf850;
-	err_t 			accept_err850;
-	uint16_t 		len;
-	uint8_t 		*data;
-	AcseConnection 	acseConnection;
-	CotpIndication 	cotpIndication;
-
-    ByteBuffer 		responseBuffer,responseFineBuffer;
+extern osThreadId IEC850TaskHandle;
 
 
+	iedServer = IedServer_create(&iedModel);	// создадим IED электронное устройство
 
-	//IsoConnection self = calloc(1, sizeof(struct sIsoConnection));
-	IsoConnection self = pvPortMalloc(sizeof(struct sIsoConnection));
+	osMutexRelease(xIEC850ServerStartMutex);
 
+// 1. ждем семафора готовности настроек IP
+	    osStatus status = osMutexWait(xIEC850StartMutex,osWaitForever);		// блокируемся
+	    if (status != osOK) {
+	    	// не запустился, всё нам конец.
+			USART_TRACE_RED("не запустился, всё нам конец.\n");
+	    }
+	    USART_TRACE_GREEN("Получили IP, запускаем сервак.\n");
+	    // 2. конфигурим сервер открываем порт.
+		IsoServer isoServer = IedServer_getIsoServer(iedServer);
+		IsoServer_setEthernetParam(isoServer,(char*)IP_ADDR,(char*)NETMASK_ADDR,(char*)GW_ADDR);
 
-	tcpip_init( NULL, NULL );
-	USART_TRACE_BLUE("MAC:%.2X-%.2X-%.2X-%.2X-%.2X-%.2X \n",MAC_ADDR0, MAC_ADDR1, MAC_ADDR2, MAC_ADDR3,MAC_ADDR4,MAC_ADDR5);
-	// устанавливаем IP параметры для первичного IP соединения, всегда сервер
-	IP4_ADDR(&first_ipaddr, first_IP_ADDR0, first_IP_ADDR1, first_IP_ADDR2, first_IP_ADDR3);
-	USART_TRACE_BLUE("IP:%d.%d.%d.%d \n",first_IP_ADDR0, first_IP_ADDR1, first_IP_ADDR2, first_IP_ADDR3);
-	// устанавливаем маску подсети.
-	IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1 , NETMASK_ADDR2, NETMASK_ADDR3);
-	USART_TRACE_BLUE("MASK:%d.%d.%d.%d \n",NETMASK_ADDR0, NETMASK_ADDR1 , NETMASK_ADDR2, NETMASK_ADDR3);
-	// устанавливаем адрес шлюза.
-	IP4_ADDR(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
-	USART_TRACE_BLUE("Gateway:%d.%d.%d.%d \n",GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
+		MAC_ADDR[0]	= MAC_ADDR0;
+		MAC_ADDR[1]	= MAC_ADDR1;
+		MAC_ADDR[2]	= MAC_ADDR2;
+		MAC_ADDR[3]	= IP_ADDR[1];//MAC_ADDR3;
+		MAC_ADDR[4]	= IP_ADDR[2];//MAC_ADDR4;
+		MAC_ADDR[5]	= IP_ADDR[3];//IP_ADDR[2];//MAC_ADDR5;
 
-	// добавим  и регистрируем NETWORK интерфейс
-	netif_add(&first_gnetif, &first_ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);
-	netif_set_default(&first_gnetif);
-	if (netif_is_link_up(&first_gnetif))	netif_set_up(&first_gnetif);		// When the netif is fully configured this function must be called
-	else									netif_set_down(&first_gnetif);		// When the netif link is down this function must be called
+		GW_ADDR[0] = IP_ADDR[0];
+		GW_ADDR[1] = IP_ADDR[1];
+		GW_ADDR[2] = IP_ADDR[2];
+		GW_ADDR[3] = 1;
 
-//	dhcp_start(&first_gnetif);		// автоматическое получение IP
+	    tcpip_init( NULL, NULL );									// создаем tcp_ip stack, таск TCP/IP
+	    // добавить функцию получения IP
+    	Netif_Config((char*)IP_ADDR,(char*)NETMASK_ADDR,(char*)GW_ADDR);		// Initialize the LwIP stack
 
-// --------------------------------------------------------------------------------------
-// freertos нужно через таски делать правильней
-// задачи в задаче создаются так:
-//
-// int main(void)
-// ...
-//	  	osThreadDef(Start, StartThread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 5);
-//		osThreadCreate (osThread(Start), NULL);
-//		osKernelStart();
-//		for( ;; );
-// ...
-//
-// static void StartThread(void const * argument)
-// ...
-//  	osThreadDef(DHCP, DHCP_thread, osPriorityBelowNormal, 0, configMINIMAL_STACK_SIZE * 5);
-//	    osThreadCreate (osThread(DHCP), &gnetif);
-//	  	osThreadDef(LED4, ToggleLed4, osPriorityLow, 0, configMINIMAL_STACK_SIZE);
-//	  	osThreadCreate (osThread(LED4), NULL);
-//	  for( ;; ){
-//	    osThreadTerminate(NULL);		 // удаляем таск который создал Thread
-//	  }
-// ...
-//
-//	функции тасков:
-//		void DHCP_thread(void const * argument) { ... }
-//		static void ToggleLed4(void const * argument) { ... }
+// 3. Информируем таск модбаса о готовности структуры для ввода данных
+	    USART_TRACE_GREEN("Разрешаем доступ к данным сервера 61850\n");
+// 4. запускаем стейтмашину 61850
+	    USART_TRACE_GREEN("запускаем стейтмашину 61850\n");
 
-
-// --------------------------------------------------------------------------------------
-/*
-	// Set the link callback function, this function is called on change of link status
-	// привяжем колбэк функцию на изменение состояния соединения
-	netif_set_link_callback(&first_gnetif, ethernetif_update_config);
-
-	// создадим семафор для информирования ethernetif о принятом пакете
-	osSemaphoreDef(Netif_SEM);
-	Netif_LinkSemaphore = osSemaphoreCreate(osSemaphore(Netif_SEM) , 1 );
-
-	link_arg.netif = &first_gnetif;
-	link_arg.semaphore = Netif_LinkSemaphore;
-
-	// Create the Ethernet link handler thread
-	osThreadDef(LinkThr, ethernetif_set_link, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 5);
-	osThreadCreate (osThread(LinkThr), &link_arg);
-
-	// клиент HHCP
-	osThreadDef(DHCP, DHCP_thread, osPriorityBelowNormal, 0, configMINIMAL_STACK_SIZE * 5);
-	osThreadCreate (osThread(DHCP), &first_gnetif);
-
-	// We should never get here as control is now taken by the scheduler
-	for( ;; ){
-		osThreadTerminate(NULL);
-	}
-*/
-// --------------------------------------------------------------------------------------
+	    Port_Off(LED1);
 
 	for(;;) {
-		// привяжем порт к интерфейсу и включим не прием
-		conn850 = netconn_new(NETCONN_TCP);										// создадим новое соединение 61850, возвращает структуру
-		if (conn850!=NULL){														// если удалось создать
-			USART_TRACE("Create NETCONN_TCP\n");
-			int8_t ready850 = netconn_bind(conn850, &first_ipaddr, IEC850_Port);		// привяжем соединение на IP и порт IEC 61850 (IEC850_Port)
-		    if (ready850 != ERR_OK)	{netconn_delete(conn850);USART_TRACE("Create NETCONN_TCP ERROR!!!\n");}
-		    else	{netconn_listen(conn850);USART_TRACE("Open port: %d\n",IEC850_Port);}		// переводим соединение в режим прослушивания
-		}
+
 		// -------------------------------------------------------------------------------------------------------------------
 		// -------------------------------------------------------------------------------------------------------------------
-		// динамическое создание модели, без файлов static_model.с .h
-		// нужны dynamic_model.c
-		// -------------------------------------------------------------------------------------------------------------------
-/*
-		iedModel = IedModel_create("testmodel");
-		LogicalDevice* lDevice1 	= LogicalDevice_create("SENSORS", iedModel);
-		LogicalNode* lln0 			= LogicalNode_create("LLN0", lDevice1);
-		DataObject* lln0_mod 		= CDC_ENS_create("Mod", (ModelNode*) lln0, 0);
-		DataObject* lln0_health 	= CDC_ENS_create("Health", (ModelNode*) lln0, 0);
-		SettingGroupControlBlock_create(lln0, 1, 1);
-
-	    // Add a temperature sensor LN
-	    LogicalNode* ttmp1 			= LogicalNode_create("TTMP1", lDevice1);
-	    DataObject* ttmp1_tmpsv 	= CDC_SAV_create("TmpSv", (ModelNode*) ttmp1, 0, false);
-
-	    DataAttribute* temperatureValue = (DataAttribute*) ModelNode_getChild((ModelNode*) ttmp1_tmpsv, "instMag.f");
-	    DataAttribute* temperatureTimestamp = (DataAttribute*) ModelNode_getChild((ModelNode*) ttmp1_tmpsv, "t");
-
-	    DataSet* dataSet = DataSet_create("events", lln0);
-	    DataSetEntry_create(dataSet, "TTMP1$MX$TmpSv$instMag$f", -1, NULL);
-
-	    uint8_t rptOptions = RPT_OPT_SEQ_NUM | RPT_OPT_TIME_STAMP | RPT_OPT_REASON_FOR_INCLUSION;
-
-	    ReportControlBlock_create("events01", lln0, "events01", false, NULL, 1, TRG_OPT_DATA_CHANGED, rptOptions, 50, 0);
-	    ReportControlBlock_create("events02", lln0, "events02", false, NULL, 1, TRG_OPT_DATA_CHANGED, rptOptions, 50, 0);
-*/
-		// -------------------------------------------------------------------------------------------------------------------
-		// -------------------------------------------------------------------------------------------------------------------
-		iedServer = IedServer_create(&iedModel);								// создадим IED электронное устройство
-
+		//iedServer = IedServer_create(&iedModel);								// создадим IED электронное устройство
 		// включаем парольный доступ
-		//AcseAuthenticationParameter auth = calloc(1, sizeof(struct sAcseAuthenticationParameter));
-		//auth->mechanism = AUTH_PASSWORD;	// 0x52 0x03 0x01 см. acse.с auth_mech_password_oid[]
-		//auth->value.password.string = "testpw";						//пароль
-		IsoServer isoServer = IedServer_getIsoServer(iedServer);
-		//IsoServer_setAuthenticationParameter(isoServer, auth);
-		//USART_TRACE("включили парольный доступ, пароль: %s механизм: 0x52, 0x03, 0x01 \n",auth->value.password.string);
+#ifdef	UseOSmem
+		AcseAuthenticationParameter auth = pvPortMalloc(sizeof(AcseAuthenticationParameter));
+#else
+		AcseAuthenticationParameter auth = malloc(sizeof(AcseAuthenticationParameter));
+#endif
+		// server_example4
+		char* password = "testpw";
+	    auth->mechanism = ACSE_AUTH_PASSWORD;
+	    auth->value.password.octetString = (uint8_t*) password;
+	    auth->value.password.passwordLength = strlen(password);
+	    //пароль
+//		IsoServer_setAuthenticationParameter(isoServer, auth);
 
-		// MMS сервер начинает слушать клиентов
-		IedServer_start(iedServer, 102);										// функция не нужна, сервер запускаю отдельно САМ
 		// -------------------------------------------------------------------------------------------------------------------
+		// Функции контроля над объектами, при управлении от клиента
 		// -------------------------------------------------------------------------------------------------------------------
-		// -------------------------------------------------------------------------------------------------------------------
-		// включаем функции мониторинга
-        IedServer_observeDataAttribute(iedServer, IEDMODEL_GenericIO_GGIO1_NamPlt_vendor, observerCallback);			// включим колбэк при записи от клиента
-        IedServer_observeDataAttribute(iedServer, IEDMODEL_GenericIO_GGIO1_NamPlt_swRev, observerCallback);				// включим колбэк при записи от клиента
 
+		// контроль за объектом IEDMODEL_GenericIO_GGIO1_Ind1. Указываем на функцию-обработчик controlHandlerForBinaryOutput и параметр (IEDMODEL_GenericIO_GGIO1_Ind1) если функция обрабатывает несколько объектов.
+		// управление выключателем
+		IedServer_setControlHandler(iedServer, IEDMODEL_CTRL_CSWI1_Pos, (ControlHandler) controlHandlerForBinaryOutput,IEDMODEL_CTRL_CSWI1_Pos_Oper);
 
-    	//IedServer_setPerformCheckHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO1,(ControlPerformCheckHandler) performCheckHandler, IEDMODEL_GenericIO_GGIO1_SPCSO1);
-/*
-    	IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_Ind1, (ControlHandler) controlHandlerForBinaryOutput,IEDMODEL_GenericIO_GGIO1_Ind1);
-    	IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_Ind2, (ControlHandler) controlHandlerForBinaryOutput,IEDMODEL_GenericIO_GGIO1_Ind2);
-    	IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_Ind3, (ControlHandler) controlHandlerForBinaryOutput,IEDMODEL_GenericIO_GGIO1_Ind3);
-    	IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_Ind4, (ControlHandler) controlHandlerForBinaryOutput,IEDMODEL_GenericIO_GGIO1_Ind4);
-    	IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_Ind5, (ControlHandler) controlHandlerForBinaryOutput,IEDMODEL_GenericIO_GGIO1_Ind5);
-    	IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_Ind6, (ControlHandler) controlHandlerForBinaryOutput,IEDMODEL_GenericIO_GGIO1_Ind6);
-    	IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_Ind7, (ControlHandler) controlHandlerForBinaryOutput,IEDMODEL_GenericIO_GGIO1_Ind7);
-    	IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_Ind8, (ControlHandler) controlHandlerForBinaryOutput,IEDMODEL_GenericIO_GGIO1_Ind8);
-*/
-        //IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO1, (ControlHandler)controlListener, IEDMODEL_GenericIO_GGIO1_SPCSO1);
+		IedServer_setControlHandler(iedServer, IEDMODEL_GGIO_LEDGGIO1_SPCSO1, (ControlHandler) controlHandlerForBinaryOutput,IEDMODEL_GGIO_LEDGGIO1_SPCSO1_Oper);
+		IedServer_setControlHandler(iedServer, IEDMODEL_CTRL_GGIO1_SPCSO1, (ControlHandler) controlHandlerForBinaryOutput,IEDMODEL_CTRL_GGIO1_SPCSO1_Oper);
+		IedServer_setControlHandler(iedServer, IEDMODEL_CTRL_GGIO1_SPCSO2, (ControlHandler) controlHandlerForBinaryOutput,IEDMODEL_CTRL_GGIO1_SPCSO2_Oper);
+		IedServer_setControlHandler(iedServer, IEDMODEL_CTRL_GGIO1_SPCSO3, (ControlHandler) controlHandlerForBinaryOutput,IEDMODEL_CTRL_GGIO1_SPCSO3_Oper);
 
-        // -------------------------------------------------------------------------------------------------------------------
 
-		// далее приём данных и обработка в цикле
-        while (1){																	// далее слушаем и  захватываем соединение
-        	accept_err850 = netconn_accept(conn850, &newconn850);
-        	if (accept_err850 == ERR_OK){											// если приняли, то обработаем его
-        		USART_TRACE("a new connection has been received...\n");
+//	    IedServer_setControlHandler(iedServer, IEDMODEL_GGIO_INGGIO1_SPCSO1,(ControlHandler) controlHandlerForBinaryOutput, IEDMODEL_GGIO_INGGIO1_SPCSO1);
+	    IedServer_setControlHandler(iedServer, IEDMODEL_CTRL_XCBR1_Mod,(ControlHandler) controlHandlerForBinaryOutput, IEDMODEL_CTRL_XCBR1_Mod_Oper);
 
-        		Port_On(LED1);
 
-        		Connection_create(newconn850,self,data);							// настроим структуру для работы
-        		AcseConnection_init(&acseConnection);
-        		AcseConnection_setAuthenticationParameter(&acseConnection, IsoServer_getAuthenticationParameter(isoServer));
+	    /* this is optional - performs operative checks */
+	    IedServer_setPerformCheckHandler(iedServer, IEDMODEL_GGIO_INGGIO1_SPCSO1, checkHandler, IEDMODEL_GGIO_INGGIO1_SPCSO1);
+/*****************************************************************************************************
+ *
+ * многоклиентский доступ
+ *
+ *****************************************************************************************************/
+		while (1){
 
-        		MmsServerConnection* mmsCon = MmsServerConnection_init(0,IedServer_getMmsServer(iedServer), self);
+			IedServer_setConnectionIndicationHandler(iedServer, (IedConnectionIndicationHandler) connectionHandler, NULL);
 
+		#if (CONFIG_MMS_THREADLESS_STACK == 1)
+			IedServer_startThreadless(iedServer, 102);		    // настраиваем сервер открываем порт и слушаем соединения.
+		#else
+			IedServer_start(iedServer, 102);					// MMS server will be instructed to start listening to client connections.
+		#endif
 
+			//--------------- SG -------------------------
+		    SettingGroupControlBlock* sgcb = LogicalDevice_getSettingGroupControlBlock(IEDMODEL_Generic_LD0);
 
-        		while (netconn_recv(newconn850, &buf850) == ERR_OK)					// принимаем данные в буфер
-                {
-                    USART_TRACE_GREEN(" ---------------------- netbuf Receive data ---------------------- \n");
+		    loadActiveSgValues(sgcb->actSG);
 
-                    t += 0.1f;
-                    STvol = !STvol;
+		    IedServer_setActiveSettingGroupChangedHandler(iedServer, sgcb, activeSgChangedHandler, NULL);
+		    IedServer_setEditSettingGroupChangedHandler(iedServer, sgcb, editSgChangedHandler, NULL);
+		    IedServer_setEditSettingGroupConfirmationHandler(iedServer, sgcb, editSgConfirmedHandler, NULL);
 
-//            	    uint64_t currentTime = Hal_getTimeInMs();
 
-/*
-                    IedServer_lockDataModel(iedServer);																	// захватываем управление mmsServer'ом
-            	    IedServer_updateFloatAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_AnIn1_mag_f, t);			// обновим в AnIn1_mag_f новое значение
-            	    IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_AnIn1_t, currentTime);	// обновим в AnIn1_t новое значение
-            	    IedServer_updateQuality(iedServer, IEDMODEL_GenericIO_GGIO1_AnIn1_q, QUALITY_VALIDITY_GOOD | QUALITY_SOURCE_SUBSTITUTED);
+			//--------------- Goose -------------------------
+			IedServer_setGooseInterfaceId(iedServer, CONFIG_ETHERNET_INTERFACE_ID);
 
-            	    IedServer_updateBooleanAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_Ind1_stVal, STvol);
-            	    IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_Ind1_t, currentTime);
+		//    GooseReceiver receiver = GooseReceiver_create();
+		//    GooseReceiver_setInterfaceId(receiver, "eth0");
+		//    GooseSubscriber subscriber = GooseSubscriber_create("simpleIOGenericIO/LLN0$GO$gcbAnalogValues", NULL);
+		//    GooseSubscriber_setAppId(subscriber, 1000);
+		//    GooseSubscriber_setListener(subscriber, gooseListener, NULL);
+		//    GooseReceiver_addSubscriber(receiver, subscriber);
+		//    GooseReceiver_start(receiver);
+			//--------------- Goose -------------------------
 
-            	    IedServer_updateBooleanAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_Ind2_stVal, STvol);
-            	    IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_Ind2_t, currentTime);
 
-            	    IedServer_updateBooleanAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_Ind3_stVal, STvol);
-            	    IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_Ind3_t, currentTime);
+			if (!IedServer_isRunning(iedServer)) {
+				USART_TRACE_RED("Ошибка запуска сервера! Останов.\n");
+				IedServer_destroy(iedServer);
+			}
 
-            	    IedServer_updateBooleanAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_Ind4_stVal, STvol);
-            	    IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_Ind4_t, currentTime);
+//			osMutexRelease(xIEC850ServerStartMutex);
 
-            	    IedServer_updateBooleanAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_Ind5_stVal, STvol);
-            	    IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_Ind5_t, currentTime);
+			//--------------- Goose -------------------------
+			/* Start GOOSE publishing */
+			IedServer_enableGoosePublishing(iedServer);
+			//--------------- Goose -------------------------
 
-            	    IedServer_updateBooleanAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_Ind6_stVal, STvol);
-            	    IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_Ind6_t, currentTime);
+			running = 1;
 
-            	    IedServer_updateBooleanAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_Ind7_stVal, STvol);
-            	    IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_Ind7_t, currentTime);
+			while (running) {
 
-            	    IedServer_updateBooleanAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_Ind8_stVal, STvol);
-            	    IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_Ind8_t, currentTime);
+				IedServer_processIncomingData(iedServer);						// Должна вызываться периодически для приёма данных и соединений
+																				// проверяем было ли соединение на сокет?
+				IedServer_performPeriodicTasks(iedServer);						// Должна вызываться периодически монитор служб 61850
 
-            	    IedServer_unlockDataModel(iedServer);																// отдаём управление mmsServer'ом
-*/
+			}
 
-//                    IedServer_setControlHandler(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO1, (ControlHandler) controlHandlerForBinaryOutput,IEDMODEL_GenericIO_GGIO1_SPCSO1);
-
-                    do
-                    {
-                    netbuf_data(buf850,(void *)&data, &len);						// указатель получил адрес вх. данных и его размер
-                    self->cotpConnection->readBuffer->buffer = data;
-                    self->cotpConnection->readBuffer->maxSize = len;
-
-                    //USART_TRACE("Receive data from a netconn. %u bytes \n",len);
-
-                    ByteBuffer_wrap(&responseBuffer, self->send_buf_1, 0, SEND_BUF_SIZE);	// буфер подготовки данных для передачи в TCP/IP
-                	//USART_TRACE("укажем буферу responseBuffer адрес выделенной области send_buf_1 с макс размером:%u\n",SEND_BUF_SIZE);
-
-                	ByteBuffer_wrap(&responseFineBuffer, self->send_buf_2, 0, SEND_BUF_SIZE);
-                	//USART_TRACE("укажем буферу responseFineBuffer адрес выделенной области send_buf_2 с макс размером:%u\n",SEND_BUF_SIZE);
-
-
-
-                    // Юзер данные перекладываем в Payload буфер
-                    cotpIndication = CotpConnection_parseIncomingMessage(self->cotpConnection);	// парсим пакет и возвращаем тип соединения, Юзер данные перекладываем в Payload буфер
-                    switch (cotpIndication) {
-                        case CONNECT_INDICATION:
-                        	USART_TRACE("ISO 8073 COTP connection indication\n");
-                        	CotpConnection_sendConnectionResponseMessage(self->cotpConnection);
-                        break;
-
-                        case DATA_INDICATION:
-                        {
-                    		Port_On(LED2);
-                        	//USART_TRACE("ISO 8073 COTP data indication\n");
-
-                            ByteBuffer* 			cotpPayload = CotpConnection_getPayload(self->cotpConnection);		// получаем адрес сообщения
-                            IsoSessionIndication	sIndication = IsoSession_parseMessage(self->session, cotpPayload);	// парсим Session сообщение
-                            ByteBuffer*				sessionUserData = IsoSession_getUserData(self->session);			// iso8823 OSI Presentation protocol в sessionUserData находится всё начиная с ISO 8823
-
-                        	ByteBuffer_wrap(self->cotpConnection->writeBuffer, self->send_buf_2, 0, SEND_BUF_SIZE);
-                        	//USART_TRACE("укажем буферу writeBuffer адрес выделенной области send_buf_2 с макс размером:%u\n",SEND_BUF_SIZE);
-
-                            switch (sIndication) {
-                            IsoPresentationIndication 	pIndication;
-
-                        		case SESSION_OK:
-                        			//USART_TRACE("iso_connection: session ok\n");
-                        			break;
-
-                            	case SESSION_CONNECT:
-                            		//USART_TRACE("iso_connection: session connect indication\n");
-                            		pIndication = IsoPresentation_parseConnect(self->presentation, sessionUserData);	// парсим Presentation сообщение
-                            		// далее в self->presentation-nextPayload данные начиная с ISO 8650-1 (AARP) сообщения запроса от клиента.
-
-                            		if (pIndication == PRESENTATION_OK) {
-                                        ByteBuffer* 	acseBuffer;
-                                        AcseIndication 	aIndication;
-                                        ByteBuffer 		mmsRequest;
-
-                            			//USART_TRACE("iso_connection: presentation ok\n");
-
-                            			acseBuffer = &(self->presentation->nextPayload);								// берём указатель на входящий ISO 8650-1 (AARP) и парсим
-                            			aIndication = AcseConnection_parseMessage(&acseConnection, acseBuffer);			// возвращаем указатель на юзерданные в acseConnection->userDataBuffer
-
-                            			if (aIndication == ACSE_ASSOCIATE) {
-                            				//USART_TRACE("cotp_server: acse associate\n");
-
-                            				ByteBuffer_wrap(&mmsRequest, acseConnection.userDataBuffer,acseConnection.userDataBufferSize, acseConnection.userDataBufferSize);
-
-                            				// Получили запрос Request, нужно его проанализировать и сформировать ответ Response
-//TODO: Нужна функция анализа Request и формирования Response.
-
-                            				//MmsServerConnection	mmsServercon;
-                            				//iedServer->mmsServer->isoServer->connectionHandler(iedServer->mmsServer->isoServer->connectionHandlerParameter);
-
-                            				//isoConnectionIndicationHandler();
-
-                            				ByteBuffer_setcurrPos(&responseBuffer,0);
-                                        	MmsServerConnection_parseMessage(mmsCon,  &mmsRequest, &responseBuffer);
-
-                            				//mmsRequest.buffer[0]++;	//ответим response
-
-
-                            				if (responseBuffer.currPos > 0) {
-                            					//USART_TRACE("iso_connection: application payload size: %i\n", responseBuffer.currPos);
-
-
-                            					// пишем в writeBuffer заголовок ISO 8650-1 (AARQ 24 байта) + содержимое mmsRequest (user infirmation = MMS)
-                            					AcseConnection_createAssociateResponseMessage(&acseConnection,ACSE_RESULT_ACCEPT,/*self->cotpConnection->writeBuffer*/&responseFineBuffer, &responseBuffer);
-                            					//USART_TRACE("add ISO 8650-1(AARQ) total size: %i\n",/* self->cotpConnection->writeBuffer->currPos*/responseFineBuffer.currPos);
-
-                            					//  пишем в payload ISO 8823 + содержимое writeBuffer (AARQ + user infirmation)
-                            					ByteBuffer_setcurrPos(self->cotpConnection->payload,0);
-                            					IsoPresentation_createCpaMessage(self->presentation, self->cotpConnection->payload,/*self->cotpConnection->writeBuffer*/&responseFineBuffer);
-                            					//USART_TRACE("add ISO 8823(ANS.1) total size: %i\n", self->cotpConnection->payload->currPos);
-
-                            					// с этого момента в payload->buffer с лежит блок: ISO 8823 + ISO 8650-1 + MMS
-                            					// до TCP уровня осталось ISO 8327-1 (SPDU), ISO 8073 (COTP), TPKT
-
-                            					ByteBuffer_setcurrPos(/*self->cotpConnection->writeBuffer*/&responseFineBuffer,0);		// обнулим укозатель для формирования хвоста начиная с ISO 8327-1
-                            					ByteBuffer_setcurrPos(&responseBuffer,0);
-
-                            					// формитуем в буфере writeBuffer конструкцию AcceptSpdu ( ISO 8327-1 OSI Session protocol )
-                            					IsoSession_createAcceptSpdu(self->session,&responseBuffer,self->cotpConnection->payload->currPos);
-                            					//USART_TRACE_MAGENTA("create new buffer ISO 8327-1(SPDU) total size: %i\n", responseBuffer.currPos);
-
-                            					// дополняем его буфером payload->buffer (ISO 8823 + ISO 8650-1 + MMS)
-                            					ByteBuffer_append(&responseBuffer, self->cotpConnection->payload->buffer,self->cotpConnection->payload->currPos);
-                            					//USART_TRACE_MAGENTA("add ISO 8823 + ISO 8650-1 + ISO 9506 (MMS) total size: %i\n", responseBuffer.currPos);
-
-                            					// добавляем TPKT и ISO 8073 (COTP) и отправляем всё в стек TCP/IP
-                            					CotpConnection_sendDataMessage(self->cotpConnection, &responseBuffer);
-                            					//USART_TRACE_MAGENTA("add TPKT & ISO 8073 (COTP) total size: %i\n",/*self->cotpConnection->writeBuffer->currPos*/responseFineBuffer.currPos);
-
-                            				}
-                            				else {
-                            					USART_TRACE_RED("iso_connection: association error. No response from application!\n");
-                            				}
-                            			}
-                            			else {
-                            				USART_TRACE_RED("iso_connection: acse association failed\n");
-                                            self->state = ISO_CON_STATE_STOPPED;
-                            			}
-                            		}
-                            		break;
-
-                            	case SESSION_DATA:
-                            		//USART_TRACE("iso_connection: session data indication\n");
-
-                            		pIndication = IsoPresentation_parseUserData(self->presentation, sessionUserData);
-                                    if (pIndication == PRESENTATION_ERROR) {
-                                        USART_TRACE_RED("cotp_server: presentation error\n");
-                                        self->state = ISO_CON_STATE_STOPPED;
-                                        break;
-                                    }
-
-                                    if (self->presentation->nextContextId == 3) {
-                                    	ByteBuffer* mmsRequest;
-
-                                    	USART_TRACE("iso_connection: mms message\n");
-
-                                    	mmsRequest = &(self->presentation->nextPayload);
-
-                        				// Получили запрос Request, нужно его проанализировать и сформировать ответ Response
-                            			ByteBuffer_setcurrPos(&responseBuffer,0);
-                                    	ByteBuffer_setcurrPos(/*self->cotpConnection->writeBuffer*/&responseFineBuffer,0);
-
-                                        MmsServerConnection_parseMessage(mmsCon,  mmsRequest, &responseBuffer);
-
-
-                                    	// создадим MMS сообщение в буфере writeBuffer с юзерданными из payload
-                                    	IsoPresentation_createUserData(self->presentation,/*self->cotpConnection->writeBuffer*/&responseFineBuffer, &responseBuffer);
-
-                                    	ByteBuffer_setcurrPos(&responseBuffer,0);						// обнулим укозатель для формирования
-
-                                    	// добавим GiveToken Data SPDU в оконечный буфер для отправки
-                                    	IsoSession_createDataSpdu(self->session, &responseBuffer);
-                                    	//USART_TRACE_MAGENTA("create new buffer ISO 8327-1(SPDU) total size: %i\n", responseBuffer.currPos);
-
-                                    	// дополняем его буфером writeBuffer->buffer (ISO 8823 + ISO 8650-1 + MMS)
-                                    	ByteBuffer_append(&responseBuffer,/*self->cotpConnection->writeBuffer->buffer*/responseFineBuffer.buffer,/*self->cotpConnection->writeBuffer->currPos*/responseFineBuffer.currPos);
-                                    	//USART_TRACE_MAGENTA("add ISO 8823 + ISO 8650-1 + ISO 9506 (MMS) total size: %i\n", responseBuffer.currPos);
-
-                                    	ByteBuffer_setcurrPos(/*self->cotpConnection->writeBuffer*/&responseFineBuffer,0);
-
-                    					// добавляем TPKT и ISO 8073 (COTP) и отправляем всё в стек TCP/IP
-                                    	CotpConnection_sendDataMessage(self->cotpConnection, &responseBuffer);
-                                    	//USART_TRACE_MAGENTA("add TPKT & ISO 8073 (COTP) total size: %i\n", /*self->cotpConnection->writeBuffer->currPos*/responseFineBuffer.currPos);
-
-                                    }else{
-                                    	USART_TRACE_RED(" iso_connection: unknown presentation layer context!\n");
-                                    }
-                            		break;
-
-                            	case SESSION_GIVE_TOKEN:
-                            		USART_TRACE("iso_connection: session give token\n");
-                            		USART_TRACE_RED("TODO: iso_connection: session give token\n");
-                            		break;
-
-                            	case SESSION_ERROR:
-                            		Port_On(LED4);
-                            		USART_TRACE_RED("iso_connection: session error\n");
-                            		self->state = ISO_CON_STATE_STOPPED;
-                            		break;
-
-                            }// switch (sIndication)
-                    	Port_Off(LED2);
-                        }// DATA_INDICATION
-                        break;
-
-                        case ERR:
-                        	USART_TRACE_RED("ISO 8073 COTP protocol error\n");
-                        	self->state = ISO_CON_STATE_STOPPED;
-                        break;
-
-                        default:
-                        	USART_TRACE_RED("COTP Unknown Indication: %i\n", cotpIndication);
-                            self->state = ISO_CON_STATE_STOPPED;
-                        break;
-                    }
-
-                    }while (netbuf_next(buf850) >= 0);
-
-                    //free(self->send_buf_1);										// освободим память
-                    //USART_TRACE_RED("free(self->send_buf_1)\n");
-
-                netbuf_delete(buf850);
-                USART_TRACE_GREEN("netbuf_delete ...\n");
-                }
-        	Port_Off(LED1);
-            }
-        	USART_TRACE_GREEN("Close netconn connection ...\n");
-            netconn_close(newconn850);											// закрываем соединение
-            netconn_delete(newconn850);											// освобождаем память
-        }
-		//! приём данных и обработка
-		IedServer_destroy(iedServer);
+			IedServer_stopThreadless(iedServer);								// stop MMS server - close TCP server socket and all client sockets
+			IedServer_destroy(iedServer);							    		// Cleanup - free all resources
+		}
+/*****************************************************************************************************
+ *
+ * !многоклиентский доступ
+ *
+ *****************************************************************************************************/
 	}
 }
-
-/*************************************************************************
- * ByteBuffer_send(ByteBuffer* self)
- * передача
- *************************************************************************/
-int		ByteBuffer_send(ByteBuffer* self)
-{
-
-	if (ERR_OK == netconn_write(newconn850, self->buffer, (size_t)self->currPos, NETCONN_COPY))
-		return 1;
-    else
-        return -1;
-
-}
-
-/*************************************************************************
- * Connection_create
- *
- *************************************************************************/
-IsoConnection	Connection_create(struct netconn *conn, IsoConnection self, uint8_t* Inbuffer)
-{
-
-	self->cotpConnection = calloc(1, sizeof(CotpConnection));
-	self->cotpConnection->readBuffer = ByteBuffer_create(NULL,RECEIVE_BUF_SIZE);		// выделяем област памяти размером RECEIVE_BUF_SIZE
-   	self->cotpConnection->payload = ByteBuffer_create(NULL,SEND_BUF_SIZE);				// выделяем област памяти размером RECEIVE_BUF_SIZE
-
-   	self->socket = conn;
-
-    self->session = calloc(1, sizeof(IsoSession));
-    IsoSession_init(self->session);
-
-    self->presentation = calloc(1, sizeof(IsoPresentation));
-    IsoPresentation_init(self->presentation);
-
-	self->receive_buf = Inbuffer;
-
-	self->send_buf_1 = malloc(SEND_BUF_SIZE);
-	USART_TRACE("Выделил память для send_buf_1 = %u \n",SEND_BUF_SIZE);
-
-	self->send_buf_2 = malloc(SEND_BUF_SIZE);
-	USART_TRACE("Выделил память для send_buf_2 = %u \n",SEND_BUF_SIZE);
-
-	self->msgRcvdHandler = NULL;
-	self->msgRcvdHandlerParameter = NULL;
-
-	self->state = ISO_CON_STATE_RUNNING;
-	self->clientAddress = Socket_getPeerAddress(conn);							// адрес клиента
-
-	USART_TRACE("Сконфигурировали IsoConnection\n");
-
-	return self;
-}
-/*************************************************************************
- * Socket_getPeerAddress
- *
- *************************************************************************/
-char*	Socket_getPeerAddress(struct netconn *conn)
-{
-    //struct sockaddr_storage addr;
-    ip_addr_t 	addr;
-    uint16_t	port;
-    uint8_t		ip0,ip1,ip2,ip3;
-
-    char* clientConnection = malloc(24);
-
-    netconn_peer(conn,&addr,&port);
-
-    ip0 = addr.addr & 0xff;
-    ip1 = (addr.addr>>8) & 0xff;
-    ip2 = (addr.addr>>16) & 0xff;
-    ip3 = (addr.addr>>24) & 0xff;
-
-    sprintf(clientConnection, "%d.%d.%d.%d[%i]",ip0, ip1, ip2, ip3, port);
-    USART_TRACE("PeerAddress: IP:%d.%d.%d.%d[%i]\n",ip0, ip1, ip2, ip3,port);
-
-   return clientConnection;
-}
-/*************************************************************************
- * observerCallback
- * колбэк монитора за атрибутами
- * если пришла команда от клиента на запись/изменение сотояния
- * то вызываем функцию
- *************************************************************************/
-void	observerCallback(DataAttribute* dataAttribute){
-    if (dataAttribute == IEDMODEL_GenericIO_GGIO1_NamPlt_vendor) {
-    	USART_TRACE("GGIO.NamPlt.vendor changed to %s\n", MmsValue_toString(dataAttribute->mmsValue));
-    }
-    else if (dataAttribute == IEDMODEL_GenericIO_GGIO1_NamPlt_swRev) {
-    	USART_TRACE("GGIO.NamPlt.swRef changed to %s\n", MmsValue_toString(dataAttribute->mmsValue));
-    }
-}
-/*************************************************************************
- * controlListener
- *************************************************************************/
-void	controlListener(void* parameter, MmsValue* value)
-{
-
-	 if (MmsValue_getType(value) == MMS_BOOLEAN) {
-	        printf("принята команда контроля MMS_BOOLEAN: ");
-
-	        if (MmsValue_getBoolean(value) == MMS_BOOLEAN)
-	            printf("on\n");
-	        else
-	            printf("off\n");
-	    }
-	 else{
-	        printf("команда не MMS_BOOLEAN\n");
-	 }
-
-	    uint64_t timeStamp = Hal_getTimeInMs();
-
-    if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO1){
-        IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO1_t, timeStamp);
-        IedServer_updateAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO1_stVal, value);
-    }
-
-}
-
-static void	updateLED4stVal(bool newLedState, uint64_t timeStamp) {
-
-	if (newLedState) Port_On(LED4); else Port_Off(LED4);
-
-    IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO1_t, timeStamp);
-    IedServer_updateBooleanAttributeValue(iedServer, IEDMODEL_GenericIO_GGIO1_SPCSO1_stVal, newLedState);
-}
-
 /*************************************************************************
  * controlHandlerForBinaryOutput
+ *  Функция контроля над бинарным объектом. После изменения этих данных от
+ *  клиента, будет вызываться эта функция.
  *************************************************************************/
 void	controlHandlerForBinaryOutput(void* parameter, MmsValue* value, bool test)
 {
+	USART_TRACE_GREEN("controlHandlerForBinaryOutput MMS_BOOLEAN:\n");
 
 	 if (MmsValue_getType(value) == MMS_BOOLEAN) {
-	        printf("принята команда контроля MMS_BOOLEAN: ");
+		 USART_TRACE("принята команда контроля MMS_BOOLEAN:\n");
 
-	        if (MmsValue_getBoolean(value) == MMS_BOOLEAN)
-	            printf("on\n");
-	        else
-	            printf("off\n");
+	        if (MmsValue_getBoolean(value)){
+	        	USART_TRACE_GREEN("on\n");
+	        }
+	        else {
+	        	USART_TRACE_RED("off\n");
+	        }
 	    }
 	 else{
-	        printf("команда не MMS_BOOLEAN\n");
+		 USART_TRACE_RED("команда не MMS_BOOLEAN\n");
 	 }
 
 	    uint64_t timeStamp = Hal_getTimeInMs();
 
 	    bool newState = MmsValue_getBoolean(value);
 
-	    if (parameter == IEDMODEL_GenericIO_GGIO1_SPCSO1)	updateLED4stVal(newState, timeStamp);
+	    // выключатель
+	    if (parameter == IEDMODEL_CTRL_CSWI1_Pos_Oper)	{
+	    	USART_TRACE_GREEN("команда управления выключателем IEDMODEL_CTRL_CSWI1_Pos_Oper\n");
+	    	CSWI_Pos_Oper_Set(newState, timeStamp);
+	    }
+	    // Сброс индикации
+	    if (parameter == IEDMODEL_GGIO_LEDGGIO1_SPCSO1_Oper)	{
+	    	USART_TRACE_GREEN("Сброс индикации\n");
+	    	GGIO_LEDGGIO1_SPCSO1_Oper(newState, timeStamp);
+	    }
+
+	    if (parameter == IEDMODEL_CTRL_GGIO1_SPCSO1_Oper)	{
+	    	USART_TRACE_GREEN("Сброс флага новой неисправности\n");
+	    	GGIO_SPCSO1_Oper(newState, timeStamp);
+	    }
+	    if (parameter == IEDMODEL_CTRL_GGIO1_SPCSO2_Oper)	{
+	    	USART_TRACE_GREEN("Сброс флага новой записи в журнале системы\n");
+	    	GGIO_SPCSO2_Oper(newState, timeStamp);
+	    }
+	    if (parameter == IEDMODEL_CTRL_GGIO1_SPCSO3_Oper)	{
+	    	USART_TRACE_GREEN("Сброс флага новой записи в журнале аварий\n");
+	    	GGIO_SPCSO3_Oper(newState, timeStamp);
+	    }
+
 
 }
 
-/*************************************************************************
- * Hal_getTimeInMs
- *
- *************************************************************************/
-void sigint_handler(int signalId)
+/**
+  * @brief  Initializes the lwIP stack
+  * @param  None
+  * @retval None
+  */
+static void Netif_Config(char* ipAddress,char* Mask, char* Gateway)
+{
+  struct ip_addr ipaddr;
+  struct ip_addr netmask;
+  struct ip_addr gw;
+
+  /* IP address default setting */
+  IP4_ADDR(&ipaddr, ipAddress[0], ipAddress[1], ipAddress[2], ipAddress[3]);
+  IP4_ADDR(&netmask, Mask[0], Mask[1] , Mask[2], Mask[3]);
+  IP4_ADDR(&gw, Gateway[0], Gateway[1], Gateway[2], Gateway[3]);
+
+  /* - netif_add(struct netif *netif, struct ip_addr *ipaddr,
+  struct ip_addr *netmask, struct ip_addr *gw,
+  void *state, err_t (* init)(struct netif *netif),
+  err_t (* input)(struct pbuf *p, struct netif *netif))
+
+  Adds your network interface to the netif_list. Allocate a struct
+  netif and pass a pointer to this structure as the first argument.
+  Give pointers to cleared ip_addr structures when using DHCP,
+  or fill them with sane numbers otherwise. The state pointer may be NULL.
+
+  The init function pointer must point to a initialization function for
+  your ethernet netif interface. The following code illustrates it's use.*/
+
+  netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);				// ethernetif_init - запуск таска для приема. tcpip_input - функция приема данных
+
+  /*  Registers the default network interface. */
+  netif_set_default(&gnetif);
+
+  if (netif_is_link_up(&gnetif))
+  {
+    /* When the netif is fully configured this function must be called.*/
+    netif_set_up(&gnetif);
+  }
+  else
+  {
+    /* When the netif link is down this function must be called */
+    netif_set_down(&gnetif);
+  }
+
+  /* Set the link callback function, this function is called on change of link status*/
+  netif_set_link_callback(&gnetif, ethernetif_update_config);
+
+  /* create a binary semaphore used for informing ethernetif of frame reception */
+  osSemaphoreDef(Netif_SEM);
+  Netif_LinkSemaphore = osSemaphoreCreate(osSemaphore(Netif_SEM) , 1 );
+
+  link_arg.netif = &gnetif;
+  link_arg.semaphore = Netif_LinkSemaphore;
+  /* Create the Ethernet link handler thread */
+#if defined(__GNUC__)
+  osThreadDef(LinkThr, ethernetif_set_link, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 5);
+#else
+  osThreadDef(LinkThr, ethernetif_set_link, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 2);
+#endif
+  osThreadCreate (osThread(LinkThr), &link_arg);
+}
+
+//--------------------------------------------------------------------
+
+static bool	activeSgChangedHandler (void* parameter, SettingGroupControlBlock* sgcb,	 uint8_t newActSg, ClientConnection connection)
+{
+    printf("Switch to setting group %i\n", (int) newActSg);
+
+    loadActiveSgValues(newActSg);
+
+    return true;
+}
+
+static bool	editSgChangedHandler (void* parameter, SettingGroupControlBlock* sgcb,  uint8_t newEditSg, ClientConnection connection)
+{
+    printf("Set edit setting group to %i\n", (int) newEditSg);
+
+    loadEditSgValues(newEditSg);
+
+    return true;
+}
+static void	editSgConfirmedHandler(void* parameter, SettingGroupControlBlock* sgcb,	uint8_t editSg)
+{
+    printf("Received edit sg confirm for sg %i\n", editSg);
+
+     if (IedServer_getActiveSettingGroup(iedServer, sgcb) == editSg) {
+        loadActiveSgValues(editSg);
+    }
+}
+//--------------------------------------------------------------------
+static void		loadActiveSgValues (int actSG)
 {
 
+	// тут функция переключения группы уставок с вычитыванием всех
+  // IedServer_updateInt32AttributeValue(iedServer, IEDMODEL_LD0_LLN0_RstTms_setVal, 1);
 }
-/*************************************************************************
- * Hal_getTimeInMs
- * Получаем от часов время в ms от лохматого 70-го года.
- * БЕЗ УЧЕТА ВИСОКОСНОСТИ.... чистые секунды .
- *************************************************************************/
-uint64_t 	Hal_getTimeInMs (void){
-
-	RTC_TimeTypeDef sTime;
-	RTC_DateTypeDef sDate;
-	uint64_t	sectmp,den;
-
-	HAL_RTC_GetTime(&hrtc, &sTime, FORMAT_BIN);			// Читаем время
-	HAL_RTC_GetDate(&hrtc, &sDate, FORMAT_BIN);			// читаем дату
-
-	den 	= (30+sDate.Year) * 365 + (30+sDate.Year+2)/4 - 2;
-
-	switch(sDate.Month) {
-	    case 2 : den +=31; break;	//31	31
-	    case 3 : den +=59; break;	//59	28
-	    case 4 : den +=90; break;	//90	31
-	    case 5 : den +=120; break;	//120	30
-	    case 6 : den +=151; break;	//151	31
-	    case 7 : den +=181; break;	//181	30
-	    case 8 : den +=212; break;	//212	31
-	    case 9 : den +=243; break;	//243	31
-	    case 10 : den +=273; break;	//273	30
-	    case 11 : den +=304; break;	//304	31
-	    case 12 : den +=334; break;	//334	30
-	   };
-
-	if (!((30+sDate.Year+2)%4) && sDate.Month>2) den++;
-
-	 den += sDate.Date;
-
-	 sectmp = den * 86400;
-	 sectmp += sTime.Hours * 3600;
-	 sectmp += sTime.Minutes * 60;
-	 sectmp += sTime.Seconds;
-
-	 sectmp -= Timezone*60*60;			//отнимем часовой пояс, для получения отсчетов UTC стандарта.
-
-	 sectmp *= 1000;
-	 sectmp += sTime.SubSeconds/10;
-
-	return sectmp;
+//--------------------------------------------------------------------
+static void		loadEditSgValues (int editSG)
+{
+//    IedServer_updateInt32AttributeValue(iedServer, IEDMODEL_SE_LD0_LLN0_RstTms_setVal, 2);
 }
+

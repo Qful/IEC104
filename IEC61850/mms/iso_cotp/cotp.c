@@ -3,10 +3,9 @@
  *
  *  ISO 8073 Connection Oriented Transport Protocol over TCP (RFC1006)
  *
- *  Partial implementation of the ISO 8073 COTP protocol for MMS.
+ *  Partial implementation of the ISO 8073 COTP (ISO TP0) protocol for MMS.
  *
- *
- *  Copyright 2013 Michael Zillgith
+ *  Copyright 2013, 2014 Michael Zillgith
  *
  *  This file is part of libIEC61850.
  *
@@ -26,414 +25,446 @@
  *  See COPYING file for the complete license text.
  */
 
-#include "main.h"
-
+#include "libiec61850_platform_includes.h"
 #include "stack_config.h"
 #include "cotp.h"
-#include "byte_stream.h"
 #include "byte_buffer.h"
+#include "buffer_chain.h"
 
-struct sSocket {
-    int fd;
-};
-
-#define COTP_RFC1006_HEADER_SIZE 4
+#define TPKT_RFC1006_HEADER_SIZE 4
 
 #define COTP_DATA_HEADER_SIZE 3
 
 #ifdef CONFIG_COTP_MAX_TPDU_SIZE
 #define COTP_MAX_TPDU_SIZE CONFIG_COTP_MAX_TPDU_SIZE
 #else
-#define COTP_MAX_TPDU_SIZE 16384
+#define COTP_MAX_TPDU_SIZE 8192
 #endif
 
-typedef struct sIsoConnection* IsoConnection;
+#ifndef DEBUG_COTP
+#define DEBUG_COTP 0
+#endif
 
-static int	addPayloadToBuffer(CotpConnection* self, int rfc1006Length);
+static bool
+addPayloadToBuffer(CotpConnection* self, uint8_t* buffer, int payloadLength);
 
-/*************************************************************************
- * writeOptions(CotpConnection* self)
- *************************************************************************/
-static CotpIndication	writeOptions(CotpConnection* self)
+static inline uint16_t
+getUint16(uint8_t* buffer)
 {
-    if (self->options.tsap_id_dst != -1) {
-        // modify by sabin
-        // if (ByteStream_writeUint8(self->stream, 0xc2) == -1)
-        //    return ERR;
-        if (ByteStream_writeUint8(self->writeBuffer, 0xc1) == -1)
-            return ERR;
-        if (ByteStream_writeUint8(self->writeBuffer, 0x02) == -1)
-            return ERR;
-        if (ByteStream_writeUint8(self->writeBuffer, (uint8_t) (self->options.tsap_id_dst / 0x100)) == -1)
-            return ERR;
-        if (ByteStream_writeUint8(self->writeBuffer, (uint8_t) (self->options.tsap_id_dst & 0xff)) == -1)
-            return ERR;
-    }
-
-    if (self->options.tsap_id_src != -1) {
-//         if (ByteStream_writeUint8(self->stream, 0xc1) == -1)
-//             return ERR;
-         if (ByteStream_writeUint8(self->writeBuffer, 0xc2) == -1)
-            return ERR;
-
-        if (ByteStream_writeUint8(self->writeBuffer, 0x02) == -1)
-            return ERR;
-        if (ByteStream_writeUint8(self->writeBuffer, (uint8_t) (self->options.tsap_id_src / 0x100)) == -1)
-            return ERR;
-        if (ByteStream_writeUint8(self->writeBuffer, (uint8_t) (self->options.tsap_id_src & 0xff)) == -1)
-            return ERR;
-    }
-
-    if (self->options.tpdu_size != -1) {
-
-        if (ByteStream_writeUint8(self->writeBuffer, 0xc0) == -1)
-            return ERR;
-        if (ByteStream_writeUint8(self->writeBuffer, 0x01) == -1)
-            return ERR;
-//         if (ByteStream_writeUint8(self->stream, self->options.tpdu_size) == -1)
-//             return ERR;
-        if (ByteStream_writeUint8(self->writeBuffer, 0x0a) == -1)
-            return ERR;
-    }
-
-    return OK;
+    return (buffer[0] * 0x100) + buffer[1];
 }
 
-/*************************************************************************
- * getOptionsLength(CotpConnection* self)
- *************************************************************************/
-static int	getOptionsLength(CotpConnection* self)
+static inline uint8_t
+getUint8(uint8_t* buffer)
+{
+    return buffer[0];
+}
+
+static void
+writeOptions(CotpConnection* self)
+{
+    // max size = 11 byte
+    uint8_t* buffer = self->writeBuffer->buffer;
+    int bufPos = self->writeBuffer->size;
+
+    if (self->options.tpduSize != 0) {
+
+        if (DEBUG_COTP)
+            printf("COTP: send TPDU size: %i\n", CotpConnection_getTpduSize(self));
+
+        buffer[bufPos++] = 0xc0;
+        buffer[bufPos++] = 0x01;
+        buffer[bufPos++] = self->options.tpduSize;
+    }
+
+    if (self->options.tSelDst.size != 0) {
+        buffer[bufPos++] = 0xc2;
+        buffer[bufPos++] = (uint8_t) self->options.tSelDst.size;
+
+        int i;
+        for (i = 0; i < self->options.tSelDst.size; i++)
+            buffer[bufPos++] = (uint8_t) self->options.tSelDst.value[i];
+    }
+
+    if (self->options.tSelSrc.size != 0) {
+        buffer[bufPos++] = 0xc1;
+        buffer[bufPos++] = (uint8_t) self->options.tSelSrc.size;
+
+        int i;
+        for (i = 0; i < self->options.tSelSrc.size; i++)
+            buffer[bufPos++] = (uint8_t) self->options.tSelSrc.value[i];
+    }
+
+    self->writeBuffer->size = bufPos;
+}
+
+static int
+getOptionsLength(CotpConnection* self)
 {
     int optionsLength = 0;
-    if (self->options.tpdu_size != -1)
+
+    if (self->options.tpduSize != 0)
         optionsLength += 3;
-    if (self->options.tsap_id_dst != -1)
-        optionsLength += 4;
-    if (self->options.tsap_id_src != -1)
-        optionsLength += 4;
+
+    if (self->options.tSelDst.size != 0)
+        optionsLength += (2 + self->options.tSelDst.size);
+
+    if (self->options.tSelSrc.size != 0)
+        optionsLength += (2 + self->options.tSelSrc.size);
+
     return optionsLength;
 }
-/*************************************************************************
- * getConnectionResponseLength(CotpConnection* self)
- *************************************************************************/
-static int	getConnectionResponseLength(CotpConnection* self)
+
+static inline void
+writeStaticConnectResponseHeader(CotpConnection* self, int optionsLength)
 {
-    return 11 + getOptionsLength(self);
+    /* always same size (7) and same position in buffer */
+    uint8_t* buffer = self->writeBuffer->buffer;
+
+    buffer[4] = 6 + optionsLength;
+    buffer[5] = 0xd0;
+    buffer[6] = (uint8_t) (self->srcRef / 0x100);
+    buffer[7] = (uint8_t) (self->srcRef & 0xff);
+    buffer[8] = (uint8_t) (self->dstRef / 0x100);
+    buffer[9] = (uint8_t) (self->dstRef & 0xff);
+    buffer[10] = (uint8_t) (self->protocolClass);
+
+    self->writeBuffer->size = 11;
 }
-/*************************************************************************
- * writeStaticConnectResponseHeader(CotpConnection* self)
- *************************************************************************/
-static CotpIndication	writeStaticConnectResponseHeader(CotpConnection* self)
-{
-    if (ByteStream_writeUint8(self->writeBuffer, 6 + getOptionsLength(self)) != 1)
-        return ERR;
-    if (ByteStream_writeUint8(self->writeBuffer, 0xd0) != 1)
-        return ERR;
-    if (ByteStream_writeUint8(self->writeBuffer, self->srcRef / 0x100) != 1)
-        return ERR;
-    if (ByteStream_writeUint8(self->writeBuffer, self->srcRef & 0xff) != 1)
-        return ERR;
-    if (ByteStream_writeUint8(self->writeBuffer, self->srcRef / 0x100) != 1)
-        return ERR;
-    if (ByteStream_writeUint8(self->writeBuffer, self->srcRef & 0xff) != 1)
-        return ERR;
-    if (ByteStream_writeUint8(self->writeBuffer, self->class) != 1)
-        return ERR;
 
-    return OK;
+static void
+writeRfc1006Header(CotpConnection* self, int len)
+{
+    uint8_t* buffer = self->writeBuffer->buffer;
+
+    buffer[0] = 0x03;
+    buffer[1] = 0x00;
+    buffer[2] = (uint8_t) (len / 0x100);
+    buffer[3] = (uint8_t) (len & 0xff);
+
+    self->writeBuffer->size = 4;
 }
-/*************************************************************************
- * writeRfc1006Header(CotpConnection* self, int len)
- * Пишем в буфер заголовок сообщения (TPKT) 4 байта
- * 03 00 Lenh lenl
- *************************************************************************/
-static CotpIndication	writeRfc1006Header(CotpConnection* self, int len)
-{
-    if (ByteStream_writeUint8(self->writeBuffer, (uint8_t) 0x03) != 1)
-        return ERR;
-    if (ByteStream_writeUint8(self->writeBuffer, (uint8_t) 0x00) != 1)
-        return ERR;
-    if (ByteStream_writeUint8(self->writeBuffer, (uint8_t) (len / 0x100)) != 1)
-        return ERR;
-    if (ByteStream_writeUint8(self->writeBuffer, (uint8_t) (len & 0xff)) != 1)
-        return ERR;
 
-    return OK;
+static void
+writeDataTpduHeader(CotpConnection* self, int isLastUnit)
+{
+    /* always 3 byte starting from byte 5 in buffer */
+    uint8_t* buffer = self->writeBuffer->buffer;
+
+    buffer[4] = 0x02;
+    buffer[5] = 0xf0;
+    if (isLastUnit)
+        buffer[6] = 0x80;
+    else
+        buffer[6] = 0x00;
+
+    self->writeBuffer->size = 7;
 }
-/*************************************************************************
- * writeDataTpduHeader(CotpConnection* self, int isLastUnit)
- *************************************************************************/
-static CotpIndication	writeDataTpduHeader(CotpConnection* self, int isLastUnit)
+
+static bool
+sendBuffer(CotpConnection* self)
 {
-    if (ByteStream_writeUint8(self->writeBuffer, (uint8_t) 0x02) != 1)
-        return ERR;
+    int writeBufferPosition = ByteBuffer_getSize(self->writeBuffer);
 
-    if (ByteStream_writeUint8(self->writeBuffer, (uint8_t) 0xf0) != 1)
-        return ERR;
+    bool retVal = false;
 
-    if (isLastUnit) {
-        if (ByteStream_writeUint8(self->writeBuffer, (uint8_t) 0x80) != 1)
-            return ERR;
-    }
-    else {
-        if (ByteStream_writeUint8(self->writeBuffer, (uint8_t) 0x00) != 1)
-            return ERR;
-    }
+    int sentBytes;
 
-    return OK;
+    do {
+        sentBytes = Socket_write(self->socket, ByteBuffer_getBuffer(self->writeBuffer), writeBufferPosition);
+
+        if (sentBytes == -1)
+            goto exit_function;
+
+    } while (sentBytes == 0);
+
+    retVal = true;
+
+    ByteBuffer_setSize(self->writeBuffer, 0);
+
+exit_function:
+    return retVal;
 }
-/*************************************************************************
- * CotpConnection_sendDataMessage(CotpConnection* self, ByteBuffer* payload)
- *************************************************************************/
-CotpIndication	CotpConnection_sendDataMessage(CotpConnection* self, ByteBuffer* writeBuffer)
+
+CotpIndication
+CotpConnection_sendDataMessage(CotpConnection* self, BufferChain payload)
 {
+    CotpIndication retValue = COTP_OK;
+
     int fragments = 1;
-    int currentBufPos = 0;
-    int currentLimit;
-    int lastUnit;
-    int i;
 
     int fragmentPayloadSize = CotpConnection_getTpduSize(self) - COTP_DATA_HEADER_SIZE;
 
-    if (writeBuffer->currPos > fragmentPayloadSize) { 					// проверим, надо ли делить на сегменты пакет
-        fragments = writeBuffer->currPos / fragmentPayloadSize;			// размер одного фрагмента
-        if ((writeBuffer->currPos % fragmentPayloadSize) != 0) 			// не получилось целое число фрагментов,
+    if (payload->length > fragmentPayloadSize) { /* Check if segmentation is required? */
+        fragments = payload->length / fragmentPayloadSize;
+
+        if ((payload->length % fragmentPayloadSize) != 0)
             fragments += 1;
     }
 
+    int currentBufPos = 0;
+    int currentLimit;
+    int lastUnit;
+
+    BufferChain currentChain = payload;
+    int currentChainIndex = 0;
+
+    if (DEBUG_COTP)
+        printf("\nCOTP: nextBufferPart: len:%i partLen:%i\n", currentChain->length, currentChain->partLength);
+
+    uint8_t* buffer = self->writeBuffer->buffer;
+
     while (fragments > 0) {
-        if (fragments > 1) {											// более одного фрагмента
+        if (fragments > 1) {
             currentLimit = currentBufPos + fragmentPayloadSize;
             lastUnit = 0;
         }
-        else {															// только один фрагмент
-            currentLimit = writeBuffer->currPos;
-            lastUnit = 1;												// признак EOT в TPDU
+        else {
+            currentLimit = payload->length;
+            lastUnit = 1;
         }
 
-        // ту наверное нужно обнулить указатель позиции буфера для очередного фрагмента
-        // или сместить до нужной позиции в блоке чтобы не нарушить целостность
-        self->writeBuffer->currPos = 0;
+        writeRfc1006Header(self, 7 + (currentLimit - currentBufPos));
 
+        writeDataTpduHeader(self, lastUnit);
 
-        // заголовок каждого сегмента
-        if (writeRfc1006Header(self, 7 + (currentLimit - currentBufPos)) == ERR) return ERR;	// 4 байта с указанием размера сегмента
-        if (writeDataTpduHeader(self, lastUnit) == ERR)		return ERR;							// 3 байта с указанием признака последнего такета (EOT)
+        int bufPos = 7;
 
-        // содержимое очередного сегмента
-        for (i = currentBufPos; i < currentLimit; i++) {										// дописываем весь пакет уже подготовленный в writeBuffer
-            if (ByteStream_writeUint8(self->writeBuffer, writeBuffer->buffer[i]) != 1)return ERR;
+        int i;
+        for (i = currentBufPos; i < currentLimit; i++) {
+
+            if (currentChainIndex >= currentChain->partLength) {
+                currentChain = currentChain->nextPart;
+                if (DEBUG_COTP)
+                    printf("\nCOTP: nextBufferPart: len:%i partLen:%i\n", currentChain->length, currentChain->partLength);
+                currentChainIndex = 0;
+            }
+
+            buffer[bufPos++] = currentChain->buffer[currentChainIndex];
+
+            currentChainIndex++;
+
             currentBufPos++;
         }
-        USART_TRACE("Send COTP fragment %i bufpos: %i\n", fragments, currentBufPos);
 
-        ByteBuffer_send(self->writeBuffer);				// передача в TCP/IP стек
+        self->writeBuffer->size = bufPos;
+
+        if (DEBUG_COTP)
+            printf("COTP: Send COTP fragment %i bufpos: %i\n", fragments, currentBufPos);
+
+        if (!sendBuffer(self)) {
+            retValue = COTP_ERROR;
+
+            if (DEBUG_COTP)
+                printf("COTP: sending message failed!\n");
+
+            goto exit_function;
+        }
+
+
         fragments--;
-    } // !while (fragments > 0)
-
-    return OK;
-}
-/*************************************************************************
- * allocateWriteBuffer(CotpConnection* self)
- * выделяет буфер в памяти и указываем его потоку
- *************************************************************************/
-static void		allocateWriteBuffer(CotpConnection* self)
-{
-    if (self->writeBuffer == NULL ) {
-        self->writeBuffer = ByteBuffer_create(NULL, CotpConnection_getTpduSize(self) + COTP_RFC1006_HEADER_SIZE);
-       // ByteStream_setWriteBuffer(self->stream, self->writeBuffer);
     }
-}
-/*************************************************************************
- * allocatePayloadBuffer(CotpConnection* self)
- * выделяет буфер в памяти и указываем его потоку
- *************************************************************************/
-static void		allocatePayloadBuffer(CotpConnection* self)
-{
-    if (self->payload == NULL ) {
-        self->payload = ByteBuffer_create(NULL, CotpConnection_getTpduSize(self) + COTP_RFC1006_HEADER_SIZE);
-       // ByteStream_setWriteBuffer(self->stream, self->writeBuffer);
-    }
-}
-/*************************************************************************
- * CotpConnection_sendConnectionRequestMessage(CotpConnection* self)
- * client side
- * отправка запроса соединения серверу
- *************************************************************************/
-CotpIndication		CotpConnection_sendConnectionRequestMessage(CotpConnection* self)
-{
-    int len = 22;
-    CotpIndication indication;
 
-    allocateWriteBuffer(self);							// выделим буфер в памяти для отправки
-    if (writeRfc1006Header(self, len) == ERR)			// TPKT заголовок
-        return ERR;
-    													// далее пакет COTP (ISO 8073)
+exit_function:
+
+    if (DEBUG_COTP)
+        printf("COTP: message transmission finished (fragments=%i, return=%i)\n", fragments, retValue);
+
+    return retValue;
+}
+
+static void
+allocateWriteBuffer(CotpConnection* self)
+{
+    if (self->writeBuffer == NULL )
+        self->writeBuffer = ByteBuffer_create(NULL,
+                CotpConnection_getTpduSize(self) + TPKT_RFC1006_HEADER_SIZE);
+}
+
+/* client side */
+CotpIndication
+CotpConnection_sendConnectionRequestMessage(CotpConnection* self, IsoConnectionParameters isoParameters)
+{
+    allocateWriteBuffer(self);
+
+    self->options.tSelDst = isoParameters->remoteTSelector;
+    self->options.tSelSrc = isoParameters->localTSelector;
+
+    int cotpRequestSize = getOptionsLength(self) + 6;
+
+    int conRequestSize = cotpRequestSize + 5;
+
+    if(self->writeBuffer->maxSize < conRequestSize)
+        return COTP_ERROR;
+
+    uint8_t* buffer = self->writeBuffer->buffer;
+
+    writeRfc1006Header(self, conRequestSize);
+
     /* LI */
-    if (ByteStream_writeUint8(self->writeBuffer, 17) != 1)	//
-        return ERR;
+    buffer[4] = (uint8_t) cotpRequestSize;
 
     /* TPDU CODE */
-    if (ByteStream_writeUint8(self->writeBuffer, 0xe0) != 1)
-        return ERR;
+    buffer[5] = 0xe0;
 
     /* DST REF */
-    if (ByteStream_writeUint8(self->writeBuffer, 0x00) != 1)
-        return ERR;
-    if (ByteStream_writeUint8(self->writeBuffer, 0x00) != 1)
-        return ERR;
+    buffer[6] = 0x00;
+    buffer[7] = 0x00;
 
     /* SRC REF */
-    if (ByteStream_writeUint8(self->writeBuffer, 0x00) != 1)
-        return ERR;
-    if (ByteStream_writeUint8(self->writeBuffer, 0x04) != 1)
-        return ERR;
-
-    // modify by sabin
-    // if (ByteStream_writeUint8(self->stream, 0x01) != 1)
-    //    return ERR;
+    buffer[8] = 0x00;
+    buffer[9] = 0x02; /* or 0x01 ? */
 
     /* Class */
-    if (ByteStream_writeUint8(self->writeBuffer, 0x00) != 1)
-        return ERR;
+    buffer[10] = 0x00;
 
-    self->options.tsap_id_dst = 1;
-    //self->options.tsap_id_src = 0;
-    self->options.tsap_id_src = 1;
+    self->writeBuffer->size = 11;
 
-    indication = writeOptions(self);
+    writeOptions(self);
 
-    ByteBuffer_send(self->writeBuffer);				// отправим буфер в сокет
-
-    return indication;
+    if (sendBuffer(self))
+        return COTP_OK;
+    else
+        return COTP_ERROR;
 }
-/*************************************************************************
- * CotpConnection_sendConnectionResponseMessage(CotpConnection* self)
- * Посылаем ответ серверу.
- *************************************************************************/
-CotpIndication	CotpConnection_sendConnectionResponseMessage(CotpConnection* self)
+
+CotpIndication
+CotpConnection_sendConnectionResponseMessage(CotpConnection* self)
 {
-    int len = getConnectionResponseLength(self);
+    allocateWriteBuffer(self);
 
-    allocateWriteBuffer(self);			// выделяет self->writeBuffer в памяти
+    int optionsLength = getOptionsLength(self);
+    int messageLength = 11 + optionsLength;
 
-    // готовим ответ
-    if (writeRfc1006Header(self, len) == ERR)				return ERR;
-    if (writeStaticConnectResponseHeader(self) != OK)		return ERR;
-    if (writeOptions(self) != OK)							return ERR;
+    writeRfc1006Header(self, messageLength);
 
-    if (ByteBuffer_send(self->writeBuffer) == -1) {
-    	USART_TRACE("ERR sending buffer\n");
-        return ERR;
-    }
-    //CotpConnection_destroy(self);		// удалим self->writeBuffer из памяти
-    return OK;
+    writeStaticConnectResponseHeader(self, optionsLength);
+
+    writeOptions(self);
+
+    if (sendBuffer(self))
+        return COTP_OK;
+    else
+        return COTP_ERROR;
 }
-/*************************************************************************
- * cotp_parse_options(CotpConnection* self, int opt_len)
- *************************************************************************/
-static int	cotp_parse_options(CotpConnection* self, int opt_len)
+
+static bool
+parseOptions(CotpConnection* self, uint8_t* buffer, int bufLen)
 {
-    int read_bytes = 0;
-    uint8_t option_type, option_len, uint8_value;
-    uint16_t uint16_value;
-    int requestedTpduSize;
-    int i;
+    int bufPos = 0;
 
-    while (read_bytes < opt_len) {
-        if (ByteStream_readUint8(self->readBuffer, &option_type) == -1)		goto cpo_ERR;
-        if (ByteStream_readUint8(self->readBuffer, &option_len) == -1)		goto cpo_ERR;
+    while (bufPos < bufLen) {
+        uint8_t optionType = buffer[bufPos++];
+        uint8_t optionLen = buffer[bufPos++];
 
-        read_bytes += 2;
-        USART_TRACE("option: %02x len: %02x\n", option_type, option_len);
+        if (optionLen > (bufLen - bufPos)) {
+            if (DEBUG_COTP)
+                printf("COTP: option to long optionLen:%i bufPos:%i bufLen:%i\n", optionLen, bufPos, bufLen);
+            goto cpo_error;
+        }
 
-        switch (option_type) {
+        if (DEBUG_COTP)
+            printf("COTP: option: %02x len: %02x\n", optionType, optionLen);
+
+        switch (optionType) {
         case 0xc0:
-            if (ByteStream_readUint8(self->readBuffer, &uint8_value) == -1)		goto cpo_ERR;
-            read_bytes++;
+			if (optionLen == 1) {
+				int requestedTpduSize = (1 << buffer[bufPos++]);
 
-            requestedTpduSize = (1 << uint8_value);
-            CotpConnection_setTpduSize(self, requestedTpduSize);
+                CotpConnection_setTpduSize(self, requestedTpduSize);
+
+				if (DEBUG_COTP)
+				    printf("COTP: requested TPDU size: %i\n", requestedTpduSize);
+			}
+			else
+			    goto cpo_error;
             break;
 
-        case 0xc1:
-            if (option_len == 2) {
-            if (ByteStream_readUint16(self->readBuffer, &uint16_value) == -1)	goto cpo_ERR;
-            read_bytes += 2;
-            self->options.tsap_id_src = (int32_t) uint16_value;
-            } else	goto cpo_ERR;
+        case 0xc1: /* remote T-selector */
+            if (optionLen < 5) {
+                self->options.tSelSrc.size = optionLen;
+
+                int i;
+                for (i = 0; i < optionLen; i++)
+                    self->options.tSelSrc.value[i] = buffer[bufPos++];
+            }
+            else
+                goto cpo_error;
             break;
 
-        case 0xc2:
-            if (option_len == 2) {
-                if (ByteStream_readUint16(self->readBuffer, &uint16_value) == -1)	goto cpo_ERR;
-                self->options.tsap_id_dst = (int32_t) uint16_value;
-                read_bytes += 2;
-            } else	goto cpo_ERR;
+        case 0xc2: /* local T-selector */
+            if (optionLen < 5) {
+                self->options.tSelDst.size = optionLen;
+
+                int i;
+                for (i = 0; i < optionLen; i++)
+                    self->options.tSelDst.value[i] = buffer[bufPos++];
+            }
+            else
+                goto cpo_error;
+            break;
+
+        case 0xc6: /* additional option selection */
+            if (optionLen == 1)
+                bufPos++; /* ignore value */
+            else
+                goto cpo_error;
             break;
 
         default:
-            USART_TRACE("Unknown option %02x\n", option_type);
+            if (DEBUG_COTP)
+                printf("COTP: Unknown option %02x\n", optionType);
 
-            for (i = 0; i < opt_len; i++)
-                if (ByteStream_readUint8(self->readBuffer, &uint8_value) == -1)	goto cpo_ERR;
+            bufPos += optionLen; /* ignore value */
 
-            read_bytes += opt_len;
             break;
-        }//!switch (option_type)
-    }//! while (read_bytes < opt_len)
+        }
+    }
 
-    return 1;
+    return true;
 
-    cpo_ERR:
-    USART_TRACE("cotp_parse_options: ERR parsing options!\n");
-    return -1;
+cpo_error:
+    if (DEBUG_COTP)
+        printf("COTP: cotp_parse_options: error parsing options!\n");
+    return false;
 }
-/*************************************************************************
- * CotpConnection_init(CotpConnection* self, ByteBuffer* payloadBuffer)
- *
- *
- *************************************************************************/
-void	CotpConnection_init(CotpConnection* self, ByteBuffer* payloadBuffer)
+
+void
+CotpConnection_init(CotpConnection* self, Socket socket,
+        ByteBuffer* payloadBuffer, ByteBuffer* readBuffer, ByteBuffer* writeBuffer)
 {
     self->state = 0;
-
+    self->socket = socket;
     self->srcRef = -1;
     self->dstRef = -1;
-    self->class = -1;
+    self->protocolClass = -1;
+	self->options.tpduSize = 0;
 
-    self->options.tpdu_size   = 0;
-    self->options.tsap_id_src = -1;
-    self->options.tsap_id_dst = -1;
+	TSelector tsel;
+	tsel.size = 2;
+	tsel.value[0] = 0;
+	tsel.value[1] = 1;
 
-    self->readBuffer = payloadBuffer;							// адрес буфера
+	self->options.tSelSrc = tsel;
+	self->options.tSelDst = tsel;
+    self->payload = payloadBuffer;
 
     /* default TPDU size is maximum size */
-    CotpConnection_setTpduSize(self, COTP_MAX_TPDU_SIZE);		//  установим размер буфера
+    CotpConnection_setTpduSize(self, COTP_MAX_TPDU_SIZE);
 
-    self->writeBuffer = NULL;									// пока нету буфера для передачи
-}
-/*************************************************************************
- * CotpConnection_destroy(CotpConnection* self)
- *************************************************************************/
-void	CotpConnection_destroy(CotpConnection* self)
-{
-    if (self->writeBuffer != NULL)
-        ByteBuffer_destroy(self->writeBuffer);
+    self->writeBuffer = writeBuffer;
+    self->readBuffer = readBuffer;
+    self->packetSize = 0;
 }
 
-/*************************************************************************
- * CotpConnection_destroy(CotpConnection* self)
- * in byte
- *************************************************************************/
-int 	CotpConnection_getTpduSize(CotpConnection* self)
+int /* in byte */
+CotpConnection_getTpduSize(CotpConnection* self)
 {
-    return (1 << self->options.tpdu_size);
+    return (1 << self->options.tpduSize);
 }
-/*************************************************************************
- * CotpConnection_destroy(CotpConnection* self)
- *************************************************************************/
-void	CotpConnection_setTpduSize(CotpConnection* self, int tpduSize /* in byte */)
+
+void
+CotpConnection_setTpduSize(CotpConnection* self, int tpduSize /* in byte */)
 {
     int newTpduSize = 1;
 
@@ -446,33 +477,23 @@ void	CotpConnection_setTpduSize(CotpConnection* self, int tpduSize /* in byte */
     if ((1 << newTpduSize) > tpduSize)
         newTpduSize--;
 
-    self->options.tpdu_size = newTpduSize;
+    self->options.tpduSize = newTpduSize;
 }
-/*************************************************************************
- * CotpConnection_getreadBuffer(CotpConnection* self)
- *************************************************************************/
-ByteBuffer*	CotpConnection_getreadBuffer(CotpConnection* self)
-{
-	return self->readBuffer;
-}
-/*************************************************************************
- * CotpConnection_getPayload(CotpConnection* self)
- *************************************************************************/
-ByteBuffer*	CotpConnection_getPayload(CotpConnection* self)
+
+ByteBuffer*
+CotpConnection_getPayload(CotpConnection* self)
 {
     return self->payload;
 }
-/*************************************************************************
- * CotpConnection_getSrcRef(CotpConnection* self)
- *************************************************************************/
-int CotpConnection_getSrcRef(CotpConnection* self)
+
+int
+CotpConnection_getSrcRef(CotpConnection* self)
 {
     return self->srcRef;
 }
-/*************************************************************************
- * CotpConnection_getDstRef(CotpConnection* self)
- *************************************************************************/
-int CotpConnection_getDstRef(CotpConnection* self)
+
+int
+CotpConnection_getDstRef(CotpConnection* self)
 {
     return self->dstRef;
 }
@@ -487,167 +508,215 @@ int CotpConnection_getDstRef(CotpConnection* self)
  +--+------+---------+---------+---+---+------+-------+---------+
  */
 
-/*************************************************************************
- * cotp_parse_CRequest_tpdu(CotpConnection* self, uint8_t len)
- *************************************************************************/
-static int		cotp_parse_CRequest_tpdu(CotpConnection* self, uint8_t len)
+
+static bool
+parseConnectRequestTpdu(CotpConnection* self, uint8_t* buffer, uint8_t len)
 {
-    uint16_t dstRef;
-    uint16_t srcRef;
-    uint8_t class;
+    if (len < 6)
+        return false;
 
-    if (ByteStream_readUint16(self->readBuffer, &dstRef) != 2)		return -1;
-    else	self->dstRef = dstRef;
+    self->dstRef = getUint16(buffer);
+    self->srcRef = getUint16(buffer + 2);
+    self->protocolClass = getUint8(buffer + 4);
 
-    if (ByteStream_readUint16(self->readBuffer, &srcRef) != 2)		return -1;
-    else	self->srcRef = srcRef;
-
-    if (ByteStream_readUint8(self->readBuffer, &class) != 1)		return -1;
-    else	self->class = class;
-
-    return cotp_parse_options(self, len - 6);
-}
-/*************************************************************************
- * cotp_parse_CConfirm_tpdu(CotpConnection* self, uint8_t len)
- *************************************************************************/
-static int		cotp_parse_CConfirm_tpdu(CotpConnection* self, uint8_t len)
-{
-    uint16_t dstRef;
-    uint16_t srcRef;
-    uint8_t class;
-
-    if (ByteStream_readUint16(self->readBuffer, &dstRef) != 2)		return -1;
-    else	self->srcRef = dstRef;
-
-    if (ByteStream_readUint16(self->readBuffer, &srcRef) != 2)		return -1;
-    else	self->dstRef = srcRef;
-
-    if (ByteStream_readUint8(self->readBuffer, &class) != 1)		return -1;
-    else	self->class = class;
-
-    return cotp_parse_options(self, len - 6);
+    return parseOptions(self, buffer + 5, len - 6);
 }
 
-/*************************************************************************
- * cotp_parse_DATA_tpdu(CotpConnection* self, uint8_t len)
- *************************************************************************/
-static int		cotp_parse_DATA_tpdu(CotpConnection* self, uint8_t len)
+static bool
+parseConnectConfirmTpdu(CotpConnection* self, uint8_t* buffer, uint8_t len)
 {
-    uint8_t eot;
+    if (len < 6)
+        return false;
 
-    if (len != 2)       return -1;
+    self->srcRef = getUint16(buffer);
+    self->dstRef = getUint16(buffer + 2);
+    self->protocolClass = getUint8(buffer + 4);
 
-    if (ByteStream_readUint8(self->readBuffer, &eot) != 1)			return -1;
-    else {
-        if (eot & 0x80)		self->eot = 1;
-        else				self->eot = 0;
-    }
-
-    return 1;
-}
-/*************************************************************************
- * parseRFC1006Header
- *************************************************************************/
-static CotpIndication	parseRFC1006Header(CotpConnection* self, uint16_t* rfc1006_length)
-{
-    uint8_t b;
-    if (ByteStream_readUint8(self->readBuffer, &b) == -1)				return ERR;
-    if (b != 3)		return ERR;
-
-    if (ByteStream_readUint8(self->readBuffer, &b) == -1)				return ERR;
-    if (b != 0)		return ERR;
-
-    if (ByteStream_readUint16(self->readBuffer, rfc1006_length) == -1)	return ERR;
-
-    return OK;
+    return parseOptions(self, buffer + 5, len - 6);
 }
 
-/*************************************************************************
- * parseIncomingMessage
- * парсим входящее сообщение
- *************************************************************************/
-static CotpIndication	parseIncomingMessage(CotpConnection* self)
+static bool
+parseDataTpdu(CotpConnection* self, uint8_t* buffer, uint8_t len)
 {
+    if (len != 2)
+        return false;
+
+    uint8_t flowControl = getUint8(buffer);
+
+    if (flowControl & 0x80)
+        self->isLastDataUnit = true;
+    else
+        self->isLastDataUnit = false;
+
+    return true;
+}
+
+static bool
+addPayloadToBuffer(CotpConnection* self, uint8_t* buffer,  int payloadLength)
+{
+    if (DEBUG_COTP)
+        printf("COTP: add to payload buffer (cur size: %i, len: %i)\n", self->payload->size, payloadLength);
+
+    if ((self->payload->size + payloadLength) > self->payload->maxSize)
+        return false;
+
+    memcpy(self->payload->buffer + self->payload->size, buffer, payloadLength);
+
+    self->payload->size += payloadLength;
+
+    return true;
+}
+
+static CotpIndication
+parseCotpMessage(CotpConnection* self)
+{
+    uint8_t* buffer = self->readBuffer->buffer + 4;
+    int tpduLength = self->readBuffer->size - 4;
+
     uint8_t len;
     uint8_t tpduType;
-    uint16_t rfc1006Length;
 
-    if (parseRFC1006Header(self, &rfc1006Length) == ERR)		return ERR;
-    if (ByteStream_readUint8(self->readBuffer, &len) != 1) 		return ERR;
+    len = buffer[0];
 
+    if (len > tpduLength) {
+      if (DEBUG_COTP)
+          printf("COTP: parseCotpMessage: len=%d tpduLength=%d\n", len, tpduLength);
 
-    if (ByteStream_readUint8(self->readBuffer, &tpduType) == 1) {
-        switch (tpduType) {
-        case 0xe0:		// CR Connection (ISO DP 8073)
-            if (cotp_parse_CRequest_tpdu(self, len) == 1)
-                return CONNECT_INDICATION;
-            else
-                return ERR;
-            break;
-
-        case 0xd0:		// CC Connection (ISO DP 8073)
-            self->eot = 1;
-            if (cotp_parse_CConfirm_tpdu(self, len) == 1)
-                return CONNECT_INDICATION;
-            else
-                return ERR;
-            break;
-
-        case 0xf0:		// DT DATA (ISO DP 8073)
-            if (cotp_parse_DATA_tpdu(self, len) == 1) {
-                if (addPayloadToBuffer(self, rfc1006Length) == 1)			// тут забирали из потока принятые данные, в буфер Payload
-                    return DATA_INDICATION;
-                else		return ERR;
-            }
-            else
-                return ERR;
-            break;
-
-        default:
-            return ERR;
-            break;
-        }//!switch (tpduType)
+      return COTP_ERROR;
     }
-    else
-        return ERR;
-}
-/*************************************************************************
- * addPayloadToBuffer
- *
- *************************************************************************/
-static int	addPayloadToBuffer(CotpConnection* self, int rfc1006Length)
-{
 
-    int payloadLength = rfc1006Length - 7;
-    int readLength;
+    tpduType = buffer[1];
 
-    if ((self->payload->currPos + payloadLength) > self->payload->maxSize)		return 0;
+    switch (tpduType) {
+    case 0xe0:
+        if (parseConnectRequestTpdu(self, buffer + 2, len))
+            return COTP_CONNECT_INDICATION;
+        else
+            return COTP_ERROR;
+    case 0xd0:
+        if (parseConnectConfirmTpdu(self, buffer + 2, len))
+            return COTP_CONNECT_INDICATION;
+        else
+            return COTP_ERROR;
+    case 0xf0:
+        if (parseDataTpdu(self, buffer + 2, len)) {
 
-    readLength = ByteStream_readOctets(self->readBuffer , self->payload->buffer + self->payload->currPos,payloadLength);
+            if (addPayloadToBuffer(self, buffer + 3, tpduLength - 3) != 1)
+                return COTP_ERROR;
 
-    if (readLength != payloadLength) {
-    	USART_TRACE("cotp: read %i bytes should have been %i\n", readLength, payloadLength);
-        return 0;
-    }
-    else {
-        self->payload->currPos += payloadLength;
-
-        if (self->eot == 0) {
-            if (parseIncomingMessage(self) == DATA_INDICATION)		return 1;
-            else	return 0;
+            if (self->isLastDataUnit)
+                return COTP_DATA_INDICATION;
+            else
+                return COTP_MORE_FRAGMENTS_FOLLOW;
         }
-        else	return 1;
+        else
+            return COTP_ERROR;
+    default:
+        return COTP_ERROR;
     }
+
 }
 
-/*************************************************************************
- * CotpConnection_parseIncomingMessage
- * парсим входные данные COTP
- *************************************************************************/
-CotpIndication	CotpConnection_parseIncomingMessage(CotpConnection* Cotpself)
+CotpIndication
+CotpConnection_parseIncomingMessage(CotpConnection* self)
 {
-	Cotpself->readBuffer->currPos = 0;			// принятый пакет
-	Cotpself->payload->currPos = 0;				// payload сюда возвращает юзерданные
-    return parseIncomingMessage(Cotpself);
+    CotpIndication indication = parseCotpMessage(self);
+
+    self->readBuffer->size = 0;
+    self->packetSize = 0;
+
+    return indication;
 }
 
+void
+CotpConnection_resetPayload(CotpConnection* self)
+{
+    self->payload->size = 0;
+}
+
+TpktState
+CotpConnection_readToTpktBuffer(CotpConnection* self)
+{
+    uint8_t* buffer = self->readBuffer->buffer;
+    int bufferSize = self->readBuffer->maxSize;
+    int bufPos = self->readBuffer->size;
+
+    assert (bufferSize > 4);
+
+    int readBytes;
+
+    if (bufPos < 4) {
+
+        readBytes = Socket_read(self->socket, buffer + bufPos, 4 - bufPos);
+
+        if (readBytes == -2) {
+            goto exit_closed;
+        }
+
+        if (readBytes < 0)
+            goto exit_tpkperror;
+
+        if (DEBUG_COTP) {
+            if (readBytes > 0)
+                printf("TPKT: read %i bytes from socket\n", readBytes);
+        }
+
+        bufPos += readBytes;
+
+        if (bufPos == 4) {
+            if ((buffer[0] == 3) && (buffer[1] == 0)) {
+                self->packetSize = (buffer[2] * 0x100) + buffer[3];
+
+                if (DEBUG_COTP)
+                    printf("TPKT: header complete (msg size = %i)\n", self->packetSize);
+
+                if (self->packetSize > bufferSize) {
+                    if (DEBUG_COTP) printf("TPKT: packet too large\n");
+                    goto exit_error;
+                }
+            }
+            else {
+                if (DEBUG_COTP) printf("TPKT: failed to decode TPKT header.\n");
+                goto exit_error;
+            }
+        }
+        else
+            goto exit_waiting;
+    }
+
+    readBytes = Socket_read(self->socket, buffer + bufPos, self->packetSize - bufPos);
+
+    if (readBytes < 0)
+        goto exit_tpkperror;
+
+    bufPos += readBytes;
+
+    if (bufPos < self->packetSize)
+       goto exit_waiting;
+
+    if (DEBUG_COTP) printf("TPKT: message complete (size = %i)\n", self->packetSize);
+
+    self->readBuffer->size = bufPos;
+    return TPKT_PACKET_COMPLETE;
+
+exit_tpkperror:
+        if (DEBUG_COTP) printf("TPKT: socket error\n");
+        return TPKT_ERROR;
+
+exit_closed:
+    if (DEBUG_COTP) printf("TPKT: socket closed\n");
+    return TPKT_CLOSE;
+
+exit_error:
+    if (DEBUG_COTP) printf("TPKT: Error parsing message\n");
+    return TPKT_ERROR;
+
+exit_waiting:
+
+    if (DEBUG_COTP)
+        if (bufPos != 0)
+            printf("TPKT: waiting (read %i of %i)\n", bufPos, self->packetSize);
+
+    self->readBuffer->size = bufPos;
+    return TPKT_WAITING;
+}

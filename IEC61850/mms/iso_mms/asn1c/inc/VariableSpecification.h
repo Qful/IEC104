@@ -9,15 +9,15 @@
 #define	_VariableSpecification_H_
 
 
-#include "asn_application.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
 #include "ObjectName.h"
 #include "Address.h"
-#include "NULL.h"
+#include <NULL.h>
 #include "TypeSpecification.h"
-#include "constr_SEQUENCE.h"
-#include "constr_CHOICE.h"
+#include <constr_SEQUENCE.h>
+#include <constr_CHOICE.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,19 +36,21 @@ typedef enum VariableSpecification_PR {
 /* Forward declarations */
 struct ScatteredAccessDescription;
 
+struct VariableSpecification__variableDescription {
+			Address_t	 address;
+			TypeSpecification_t	 typeSpecification;
+			
+			/* Context for parsing across buffer boundaries */
+			asn_struct_ctx_t _asn_ctx;
+		};
+
 /* VariableSpecification */
 typedef struct VariableSpecification {
 	VariableSpecification_PR present;
 	union VariableSpecification_u {
 		ObjectName_t	 name;
 		Address_t	 address;
-		struct VariableSpecification__variableDescription {
-			Address_t	 address;
-			TypeSpecification_t	 typeSpecification;
-			
-			/* Context for parsing across buffer boundaries */
-			asn_struct_ctx_t _asn_ctx;
-		} variableDescription;
+		struct VariableSpecification__variableDescription variableDescription;
 		struct ScatteredAccessDescription	*scatteredAccessDescription;
 		NULL_t	 invalidated;
 	} choice;

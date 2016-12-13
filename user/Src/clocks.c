@@ -32,16 +32,16 @@ void Clocks_Init(void)
     hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
     hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
     HAL_RTC_Init(&hrtc);
-
-    sDate.WeekDay = RTC_WEEKDAY_SUNDAY;
-    sDate.Month = RTC_MONTH_FEBRUARY;
-    sDate.Date = 28;
+/*
+    sDate.WeekDay = RTC_WEEKDAY_FRIDAY;
+    sDate.Month = RTC_MONTH_APRIL;
+    sDate.Date = 29;
     sDate.Year = 16;								//от 2000 года 1970
     HAL_RTC_SetDate(&hrtc, &sDate, FORMAT_BIN);
 
-    sTime.Hours = 23;
-    sTime.Minutes = 58;
-    sTime.Seconds = 15;
+    sTime.Hours = 0;
+    sTime.Minutes = 0;
+    sTime.Seconds = 0;
     sTime.SubSeconds = 0;
     sTime.TimeFormat = RTC_HOURFORMAT_24;
     sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
@@ -49,4 +49,6 @@ void Clocks_Init(void)
     HAL_RTC_SetTime(&hrtc, &sTime, FORMAT_BIN);
 
     HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR0, 0x32F2);
+*/
+    HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR0, 0xFFFF);
 }

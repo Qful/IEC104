@@ -3,10 +3,10 @@
  * All rights reserved.
  * Redistribution and modifications are permitted subject to BSD license.
  */
-#include "asn_internal.h"
-#include "INTEGER.h"
-#include "asn_codecs_prim.h"	/* Encoder and decoder of a primitive type */
-#include "errno.h"
+#include <asn_internal.h>
+#include <INTEGER.h>
+#include <asn_codecs_prim.h>	/* Encoder and decoder of a primitive type */
+//#include <errno.h>
 
 /*
  * INTEGER basic type description.
@@ -18,12 +18,12 @@ asn_TYPE_descriptor_t asn_DEF_INTEGER = {
 	"INTEGER",
 	"INTEGER",
 	ASN__PRIMITIVE_TYPE_free,
-	INTEGER_print,
+	NULL,
 	asn_generic_no_constraint,
 	ber_decode_primitive,
 	INTEGER_encode_der,
-	INTEGER_decode_xer,
-	INTEGER_encode_xer,
+	NULL,
+	NULL,
 	INTEGER_decode_uper,	/* Unaligned PER decoder */
 	INTEGER_encode_uper,	/* Unaligned PER encoder */
 	0, /* Use generic outmost tag fetcher */
@@ -95,8 +95,7 @@ INTEGER_encode_der(asn_TYPE_descriptor_t *td, void *sptr,
 	return der_encode_primitive(td, sptr, tag_mode, tag, cb, app_key);
 }
 
-static const asn_INTEGER_enum_map_t *INTEGER_map_enum2value(asn_INTEGER_specifics_t *specs, const char *lstart, const char *lstop);
-
+#if 0
 /*
  * INTEGER specific human-readable output.
  */
@@ -194,7 +193,10 @@ INTEGER__dump(asn_TYPE_descriptor_t *td, const INTEGER_t *st, asn_app_consume_by
 	wrote += p - scratch;
 	return (cb(scratch, p - scratch, app_key) < 0) ? -1 : wrote;
 }
+#endif
 
+
+#if 0
 /*
  * INTEGER specific human-readable output.
  */
@@ -214,7 +216,9 @@ INTEGER_print(asn_TYPE_descriptor_t *td, const void *sptr, int ilevel,
 
 	return (ret < 0) ? -1 : 0;
 }
+#endif
 
+#if 0
 struct e2v_key {
 	const char *start;
 	const char *stop;
@@ -239,6 +243,7 @@ INTEGER__compar_enum2value(const void *kp, const void *am) {
 	}
 	return name[0] ? -1 : 0;
 }
+
 
 static const asn_INTEGER_enum_map_t *
 INTEGER_map_enum2value(asn_INTEGER_specifics_t *specs, const char *lstart, const char *lstop) {
@@ -277,7 +282,9 @@ INTEGER_map_enum2value(asn_INTEGER_specifics_t *specs, const char *lstart, const
 	}
 	return el_found;
 }
+#endif
 
+#if 0
 static int
 INTEGER__compar_value2enum(const void *kp, const void *am) {
 	long a = *(const long *)kp;
@@ -296,7 +303,9 @@ INTEGER_map_value2enum(asn_INTEGER_specifics_t *specs, long value) {
 		count, sizeof(specs->value2enum[0]),
 		INTEGER__compar_value2enum);
 }
+#endif
 
+#if 0
 static int
 INTEGER_st_prealloc(INTEGER_t *st, int min_size) {
 	void *p = MALLOC(min_size + 1);
@@ -310,7 +319,9 @@ INTEGER_st_prealloc(INTEGER_t *st, int min_size) {
 		return -1;
 	}
 }
+#endif
 
+#if 0
 /*
  * Decode the chunk of XML text encoding INTEGER.
  */
@@ -531,7 +542,10 @@ INTEGER_decode_xer(asn_codec_ctx_t *opt_codec_ctx,
 		sptr, sizeof(INTEGER_t), opt_mname,
 		buf_ptr, size, INTEGER__xer_body_decode);
 }
+#endif
 
+
+#if 0
 asn_enc_rval_t
 INTEGER_encode_xer(asn_TYPE_descriptor_t *td, void *sptr,
 	int ilevel, enum xer_encoder_flags_e flags,
@@ -550,6 +564,7 @@ INTEGER_encode_xer(asn_TYPE_descriptor_t *td, void *sptr,
 
 	_ASN_ENCODED_OK(er);
 }
+#endif
 
 asn_dec_rval_t
 INTEGER_decode_uper(asn_codec_ctx_t *opt_codec_ctx, asn_TYPE_descriptor_t *td,
@@ -727,7 +742,7 @@ asn_INTEGER2long(const INTEGER_t *iptr, long *lptr) {
 
 	/* Sanity checking */
 	if(!iptr || !iptr->buf || !lptr) {
-		errno = EINVAL;
+		//errno = EINVAL;
 		return -1;
 	}
 
@@ -756,7 +771,7 @@ asn_INTEGER2long(const INTEGER_t *iptr, long *lptr) {
 		size = end - b;
 		if(size > sizeof(long)) {
 			/* Still cannot fit the long */
-			errno = ERANGE;
+			//errno = ERANGE;
 			return -1;
 		}
 	}
@@ -789,7 +804,7 @@ asn_long2INTEGER(INTEGER_t *st, long value) {
 	int add;
 
 	if(!st) {
-		errno = EINVAL;
+		//errno = EINVAL;
 		return -1;
 	}
 

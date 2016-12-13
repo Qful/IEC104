@@ -9,12 +9,10 @@
 #define	_Integer8_H_
 
 
-#include "asn_application.h"
-
-//#include "stdint.h"
+#include <asn_application.h>
 
 /* Including external dependencies */
-#include "NativeInteger.h"
+#include <NativeInteger.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,17 +20,16 @@ extern "C" {
 
 /* Integer8 */
 typedef long	 Integer8_t;
-//int8_t			Integer8_t;
 
 /* Implementation */
 extern asn_TYPE_descriptor_t asn_DEF_Integer8;
-asn_struct_free_f 	Integer8_free;
-asn_struct_print_f 	Integer8_print;
-asn_constr_check_f 	Integer8_constraint;
-ber_type_decoder_f 	Integer8_decode_ber;
-der_type_encoder_f 	Integer8_encode_der;
-xer_type_decoder_f 	Integer8_decode_xer;
-xer_type_encoder_f 	Integer8_encode_xer;
+asn_struct_free_f Integer8_free;
+asn_struct_print_f Integer8_print;
+asn_constr_check_f Integer8_constraint;
+ber_type_decoder_f Integer8_decode_ber;
+der_type_encoder_f Integer8_encode_der;
+xer_type_decoder_f Integer8_decode_xer;
+xer_type_encoder_f Integer8_encode_xer;
 
 #ifdef __cplusplus
 }

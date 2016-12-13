@@ -1,7 +1,7 @@
 /*
  *  reporting.h
  *
- *  Copyright 2013 Michael Zillgith
+ *  Copyright 2013, 2014 Michael Zillgith
  *
  *  This file is part of libIEC61850.
  *
@@ -24,29 +24,80 @@
 #ifndef REPORTING_H_
 #define REPORTING_H_
 
+typedef struct sReportBufferEntry ReportBufferEntry;
+
+struct sReportBufferEntry {
+    uint8_t entryId[8];
+    uint8_t flags; /* bit 0 (1 = isIntegrityReport), bit 1 (1 = isGiReport) */
+    uint64_t timeOfEntry;
+    int entryLength;
+    ReportBufferEntry* next;
+};
+
+typedef struct {
+    uint8_t* memoryBlock;
+    int memoryBlockSize;
+    int reportsCount;     /* number of reports currently enqueued */
+    ReportBufferEntry* oldestReport;
+    ReportBufferEntry* lastEnqueuedReport;
+    ReportBufferEntry* nextToTransmit;
+    bool isOverflow; /* true if overflow condition is active */
+} ReportBuffer;
+
 typedef struct {
     char* name;
     MmsDomain* domain;
+
+    LogicalNode* parentLN;
+
     MmsValue* rcbValues;
     MmsValue* inclusionField;
     MmsValue* confRev;
-    MmsValue* timeOfEntry;
     DataSet* dataSet;
+    bool isDynamicDataSet;
     bool enabled;
-    bool bufferd;
-    bool gi;
-    bool triggered;
+    bool reserved;
+    bool buffered; /* true if report is a buffered report */
+
+    MmsValue** bufferedDataSetValues; /* used to buffer values during bufTm time */
+
+    MmsValue** valueReferences; /* array to store value references for fast access */
+
+    bool gi; /* flag to indicate that a GI report is triggered */
+
     uint16_t sqNum;
     uint32_t intgPd;
     uint32_t bufTm;
     uint64_t nextIntgReportTime;
-    uint64_t reportTime;
-    MmsServerConnection* clientConnection;
-    ReportInclusionFlag* inclusionFlags;
+    uint64_t reservationTimeout;
+    MmsServerConnection clientConnection;
+
+    uint64_t lastEntryId;
+
+    int triggerOps;
+
+#if (CONFIG_MMS_THREADLESS_STACK != 1)
+    Semaphore createNotificationsMutex;  /* { covered by mutex } */
+#endif
+
+    ReportInclusionFlag* inclusionFlags; /* { covered by mutex } */
+    bool triggered;                      /* { covered by mutex } */
+    uint64_t reportTime;                 /* { covered by mutex } */
+
+    /*
+     * the following members are only required for buffered RCBs *
+     * TODO move to ReportBuffer structure!
+     */
+
+    bool isBuffering; /* true if buffered RCB is buffering (datSet is set to a valid value) */
+    bool isResync; /* true if buffered RCB is in resync state */
+
+    ReportBuffer* reportBuffer;
+    MmsValue* timeOfEntry;
 } ReportControl;
 
 ReportControl*
-ReportControl_create(bool buffered);
+ReportControl_create(bool buffered, LogicalNode* parentLN);
 
 void
 ReportControl_destroy(ReportControl* self);
@@ -57,19 +108,25 @@ ReportControl_valueUpdated(ReportControl* self, int dataSetEntryIndex, ReportInc
 MmsValue*
 ReportControl_getRCBValue(ReportControl* rc, char* elementName);
 
-MmsTypeSpecification*
+MmsVariableSpecification*
 Reporting_createMmsBufferedRCBs(MmsMapping* self, MmsDomain* domain,
         LogicalNode* logicalNode, int reportsCount);
 
-MmsTypeSpecification*
+MmsVariableSpecification*
 Reporting_createMmsUnbufferedRCBs(MmsMapping* self, MmsDomain* domain,
         LogicalNode* logicalNode, int reportsCount);
 
-MmsValueIndication
+MmsDataAccessError
 Reporting_RCBWriteAccessHandler(MmsMapping* self, ReportControl* rc, char* elementName, MmsValue* value,
-        MmsServerConnection* connection);
+        MmsServerConnection connection);
+
+void
+Reporting_activateBufferedReports(MmsMapping* self);
 
 void
 Reporting_processReportEvents(MmsMapping* self, uint64_t currentTimeInMs);
+
+void
+Reporting_deactivateReportsForConnection(MmsMapping* self, MmsServerConnection connection);
 
 #endif /* REPORTING_H_ */

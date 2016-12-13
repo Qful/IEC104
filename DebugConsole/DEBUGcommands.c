@@ -63,7 +63,7 @@ static const CLI_Command_Definition_t xIPDebugStats =
 static const CLI_Command_Definition_t xRunTimeStats =
 {
 	"runtime", /* The command string to type. */
-	"runtime:\r\n Отображает таблицу, показывающую, сколько времени обработки использовал каждую задачу FreeRTOS \r\n\r\n",
+	"runtime:\r\n сколько времени обработки использовал каждую задачу FreeRTOS \r\n\r\n",
 	prvRunTimeStatsCommand, /* The function to run. */
 	0 /* No parameters are expected. */
 };
@@ -72,7 +72,7 @@ static const CLI_Command_Definition_t xRunTimeStats =
 static const CLI_Command_Definition_t xls =
 {
 	"ls",
-	"ls:\r\n  команда, отображающая список файлов и подкатологов, находящихся в конкретном каталоге \r\n\r\n",
+	"ls:\r\n  список файлов и подкатологов, находящихся в конкретном каталоге \r\n\r\n",
 	prvlsCommand,
 	0
 };
@@ -142,7 +142,7 @@ void vRegisterDEBUGCommands( void )
 
 static BaseType_t prvTaskStatsCommand( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
 {
-const char *const pcHeader = "Task          State  Priority  Stack	#\r\n************************************************\r\n";
+const char *const pcHeader = "Task          State  Priority  Stack	#\r\n\r\n";
 	( void ) pcCommandString;
 	( void ) xWriteBufferLen;
 	UBaseType_t fre;
@@ -157,7 +157,7 @@ const char *const pcHeader = "Task          State  Priority  Stack	#\r\n********
 /*-----------------------------------------------------------*/
 static BaseType_t prvDisplayIPDebugStats( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
 {
-	const char * const pcHeader = "prvDisplayIPDebugStats\r\n****************************************\r\n";
+	const char * const pcHeader = "prvDisplayIPDebugStats\r\n\r\n";
 	( void ) pcCommandString;
 	( void ) xWriteBufferLen;
 	configASSERT( pcWriteBuffer );
@@ -170,7 +170,7 @@ static BaseType_t prvDisplayIPDebugStats( char *pcWriteBuffer, size_t xWriteBuff
 
 static BaseType_t prvRunTimeStatsCommand( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
 {
-    const char * const pcHeader = "Task            Abs Time      % Time\r\n****************************************\r\n";
+    const char * const pcHeader = "Task            Abs Time      % Time\r\n\r\n";
 
 	( void ) pcCommandString;
 	( void ) xWriteBufferLen;
@@ -184,7 +184,7 @@ static BaseType_t prvRunTimeStatsCommand( char *pcWriteBuffer, size_t xWriteBuff
 /*-----------------------------------------------------------*/
 static BaseType_t prvlsCommand( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
 {
-    const char * const pcHeader = "ls:\r\n****************************************\r\n";
+    const char * const pcHeader = "ls:\r\n\r\n";
 
 	( void ) pcCommandString;
 	( void ) xWriteBufferLen;
@@ -220,7 +220,7 @@ static BaseType_t prvfreememCommand( char *pcWriteBuffer, size_t xWriteBufferLen
 
 	strcpy( pcWriteBuffer, pcHeader );
 
-	sprintf(  pcWriteBuffer + strlen( pcHeader ),"%u байт \r\n************\r\n",xPortGetFreeHeapSize());
+	sprintf(  pcWriteBuffer + strlen( pcHeader ),"%u байт \r\n\r\n",xPortGetFreeHeapSize());
 
 	return pdFALSE;
 }

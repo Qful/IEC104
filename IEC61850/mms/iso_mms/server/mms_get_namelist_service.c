@@ -1,7 +1,7 @@
 /*
  *  mms_get_namelist_service.c
  *
- *  Copyright 2013 Michael Zillgith
+ *  Copyright 2013, 2014, 2015 Michael Zillgith
  *
  *  This file is part of libIEC61850.
  *
@@ -21,17 +21,33 @@
  *  See COPYING file for the complete license text.
  */
 
+#include "libiec61850_platform_includes.h"
 #include "mms_server_internal.h"
 #include "ber_encoder.h"
+#include "ber_decode.h"
 
-#include "main.h"
+#if (MMS_GET_NAME_LIST == 1)
 
 /**********************************************************************************************
  * MMS GetNameList Service
  *********************************************************************************************/
 
+#ifndef CONFIG_MMS_SORT_NAME_LIST
+#define CONFIG_MMS_SORT_NAME_LIST 1
+#endif
+
+#define OBJECT_CLASS_NAMED_VARIABLE 0
+#define OBJECT_CLASS_NAMED_VARIABLE_LIST 2
+#define OBJECT_CLASS_JOURNAL 8
+#define OBJECT_CLASS_DOMAIN 9
+
+#define OBJECT_SCOPE_VMD 0
+#define OBJECT_SCOPE_DOMAIN 1
+#define OBJECT_SCOPE_ASSOCIATION 2
+
 static LinkedList
-getNameListVMDSpecific(MmsServerConnection* connection) {
+getDomainNames(MmsServerConnection connection)
+{
 	MmsDevice* device = MmsServer_getDevice(connection->server);
 
 	LinkedList list = LinkedList_create();
@@ -46,14 +62,54 @@ getNameListVMDSpecific(MmsServerConnection* connection) {
 }
 
 
-static char* appendMmsSubVariable(char* name, char* child)
+#if (CONFIG_MMS_SUPPORT_VMD_SCOPE_NAMED_VARIABLES == 1)
+static LinkedList
+getNameListVMDSpecific(MmsServerConnection connection)
+{
+    MmsDevice* device = MmsServer_getDevice(connection->server);
+
+    LinkedList list = LinkedList_create();
+
+    int i;
+
+    for (i = 0; i < device->namedVariablesCount; i++) {
+        LinkedList_add(list, device->namedVariables[i]->name);
+    }
+
+    return list;
+}
+#endif /* (CONFIG_MMS_SUPPORT_VMD_SCOPE_NAMED_VARIABLES == 1) */
+
+
+#if (CONFIG_MMS_SORT_NAME_LIST == 1)
+static void
+sortIndex(int* index, int size, MmsVariableSpecification** namedVariables)
+{
+    int n;
+    int i;
+
+    for (n = size; n > 1; n = n - 1) {
+        for (i = 0; i < n - 1; i = i + 1) {
+            if (StringUtils_compareStrings(namedVariables[index[i]]->name, namedVariables[index[i + 1]]->name) > 0) {
+                int storedIndex = index[i];
+                index[i] = index[i + 1];
+                index[i + 1] = storedIndex;
+            }
+        }
+    }
+}
+#endif /* (CONFIG_MMS_SORT_NAME_LIST == 1) */
+
+#if (CONFIG_MMS_SUPPORT_FLATTED_NAME_SPACE == 1)
+static char*
+appendMmsSubVariable(char* name, char* child)
 {
     int nameLen = strlen(name);
     int childLen = strlen(child);
 
     int newSize = nameLen + childLen + 2;
 
-    char* newName = malloc(newSize);
+    char* newName = (char*) GLOBAL_MALLOC(newSize);
 
     int bufPos = 0;
     int i;
@@ -72,113 +128,192 @@ static char* appendMmsSubVariable(char* name, char* child)
 }
 
 static LinkedList
-addSubNamedVaribleNamesToList(LinkedList nameList, char* prefix, MmsTypeSpecification* variable)
+addSubNamedVaribleNamesToList(LinkedList nameList, char* prefix, MmsVariableSpecification* variable)
 {
-	LinkedList listElement = nameList;
+    LinkedList listElement = nameList;
 
-	if (variable->type == MMS_STRUCTURE) {
+    if (variable->type == MMS_STRUCTURE) {
 
-		int i;
-
-		MmsTypeSpecification** variables = variable->typeSpec.structure.elements;
-
-		for (i = 0; i < variable->typeSpec.structure.elementCount; i++) {
-			//char* variableName = createString(3, prefix, "$", variables[i]->name);
-
-			char* variableName = appendMmsSubVariable(prefix, variables[i]->name);
-			//printf("item: %s\n", variableName);
-
-			//LinkedList_add(nameList, variableName);
-			listElement = LinkedList_insertAfter(listElement, variableName);
-
-			listElement = addSubNamedVaribleNamesToList(listElement, variableName, variables[i]);
-		}
-	}
-	else if (variable->type == MMS_ARRAY) {
-		MmsTypeSpecification* element = variable->typeSpec.array.elementTypeSpec;
-		listElement = addSubNamedVaribleNamesToList(listElement, prefix, element);
-	}
-
-	return listElement;
-}
-
-/*************************************************************************
- * getNameListDomainSpecific
- * Возвращает список LN узлов из LD (домена) в виде структуры LinkedList
- *************************************************************************/
-static LinkedList	getNameListDomainSpecific(MmsServerConnection* connection, char* domainName) {
-	MmsDevice* device = MmsServer_getDevice(connection->server);
-
-	LinkedList nameList = NULL;
-
-	MmsDomain* domain = MmsDevice_getDomain(device, domainName);
-
-	if (domain != NULL) {
-		MmsTypeSpecification** variables;
         int i;
-        LinkedList element;
-        nameList = LinkedList_create();
-		variables = domain->namedVariables;
 
-		element = nameList;
+        MmsVariableSpecification** variables = variable->typeSpec.structure.elements;
 
-		for (i = 0; i < domain->namedVariablesCount; i++) {
-			// LinkedList_add(nameList, copyString(variables[i]->name));
-			char* prefix;
-            element = LinkedList_insertAfter(element, copyString(variables[i]->name));
+#if (CONFIG_MMS_SORT_NAME_LIST == 1)
+        int* index = (int*) GLOBAL_MALLOC(sizeof(int) * variable->typeSpec.structure.elementCount);
 
-			prefix = variables[i]->name;
+        for (i = 0; i < variable->typeSpec.structure.elementCount; i++)
+            index[i] = i;
 
-			//addSubNamedVaribleNamesToList(nameList, prefix, variables[i]);
-			element = addSubNamedVaribleNamesToList(element, prefix, variables[i]);
-		}
-	}
+        sortIndex(index, variable->typeSpec.structure.elementCount, variables);
+#endif /* (CONFIG_MMS_SORT_NAME_LIST == 1) */
 
-	return nameList;
+        for (i = 0; i < variable->typeSpec.structure.elementCount; i++) {
+#if (CONFIG_MMS_SORT_NAME_LIST == 1)
+            char* variableName = appendMmsSubVariable(prefix, variables[index[i]]->name);
+#else
+            char* variableName = appendMmsSubVariable(prefix, variables[i]->name);
+#endif /* (CONFIG_MMS_SORT_NAME_LIST == 1) */
+
+            listElement = LinkedList_insertAfter(listElement, variableName);
+
+#if (CONFIG_MMS_SORT_NAME_LIST == 1)
+            listElement = addSubNamedVaribleNamesToList(listElement, variableName, variables[index[i]]);
+#else
+            listElement = addSubNamedVaribleNamesToList(listElement, variableName, variables[i]);
+#endif /* (CONFIG_MMS_SORT_NAME_LIST == 1) */
+        }
+
+#if (CONFIG_MMS_SORT_NAME_LIST == 1)
+        GLOBAL_FREEMEM(index);
+#endif
+    }
+
+    return listElement;
 }
 
-#ifdef MMS_DATA_SET_SERVICE 1
+#endif /* (CONFIG_MMS_SUPPORT_FLATTED_NAME_SPACE == 1) */
+
+
+
+
+static LinkedList
+getJournalListDomainSpecific(MmsServerConnection connection, char* domainName)
+{
+    MmsDevice* device = MmsServer_getDevice(connection->server);
+
+    LinkedList nameList = NULL;
+
+    MmsDomain* domain = MmsDevice_getDomain(device, domainName);
+
+    if (domain != NULL) {
+        nameList = LinkedList_create();
+
+        if (domain->journals != NULL) {
+
+            LinkedList journalList = domain->journals;
+
+            while ((journalList = LinkedList_getNext(journalList)) != NULL) {
+
+                MmsJournal journal = (MmsJournal) LinkedList_getData(journalList);
+
+                LinkedList_add(nameList, (void*) journal->name);
+            }
+
+        }
+    }
+
+    return nameList;
+}
+
+static LinkedList
+getNameListDomainSpecific(MmsServerConnection connection, char* domainName)
+{
+    MmsDevice* device = MmsServer_getDevice(connection->server);
+
+    LinkedList nameList = NULL;
+
+    MmsDomain* domain = MmsDevice_getDomain(device, domainName);
+
+    if (domain != NULL) {
+        nameList = LinkedList_create();
+        MmsVariableSpecification** variables = domain->namedVariables;
+
+        int i;
+
+        LinkedList element = nameList;
+
+#if (CONFIG_MMS_SORT_NAME_LIST == 1)
+        int* index = (int*) GLOBAL_MALLOC(sizeof(int) * domain->namedVariablesCount);
+
+        for (i = 0; i < domain->namedVariablesCount; i++)
+            index[i] = i;
+
+        sortIndex(index, domain->namedVariablesCount, domain->namedVariables);
+#endif /* (CONFIG_MMS_SORT_NAME_LIST == 1) */
+
+        for (i = 0; i < domain->namedVariablesCount; i++) {
+
+#if (CONFIG_MMS_SORT_NAME_LIST == 1)
+            element = LinkedList_insertAfter(element, copyString(variables[index[i]]->name));
+#else
+            element = LinkedList_insertAfter(element, copyString(variables[i]->name));
+#endif
+
+#if (CONFIG_MMS_SUPPORT_FLATTED_NAME_SPACE == 1)
+#if (CONFIG_MMS_SORT_NAME_LIST == 1)
+            char* prefix = variables[index[i]]->name;
+            element = addSubNamedVaribleNamesToList(element, prefix, variables[index[i]]);
+#else
+            char* prefix = variables[i]->name;
+            element = addSubNamedVaribleNamesToList(element, prefix, variables[i]);
+#endif /* (CONFIG_MMS_SORT_NAME_LIST == 1) */
+#endif /* (CONFIG_MMS_SUPPORT_FLATTED_NAME_SPACE == 1) */
+
+        }
+
+#if (CONFIG_MMS_SORT_NAME_LIST == 1)
+        GLOBAL_FREEMEM(index);
+#endif
+    }
+
+    return nameList;
+}
+
+
+#if (MMS_DATA_SET_SERVICE == 1)
 
 static LinkedList
 createStringsFromNamedVariableList(LinkedList nameList, LinkedList variableLists)
 {
-    LinkedList variableListsElement;
-	nameList = LinkedList_create();
-	variableListsElement = LinkedList_getNext(variableLists);
-	while (variableListsElement != NULL ) {
-		MmsNamedVariableList variableList =
-				(MmsNamedVariableList) variableListsElement->data;
+    nameList = LinkedList_create();
+    LinkedList variableListsElement = LinkedList_getNext(variableLists);
+    while (variableListsElement != NULL) {
+        MmsNamedVariableList variableList =
+                (MmsNamedVariableList) variableListsElement->data;
 
-		LinkedList_add(nameList,
-				copyString(MmsNamedVariableList_getName(variableList)));
+        LinkedList_add(nameList,
+                copyString(MmsNamedVariableList_getName(variableList)));
 
-		variableListsElement = LinkedList_getNext(variableListsElement);
-	}
-	return nameList;
-}
-/*************************************************************************
- * getNamedVariableListDomainSpecific
- * Возвращает список переменных  в узле LN узлов в виде структуры LinkedList
- *************************************************************************/
-static LinkedList		getNamedVariableListDomainSpecific(MmsServerConnection* connection, char* domainName)
-{
-	MmsDevice* device = MmsServer_getDevice(connection->server);
-
-	LinkedList nameList = NULL;
-
-	MmsDomain* domain = MmsDevice_getDomain(device, domainName);
-
-	if (domain != NULL) {
-		LinkedList variableLists = MmsDomain_getNamedVariableLists(domain);
-
-		nameList = createStringsFromNamedVariableList(nameList, variableLists);
-	}
-
-	return nameList;
+        variableListsElement = LinkedList_getNext(variableListsElement);
+    }
+    return nameList;
 }
 
 static LinkedList
-getNamedVariableListAssociationSpecific(MmsServerConnection* connection)
+getNamedVariableListsDomainSpecific(MmsServerConnection connection, char* domainName)
+{
+    MmsDevice* device = MmsServer_getDevice(connection->server);
+
+    LinkedList nameList = NULL;
+
+    MmsDomain* domain = MmsDevice_getDomain(device, domainName);
+
+    if (domain != NULL) {
+        LinkedList variableLists = MmsDomain_getNamedVariableLists(domain);
+
+        nameList = createStringsFromNamedVariableList(nameList, variableLists);
+    }
+
+    return nameList;
+}
+
+static LinkedList
+getNamedVariableListsVMDSpecific(MmsServerConnection connection)
+{
+    MmsDevice* device = MmsServer_getDevice(connection->server);
+
+    LinkedList nameList = NULL;
+
+    LinkedList variableLists = MmsDevice_getNamedVariableLists(device);
+
+    nameList = createStringsFromNamedVariableList(nameList, variableLists);
+
+    return nameList;
+}
+
+#if (MMS_DYNAMIC_DATA_SETS == 1)
+static LinkedList
+getNamedVariableListAssociationSpecific(MmsServerConnection connection)
 {
 	LinkedList nameList = NULL;
 
@@ -188,32 +323,22 @@ getNamedVariableListAssociationSpecific(MmsServerConnection* connection)
 
 	return nameList;
 }
-#endif
-/*************************************************************************
- * createNameListResponse
- *
- *************************************************************************/
-#define	overheadsizeofPDU		40
-static void		createNameListResponse( MmsServerConnection* connection, int invokeId, LinkedList nameList, ByteBuffer* response, char* continueAfter)
+#endif /* (MMS_DYNAMIC_DATA_SETS == 1) */
+
+#endif /* (MMS_DATA_SET_SERVICE == 1) */
+
+static void
+createNameListResponse(
+        MmsServerConnection connection,
+        int invokeId,
+        LinkedList nameList,
+        ByteBuffer* response,
+        char* continueAfter)
 {
     LinkedList startElement = NULL;
-    int nameCount;
-    int mmsPduLength;
-    int maxPduSize;
-    bool moreFollows;
-    LinkedList element;
-    uint32_t identifierListSize;
-    uint32_t listOfIdentifierSize;
-    uint32_t getNameListSize;
-    uint32_t confirmedServiceResponseSize;
-    uint32_t invokeIdSize;
-    uint32_t confirmedResponsePDUSize;
-    uint8_t* buffer;
-    int bufPos;
-    int i = 0;
 
     if (continueAfter != NULL) {
-        element = nameList;
+        LinkedList element = nameList;
 
         while ((element = LinkedList_getNext(element)) != NULL) {
             if (strcmp((char*) (element->data), continueAfter) == 0) {
@@ -223,59 +348,60 @@ static void		createNameListResponse( MmsServerConnection* connection, int invoke
         }
 
         if (startElement == NULL) {
-            mmsServer_createConfirmedErrorPdu(invokeId, response, MMS_ERROR_TYPE_OBJECT_ACCESS_UNSUPPORTED);
+            mmsServer_createServiceErrorPdu(invokeId, response, MMS_ERROR_ACCESS_OBJECT_ACCESS_UNSUPPORTED);
             return;
         }
     }
 
     /* determine number of identifiers to include in response */
-    if (startElement == NULL)	startElement = nameList;
+    if (startElement == NULL)
+        startElement = nameList;
 
-    nameCount = 0;
-    mmsPduLength = overheadsizeofPDU;//25; 													// запас размера для дополнения заголовка	/* 25 estimated overhead size of PDU encoding */
-    maxPduSize = connection->maxPduSize;								// максимальный размер буфера
+    int nameCount = 0;
+    int estimatedMmsPduLength = 27; /* estimated overhead size of PDU encoding */
+    int maxPduSize = connection->maxPduSize;
 
-    moreFollows = false;
+    bool moreFollows = false;
 
-    element = startElement;
+    LinkedList element = startElement;
+
+    uint32_t identifierListSize = 0;
 
     while ((element = LinkedList_getNext(element)) != NULL) {
         int elementLength;
 
         elementLength = BerEncoder_determineEncodedStringSize((char*) element->data);
 
-        if ((mmsPduLength + elementLength) > maxPduSize) {				// если размер списка с текущим элементом больше размера буфура то рубис на несколько пакетов
+        if ((estimatedMmsPduLength + elementLength) > maxPduSize) {
             moreFollows = true;
             break;
         }
         else {
-            mmsPduLength += elementLength;
+            estimatedMmsPduLength += elementLength;
+            identifierListSize += elementLength;
             nameCount++;
         }
 
     }
 
-    identifierListSize = mmsPduLength - overheadsizeofPDU;
+    uint32_t listOfIdentifierSize = 1 + BerEncoder_determineLengthSize(identifierListSize) + identifierListSize;
 
-    listOfIdentifierSize = 1 + BerEncoder_determineLengthSize(identifierListSize) + identifierListSize;
+    uint32_t getNameListSize = listOfIdentifierSize;
 
-    getNameListSize = listOfIdentifierSize + 3;
+    if (moreFollows == false)
+    	getNameListSize += 3;
 
-    confirmedServiceResponseSize = 1 + BerEncoder_determineLengthSize(getNameListSize) + getNameListSize;
+    uint32_t confirmedServiceResponseSize = 1 + BerEncoder_determineLengthSize(getNameListSize) + getNameListSize;
 
-    invokeIdSize = BerEncoder_UInt32determineEncodedSize((uint32_t) invokeId) + 2;
+    uint32_t invokeIdSize = BerEncoder_UInt32determineEncodedSize((uint32_t) invokeId) + 2;
 
-    confirmedResponsePDUSize = confirmedServiceResponseSize + invokeIdSize;
-
-
-    USART_TRACE("createNameListResponse - максимальный размер Pdu: %i\n", maxPduSize);
-    USART_TRACE("createNameListResponse - размер фрейма Pdu: %i (имён:%i , Фреймов:%i)\n", mmsPduLength, nameCount, moreFollows);
+    uint32_t confirmedResponsePDUSize = confirmedServiceResponseSize + invokeIdSize;
 
     /* encode response */
     element = startElement;
 
-    buffer = response->buffer;
-    bufPos = 0;
+    uint8_t* buffer = response->buffer;
+    int bufPos = 0;
 
     bufPos = BerEncoder_encodeTL(0xa1, confirmedResponsePDUSize, buffer, bufPos);
 
@@ -285,132 +411,254 @@ static void		createNameListResponse( MmsServerConnection* connection, int invoke
     bufPos = BerEncoder_encodeTL(0xa1, getNameListSize, buffer, bufPos);
     bufPos = BerEncoder_encodeTL(0xa0, identifierListSize, buffer, bufPos);
 
-    i = 0;
+    int i = 0;
 
     while ((element = LinkedList_getNext(element)) != NULL) {
-
-        USART_TRACE("добавлен элемент N%i: %s\n",i, element->data);
         bufPos = BerEncoder_encodeStringWithTag(0x1a, (char*) element->data, buffer, bufPos);
+
         i++;
 
-        if (i == nameCount)	break;
+        if (i == nameCount)
+            break;
     }
 
-    bufPos = BerEncoder_encodeBoolean(0x81, moreFollows, buffer, bufPos);
+    if (moreFollows == false)
+    	bufPos = BerEncoder_encodeBoolean(0x81, moreFollows, buffer, bufPos);
 
-    response->currPos = bufPos;
+    response->size = bufPos;
+
+    if (DEBUG_MMS_SERVER)
+        printf("MMS_SERVER: getNameList: encoded %i bytes\n", response->size);
 }
 
-/*************************************************************************
- * mmsServer_handleGetNameListRequest
- * получаем список имён переменных для передачи
- *************************************************************************/
-void	mmsServer_handleGetNameListRequest(	MmsServerConnection* connection, GetNameListRequest_t* getNameList,	int invokeId, ByteBuffer* response)
+void
+mmsServer_handleGetNameListRequest(
+		MmsServerConnection connection,
+		uint8_t* buffer, int bufPos, int maxBufPos,
+		uint32_t invokeId,
+		ByteBuffer* response)
 {
-	long objectClass;
-    char* continueAfter;
-    long objectScope;
-    char* domainSpecificName;
+	int objectClass = -1;
 
-    LinkedList nameList;
+	int objectScope = -1;
 
-	asn_INTEGER2long(&getNameList->objectClass.choice.basicObjectClass, &objectClass);
+	char* domainId = NULL;
+	int domainIdLength;
 
-	switch (getNameList->objectScope.present) {
-	case GetNameListRequest__objectScope_PR_NOTHING:
-		objectScope = 0;
-		break;
-	case GetNameListRequest__objectScope_PR_vmdSpecific:
-		objectScope = 1;
-		break;
-	case GetNameListRequest__objectScope_PR_domainSpecific:
-		objectScope = 2;
-		break;
-	case GetNameListRequest__objectScope_PR_aaSpecific:
-		objectScope = 3;
-		break;
-	default:
-		objectScope = -1;
-		break;
-	}
+	char* continueAfter = NULL;
+	int continueAfterLength;
 
-	continueAfter = NULL;
+	while (bufPos < maxBufPos) {
+		uint8_t tag = buffer[bufPos++];
+		int length;
 
-	if (getNameList->continueAfter != NULL) {
-		int identifierLength = getNameList->continueAfter->size;
-		continueAfter = malloc(identifierLength + 1);
+		bufPos = BerDecoder_decodeLength(buffer, &length, bufPos, maxBufPos);
 
-		memcpy(continueAfter, getNameList->continueAfter->buf, identifierLength);
-		continueAfter[identifierLength] = 0;
-	}
+		if (bufPos < 0)  {
+			mmsServer_writeMmsRejectPdu(&invokeId, MMS_ERROR_REJECT_INVALID_PDU, response);
+			return;
+		}
 
-	domainSpecificName = NULL;
+		switch (tag) {
 
-	if (objectScope == 2) {
+		case 0xa0: /* objectClass */
+			bufPos++;
+			length = buffer[bufPos++];
+			objectClass = BerDecoder_decodeUint32(buffer, length, bufPos);
+			break;
 
-		domainSpecificName = createStringFromBuffer( getNameList->objectScope.choice.domainSpecific.buf, getNameList->objectScope.choice.domainSpecific.size);
+		case 0xa1: /* objectScope */
+			{
+				uint8_t objectScopeTag = buffer[bufPos++];
+				bufPos = BerDecoder_decodeLength(buffer, &length, bufPos, maxBufPos);
 
-		if (objectClass == ObjectClass__basicObjectClass_namedVariable) {
-
-			nameList = getNameListDomainSpecific(connection, domainSpecificName);
-
-			if (nameList == NULL)	{
-				mmsServer_createConfirmedErrorPdu(invokeId, response, MMS_ERROR_TYPE_OBJECT_NON_EXISTENT);
+				switch (objectScopeTag) {
+				case 0x80: /* vmd-specific */
+					objectScope = OBJECT_SCOPE_VMD;
+					break;
+				case 0x81: /* domain-specific */
+				    domainIdLength = length;
+					domainId = (char*) (buffer + bufPos);
+					objectScope = OBJECT_SCOPE_DOMAIN;
+					break;
+				case 0x82: /* association-specific */
+					objectScope = OBJECT_SCOPE_ASSOCIATION;
+					break;
+				default:
+					mmsServer_writeMmsRejectPdu(&invokeId, MMS_ERROR_REJECT_UNRECOGNIZED_MODIFIER, response);
+					return;
+				}
 			}
+			break;
+
+		case 0x82: /* continueAfter */
+			continueAfter = (char*) (buffer + bufPos);
+			continueAfterLength = length;
+			break;
+		default:
+			/* ignore unknown tag */
+			break;
+		}
+
+		bufPos += length;
+	}
+
+
+	char continueAfterIdMemory[130];
+	char* continueAfterId = NULL;
+
+	if (continueAfter != NULL) {
+		continueAfterId = continueAfterIdMemory;
+		memcpy(continueAfterId, continueAfter, continueAfterLength);
+		continueAfterId[continueAfterLength] = 0;
+
+		if (DEBUG_MMS_SERVER)
+		    printf("MMS_SERVER: getNameListRequest - continue after: (%s)\n", continueAfterId);
+	}
+
+	if (objectScope == OBJECT_SCOPE_DOMAIN) {
+		char domainSpecificName[130];
+
+		memcpy(domainSpecificName, domainId, domainIdLength);
+		domainSpecificName[domainIdLength] = 0;
+
+		if (objectClass == OBJECT_CLASS_NAMED_VARIABLE) {
+		    if (DEBUG_MMS_SERVER)
+		        printf("MMS_SERVER: get namelist for (%s)\n", domainSpecificName);
+
+			LinkedList nameList = getNameListDomainSpecific(connection, domainSpecificName);
+
+			if (nameList == NULL)
+				mmsServer_createServiceErrorPdu(invokeId, response, MMS_ERROR_ACCESS_OBJECT_NON_EXISTENT);
 			else {
-				USART_TRACE("mms_server: Создаём ответ со списком имён\n");
-				createNameListResponse(connection, invokeId, nameList, response, continueAfter);
+				createNameListResponse(connection, invokeId, nameList, response, continueAfterId);
 				LinkedList_destroy(nameList);
 			}
 		}
-#ifdef MMS_DATA_SET_SERVICE
-		else if (objectClass == ObjectClass__basicObjectClass_namedVariableList) {
+		else if (objectClass == OBJECT_CLASS_JOURNAL) {
+		    LinkedList nameList = getJournalListDomainSpecific(connection, domainSpecificName);
 
-		    LinkedList nList = getNamedVariableListDomainSpecific(connection, domainSpecificName);
-
-			nameList = getNamedVariableListDomainSpecific(connection, domainSpecificName);
-
-			createNameListResponse(connection, invokeId, nameList, response, continueAfter);
-
-			LinkedList_destroy(nameList);
-		}
+            if (nameList == NULL)
+                mmsServer_createServiceErrorPdu(invokeId, response, MMS_ERROR_ACCESS_OBJECT_NON_EXISTENT);
+            else {
+#if (CONFIG_MMS_SORT_NAME_LIST == 1)
+                StringUtils_sortList(nameList);
 #endif
-		else {
-			USART_TRACE_RED("mms_server: getNameList objectClass %li not supported!\n", objectClass);
 
-			mmsServer_createConfirmedErrorPdu(invokeId, response, MMS_ERROR_TYPE_OBJECT_ACCESS_UNSUPPORTED);
+                createNameListResponse(connection, invokeId, nameList, response, continueAfterId);
+                LinkedList_destroyStatic(nameList);
+            }
 		}
+#if (MMS_DATA_SET_SERVICE == 1)
+		else if (objectClass == OBJECT_CLASS_NAMED_VARIABLE_LIST) {
+			LinkedList nameList = getNamedVariableListsDomainSpecific(connection, domainSpecificName);
 
-		free(domainSpecificName);
+			if (nameList == NULL)
+	            mmsServer_createServiceErrorPdu(invokeId, response, MMS_ERROR_ACCESS_OBJECT_NON_EXISTENT);
+			else {
+
+#if (CONFIG_MMS_SORT_NAME_LIST == 1)
+				StringUtils_sortList(nameList);
+#endif
+
+                createNameListResponse(connection, invokeId, nameList, response, continueAfter);
+                LinkedList_destroy(nameList);
+			}
+		}
+#endif /* (MMS_DATA_SET_SERVICE == 1) */
+
+		else {
+			if (DEBUG_MMS_SERVER) printf("MMS_SERVER: getNameList domain specific objectClass %i not supported!\n", objectClass);
+
+			mmsServer_createServiceErrorPdu(invokeId, response, MMS_ERROR_ACCESS_OBJECT_ACCESS_UNSUPPORTED);
+		}
 	}
 
-	else if (objectScope == 1) {
+	else if (objectScope == OBJECT_SCOPE_VMD) { /* vmd-specific */
 
-		nameList = getNameListVMDSpecific(connection);
+	    if (objectClass == OBJECT_CLASS_DOMAIN) {
 
-		createNameListResponse(connection, invokeId, nameList, response, continueAfter);
+	        LinkedList nameList = getDomainNames(connection);
 
-		LinkedList_destroyStatic(nameList);
+#if (CONFIG_MMS_SORT_NAME_LIST == 1)
+	        StringUtils_sortList(nameList);
+#endif
+
+	        createNameListResponse(connection, invokeId, nameList, response, continueAfter);
+
+	        LinkedList_destroyStatic(nameList);
+	    }
+
+#if (CONFIG_MMS_SUPPORT_VMD_SCOPE_NAMED_VARIABLES == 1)
+	    else if (objectClass == OBJECT_CLASS_NAMED_VARIABLE) {
+            LinkedList nameList = getNameListVMDSpecific(connection);
+
+            createNameListResponse(connection, invokeId, nameList, response, continueAfter);
+
+            LinkedList_destroyStatic(nameList);
+	    }
+#endif /* (CONFIG_MMS_SUPPORT_VMD_SCOPE_NAMED_VARIABLES == 1) */
+
+#if (MMS_DATA_SET_SERVICE == 1)
+	    else if (objectClass == OBJECT_CLASS_NAMED_VARIABLE_LIST) {
+	        LinkedList nameList = getNamedVariableListsVMDSpecific(connection);
+
+#if (CONFIG_MMS_SORT_NAME_LIST == 1)
+	        StringUtils_sortList(nameList);
+#endif
+
+	        createNameListResponse(connection, invokeId, nameList, response, continueAfter);
+
+	        LinkedList_destroy(nameList);
+	    }
+#endif /* (MMS_DATA_SET_SERVICE == 1) */
+
+	    else if (objectClass == OBJECT_CLASS_JOURNAL) {
+	        LinkedList nameList = LinkedList_create();
+
+#if (CONFIG_MMS_SORT_NAME_LIST == 1)
+	        StringUtils_sortList(nameList);
+#endif
+
+	        createNameListResponse(connection, invokeId, nameList, response, continueAfter);
+
+	        LinkedList_destroy(nameList);
+	    }
+
+        else {
+            if (DEBUG_MMS_SERVER) printf("MMS_SERVER: getNameList VMD specific objectClass %i not supported!\n", objectClass);
+
+            mmsServer_createServiceErrorPdu(invokeId, response, MMS_ERROR_ACCESS_OBJECT_ACCESS_UNSUPPORTED);
+        }
 	}
-#ifdef MMS_DATA_SET_SERVICE 1
-	else if (objectScope == 3) {
 
-		if (objectClass == ObjectClass__basicObjectClass_namedVariableList) {
-			nameList = getNamedVariableListAssociationSpecific(connection);
+#if (MMS_DATA_SET_SERVICE == 1)
+#if (MMS_DYNAMIC_DATA_SETS == 1)
+	else if (objectScope == OBJECT_SCOPE_ASSOCIATION) { /* association-specific */
+
+		if (objectClass == OBJECT_CLASS_NAMED_VARIABLE_LIST) {
+			LinkedList nameList = getNamedVariableListAssociationSpecific(connection);
+
+#if (CONFIG_MMS_SORT_NAME_LIST == 1)
+			StringUtils_sortList(nameList);
+#endif
 
 			createNameListResponse(connection, invokeId, nameList, response, continueAfter);
 
 			LinkedList_destroy(nameList);
 		}
 		else
-			mmsServer_createConfirmedErrorPdu(invokeId, response, MMS_ERROR_TYPE_OBJECT_ACCESS_UNSUPPORTED);
+			mmsServer_createServiceErrorPdu(invokeId, response, MMS_ERROR_ACCESS_OBJECT_ACCESS_UNSUPPORTED);
 	}
-#endif
+#endif /* (MMS_DYNAMIC_DATA_SETS == 1) */
+#endif /* (MMS_DATA_SET_SERVICE == 1) */
+
 	else {
-		USART_TRACE_RED("mms_server: getNameList(%li) not supported!\n", objectScope);
-		mmsServer_createConfirmedErrorPdu(invokeId, response, MMS_ERROR_TYPE_OBJECT_ACCESS_UNSUPPORTED);
+		if (DEBUG_MMS_SERVER) printf("MMS_SERVER:  getNameList(%i) not supported!\n", objectScope);
+		mmsServer_createServiceErrorPdu(invokeId, response, MMS_ERROR_ACCESS_OBJECT_ACCESS_UNSUPPORTED);
 	}
 
-	if (continueAfter != NULL)
-		free(continueAfter);
 }
+
+
+#endif /* (MMS_GET_NAME_LIST == 1) */

@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    system_stm32f4xx.c
   * @author  MCD Application Team
-  * @version V1.2.2
-  * @date    25-May-2015
+  * @version V1.2.1
+  * @date    13-March-2015
   * @brief   CMSIS Cortex-M4 Device Peripheral Access Layer System Source File.
   *
   *   This file provides two functions and one global variable to be called from 
@@ -90,10 +90,9 @@
   */
 
 /************************* Miscellaneous Configuration ************************/
-/*!< Uncomment the following line if you need to use external SRAM or SDRAM mounted
-     on STM324xG_EVAL/STM324x9I_EVAL boards as data memory  */
+/*!< Uncomment the following line if you need to use external SRAM or SDRAM mounted on STM324xG_EVAL/STM324x9I_EVAL boards as data memory  */
 #if defined(STM32F405xx) || defined(STM32F415xx) || defined(STM32F407xx) || defined(STM32F417xx) || defined(STM32F427xx) || defined(STM32F437xx) || defined(STM32F429xx) || defined(STM32F439xx)
-/* #define DATA_IN_ExtSRAM */
+#define DATA_IN_ExtSRAM
 #endif /* STM32F405xx || STM32F415xx || STM32F407xx || STM32F417xx || STM32F427xx || STM32F437xx || STM32F429xx || STM32F439xx */
  
 #if defined(STM32F427xx) || defined(STM32F437xx) || defined(STM32F429xx) || defined(STM32F439xx)
@@ -104,9 +103,8 @@
  #error "Please select DATA_IN_ExtSRAM or DATA_IN_ExtSDRAM " 
 #endif /* DATA_IN_ExtSRAM && DATA_IN_ExtSDRAM */
 
-/*!< Uncomment the following line if you need to relocate your vector Table in
-     Internal SRAM. */
-/* #define VECT_TAB_SRAM */
+/*!< Uncomment the following line if you need to relocate your vector Table in  Internal SRAM. */
+//#define VECT_TAB_SRAM
 #define VECT_TAB_OFFSET  0x00 /*!< Vector Table base offset field. 
                                    This value must be a multiple of 0x200. */
 /******************************************************************************/
@@ -134,7 +132,7 @@
                is no need to call the 2 first functions listed above, since SystemCoreClock
                variable is updated automatically.
   */
-  uint32_t SystemCoreClock = 1680000000;	//
+  uint32_t SystemCoreClock = 16000000;
   __I uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
 
 /**
@@ -192,6 +190,7 @@ void SystemInit(void)
 #if defined (DATA_IN_ExtSRAM) || defined (DATA_IN_ExtSDRAM)
   SystemInit_ExtMemCtl(); 
 #endif /* DATA_IN_ExtSRAM || DATA_IN_ExtSDRAM */
+
 
   /* Configure the Vector Table location add offset address ------------------*/
 #ifdef VECT_TAB_SRAM
@@ -296,6 +295,27 @@ void SystemCoreClockUpdate(void)
   */
 void SystemInit_ExtMemCtl(void)
 {
+	/*-- GPIOs Configuration -----------------------------------------------------*/
+	/*
+	 +-------------------+--------------------+------------------+--------------+
+	 +                       SRAM pins assignment                               +
+	 +-------------------+--------------------+------------------+--------------+
+	 | PD0  <-> FMC_D2  | PE0  <-> FMC_NBL0 | PF0  <-> FMC_A0 | PG0 <-> FMC_A10 |
+	 | PD1  <-> FMC_D3  | PE1  <-> FMC_NBL1 | PF1  <-> FMC_A1 | PG1 <-> FMC_A11 |
+	 | PD4  <-> FMC_NOE | PE3  <-> FMC_A19  | PF2  <-> FMC_A2 | PG2 <-> FMC_A12 |
+	 | PD5  <-> FMC_NWE | PE4  <-> FMC_A20  | PF3  <-> FMC_A3 | PG3 <-> FMC_A13 |
+	 | PD8  <-> FMC_D13 | PE7  <-> FMC_D4   | PF4  <-> FMC_A4 | PG4 <-> FMC_A14 |
+	 | PD9  <-> FMC_D14 | PE8  <-> FMC_D5   | PF5  <-> FMC_A5 | PG5 <-> FMC_A15 |
+	 | PD10 <-> FMC_D15 | PE9  <-> FMC_D6   | PF12 <-> FMC_A6 | PG9 <-> FMC_NE2 |
+	 | PD11 <-> FMC_A16 | PE10 <-> FMC_D7   | PF13 <-> FMC_A7 |-----------------+
+	 | PD12 <-> FMC_A17 | PE11 <-> FMC_D8   | PF14 <-> FMC_A8 |
+	 | PD13 <-> FMC_A18 | PE12 <-> FMC_D9   | PF15 <-> FMC_A9 |
+	 | PD14 <-> FMC_D0  | PE13 <-> FMC_D10  |-----------------+
+	 | PD15 <-> FMC_D1  | PE14 <-> FMC_D11  |
+	 |                  | PE15 <-> FMC_D12  |
+	 +------------------+------------------+
+	*/
+
 #if defined(STM32F427xx) || defined(STM32F437xx) || defined(STM32F429xx) || defined(STM32F439xx)
 #if defined (DATA_IN_ExtSDRAM)
   register uint32_t tmpreg = 0, timeout = 0xFFFF;
@@ -438,12 +458,12 @@ void SystemInit_ExtMemCtl(void)
   RCC->AHB1ENR   |= 0x00000078;
   
   /* Connect PDx pins to FMC Alternate function */
-  GPIOD->AFR[0]  = 0x00CCC0CC;
+  GPIOD->AFR[0]  = 0xC0CCC0CC;	//0x00CCC0CC;
   GPIOD->AFR[1]  = 0xCCCCCCCC;
   /* Configure PDx pins in Alternate function mode */  
-  GPIOD->MODER   = 0xAAAA0A8A;
+  GPIOD->MODER   = 0xAAAA8A8A;
   /* Configure PDx pins speed to 100 MHz */  
-  GPIOD->OSPEEDR = 0xFFFF0FCF;
+  GPIOD->OSPEEDR = 0xFFFFFFCF;
   /* Configure PDx pins Output type to push-pull */  
   GPIOD->OTYPER  = 0x00000000;
   /* No pull-up, pull-down for PDx pins */ 
@@ -477,7 +497,7 @@ void SystemInit_ExtMemCtl(void)
   GPIOG->AFR[0]  = 0x00CCCCCC;
   GPIOG->AFR[1]  = 0x000000C0;
   /* Configure PGx pins in Alternate function mode */ 
-  GPIOG->MODER   = 0x00085AAA;
+  GPIOG->MODER   = 0x00080AAA;
   /* Configure PGx pins speed to 100 MHz */ 
   GPIOG->OSPEEDR = 0x000CAFFF;
   /* Configure PGx pins Output type to push-pull */  
@@ -497,10 +517,19 @@ void SystemInit_ExtMemCtl(void)
 #endif /* STM32F427xx || STM32F437xx || STM32F429xx || STM32F439xx */ 
 
 #if defined(STM32F405xx) || defined(STM32F415xx) || defined(STM32F407xx)|| defined(STM32F417xx)
+  //  FSMC_Bank1->BTCR[(3-1)*2 + 1] =       /* Bank3 NOR/SRAM timing register configuration */
+  //                          (0 << 28) |   /* FSMC AccessMode A */
+  //                          (0 << 24) |   /* Data Latency */
+  //                          (0 << 20) |   /* CLK Division */
+  //                          (0 << 16) |   /* Bus Turnaround Duration */
+  //                          (9 <<  8) |   /* Data SetUp Time */
+  //                          (0 <<  4) |   /* Address Hold Time */
+  //                          (1 <<  0);    /* Address SetUp Time */
   /* Configure and enable Bank1_SRAM2 */
-  FSMC_Bank1->BTCR[2]  = 0x00001011;
-  FSMC_Bank1->BTCR[3]  = 0x00000201;
-  FSMC_Bank1E->BWTR[2] = 0x0FFFFFFF;
+  // -- Bank1 NE1 - RAM 1024K x 8 --
+  FSMC_Bank1->BTCR[0]  = 0x00005001; //0x00005001:   | ASYNCWAIT=0,EXTMOD=1,WAITEN=0,WREN=1 | WAITCFG=0,WRAPMOD=0,WAITPOL=0,BURSTEN=0 | nc,FACCEN=0,MWID=00(8bit) | MTYP=00(SRAM),MUXEN=0,MBKEN=1
+  FSMC_Bank1->BTCR[1]  = 0x02210515; //0x02210717     0x00000201;
+  FSMC_Bank1E->BWTR[0] = 0x02210515; //0x02210515 //0x0FFFFFFF
 #endif /* STM32F405xx || STM32F415xx || STM32F407xx || STM32F417xx */
 
 #endif /* DATA_IN_ExtSRAM */
