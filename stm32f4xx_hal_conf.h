@@ -244,6 +244,13 @@
 #define 	PHY_SR 				0
 #define 	PHY_DUPLEX_STATUS	0
 #define 	PHY_SPEED_STATUS	0
+
+#define Partner_FULLDUPLEX_100M             ((uint16_t)0x0100)  /*!< Set the full-duplex mode at 100 Mb/s */
+#define Partner_HALFDUPLEX_100M             ((uint16_t)0x0080)  /*!< Set the half-duplex mode at 100 Mb/s */
+#define Partner_FULLDUPLEX_10M              ((uint16_t)0x0040)  /*!< Set the full-duplex mode at 10 Mb/s  */
+#define Partner_HALFDUPLEX_10M              ((uint16_t)0x0020)  /*!< Set the half-duplex mode at 10 Mb/s  */
+
+
  /* Definition of the Ethernet driver buffers size and count */
  #define ETH_RX_BUF_SIZE                ETH_MAX_PACKET_SIZE /* buffer size for receive               */
  #define ETH_TX_BUF_SIZE                ETH_MAX_PACKET_SIZE /* buffer size for transmit              */
@@ -257,7 +264,7 @@
 
 #define PHY_RESET_DELAY                 ((uint32_t)0x000000FF)
 /* PHY Configuration delay */
-#define PHY_CONFIG_DELAY                ((uint32_t)0x00000FFF)
+#define PHY_CONFIG_DELAY                ((uint32_t)0x00000FFF)			//FFF
 
 #define PHY_READ_TO                     ((uint32_t)0x0000FFFF)
 #define PHY_WRITE_TO                    ((uint32_t)0x0000FFFF)
@@ -266,6 +273,7 @@
 
 #define PHY_BCR                         ((uint16_t)0x00)    /*!< Transceiver Basic Control Register   */
 #define PHY_BSR                         ((uint16_t)0x01)    /*!< Transceiver Basic Status Register    */
+#define PHY_ANLPA                       ((uint16_t)0x05)
 
 
 // ----------------------- MII Basic Control -----------------------

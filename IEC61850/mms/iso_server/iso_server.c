@@ -402,6 +402,7 @@ handleIsoConnectionsThreadless(IsoServer self)
         self->connectionHandler(ISO_CONNECTION_OPENED, self->connectionHandlerParameter, isoConnection);	// Вызываем isoConnectionIndicationHandler(); для Iso соединения
         																									// isoConnectionIndicationHandler(IsoConnectionIndication indication, void* parameter, IsoConnection connection);
     }
+//	USART_TRACE_RED("handleClientConnections....\n");
     handleClientConnections(self);				// Парсим если открыто. тут же даёт ответ в порт, если сюда не попали то и ответа не будет.
 }
 

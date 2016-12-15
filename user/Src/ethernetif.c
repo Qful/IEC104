@@ -32,6 +32,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
+//#include "stm32f4xx_hal_conf.h"
 #include "lwip/opt.h"
 
 #include "lwip/lwip_timers.h"
@@ -226,7 +227,7 @@ void HAL_ETH_MspInit(ETH_HandleTypeDef* heth)
     PHY_PowerON();
 #endif
     /* Peripheral interrupt init*/
-    HAL_NVIC_SetPriority(ETH_IRQn, 5, 0);
+    HAL_NVIC_SetPriority(ETH_IRQn, 12, 0);		//5
     HAL_NVIC_EnableIRQ(ETH_IRQn);
   }
 
@@ -276,6 +277,9 @@ void HAL_ETH_MspDeInit(ETH_HandleTypeDef* heth)
 void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth)
 {
 	//приняли данные от ETH. Семафорим об этом таску.
+
+//	NVIC_SystemReset();
+
     osSemaphoreRelease(s_xSemaphore);
 }
 /*******************************************************************************
@@ -298,7 +302,7 @@ static void low_level_init(struct netif *netif)
 //  uint8_t MACAddr[6]= { MAC_ADDR0, MAC_ADDR1, MAC_ADDR2, MAC_ADDR3, MAC_ADDR4, MAC_ADDR5 };
 //  uint8_t MACAddr[6]= { MAC_ADDR[0], MAC_ADDR[1], MAC_ADDR[2], MAC_ADDR[3], MAC_ADDR[4], MAC_ADDR[5] };
   heth.Instance = ETH;
-  heth.Init.AutoNegotiation = ETH_AUTONEGOTIATION_DISABLE;//ETH_AUTONEGOTIATION_DISABLE;//ETH_AUTONEGOTIATION_ENABLE
+  heth.Init.AutoNegotiation = ETH_AUTONEGOTIATION_ENABLE;//ETH_AUTONEGOTIATION_DISABLE;//ETH_AUTONEGOTIATION_ENABLE
   heth.Init.Speed = ETH_SPEED_100M;
   heth.Init.DuplexMode = ETH_MODE_FULLDUPLEX;
   heth.Init.PhyAddress = 1;//KSZ8873_PHY1_ADDRESS;
@@ -316,12 +320,15 @@ static void low_level_init(struct netif *netif)
 #endif
   hal_eth_init_status = HAL_ETH_Init(&heth);
 
-  USART_TRACE_MAGENTA("HAL_ETH_Init:%u\n",hal_eth_init_status);
 
   if (hal_eth_init_status == HAL_OK)
   {
     /* Set netif link flag */  
     netif->flags |= NETIF_FLAG_LINK_UP;
+    USART_TRACE_MAGENTA("HAL_ETH_Init:%u\n",hal_eth_init_status);
+  } else{
+	USART_TRACE_RED("HAL_ETH_Init error:%u\n",hal_eth_init_status);
+
   }
 
   /* Initialize Tx Descriptors list: Chain Mode */
@@ -359,6 +366,7 @@ static void low_level_init(struct netif *netif)
 
   USART_TRACE_MAGENTA("osSemaphoreCreate:0x%X\n",s_xSemaphore);
 
+  USART_TRACE_MAGENTA("(EthIf) create the task that handles the ETH_MAC\n");
 /* create the task that handles the ETH_MAC */
   osThreadDef(EthIf, ethernetif_input, osPriorityRealtime, 0, INTERFACE_THREAD_STACK_SIZE);
   osThreadCreate (osThread(EthIf), netif);
@@ -603,10 +611,10 @@ void ethernetif_input( void const * argument )
         	ret_error = netif->input( p, netif);
           if (ret_error != ERR_OK )							// вызываем функцию приема данных она же: (err_t)tcpip_input(struct pbuf *p, struct netif *inp)
           {
-        	  printf("tcpip_input ERROR : %i \n", ret_error);
+//        	  printf("tcpip_input ERROR : %i \n", ret_error);
               pbuf_free(p);
           }else{
-              printf("tcpip_input no error. pbuf: 0x%x\n",(unsigned int)p);
+//              printf("tcpip_input no error. pbuf: 0x%x\n",(unsigned int)p);
           }
         }
       } while(p!=NULL);
@@ -652,6 +660,9 @@ err_t ethernetif_init(struct netif *netif)
 {
   LWIP_ASSERT("netif != NULL", (netif != NULL));
   
+  USART_TRACE_GREEN("ethernetif_init.\n");
+
+
 #if LWIP_NETIF_HOSTNAME
   /* Initialize interface hostname */
   netif->hostname = "lwip";
@@ -788,58 +799,95 @@ void ethernetif_set_link(void const *argument)
   */
 void ethernetif_update_config(struct netif *netif)
 {
-  __IO uint32_t timeout = 0;
+  __IO uint32_t tickstart = 0;
   uint32_t regvalue = 0;
   
+  USART_TRACE_GREEN("ethernetif_update_config.\n");
+
+/*
   if(netif_is_link_up(netif))
   { 
     // Restart the auto-negotiation
     if(heth.Init.AutoNegotiation != ETH_AUTONEGOTIATION_DISABLE)
     {
       HAL_ETH_WritePHYRegister(&heth, PHY_BCR, PHY_AUTONEGOTIATION);					// Enable Auto-Negotiation
-      do																				// Wait until the auto-negotiation will be completed
-      {
-        timeout++;
-        HAL_ETH_ReadPHYRegister(&heth, PHY_BSR, &regvalue);
-      } while (!(regvalue & PHY_AUTONEGO_COMPLETE) && (timeout < PHY_READ_TO));
-      if(timeout == PHY_READ_TO)     goto error;
 
-      timeout = 0;      																// Reset Timeout counter
-/*
+      // Get tick
+      tickstart = HAL_GetTick();
+
+      // Wait until the auto-negotiation will be completed
+		do
+		{
+		  HAL_ETH_ReadPHYRegister(&heth, PHY_BSR, &regvalue);
+
+		  // Check for the Timeout ( 1s )
+		  if((HAL_GetTick() - tickstart ) > 1000)
+		  {
+			// In case of timeout
+			goto error;
+		  }
+		} while (((regvalue & PHY_AUTONEGO_COMPLETE) != PHY_AUTONEGO_COMPLETE));
+
+
       // Read the result of the auto-negotiation
-      HAL_ETH_ReadPHYRegister(&heth, PHY_SR, &regvalue);
-      if((regvalue & PHY_DUPLEX_STATUS) != (uint32_t)RESET)        heth.Init.DuplexMode = ETH_MODE_FULLDUPLEX;     		//  Set Full-duplex
-      else        													heth.Init.DuplexMode = ETH_MODE_HALFDUPLEX;   		//  Set Half-duplex
-      if(regvalue & PHY_SPEED_STATUS)       heth.Init.Speed = ETH_SPEED_10M; 											// Set Ethernet speed to 10M
-      else							        heth.Init.Speed = ETH_SPEED_100M;											// Set Ethernet speed to 100M
-*/
-      // зафиксируем без вариантов скорость и направление
-      heth.Init.DuplexMode = ETH_MODE_FULLDUPLEX;
-      heth.Init.Speed = ETH_SPEED_100M;
+      HAL_ETH_ReadPHYRegister(&heth, PHY_ANLPA, &regvalue);
+    	  // проверка состояния 0x5 адреса на возможности партнера
+       if((regvalue & Partner_FULLDUPLEX_100M) != (uint32_t)RESET)
+       {
+    	   heth.Init.DuplexMode = ETH_MODE_FULLDUPLEX;
+    	   heth.Init.Speed = ETH_SPEED_100M;
+       }
+       else
+       if((regvalue & Partner_HALFDUPLEX_100M) != (uint32_t)RESET)
+       {
+    	   heth.Init.DuplexMode = ETH_MODE_HALFDUPLEX;
+    	   heth.Init.Speed = ETH_SPEED_100M;
+       }
+       else
+       if((regvalue & Partner_FULLDUPLEX_10M) != (uint32_t)RESET)
+       {
+    	   heth.Init.DuplexMode = ETH_MODE_FULLDUPLEX;
+    	   heth.Init.Speed = ETH_SPEED_10M;
+       }
+       else
+       if((regvalue & Partner_HALFDUPLEX_10M) != (uint32_t)RESET)
+       {
+    	   heth.Init.DuplexMode = ETH_MODE_HALFDUPLEX;
+    	   heth.Init.Speed = ETH_SPEED_10M;
+       }
+       else
+
+       {
+       // зафиксируем без вариантов скорость и направление
+       heth.Init.DuplexMode = ETH_MODE_FULLDUPLEX;
+       heth.Init.Speed = ETH_SPEED_100M;
+       }
+
+      assert_param(IS_ETH_SPEED(heth->Init.Speed));
+      assert_param(IS_ETH_DUPLEX_MODE(heth->Init.DuplexMode));
+
+      HAL_ETH_WritePHYRegister(&heth, PHY_BCR, ((uint16_t)(heth.Init.DuplexMode >> 3) | (uint16_t)(heth.Init.Speed >> 1)));
+
+      HAL_Delay(PHY_CONFIG_DELAY);
     }
-    else /* AutoNegotiation Disable */
+    else // AutoNegotiation Disable
     {
     error :
-      /* Check parameters */
       assert_param(IS_ETH_SPEED(heth.Init.Speed));
       assert_param(IS_ETH_DUPLEX_MODE(heth.Init.DuplexMode));
       
-      /* Set MAC Speed and Duplex Mode to PHY */
       HAL_ETH_WritePHYRegister(&heth, PHY_BCR, ((uint16_t)(heth.Init.DuplexMode >> 3) | (uint16_t)(heth.Init.Speed >> 1)));
     }
 
-    /* ETHERNET MAC Re-Configuration */
     HAL_ETH_ConfigMAC(&heth, (ETH_MACInitTypeDef *) NULL);
-
-    /* Restart MAC interface */
-    HAL_ETH_Start(&heth);   
+    HAL_ETH_Start(&heth);
   }
   else
   {
-    /* Stop MAC interface */
+    // Stop MAC interface
     HAL_ETH_Stop(&heth);
   }
-
+*/
   ethernetif_notify_conn_changed(netif);
 }
 

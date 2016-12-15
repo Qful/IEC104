@@ -11,10 +11,10 @@
 
 /* print debugging information with printf */
 #define DEBUG 					1
-#define DEBUG_MMS_SERVER 		1
+#define DEBUG_MMS_SERVER 		0
 #define DEBUG_MMS_CLIENT		1
 #define	DEBUG_IED_SERVER		0
-#define	DEBUG_ISO_SERVER		1
+#define	DEBUG_ISO_SERVER		0
 #define	DEBUG_SOCKET			1
 #define	DEBUG_GOOSE_PUBLISHER	1
 

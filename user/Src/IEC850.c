@@ -340,6 +340,13 @@ extern osThreadId IEC850TaskHandle;
 
 			running = 1;
 
+
+			printf("memory gap = %u\r\n", xPortGetFreeHeapSize());
+			printf("task count = %u\r\n", uxTaskGetNumberOfTasks());
+			static signed char taskInfoBuf[48 * 8];
+			vTaskGetRunTimeStats(taskInfoBuf );
+			printf("%s\r\n", taskInfoBuf);
+
 			while (running) {
 
 				IedServer_processIncomingData(iedServer);						// Должна вызываться периодически для приёма данных и соединений
@@ -428,6 +435,11 @@ static void Netif_Config(char* ipAddress,char* Mask, char* Gateway)
   IP4_ADDR(&netmask, Mask[0], Mask[1] , Mask[2], Mask[3]);
   IP4_ADDR(&gw, Gateway[0], Gateway[1], Gateway[2], Gateway[3]);
 
+	USART_TRACE_BLUE("MAC:%.2X-%.2X-%.2X-%.2X-%.2X-%.2X \n",MAC_ADDR[0], MAC_ADDR[1], MAC_ADDR[2], MAC_ADDR[3],MAC_ADDR[4],MAC_ADDR[5]);	// временно чтобы отличались устройства
+	USART_TRACE_BLUE("IP:%d.%d.%d.%d \n", ipAddress[0], ipAddress[1], ipAddress[2], ipAddress[3]);
+	USART_TRACE_BLUE("Gateway:%d.%d.%d.%d \n",Gateway[0], Gateway[1], Gateway[2], Gateway[3]);
+
+
   /* - netif_add(struct netif *netif, struct ip_addr *ipaddr,
   struct ip_addr *netmask, struct ip_addr *gw,
   void *state, err_t (* init)(struct netif *netif),
@@ -467,6 +479,7 @@ static void Netif_Config(char* ipAddress,char* Mask, char* Gateway)
   link_arg.netif = &gnetif;
   link_arg.semaphore = Netif_LinkSemaphore;
   /* Create the Ethernet link handler thread */
+  USART_TRACE_MAGENTA("(LinkThr) Create the Ethernet link handler thread.\n");
 #if defined(__GNUC__)
   osThreadDef(LinkThr, ethernetif_set_link, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 5);
 #else
