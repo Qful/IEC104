@@ -19,6 +19,7 @@
 
 // размер буфера команд в символах принятых из консоли
 #define cmdMAX_INPUT_SIZE					20
+#define cmdMAX_OUTPUT_SIZE					255
 
 // максимальное время для ожидания доступа мьютекса
 #define cmdMAX_MUTEX_WAIT					( 200 / portTICK_RATE_MS )			// мс/portTICK_RATE_MS
@@ -36,6 +37,8 @@ static xSemaphoreHandle 	xNewDataSemaphore;
 // защита доступа к аппаратноиу USART если он используется более одной задачей.
 static xSemaphoreHandle 	xDEBUGbusMutex;		//xCDCMutex
 
+extern xQueueHandle		xDebugUsartOut;			// очередь бля отправки в юсартдебаг
+
 /* Const messages output by the command console. */
 //static const char * const pcWelcomeMessage = "Режим отладки IEC61850.\r\n\r\n>";
 static const char * const pcEndOfOutputMessage = "\r\nENTER\r\n>";
@@ -48,8 +51,33 @@ UART_HandleTypeDef 	BOOT_UART;			//USART1
 
 char cGetChar( void );
 
-/*-----------------------------------------------------------*/
+/************************************************************
+ *
+ *
+ *
+ ************************************************************/
+void DEBUGUSARTOUTTask(void const * argument)
+{
+	char 	*OutputString;
 
+	// очередь и 5-х векторов на адрес буфера для передачи
+	xDebugUsartOut = xQueueCreate( 5, sizeof(char*));
+
+	/*
+	 * так добавляем в очередь.
+	 * xQueueSend( xDebugUsartOut, ( void * ) &toSend, portMAX_DELAY  );
+	 *
+	 * так забираем из очереди
+	 * xQueueReceive(xDebugUsartOut, &( rec ), portMAX_DELAY );
+	 */
+	 for( ;; ) {
+		if (xQueueReceive( xDebugUsartOut,  OutputString, 0 )){
+			//HAL_UART_Transmit_DMA(&BOOT_UART, OutputString, strlen(OutputString) );
+			HAL_UART_Transmit(&BOOT_UART, (uint8_t *)OutputString, strlen(OutputString), 0xFFFF);
+		}
+	 }
+}
+/*-----------------------------------------------------------*/
 void DEBUGConsoleTask(void const * argument)//( void *pvParameters )
 {
 char 		cRxedChar;
@@ -78,10 +106,10 @@ BaseType_t 	xReturned;
 	pcOutputString = DEBUG_GetOutputBuffer();
 
 	// Инит выходного драйвера
-	BOOT_UART_Init(115200);
+//	BOOT_UART_Init(115200);
 
 	// отправим привет
-	HAL_UART_Transmit_DMA(&BOOT_UART, (uint8_t *)"DBG->", strlen( "DBG->" ));
+//	HAL_UART_Transmit_DMA(&BOOT_UART, (uint8_t *)"DBG->", strlen( "DBG->" ));
 
 	for( ;; )
 	{

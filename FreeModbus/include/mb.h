@@ -118,7 +118,12 @@ typedef enum
     MB_ENORES,                  /*!< insufficient resources. */
     MB_EIO,                     /*!< I/O error. */
     MB_EILLSTATE,               /*!< protocol stack in illegal state. */
-    MB_ETIMEDOUT                /*!< timeout error occurred. */
+    MB_ETIMEDOUT,                /*!< timeout error occurred. */
+    MB_ESENT,
+    MB_ERECV,
+    MB_ERECVDATA,				// приняли и обработали данные
+    MB_ERECVDATAERROR,			// Не приняли и обработали данные
+    MB_NOTASK
 } eMBErrorCode;
 
 

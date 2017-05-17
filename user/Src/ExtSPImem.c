@@ -52,13 +52,13 @@ void AT45DB161D_spi_init(void)
 
 	if(HAL_SPI_Init(&SpiHandle) != HAL_OK)
 	{
-	  USART_TRACE("SPI Init error.. память ad45db161d не будет подключена. \n");
+//	  USART_TRACE_RED("SPI Init error.. память ad45db161d не будет подключена. \n");
 	  //for(;;){}
 	} else {
-	  USART_TRACE("Инит шины SPI... ok. \n");
+//	  USART_TRACE("Инит шины SPI... ok. \n");
 	}
 
-//  HAL_SPI_TransmitReceive_DMA(&SpiHandle, (uint8_t*)page_Buf_Out, (uint8_t *)page_Buf_In, PAGE_SIZE);
+//  HAL_SPI_TransmitReceive_DMA(&SpiHandle, (uint8_t*)NULL, (uint8_t *)NULL, 0);
 
 }
 //*******************************************************************************
@@ -145,7 +145,7 @@ uint16_t	i;
 			if (!GetFromMEM(dst,AddrPage,AddrByte,Size)) return FALSE;	// читаем прямо из памяти
 		}
 	}
-
+/*
 	if (Size != 12){
 		USART_TRACE_GREEN("читаем  память: Addr = %.7u, Size = %.3u : '%s'\n",(unsigned int) Addr,(unsigned int) Size, dst);
 	}else{
@@ -153,7 +153,7 @@ uint16_t	i;
 		for (i=0;i<Size;i++){printf(" 0x%.2X",dst[i]);}
 		printf("\n");
 	}
-
+*/
 return TRUE;
 /*
 	AddrPage = 	Addr / PAGE_SIZE_528;
@@ -192,6 +192,48 @@ return TRUE;
 */
 }
 /*************************************************************************
+ * memory_write_to_mem
+ * просто запись данных через буфер в память не дожидаясь заполнения буфера
+ * до конца.
+ *
+ *************************************************************************/
+int8_t 	memory_write_to_mem (uint8_t *src, uint32_t Addr, uint16_t Size)
+{
+	uint16_t		nPage,i;
+	uint16_t		AddrPage,AddrByte;
+	uint16_t		AddrPageSecond,AddrByteSecond;
+	uint16_t		SizeInFirstPage,SizeInSecondPage;
+
+//	USART_TRACE_GREEN("SPIMEM. пишем в память: Addr = %.7u, Size = %.3u :", Addr, Size);
+//	for (i=0;i<Size;i++){printf(" 0x%.2X",src[i]);}
+//	printf("\n");
+
+	// нужно проверить выходит ли за границы буфера, если выходит то работаем с 2-мя буферами.
+	AddrPage = 	Addr / PAGE_SIZE_528;						// высчитаем номер страницы.
+	AddrByte = Addr % PAGE_SIZE_528;						// адрес на странице.
+
+	AddrPageSecond = (Addr + Size) / PAGE_SIZE_528;			// номер страницы конца блока данных.
+	AddrByteSecond = (Addr + Size) % PAGE_SIZE_528;			// номер ячейки конца блока данных.
+
+	if (AddrPageSecond == AddrPage){						// вмещается в одну страницу
+		SizeInFirstPage = Size;								// тут просто льём кусок и всё.
+		SizeInSecondPage = 0;
+
+		if (!GetMemtoBUF1(AddrPage)) return FALSE;							// перекидываем из SPI в буфер1
+		if (!SendToBUF1(src,AddrByte,SizeInFirstPage)) return FALSE;		// закидываем в буфер
+		if (!SendBUF1ToMem(AddrPage)) return FALSE;							// перекидываем буфер в память SPI
+
+		// все, пошли назад
+		//USART_TRACE_GREEN("memory_write_to_mem.\n");
+
+		return TRUE;
+	} else{
+//		USART_TRACE_RED("SPIMEM. Не вмещается в одну страницу\n");
+		return FALSE;
+	}
+
+}
+/*************************************************************************
  * memory_write
  * Нужно добавить обработку записи блоков более одной страницы.
  * 1. проверяем не переходит ли блок на вторую страницу, если нет
@@ -212,6 +254,7 @@ int8_t 	memory_write (uint8_t *src, uint32_t Addr, uint16_t Size)
 	uint16_t		SizeInFirstPage,SizeInSecondPage;
 	uint16_t		nPage,i;
 
+	/*
 	if (Size != 12){
 		USART_TRACE_GREEN("пишем в память: Addr = %.7u, Size = %.3u : '%s'\n", Addr, Size,src);
 	}else{
@@ -219,7 +262,7 @@ int8_t 	memory_write (uint8_t *src, uint32_t Addr, uint16_t Size)
 		for (i=0;i<Size;i++){printf(" 0x%.2X",src[i]);}
 		printf("\n");
 	}
-
+*/
 	// -------------------------------------------------------------------------------------------------------------
 	// -------------------------------------------------------------------------------------------------------------
 	// нужно проверить выходит ли за границы буфера, если выходит то работаем с 2-мя буферами.
@@ -566,18 +609,27 @@ void memory_to_buffer2_transfer (uint16_t page){
 //*******************************************************************************
 uint8_t AT45DB_StatusRegisterRead(void)
 {
-	uint8_t 	DataOut = AT45DB_READ_STATE_REGISTER,DataIn[2];
+
+	uint8_t 	DataOut[3],DataIn[3];
+	DataOut[0] = AT45DB_READ_STATE_REGISTER;
 
     MEM_Chipselect(GPIO_PIN_RESET);
-    if(HAL_SPI_TransmitReceive_DMA(&SpiHandle,(uint8_t*)&DataOut,(uint8_t*)&DataIn[0], 2) != HAL_OK)
+    if(HAL_SPI_TransmitReceive_DMA(&SpiHandle,(uint8_t*)&DataOut[0],(uint8_t*)&DataIn[0], 2) != HAL_OK)
       {
       	USART_TRACE_RED("Ошибка приема-передачи регистра статуса. \n");
       }
- //   HAL_SPI_Transmit_DMA(&SpiHandle,(uint8_t*)&DataOut, 1);
- //   HAL_SPI_Receive_DMA(&SpiHandle,(uint8_t*)&DataIn, 1);
 	MEM_Chipselect(GPIO_PIN_SET);
-
     return DataIn[1];
+
+/*
+	// медленно но без ошибок ФИФО
+	uint8_t		Data = AT45DB_READ_STATE_REGISTER;
+    MEM_Chipselect(GPIO_PIN_RESET);
+    HAL_SPI_Transmit_DMA(&SpiHandle,(uint8_t*)&Data, 1);
+    HAL_SPI_Receive_DMA(&SpiHandle,(uint8_t*)&Data, 1);
+    MEM_Chipselect(GPIO_PIN_SET);
+    return Data;
+*/
 }
 //*******************************************************************************
 // void AT45DB_buffer1_write(uint16_t addres,uint8_t data )
@@ -709,7 +761,7 @@ void MEM_Chipselect(GPIO_PinState select){
 //*******************************************************************************
 uint8_t GetFromMEM(uint8_t* dst, uint16_t AddrPage, uint16_t AddrByte, uint16_t Size){
 
-uint8_t 	DataOut[8];
+uint8_t 	DataOut[9];
 
 	while(!((AT45DB_StatusRegisterRead()>>7) & 1 )){}			// подождём готовность памяти
 
@@ -726,7 +778,7 @@ uint8_t 	DataOut[8];
 
 	MEM_Chipselect(GPIO_PIN_RESET);
 
-	if(HAL_SPI_Transmit_DMA(&SpiHandle,DataOut,8) != HAL_OK){
+	if(HAL_SPI_Transmit_DMA(&SpiHandle,(uint8_t *)&DataOut[0],8) != HAL_OK){
 		USART_TRACE_RED("Ошибка передачи SPI. \n");
 		return FALSE;
 	}

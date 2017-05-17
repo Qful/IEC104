@@ -41,16 +41,26 @@ _Min_Stack_Size = 0x400; 	/* required amount of stack	было 0x400 */
 /* Specify the memory areas */
 MEMORY
 {
-FLASH (rx)      : ORIGIN = 0x08000000, LENGTH = 1024K
+FLASHBOOT (rx)  : ORIGIN = 0x08000000, LENGTH = 128K	/*1024K-32K*/
+FLASH (rx)      : ORIGIN = 0x08020000, LENGTH = 896K	/*1024K-32K*/
+//FLASH (rx)      : ORIGIN = 0x08000000, LENGTH = 1024K	/*1024K-32K*/
 RAM (xrw)       : ORIGIN = 0x60000000, LENGTH = 1024K
 RAMINT (xrw)    : ORIGIN = 0x20000000, LENGTH = 128K
-CFLASH (rx) 	: ORIGIN = 0x080F7FFF, LENGTH = 32K
+//CFLASH (rx) 	: ORIGIN = 0x080F7FFF, LENGTH = 32K
 CCMRAM (rw)     : ORIGIN = 0x10000000, LENGTH = 64K
 }
 
 /* Define output sections */
 SECTIONS
 {
+	.ramext :
+	  {
+        . = ALIGN(4);
+	    *(.ramext)
+	    *(.ramext*)
+	    . = ALIGN(4);
+	  } >RAM
+	  
 	.ramint :
 	  {
         . = ALIGN(4);
@@ -60,13 +70,20 @@ SECTIONS
 	  } >RAMINT
   
   /* Константы во FLASH */
+    .boot :
+  {
+    . = ALIGN(4);
+    KEEP(*(.boot))       
+    . = ALIGN(4);
+  } >FLASHBOOT
+  /*
   .eb0rodata :
   {
     . = ALIGN(4);
     KEEP(*(.eb0rodata))       
     . = ALIGN(4);
   } >CFLASH
-  
+  */
   /* Код запуска идет сначала в FLASH */
   .isr_vector :
   {

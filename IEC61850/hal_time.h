@@ -48,7 +48,10 @@ extern "C" {
  *
  * \return the system time with millisecond resolution.
  */
-uint64_t Hal_getTimeInMs(void);
+uint64_t 	Hal_getTimeInMs(void);
+void 		Hal_setTimeInMs (uint64_t timeinms);
+
+void 	Hal_setCalibrTime (uint16_t period, int16_t timeCal);
 
 /*! @} */
 

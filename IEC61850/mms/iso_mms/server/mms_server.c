@@ -309,6 +309,12 @@ MmsServer_handleIncomingMessages(MmsServer self)
 }
 
 void
+MmsServer_GetClientList(uint8_t *pcWriteBuffer, MmsServer self)
+{
+	IsoServer_processGetClientList(pcWriteBuffer, self->isoServer);
+}
+
+void
 MmsServer_stopListeningThreadless(MmsServer self)
 {
     IsoServer_stopListeningThreadless(self->isoServer);

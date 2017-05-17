@@ -66,6 +66,8 @@ typedef enum {
     TPKT_CLOSE = 3
 } TpktState;
 
+//#define 	LIMITERRORCONNECT		10000
+
 int /* in byte */
 CotpConnection_getTpduSize(CotpConnection* self);
 

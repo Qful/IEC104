@@ -39,12 +39,19 @@
 #include "mbrtu.h"
 
 #include "modbus.h"
+
+/* ----------------------- flash includes ----------------------------------*/
+#include "inflash.h"
+#include "ExtSPImem.h"
+
 /* ----------------------- Defines ------------------------------------------*/
-
-
-
 #define	RT_TICK_PER_SECOND		20000
 /* ----------------------- Variables ----------------------------------------*/
+// константы во FLASH
+//__attribute__((__section__(".eb0rodata"))) const
+extern	uint8_t userConfig[0x7FFC];// = {1,2,3,4,5,6,7,8,9,0};
+
+
 extern 	RTC_HandleTypeDef hrtc;						// часы
 
 extern UART_HandleTypeDef 	MODBUS;
@@ -62,23 +69,48 @@ static USHORT usT35TimeOut50us;
 TIM_HandleTypeDef    TimHandle;
 
 
+
+#if defined (MR5_700)
+extern uint16_t   usMDiscInStart;			// адрес
+extern volatile uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   usMAnalogInStart;
+extern volatile uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+#endif
+#if defined (MR5_600)
+extern uint16_t   usMDiscInStart;			// адрес
+extern volatile uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   usMAnalogInStart;
+extern volatile uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+#endif
+#if defined (MR5_500)
+extern uint16_t   usMDiscInStart;			// адрес
+extern volatile uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   usMAnalogInStart;
+extern volatile uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+#endif
 #if defined (MR771)
 extern uint16_t   usMDiscInStart;			// адрес
 extern volatile uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
 extern uint16_t   usMAnalogInStart;
 extern volatile uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
-
-extern uint16_t   usMConfigStartTrans;
-extern uint16_t   ucMConfigBufTrans[MB_Size_ConfTrans];
-extern uint16_t   usMConfigStartNaddr;
-extern uint16_t   ucMConfigNaddrBuf[MB_NumbConfigNaddr];
-#elif defined (MR5_700)
-
+#endif
+#if defined (MR761) || defined (MR762) || defined (MR763)
 extern uint16_t   usMDiscInStart;			// адрес
 extern volatile uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
 extern uint16_t   usMAnalogInStart;
 extern volatile uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
-
+#endif
+#if defined (MR801)
+extern uint16_t   usMDiscInStart;			// адрес
+extern volatile uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   usMAnalogInStart;
+extern volatile uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+#endif
+#if defined (MR901) || defined (MR902)
+extern uint16_t   usMDiscInStart;			// адрес
+extern volatile uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   usMAnalogInStart;
+extern volatile uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
 #endif
 
 extern osMutexId 	xIEC850StartMutex;		// мьютекс готовности к запуску TCP/IP
@@ -269,6 +301,7 @@ BOOL     xMBMasterPortSerialPutByte( CHAR ucByte )
 BOOL     xMBMasterPortSerialPutBUF( CHAR * putBuf, USHORT leng )
 {
 	if (HAL_UART_Transmit_DMA(&MODBUS, (uint8_t *)putBuf, leng) == HAL_OK){
+		//USART_TRACE_RED("Transmit OK.\n");
 			return TRUE;
 	}
 	else	return FALSE;
@@ -540,10 +573,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   * @retval None
  *************************************************************************/
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-	if (huart == &MODBUS) {
+	if (huart == &MODBUS) {						// разблокировка MODBUS таска
 		pxMBMasterFrameCBByteReceived();
 	}
-	if (huart == &BOOT_UART) {
+	if (huart == &BOOT_UART) {					// разблокировка таска по приёму из DEBUGUASRT
 		xDEBUGRTUReceiveFSM();
 	}
 }
@@ -758,6 +791,7 @@ BOOL	Hal_setTimeFromMB_Date( uint16_t * MDateBuf ){
 	RTC_TimeTypeDef sTime;
 	RTC_DateTypeDef sDate;
 
+	sTime.TimeFormat = RTC_HOURFORMAT_24;
 	sTime.Hours =  MDateBuf[3];
 	sTime.Minutes =  MDateBuf[4];
 	sTime.Seconds =  MDateBuf[5];
@@ -784,28 +818,43 @@ BOOL	Hal_setTimeFromMB_Date( uint16_t * MDateBuf ){
  * Hal_setIPFromMB_Date
  * установка IP адреса из буфера MODBUS
  *********************************************************************************************************/
-BOOL	Hal_setIPFromMB_Date( uint16_t * MDateBuf ){
+int8_t	Hal_setIPFromMB_Date( uint16_t * MDateBuf ){
 extern uint8_t		IP_ADDR[4];
 
 
-	if (	MDateBuf[0] == 0xffff &&
-			MDateBuf[1] == 0xffff)	{
-		return	FALSE;
-	} else{
+	if (	MDateBuf[0] == 0xffff && MDateBuf[1] == 0xffff)	{
+		return	-1;
+	}else
+	if (	(IP_ADDR[3] == (MDateBuf[0] & 0xFF)) &&
+			(IP_ADDR[2] == (MDateBuf[0]>>8 & 0xFF)) &&
+			(IP_ADDR[1] == (MDateBuf[1] & 0xFF)) &&
+			(IP_ADDR[0] == (MDateBuf[1]>>8 & 0xFF))
+			)
+	{
+		return	2;
+		}
+	else
+	{
 		IP_ADDR[3] = MDateBuf[0] & 0xFF;
 		IP_ADDR[2] = MDateBuf[0]>>8 & 0xFF;
 		IP_ADDR[1] = MDateBuf[1] & 0xFF;
 		IP_ADDR[0] = MDateBuf[1]>>8 & 0xFF;
 
-		osMutexRelease(xIEC850StartMutex);
+
+		//Flash_Write((uint8_t *)&IP_ADDR[0],(uint8_t *)&userConfig[_IfIPaddr],4);	// Пишем IP во внутреннюю флэш
+		memory_write_to_mem((uint8_t *)&IP_ADDR[0],_IfIPaddr,4);
+		USART_TRACE_BLUE("сохраним во flash IP:%d.%d.%d.%d \n", IP_ADDR[0], IP_ADDR[1], IP_ADDR[2], IP_ADDR[3]);
+
+
+//		osMutexRelease(xIEC850StartMutex);
 	}
-	return	TRUE;
+	return	0;
 }
 /********************************************************************************************************
  * Hal_setConfSWFromMB_Date
  * установка конфига выключателя в нужных узлах
  *********************************************************************************************************/
-#if defined (MR771)
+#if defined (MR771) || defined (MR801)
 BOOL	Hal_setConfSWFromMB_Date ( uint16_t * MDateBuf ){
 
 	uint64_t currentTime;
@@ -820,15 +869,16 @@ BOOL	Hal_setConfSWFromMB_Date ( uint16_t * MDateBuf ){
 
 
 //CSWI1_Mod
-	IedServer_updateInt32AttributeValue(iedServer, IEDMODEL_GenericIO_CSWI1_Mod_stVal, reg);
-	IedServer_updateQuality(iedServer,IEDMODEL_GenericIO_CSWI1_Mod_q,0);
-	IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_CSWI1_Mod_t, currentTime);
+	IedServer_updateInt32AttributeValue(iedServer, &iedModel_CTRL_CSWI1_Mod_stVal, reg);
+	IedServer_updateQuality(iedServer,&iedModel_CTRL_CSWI1_Mod_q,0);
+	IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_CSWI1_Mod_t, currentTime);
 //CSWI1_Beh
-	IedServer_updateInt32AttributeValue(iedServer, IEDMODEL_GenericIO_CSWI1_Beh_stVal, reg);
-	IedServer_updateQuality(iedServer,IEDMODEL_GenericIO_CSWI1_Beh_q,0);
-	IedServer_updateUTCTimeAttributeValue(iedServer, IEDMODEL_GenericIO_CSWI1_Beh_t, currentTime);
+	IedServer_updateInt32AttributeValue(iedServer, &iedModel_CTRL_CSWI1_Beh_stVal, reg);
+	IedServer_updateQuality(iedServer,&iedModel_CTRL_CSWI1_Beh_q,0);
+	IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_CSWI1_Beh_t, currentTime);
 	return	TRUE;
 }
-#elif defined (MR5_700)
+#endif
+#if defined (MR5_700)
 
 #endif

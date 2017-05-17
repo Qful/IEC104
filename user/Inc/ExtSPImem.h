@@ -79,8 +79,10 @@ void 		AT45DB161D_spi_init(void);
 int8_t		MEM_ID_Read (MEMDeviceIDTypeDef *IDInfo );
 void 		MEM_Reset (void);
 
+int8_t 		memory_write_to_mem (uint8_t *src, uint32_t Addr, uint16_t Size);			// запись прямо в память
+
 int8_t 		memory_read (uint8_t *dst, uint32_t Addr, uint16_t Size);
-int8_t 		memory_write (uint8_t *src, uint32_t Addr, uint16_t Size);
+int8_t 		memory_write (uint8_t *src, uint32_t Addr, uint16_t Size);					// запись в буфер до заполнения его. После этого в память.
 
 int8_t 		Page_memory_read(uint8_t *dst, uint16_t PageAddr, uint16_t PageSize);
 int8_t 		Block_memory_read(uint8_t *dst, uint16_t PageAddr, uint16_t PageSize,  uint16_t NumberOfPages);

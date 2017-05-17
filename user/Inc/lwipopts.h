@@ -33,7 +33,7 @@
  * critical regions during buffer allocation, deallocation and memory
  * allocation and deallocation.
  */
-#define SYS_LIGHTWEIGHT_PROT    0
+#define SYS_LIGHTWEIGHT_PROT    1//0     включил защиту доступа к памяти
 
 #define ETHARP_TRUST_IP_MAC     0
 #define IP_REASSEMBLY           0
@@ -52,26 +52,22 @@
    lwIP is compiled. 4 byte alignment -> define MEM_ALIGNMENT to 4, 2
    byte alignment -> define MEM_ALIGNMENT to 2. */
 #define MEM_ALIGNMENT           4
+// пробую от завичсания
+//#define MEM_LIBC_MALLOC			1
 
-/* MEM_SIZE: the size of the heap memory. If the application will send
-a lot of data that needs to be copied, this should be set high. */
+/* MEM_SIZE: the size of the heap memory. If the application will send a lot of data that needs to be copied, this should be set high. */
 #define MEM_SIZE                (10 *1024)
 
-/* MEMP_NUM_PBUF: the number of memp struct pbufs. If the application
-   sends a lot of data out of ROM (or other static memory), this
-   should be set high. */
+/* MEMP_NUM_PBUF: the number of memp struct pbufs. If the application sends a lot of data out of ROM (or other static memory), this   should be set high. */
 #define MEMP_NUM_PBUF           50
-/* MEMP_NUM_UDP_PCB: the number of UDP protocol control blocks. One
-   per active UDP "connection". */
+/* MEMP_NUM_UDP_PCB: the number of UDP protocol control blocks. One per active UDP "connection". */
 #define MEMP_NUM_UDP_PCB        6
-/* MEMP_NUM_TCP_PCB: the number of simulatenously active TCP
-   connections. */
+/* MEMP_NUM_TCP_PCB: the number of simulatenously active TCP  connections. */
 #define MEMP_NUM_TCP_PCB        10
 /* MEMP_NUM_TCP_PCB_LISTEN: the number of listening TCP
    connections. */
-#define MEMP_NUM_TCP_PCB_LISTEN 5
-/* MEMP_NUM_TCP_SEG: the number of simultaneously queued TCP
-   segments. */
+#define MEMP_NUM_TCP_PCB_LISTEN 6
+/* MEMP_NUM_TCP_SEG: the number of simultaneously queued TCP  segments. */
 #define MEMP_NUM_TCP_SEG        12
 /* MEMP_NUM_SYS_TIMEOUT: the number of simulateously active
    timeouts. */
@@ -117,16 +113,33 @@ a lot of data that needs to be copied, this should be set high. */
 /* Define LWIP_DHCP to 1 if you want DHCP configuration of
    interfaces. DHCP is not implemented in lwIP 0.5.1, however, so
    turning this on does currently not work. */
-#define LWIP_DHCP               1
+#define LWIP_DHCP               0
 
 
 /* ---------- UDP options ---------- */
 #define LWIP_UDP                1
 #define UDP_TTL                 255
 
+/*
+   ----------------------------------
+   ---------- IGMP options ----------
+   ----------------------------------
+*/
+
+/**
+ * LWIP_IGMP==1: Turn on IGMP module.
+ */
+#include "../../STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rng.h"
+
+#define LWIP_MULTICAST_PING             0
+
+//extern RNG_HandleTypeDef RngHandle;
+#define LWIP_IGMP                       0
+//#define LWIP_RAND()                    HAL_RNG_GetRandomNumber(&RngHandle)//vRndGen_GetValue()
 
 /* ---------- Statistics options ---------- */
-#define LWIP_STATS 0
+// статистика стека, ошибки и всё остальное.
+#define LWIP_STATS 						1 //0
 #define LWIP_PROVIDE_ERRNO 1
 
 /* ---------- link callback options ---------- */
@@ -221,7 +234,7 @@ The STM32F4x7 allows computing and verifying the IP, UDP, TCP and ICMP checksums
 #define TCPIP_THREAD_STACKSIZE          1000
 #define TCPIP_MBOX_SIZE                 5
 #define DEFAULT_UDP_RECVMBOX_SIZE       2000
-#define DEFAULT_TCP_RECVMBOX_SIZE       2000
+#define DEFAULT_TCP_RECVMBOX_SIZE       2000//2000
 #define DEFAULT_ACCEPTMBOX_SIZE         2000
 #define DEFAULT_THREAD_STACKSIZE        500
 #define TCPIP_THREAD_PRIO               (configMAX_PRIORITIES - 2)

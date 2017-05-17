@@ -66,6 +66,8 @@ typedef void
 typedef void
 (*MessageReceivedHandler)(void* parameter, ByteBuffer* message, ByteBuffer* response);
 
+int	IsoConnection_getSocketFd(IsoConnection self);
+
 char*
 IsoConnection_getPeerAddress(IsoConnection self);
 
@@ -79,6 +81,8 @@ IsoConnection_installListener(IsoConnection self, MessageReceivedHandler handler
 void*
 IsoConnection_getSecurityToken(IsoConnection self);
 
+
+void		handleNTPConnectionsThreadless(IsoServer self);
 /**
  * \brief send a message over an ISO connection
  *
@@ -146,14 +150,13 @@ IsoServer_startListeningThreadless(IsoServer self);
 void
 IsoServer_processIncomingMessages(IsoServer self);
 
-int
-IsoServer_waitReady(IsoServer self, unsigned int timeoutMs);
+void	IsoServer_processGetClientList(uint8_t *pcWriteBuffer,IsoServer self);
 
-void
-IsoServer_stopListeningThreadless(IsoServer self);
+int		IsoServer_OnewaitReady(IsoServer self,int num, unsigned int timeoutMs);
+int		IsoServer_waitReady(IsoServer self, unsigned int timeoutMs);
 
-void
-IsoServer_closeConnection(IsoServer self, IsoConnection isoConnection);
+void	IsoServer_stopListeningThreadless(IsoServer self);
+void	IsoServer_closeConnection(IsoServer self, IsoConnection isoConnection);
 
 void
 IsoServer_destroy(IsoServer self);

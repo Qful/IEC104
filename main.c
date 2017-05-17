@@ -21,6 +21,7 @@
 #include "cmsis_os.h"
 
 #include "stm32f4xx_hal.h"
+#include "stm32f4xx_hal_rcc.h"
 #include "stm32f4xx_hal_pwr.h"
 #include "stm32f4xx_hal_gpio.h"
 #include "stm32f4xx_hal_spi.h"
@@ -39,44 +40,28 @@
 
 // память SPI
 #include "ExtSPImem.h"
+// работа с внутренним флэшем
+#include "inflash.h"
 
 // Файловая система
 #include "ff.h"
 
 #include "iec61850_server.h"
 #include "iec850.h"
+#include "lib_memory.h"
+
+	static char Boot_Ready;
+
+// переменные для бутлоадера. Используем память в начале для кода бутлоадера.
+uint32_t JumpAddress;
+pFunction Jump_To_Application;
+
+uint16_t	GLOBAL_QUALITY = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;
+
+extern xQueueHandle		xDebugUsartOut;			// очередь бля отправки в юсартдебаг
 
 
-//__IO uint32_t MSPValue = 0;
-
-// константы во FLASH
-//__attribute__((__section__(".eb0rodata"))) const uint8_t userConfig[0x7FFC] = {1,2,3,4,5,6,7,8,9,0};
-
-__attribute__((__section__(".eb0rodata"))) const uint8_t userConfig[0x7FFC];// = {1,2,3,4,5,6,7,8,9,0};
-//__attribute__((__section__(".eb0rodata"))) const  uint8_t aTxBuffer[] = " ****UART_TwoBoards communication based on DMA****  ****UART_TwoBoards communication based on DMA****  ****UART_TwoBoards communication based on DMA**** ";
-
-
-// карта памяти Устройства -----------
-//USHORT		Memory_00[1];
-//USHORT		Memory_02[7];
-
-//USHORT		Memory_05[17];
-//USHORT		Memory_06[0xFF];
-//USHORT		Memory_07[0xFF];
-
-// 0x08- 0x0C - Осциллограф
-//USHORT		Memory_0D[0xFF];
-//USHORT		Memory_0E[0xFF];
-//USHORT		Memory_10[0xFF];
-
-// ----------------------------------
-//FATFS 	SPIFatFs;  					// File system object for SD card logical drive
-//FIL 	SPIFile;     				// File object
-//char 	SPIPath[4]; 				// логический путь диска SPI памяти
-
-//static	IedServer iedServer = NULL;
-
-volatile RTC_HandleTypeDef 	hrtc;
+RTC_HandleTypeDef 	hrtc;
 
 // Светодиоды
 GPIO_TypeDef* GPIO_PORT[PORTn] = {LED1_GPIO_PORT, LED2_GPIO_PORT, LED3_GPIO_PORT, LED4_GPIO_PORT, RS485_1_DE_GPIO_PORT, RS485_2_DE_GPIO_PORT, MODBUS_DE_GPIO_PORT};
@@ -94,45 +79,19 @@ const uint16_t SRAM_PIN[SRAMn] = {    SRAM_L0, SRAM_L1, SRAM_L2, SRAM_L3, SRAM_L
  *
  ******************************************************************************************/
 
-volatile uint8_t	MAC_ADDR[6]		= {MAC_ADDR0,MAC_ADDR1,MAC_ADDR2,MAC_ADDR3,MAC_ADDR4,MAC_ADDR5};
+volatile uint8_t	MAC_ADDR[6]		= {0,0,0,0,0,0};//{MAC_ADDR0,MAC_ADDR1,MAC_ADDR2,MAC_ADDR3,MAC_ADDR4,MAC_ADDR5};
 volatile uint8_t	IP_ADDR[4] 		= {255,255,255,255};//{192,168,0,254};{192,168,0,252};
 volatile uint8_t	NETMASK_ADDR[4]	= {255,255,255,0};
 volatile uint8_t	GW_ADDR[4]		= {192,168,0,1};
+volatile uint8_t	SNTP_IP_ADDR[4] = {192,168,0,122};//адрес SNTPсервера
+volatile uint16_t	SNTP_Period		= 0;
+volatile int8_t		TimeZone_my		= +3;
 
-#if defined (MR771)
-//Master mode: База данных конфигурации системы
-uint16_t   usMConfigSystem = MB_ConfigSystem;		// адрес
-uint16_t   ucMConfigSystemBuf[MB_Size_ConfSysytem];	// буфер для хранения конфигурации системы
+int16_t		ppm;
 
-//Master mode: База данных конфигурации Выключателя
-uint16_t   usMConfigSW = MB_ConfigSW;
-uint16_t   ucMConfigSWBuf[MB_Size_ConfSW];			// буфер для хранения конфигурации Выключателя
+uint8_t		NTP_IP[16];// = "192.168.000.122";
 
-
-//Master mode: База данных часов
-uint16_t   usMDateStart = MB_StartDateNaddr;		// адрес
-uint16_t   ucMDateBuf[MB_NumbDate];					// буфер для хранения
-
-//Master mode: База данных Версии
-uint16_t   usMRevStart = MB_StartRevNaddr;
-uint16_t   ucMRevBuf[MB_NumbWordRev];
-
-//Master mode: База данных дискретных сигналов
-uint16_t   usMDiscInStart = MB_StartDiscreetaddr;
-uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
-
-//Master mode: База данных аналоговых сигналов
-uint16_t   usMAnalogInStart = MB_StartAnalogINaddr;
-uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
-
-//Master mode: База уставок транса
-uint16_t   usMConfigStartTrans = MB_StartConfig + MB_offset_ConfTrans;
-uint16_t   ucMConfigBufTrans[MB_Size_ConfTrans];
-
-//Master mode: Настройки сети
-uint16_t   usMConfigStartNaddr = MB_StartConfigNaddr;
-uint16_t   ucMConfigNaddrBuf[MB_NumbConfigNaddr];
-#elif defined (MR5_700)
+#if defined (MR5_700)
 
 uint16_t   usMDateStart = MB_StartDateNaddr;		// адрес
 uint16_t   ucMDateBuf[MB_NumbDate];					// буфер для хранения
@@ -159,34 +118,266 @@ uint16_t   ucMConfigBufall[MB_NumbConfigall];
 
 uint16_t   usMConfigStartSWCrash = MB_StartSWCrash;
 uint16_t   ucMSWCrash[MB_NumbSWCrash];
+#endif
+#if defined (MR5_600)
 
+uint16_t   usMDateStart = MB_StartDateNaddr;		// адрес
+uint16_t   ucMDateBuf[MB_NumbDate];					// буфер для хранения
+
+//Master mode: База данных Версии
+uint16_t   usMRevStart = MB_StartRevNaddr;
+uint16_t   ucMRevBuf[MB_NumbWordRev];
+
+//Master mode: База данных дискретных сигналов
+uint16_t   usMDiscInStart = MB_StartDiscreetaddr;
+uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+
+//Master mode: База данных аналоговых сигналов
+uint16_t   usMAnalogInStart = MB_StartAnalogINaddr;
+uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+
+//Master mode: База уставок
+uint16_t   usMConfigStart = MB_StartConfigNaddr;
+uint16_t   ucMConfigBuf[MB_NumbConfig];
+
+//Master mode: База уставок
+uint16_t   usMConfigStartall = MB_StartConfig;
+uint16_t   ucMConfigBufall[MB_NumbConfigall];
+
+uint16_t   usMConfigStartSWCrash = MB_StartSWCrash;
+uint16_t   ucMSWCrash[MB_NumbSWCrash];
+#endif
+#if defined (MR5_500)
+
+uint16_t   usMDateStart = MB_StartDateNaddr;		// адрес
+uint16_t   ucMDateBuf[MB_NumbDate];					// буфер для хранения
+
+//Master mode: База данных Версии
+uint16_t   usMRevStart = MB_StartRevNaddr;
+uint16_t   ucMRevBuf[MB_NumbWordRev];
+
+//Master mode: База данных дискретных сигналов
+uint16_t   usMDiscInStart = MB_StartDiscreetaddr;
+uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+
+//Master mode: База данных аналоговых сигналов
+uint16_t   usMAnalogInStart = MB_StartAnalogINaddr;
+uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+
+//Master mode: База уставок
+uint16_t   usMConfigStart = MB_StartConfigNaddr;
+uint16_t   ucMConfigBuf[MB_NumbConfig];
+
+//Master mode: База уставок
+uint16_t   usMConfigStartall = MB_StartConfig;
+uint16_t   ucMConfigBufall[MB_NumbConfigall];
+
+uint16_t   usMConfigStartSWCrash = MB_StartSWCrash;
+uint16_t   ucMSWCrash[MB_NumbSWCrash];
+#endif
+
+#if defined (MR771)
+
+//Master mode: База данных часов
+uint16_t   usMDateStart = MB_StartDateNaddr;		// адрес
+uint16_t   ucMDateBuf[MB_NumbDate];					// буфер для хранения
+
+//Master mode: База данных Версии
+uint16_t   usMRevStart = MB_StartRevNaddr;
+uint16_t   ucMRevBuf[MB_NumbWordRev];
+
+//Master mode: База данных дискретных сигналов
+uint16_t   usMDiscInStart = MB_StartDiscreetaddr;
+uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+
+//Master mode: База данных аналоговых сигналов
+uint16_t   usMAnalogInStart = MB_StartAnalogINaddr;
+uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+
+//Master mode: База конфигурации выключателя
+uint16_t   usMConfigStartSW = MB_StartConfigSW;					// конфигурация Выключателя
+uint16_t   ucMConfigBufSW[MB_Size_ConfSW];
+
+uint16_t   usConfigAPWStart = MB_StartConfigAPW;				// конфигурация АПВ
+uint16_t   ucConfigAPWBuf[MB_NumbConfigAPW];
+
+uint16_t   usConfigTRMeasStart = MB_StartConfigTRMeas;			// конфигурация измерительного транса
+uint16_t   ucConfigTRMeasBuf[MB_NumbConfigTRMeas];
+
+uint16_t   usConfigUstavkiStart = MB_StartUstavkiaddr0;			// группа уставок
+uint16_t   ucMUstavkiInBuf[MB_NumbUstavki];
+
+uint16_t   usConfigAutomatStart = MB_StartAutomat;				// параметры автоматики
+uint16_t   ucMAutomatBuf[MB_NumbAutomat];
+
+uint16_t   usConfigVLSInStart = MB_StartConfigVLSIn;			// чтение конфигурации входных логических сигналов
+uint16_t   ucVLSInBuf[MB_NumbConfigVLSIn];
+
+uint16_t   usConfigVLSOutStart = MB_StartConfigVLSOut;			// чтение конфигурации выходных логических сигналов
+uint16_t   ucVLSOutBuf[MB_NumbConfigVLSOut];
+
+uint16_t   usSystemCfgStart = MB_StartSystemCfg;				// параметры системы
+uint16_t   ucSystemCfgBuf[MB_NumbSystemCfg];
+
+uint16_t   usSGStart = MB_Startaddr_SG;							// параметры группы уставок
+uint16_t   ucSGBuf[MB_NumbSG];
+
+#endif
+/*************************************************************************
+ * MR761 MR762 MR763
+ *************************************************************************/
+#if defined (MR761) || defined (MR762) || defined (MR763)
+
+//Master mode: База данных часов
+uint16_t   usMDateStart = MB_StartDateNaddr;		// адрес
+uint16_t   ucMDateBuf[MB_NumbDate];					// буфер для хранения
+
+//Master mode: База данных Версии
+uint16_t   usMRevStart = MB_StartRevNaddr;
+uint16_t   ucMRevBuf[MB_NumbWordRev];
+
+//Master mode: База данных дискретных сигналов
+uint16_t   usMDiscInStart = MB_StartDiscreetaddr;
+uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+
+//Master mode: База данных аналоговых сигналов
+uint16_t   usMAnalogInStart = MB_StartAnalogINaddr;
+uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+
+//Master mode: База конфигурации выключателя
+uint16_t   usMConfigStartSW = MB_StartConfigSW;					// конфигурация Выключателя
+uint16_t   ucMConfigBufSW[MB_Size_ConfSW];
+
+uint16_t   usConfigAPWStart = MB_StartConfigAPW;				// конфигурация АПВ
+uint16_t   ucConfigAPWBuf[MB_NumbConfigAPW];
+
+uint16_t   usConfigTRMeasStart = MB_StartConfigTRMeas;			// конфигурация измерительного транса
+uint16_t   ucConfigTRMeasBuf[MB_NumbConfigTRMeas];
+
+uint16_t   usConfigUstavkiStart = MB_StartUstavkiaddr0;			// группа уставок
+uint16_t   ucMUstavkiInBuf[MB_NumbUstavki];
+
+uint16_t   usConfigAutomatStart = MB_StartAutomat;				// параметры автоматики
+uint16_t   ucMAutomatBuf[MB_NumbAutomat];
+
+uint16_t   usConfigVLSInStart = MB_StartConfigVLSIn;			// чтение конфигурации входных логических сигналов
+uint16_t   ucVLSInBuf[MB_NumbConfigVLSIn];
+
+uint16_t   usConfigVLSOutStart = MB_StartConfigVLSOut;			// чтение конфигурации выходных логических сигналов
+uint16_t   ucVLSOutBuf[MB_NumbConfigVLSOut];
+
+uint16_t   usSystemCfgStart = MB_StartSystemCfg;				// параметры системы
+uint16_t   ucSystemCfgBuf[MB_NumbSystemCfg];
+
+uint16_t   usSGStart = MB_Startaddr_SG;							// параметры группы уставок
+uint16_t   ucSGBuf[MB_NumbSG];
 
 #endif
 
+#if defined (MR801)
+
+//Master mode: База данных часов
+uint16_t   usMDateStart = MB_StartDateNaddr;		// адрес
+uint16_t   ucMDateBuf[MB_NumbDate];					// буфер для хранения
+
+//Master mode: База данных Версии
+uint16_t   usMRevStart = MB_StartRevNaddr;
+uint16_t   ucMRevBuf[MB_NumbWordRev];
+
+//Master mode: База данных дискретных сигналов
+uint16_t   usMDiscInStart = MB_StartDiscreetaddr;
+uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+
+//Master mode: База данных аналоговых сигналов
+uint16_t   usMAnalogInStart = MB_StartAnalogINaddr;
+uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+
+//Master mode: База конфигурации выключателя
+uint16_t   usMConfigStartSW = MB_StartSW;						// конфигурация Выключателя
+uint16_t   ucMConfigBufSW[MB_Size_ConfSW];
+
+uint16_t   usConfigAPWStart = MB_StartConfigAPW;				// конфигурация АПВ
+uint16_t   ucConfigAPWBuf[MB_NumbConfigAPW];
+
+uint16_t   usConfigAWRStart = MB_StartConfigAWR;				// конфигурация АВР
+uint16_t   ucConfigAWRBuf[MB_NumbConfigAWR];
+
+uint16_t   usConfigTRMeasStart = MB_StartConfigTRMeas;			// конфигурация измерительного транса
+uint16_t   ucConfigTRMeasBuf[MB_NumbConfigTRMeas];
+
+uint16_t   usConfigTRPWRStart = MB_StartConfigTRPWR;			// конфигурация силового транса
+uint16_t   ucConfigTRPWRBuf[MB_NumbConfigTRPWR];
+
+uint16_t   usConfigUstavkiStart = MB_StartUstavkiaddr0;			// группа уставок
+uint16_t   ucMUstavkiInBuf[MB_NumbUstavki];
+
+uint16_t   usConfigAutomatStart = MB_StartAutomat;				// параметры автоматики
+uint16_t   ucMAutomatBuf[MB_NumbAutomat];
+
+uint16_t   usConfigVLSInStart = MB_StartConfigVLSIn;			// чтение конфигурации входных логических сигналов
+uint16_t   ucVLSInBuf[MB_NumbConfigVLSIn];
+
+uint16_t   usConfigVLSOutStart = MB_StartConfigVLSOut;			// чтение конфигурации выходных логических сигналов
+uint16_t   ucVLSOutBuf[MB_NumbConfigVLSOut];
+
+uint16_t   usSystemCfgStart = MB_StartSystemCfg;				// параметры системы
+uint16_t   ucSystemCfgBuf[MB_NumbSystemCfg];
+
+#endif
+
+#if defined (MR901) || defined (MR902)
+
+//Master mode: База данных часов
+uint16_t   usMDateStart = MB_StartDateNaddr;		// адрес
+uint16_t   ucMDateBuf[MB_NumbDate];					// буфер для хранения
+
+//Master mode: База данных Версии
+uint16_t   usMRevStart = MB_StartRevNaddr;
+uint16_t   ucMRevBuf[MB_NumbWordRev];
+
+//Master mode: База данных дискретных сигналов
+uint16_t   usMDiscInStart = MB_StartDiscreetaddr;
+uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+
+//Master mode: База данных аналоговых сигналов
+uint16_t   usMAnalogInStart = MB_StartAnalogINaddr;
+uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+
+//Master mode: База конфигурации выключателя
+uint16_t   usMConfigStartSW = MB_StartSW;						// конфигурация Выключателя
+uint16_t   ucMConfigBufSW[MB_Size_ConfSW];
+
+uint16_t   usConfigAPWStart = MB_StartConfigAPW;				// конфигурация АПВ
+uint16_t   ucConfigAPWBuf[MB_NumbConfigAPW];
+
+uint16_t   usConfigAWRStart = MB_StartConfigAWR;				// конфигурация АВР
+uint16_t   ucConfigAWRBuf[MB_NumbConfigAWR];
+
+uint16_t   usConfigTRMeasStart = MB_StartConfigTRMeas;			// конфигурация измерительного транса
+uint16_t   ucConfigTRMeasBuf[MB_NumbConfigTRMeas];
+
+uint16_t   usConfigTRPWRStart = MB_StartConfigTRPWR;			// конфигурация силового транса
+uint16_t   ucConfigTRPWRBuf[MB_NumbConfigTRPWR];
+
+uint16_t   usConfigUstavkiStart = MB_StartUstavkiaddr0;			// группа уставок
+uint16_t   ucMUstavkiInBuf[MB_NumbUstavki];
+
+uint16_t   usConfigAutomatStart = MB_StartAutomat;				// параметры автоматики
+uint16_t   ucMAutomatBuf[MB_NumbAutomat];
+
+uint16_t   usConfigVLSInStart = MB_StartConfigVLSIn;			// чтение конфигурации входных логических сигналов
+uint16_t   ucVLSInBuf[MB_NumbConfigVLSIn];
+
+uint16_t   usConfigVLSOutStart = MB_StartConfigVLSOut;			// чтение конфигурации выходных логических сигналов
+uint16_t   ucVLSOutBuf[MB_NumbConfigVLSOut];
+
+uint16_t   usSystemCfgStart = MB_StartSystemCfg;				// параметры системы
+uint16_t   ucSystemCfgBuf[MB_NumbSystemCfg];
+
+#endif
 uint16_t	Ktt,Ktn;
 uint16_t	ConfigOffset=0;			// смещение группы уставок
-/*
-//Master mode: хранилище дискретных входов
-USHORT   usMDiscInStart                             = M_DISCRETE_INPUT_START;
-#if      M_DISCRETE_INPUT_NDISCRETES%8
-UCHAR    ucMDiscInBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_DISCRETE_INPUT_NDISCRETES/8+1];
-#else
-UCHAR    ucMDiscInBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_DISCRETE_INPUT_NDISCRETES/8];
-#endif
-//Master mode:Coils variables
-USHORT   usMCoilStart                               = M_COIL_START;
-#if      M_COIL_NCOILS%8
-UCHAR    ucMCoilBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_COIL_NCOILS/8+1];
-#else
-UCHAR    ucMCoilBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_COIL_NCOILS/8];
-#endif
-//Master mode: хранилище входных регистров
-USHORT   usMRegInStart                              = M_REG_INPUT_START;
-USHORT   usMRegInBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_REG_INPUT_NREGS];
-//Master mode:хранилище выходных регистров
-USHORT   usMRegHoldStart                            = M_REG_HOLDING_START;
-USHORT   usMRegHoldBuf[MB_MASTER_TOTAL_SLAVE_NUM][M_REG_HOLDING_NREGS];
-*/
+
 /******************************************************************************************
  *
  ******************************************************************************************/
@@ -213,6 +404,10 @@ int8_t ExtMEM_Test(void);
 uint32_t	readAddrLine(void);
 int8_t ExtMEM_Init(void);
 void LED_Init(void);
+
+void NVIC_SetVectorTable(uint32_t NVIC_VectTab, uint32_t Offset);
+
+static void	MemoryException ( void);
 /***********************************************************************
  *
  ***********************************************************************/
@@ -269,7 +464,14 @@ FRESULT scan_files (char* path)        // Start node to be scanned (also used as
     return res;
 }
 */
-
+/***********************************************************************
+ * boot
+ ***********************************************************************/
+// указание в какой адрес ложить функцию
+//__attribute__((__section__(".boot")))
+//void boot(void) {
+//	static const char boot[] = {};
+//}
 /***********************************************************************
  * reset
  ***********************************************************************/
@@ -285,25 +487,63 @@ void exit(int reason) {
 	  while(1);
 }
 
+#define NVIC_VectTab_FLASH           0x08000000
 /***********************************************************************
  * main
  ***********************************************************************/
 int main(void) {
 
-		// запись в FLASH
-	//   HAL_FLASH_Unlock();
-	//   HAL_FLASH_Program(TYPEPROGRAM_WORD,(uint32_t)&userConfig[0], 100);
-	//   HAL_FLASH_Lock();
+	// временно, для выяснения причины HardFault_Handler
+	// закоментить в рабочем коде после выяснения
+//	SCnSCB->ACTLR = SCnSCB_ACTLR_DISDEFWBUF_Msk;
+
+	__set_PRIMASK(1);//отключить все прерывания
+	    NVIC_SetVectorTable(NVIC_VectTab_FLASH, 0x20000); 						//Адрес таблицы относительно начала Flash
+	__set_PRIMASK(0);//включить все прерывания
 
 	  HAL_Init();						// инит. Flash и Systick.
 	  SystemClock_Config();				// когфиг осциллятора.
 	  GPIO_Init();						// конфиг портов.
 	  Clocks_Init();					// конфиг часов.
 
-	  BOOT_UART_Init(921600);			// настройка BOOT интерфейса.
+
+	  AT45DB161D_spi_init();			// инит внешней флэшки
+
+	  uint8_t	resetpage = _startsoft;									// ставим признак готовности к работе проги. (0)
+	  memory_write_to_mem((uint8_t *)&resetpage,_Ifboot,1);
+
+	  BOOT_UART_Init(2000000);			// настройка BOOT интерфейса.
+
 	  USART_0TRACE("\033[2J\033[1;1H");
 	  USART_TRACE("------------------------------------\n");
-	  USART_TRACE("BOOT_Init.. ok\n");
+	  USART_TRACE("%s : %s\n",_swREV,_SWRevision);
+
+	  memory_read((uint8_t *)&resetpage,_Ifboot,1);							// читаем IP из внешней флэшки
+	  USART_TRACE_BLUE("cтавим признак готовности к работе: %u\n",resetpage);
+
+	  memory_read((uint8_t *)&IP_ADDR[0],_IfIPaddr,4);							// читаем IP из внешней флэшки
+	  USART_TRACE_BLUE("получили из flash IP:%d.%d.%d.%d \n", IP_ADDR[0], IP_ADDR[1], IP_ADDR[2], IP_ADDR[3]);
+
+	  if ((IP_ADDR[0] == 0) || (IP_ADDR[1] == 0)){
+		  IP_ADDR[0] = 192;IP_ADDR[1] = 168;IP_ADDR[2] = 0;IP_ADDR[3] = 254;
+		  SNTP_Period = 0;
+			int8_t res = memory_write_to_mem((uint8_t *)&IP_ADDR[0],_IfIPaddr,4);
+			if (res == FALSE){
+				USART_TRACE_RED("ошибка записи во flash \n");
+			}
+			USART_TRACE_BLUE("сохраним во flash IP:%d.%d.%d.%d \n", IP_ADDR[0], IP_ADDR[1], IP_ADDR[2], IP_ADDR[3]);
+	  }
+
+	  memory_read((uint8_t *)&SNTP_IP_ADDR[0],_IfNTP_IP,4);							// читаем SNTP IP из внешней флэшки
+	  USART_TRACE_BLUE("получили из flash SNTP IP:%d.%d.%d.%d \n", SNTP_IP_ADDR[0], SNTP_IP_ADDR[1], SNTP_IP_ADDR[2], SNTP_IP_ADDR[3]);
+	  sprintf((char *)&NTP_IP,"%d.%d.%d.%d", SNTP_IP_ADDR[0], SNTP_IP_ADDR[1], SNTP_IP_ADDR[2], SNTP_IP_ADDR[3]);
+
+	  memory_read((uint8_t *)&SNTP_Period,_IfNTP_Period,2);
+	  USART_TRACE_BLUE("получили из flash SNTP Period :%u \n", SNTP_Period);
+
+	  memory_read((uint8_t *)&TimeZone_my,_IfNTP_TimeZone,1);
+	  USART_TRACE_BLUE("получили из flash Часовой пояс:%i \n", TimeZone_my);
+
 
 	  Port_Init(MODBUS_DEn,GPIO_MODE_INPUT);			// пока не используем
 
@@ -324,82 +564,7 @@ int main(void) {
 		  }
 	  }
 #endif
-
-
-//	  uint16_t* slf = malloc(10);
-//	  USART_TRACE_MAGENTA("calloc размер:%d адрес:%X \n",10,(unsigned int)slf);
-//	  free(slf);
-
-//	  RS485_1_UART_Init(115200);		// настройка RS485 1 канала.
-//	  USART_TRACE("RS485_1_UART_Init.. ok\n");
-
-//  	  RS485_2_UART_Init(115200);		// настройка RS485 2 канала.
-//  	  USART_TRACE("RS485_2_UART_Init.. ok\n");
-
-/*
-  	  if(FATFS_LinkDriver(&SPIDISK_Driver, SPIPath) == 0){				// линкуем драйвер
-  	    if(f_mount(&SPIFatFs, (TCHAR const*)SPIPath, 0) != FR_OK){		// монтируем в устройство
-  	    	USART_TRACE("ошибка монтирования диска.\n");
-  	    }else{
-  	    	USART_TRACE("удачно смонтировали.\n");
-  	    	if(0){
-  	    	 //if(f_mkfs((TCHAR const*)SPIPath, 0, 0) != FR_OK){			// форматируем
-  	    		USART_TRACE("ошибка форматирования диска.\n");
-  	    	      }else{
-  	    	    	  	   //удачно смонтировали и отформатировали диск
-  	    	 		//vOutputDEBUG("отформатировали диск: %s\n",SPIPath);
-  	    	 		//if(!f_mkdir("folder1")) USART_TRACE("Создали папку /folder1\n");
-  	    	 		//if(!f_mkdir("folder2")) USART_TRACE("Создали папку /folder2\n");
-  	    	 		//f_mkdir("sub1/sub2/sub3");
-  	    	 		//if(!f_chdir("/folder2
-  	    	 		 * ")) USART_TRACE("перешли в папку /folder2\n");
-
-    	    	 	scan_files(SPIPath);
-
-  	    	 		resFile = f_open(&SPIFile, "Health", FA_CREATE_ALWAYS | FA_WRITE);
-					f_close(&SPIFile);
- 	    	    	resFile = f_open(&SPIFile, "Beh", FA_CREATE_ALWAYS | FA_WRITE);
-					f_close(&SPIFile);
-
-	    	 		  if(resFile == FR_OK){
-	    	 			 USART_TRACE("Создали файл\n");
-						  f_write(&SPIFile, "Проверка записи файла.", sizeof("Проверка записи файла."), NULL);
-						  USART_TRACE("записали в него.\n");
-						  f_close(&SPIFile);
-	    	 		  }
-  	    	 		scan_files(SPIPath);
-  	    	    	// Vendor
-
-  	    	    	resFile = f_open(&SPIFile, "NamPlt", FA_CREATE_ALWAYS | FA_WRITE);
-
-  	    	 		  if(resFile == FR_OK){
-  	    	 			USART_TRACE("Создали файл\n");
-						  f_write(&SPIFile, "Проверка записи файла.", sizeof("Проверка записи файла."), NULL);
-						  USART_TRACE("записали в него.\n");
-						  f_close(&SPIFile);
-						  USART_TRACE("Закрыли файл\n");
-					  }else
-					  if(resFile == FR_INVALID_NAME){
-						  USART_TRACE("ошибка создания файла, не правильное имя или путь.\n");
-					  }else
-					  if(resFile == FR_NO_FILESYSTEM){
-						  USART_TRACE("ошибка создания файла, нету FAT\n");
-					  }else
-					  if(resFile == FR_DENIED){
-						  USART_TRACE("ошибка создания файла, Доступ запрещен или каталога полный\n");
-					  }else
-					  {
-						  USART_TRACE("- ошибка создания файла\n");
-					  }
-  	    	 		scan_files("");
-
-  	    	      }
-  	    }
-  	  }else{
-  		USART_TRACE("ошибка подключения драйвера SPI памяти.\n");
-  	  }
-*/
-	  // тут нужно получить параметры системы от головного(MODBUS) скорости, адреса, порты....
+	  Memory_installExceptionHandler((MemoryExceptionHandler)MemoryException,NULL);
 
 	  FREERTOS_Init();					// инит. FREERTOS.
 	  osKernelStart();					// Старт планировщика
@@ -416,7 +581,7 @@ int main(void) {
  *************************************************************************/
 void vApplicationStackOverflowHook( xTaskHandle pxTask, signed char *pcTaskName )
 {
-	static UBaseType_t WaterMark;
+//	static UBaseType_t WaterMark;
 	( void ) pxTask;
 	( void ) pcTaskName;
 
@@ -522,8 +687,11 @@ void SystemClock_Config(void)
 #ifndef KSZ8873
   HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_HSE, RCC_MCODIV_1);
 #else
-
 #endif
+
+  // Output HSE divided by 1 on MCO2 pin(PC9)  проверка точности кварца 25MHz + тактовая для ETHERNET контроллера
+  HAL_RCC_MCOConfig(RCC_MCO2, RCC_MCO2SOURCE_HSE, RCC_MCODIV_1);
+
   HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
 
   HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
@@ -534,6 +702,7 @@ void SystemClock_Config(void)
   }
 
 }
+
 /*************************************************************************
  * Port_Init
  *************************************************************************/
@@ -590,13 +759,30 @@ void Port_Toggle(Port_TypeDef Port)
  *************************************************************************/
 int __io_putchar(int ch)
 {
-  HAL_UART_Transmit(&BOOT_UART, (uint8_t *)&ch, 1, 0xFFFF);
+	if( xQueueSend( xDebugUsartOut, ( void * ) &ch, ( TickType_t ) 10 ) != pdPASS )//portMAX_DELAY
+	{
+		// Failed to post the message, even after 10 ticks.
+		  return 0;
+	}
   return ch;
+
+//  HAL_UART_Transmit(&BOOT_UART, (uint8_t *)&ch, 1, 0xFFFF);
+//  return ch;
+
 }
+//________________________________________________________
+int __io_putfromTask(char *ptr, int len)
+{
+	if( xQueueSend( xDebugUsartOut, ( void * ) ptr, ( TickType_t ) 10 ) != pdPASS )//portMAX_DELAY
+	{
+		// Failed to post the message, even after 10 ticks.
+		  return 0;
+	}
+  return len;
+}
+//________________________________________________________
 int __io_putstrDMA(char *ptr, int len)
 {
-	static	Boot_Ready;
-
 
 	if((HAL_UART_GetState(&BOOT_UART) == HAL_UART_STATE_READY) &&(Boot_Ready == 0)){
 
@@ -625,14 +811,16 @@ uint32_t xGetRunTimeCounterValue( void )
 void 	printfTime (void){
 	RTC_TimeTypeDef sTime;
 	RTC_DateTypeDef sDate;
-	char WriteBuffer[16];
+	char WriteBuffer[24];
 
 		HAL_RTC_GetTime((RTC_HandleTypeDef *)&hrtc, &sTime, FORMAT_BIN);			// Читаем время
 		HAL_RTC_GetDate((RTC_HandleTypeDef *)&hrtc, &sDate, FORMAT_BIN);			// читаем дату
 
 //		char* WriteBuffer = pvPortMalloc(16);
 
-		sprintf( WriteBuffer, "[%02d.%02d.%02d.%04u] ",sTime.Hours,sTime.Minutes,sTime.Seconds,(uint16_t)(3999-sTime.SubSeconds/2) );
+		uint16_t mst = (1000 - (sTime.SubSeconds * 1000 / hrtc.Init.SynchPrediv));
+
+		sprintf( WriteBuffer, "[%02d.%02d %02d:%02d:%02d.%03u] ",sDate.Date,sDate.Month,sTime.Hours,sTime.Minutes,sTime.Seconds,(uint16_t)mst);
 		USART_0TRACE(WriteBuffer);
 
 //		vPortFree(WriteBuffer);
@@ -765,7 +953,7 @@ void LED_Init(void){
 	  Port_Init(LED1,GPIO_MODE_OUTPUT_OD);
 	  Port_Off(LED1);
 #endif
-	  USART_TRACE("LED_Init.. ok\n");
+//	  USART_TRACE("LED_Init.. ok\n");
 }
 #ifdef	memtest
 /*************************************************************************
@@ -880,3 +1068,33 @@ return ret;
 }
 #endif
 
+/**
+  * @brief  Sets the vector table location and Offset.
+  * @param  NVIC_VectTab: specifies if the vector table is in RAM or FLASH memory.
+  *   This parameter can be one of the following values:
+  *     @arg NVIC_VectTab_RAM
+  *     @arg NVIC_VectTab_FLASH
+  * @param  Offset: Vector Table base offset field. This value must be a multiple of 0x100.
+  * @retval None
+  */
+void NVIC_SetVectorTable(uint32_t NVIC_VectTab, uint32_t Offset)
+{
+  /* Check the parameters */
+  assert_param(IS_NVIC_VECTTAB(NVIC_VectTab));
+  assert_param(IS_NVIC_OFFSET(Offset));
+
+  SCB->VTOR = NVIC_VectTab | (Offset & (uint32_t)0x1FFFFF80);
+}
+
+
+/*************************************************************************
+ * MemoryException
+ *************************************************************************/
+static void	MemoryException (void)
+{
+	  USART_TRACE_RED("------------------------\n");
+	  USART_TRACE_RED("Ошибка выделения памяти.\n");
+	  USART_TRACE_RED("------------------------\n");
+		while (1) {
+		}
+}

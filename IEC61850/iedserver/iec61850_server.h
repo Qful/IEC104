@@ -58,6 +58,8 @@ typedef struct sClientConnection* ClientConnection;
  */
 
 
+void
+IedServer_getClientconections(uint8_t *pcWriteBuffer, IedServer self);
 /**
  * \brief Create a new IedServer instance
  *
@@ -507,7 +509,8 @@ IedServer_updateAttributeValue(IedServer self, DataAttribute* dataAttribute, Mms
  * \param dataAttribute the data attribute handle
  * \param value the new float value of the data attribute.
  */
-void
+//void
+int
 IedServer_updateFloatAttributeValue(IedServer self, DataAttribute* dataAttribute, float value);
 
 /**
@@ -522,7 +525,8 @@ IedServer_updateFloatAttributeValue(IedServer self, DataAttribute* dataAttribute
  * \param dataAttribute the data attribute handle
  * \param value the new integer value of the data attribute.
  */
-void
+//void
+int
 IedServer_updateInt32AttributeValue(IedServer self, DataAttribute* dataAttribute, int32_t value);
 
 /**
@@ -537,7 +541,8 @@ IedServer_updateInt32AttributeValue(IedServer self, DataAttribute* dataAttribute
  * \param dataAttribute the data attribute handle
  * \param value the new 64 bit integer value of the data attribute.
  */
-void
+//void
+int
 IedServer_updateInt64AttributeValue(IedServer self, DataAttribute* dataAttribute, int64_t value);
 
 /**
@@ -567,7 +572,8 @@ IedServer_updateUnsignedAttributeValue(IedServer self, DataAttribute* dataAttrib
  * \param dataAttribute the data attribute handle
  * \param value the new bit string integer value of the data attribute.
  */
-void
+//void
+int
 IedServer_updateBitStringAttributeValue(IedServer self, DataAttribute* dataAttribute, uint32_t value);
 
 /**
@@ -582,7 +588,8 @@ IedServer_updateBitStringAttributeValue(IedServer self, DataAttribute* dataAttri
  * \param dataAttribute the data attribute handle
  * \param value the new boolean value of the data attribute.
  */
-void
+//void
+int
 IedServer_updateBooleanAttributeValue(IedServer self, DataAttribute* dataAttribute, bool value);
 
 /**
@@ -1040,7 +1047,8 @@ void
 IedServer_setWriteAccessPolicy(IedServer self, FunctionalConstraint fc, AccessPolicy policy);
 
 
-void	IedServer_updateBitStrinAttributeValue(IedServer self, DataAttribute* dataAttribute, uint32_t value);
+//void
+int	IedServer_updateBitStrinAttributeValue(IedServer self, DataAttribute* dataAttribute, uint32_t value);
 
 /**@}*/
 

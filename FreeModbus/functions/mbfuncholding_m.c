@@ -37,6 +37,7 @@
 
 #include "main.h"
 
+#include "iec850.h"
 #include "iec61850_server.h"
 #include "static_model.h"
 /* ----------------------- Modbus includes ----------------------------------*/
@@ -49,43 +50,77 @@
 #include "modbus.h"
 /* ----------------------- external ------------------------------------------*/
 extern IedServer iedServer;
+extern osThreadId IEC850TaskHandle;
 
+/*************************************************************************
+ * MR771
+ *************************************************************************/
 #if defined (MR771)
-//Master mode: База данных конфигурации системы
-extern uint16_t   usMConfigSystem;
-extern uint16_t   ucMConfigSystemBuf[MB_Size_ConfSysytem];
-
-//Master mode: База данных конфигурации Выключателя
-extern uint16_t   usMConfigSW;
-extern uint16_t   ucMConfigSWBuf[MB_Size_ConfSW];
-
-//Master mode: База данных Версии
-extern uint16_t   usMRevStart;
+extern uint16_t   ucVLSOutBuf[MB_NumbConfigVLSOut];
+extern uint16_t   ucVLSInBuf[MB_NumbConfigVLSIn];
+extern uint16_t   ucMDateBuf[MB_NumbDate];
 extern uint16_t   ucMRevBuf[MB_NumbWordRev];
+extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+extern uint16_t   ucMConfigBufSW[MB_Size_ConfSW];
+extern uint16_t   ucSystemCfgBuf[MB_NumbSystemCfg];
+extern uint16_t   ucConfigTRMeasBuf[MB_NumbConfigTRMeas];
+extern uint16_t   ucMUstavkiInBuf[MB_NumbUstavki];
+extern uint16_t   ucConfigAPWBuf[MB_NumbConfigAPW];
+extern uint16_t   ucSGBuf[MB_NumbSG];
+extern uint16_t   ucMAutomatBuf[MB_NumbAutomat];
 
-//Master mode: База данных часов
-extern	uint16_t   usMDateStart;
-extern	uint16_t   ucMDateBuf[MB_NumbDate];
 
-//Master mode: База данных дискретных сигналов
-extern	uint16_t   usMDiscInStart;
-extern	uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
 
-//Master mode: База данных аналоговых сигналов
-extern	uint16_t   usMAnalogInStart;
-extern	uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+extern uint16_t   usMDateStart;
+extern uint16_t   usMRevStart;
+extern uint16_t   usMDiscInStart;
+extern uint16_t   usMAnalogInStart;
+extern uint16_t   usMConfigStartSW;
+extern uint16_t   usConfigUstavkiStart;			// группа уставок
+extern uint16_t   usConfigAutomatStart;			// параметры автоматики
+extern uint16_t   usConfigVLSInStart;			// чтение конфигурации входных логических сигналов
+extern uint16_t   usConfigVLSOutStart;			// чтение конфигурации выходных логических сигналов
+extern uint16_t   usConfigAPWStart;				// конфигурация АПВ
+extern uint16_t   usSystemCfgStart;				// параметры системы
+extern uint16_t   usConfigTRMeasStart;			// конфигурация измерительного транса
+extern uint16_t   usSGStart;
+extern uint16_t   usConfigAutomatStart;
+#endif
+/*************************************************************************
+ * MR761 MR762 MR763
+ *************************************************************************/
+#if defined (MR761) || defined (MR762) || defined (MR763)
+extern uint16_t   ucVLSOutBuf[MB_NumbConfigVLSOut];
+extern uint16_t   ucVLSInBuf[MB_NumbConfigVLSIn];
+extern uint16_t   ucMDateBuf[MB_NumbDate];
+extern uint16_t   ucMRevBuf[MB_NumbWordRev];
+extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+extern uint16_t   ucMConfigBufSW[MB_Size_ConfSW];
+extern uint16_t   ucSystemCfgBuf[MB_NumbSystemCfg];
+extern uint16_t   ucConfigTRMeasBuf[MB_NumbConfigTRMeas];
+extern uint16_t   ucMUstavkiInBuf[MB_NumbUstavki];
+extern uint16_t   ucConfigAPWBuf[MB_NumbConfigAPW];
 
-//Master mode: База уставок
-extern uint16_t   usMConfigStartTrans;
-extern uint16_t    ucMConfigBufTrans[MB_Size_ConfTrans];
+extern uint16_t   usMDateStart;
+extern uint16_t   usMRevStart;
+extern uint16_t   usMDiscInStart;
+extern uint16_t   usMAnalogInStart;
+extern uint16_t   usMConfigStartSW;
+extern uint16_t   usConfigUstavkiStart;			// группа уставок
+extern uint16_t   usConfigAutomatStart;			// параметры автоматики
+extern uint16_t   usConfigVLSInStart;			// чтение конфигурации входных логических сигналов
+extern uint16_t   usConfigVLSOutStart;			// чтение конфигурации выходных логических сигналов
+extern uint16_t   usConfigAPWStart;				// конфигурация АПВ
+extern uint16_t   usSystemCfgStart;				// параметры системы
+extern uint16_t   usConfigTRMeasStart;			// конфигурация измерительного транса
+#endif
 
-//Master mode: Настройки сети
-extern uint16_t   usMConfigStartNaddr;
-extern uint16_t   ucMConfigNaddrBuf[MB_NumbConfigNaddr];
-
-extern uint16_t		Ktt,Ktn;
-extern uint16_t		ConfigOffset;			// смещение группы уставок
-#elif defined (MR5_700)
+/*************************************************************************
+ * MR5_700
+ *************************************************************************/
+#if defined (MR5_700)
 
 extern uint16_t   usMDateStart;
 extern uint16_t   ucMDateBuf[MB_NumbDate];
@@ -103,11 +138,123 @@ extern uint16_t   usMConfigStartSWCrash;
 extern uint16_t   ucMSWCrash[MB_NumbSWCrash];
 
 extern uint16_t	    Ktt,Ktn;
+#endif
+#if defined (MR5_600)
+
+extern uint16_t   usMDateStart;
+extern uint16_t   ucMDateBuf[MB_NumbDate];
+extern uint16_t   usMRevStart;
+extern uint16_t   ucMRevBuf[MB_NumbWordRev];
+extern uint16_t   usMDiscInStart;
+extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   usMAnalogInStart;
+extern uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+extern uint16_t   usMConfigStart;
+extern uint16_t   ucMConfigBuf[MB_NumbConfig];
+extern uint16_t   usMConfigStartall;
+extern uint16_t   ucMConfigBufall[MB_NumbConfigall];
+extern uint16_t   usMConfigStartSWCrash;
+extern uint16_t   ucMSWCrash[MB_NumbSWCrash];
+
+extern uint16_t	    Ktn;
+#endif
+#if defined (MR5_500)
+
+extern uint16_t   usMDateStart;
+extern uint16_t   ucMDateBuf[MB_NumbDate];
+extern uint16_t   usMRevStart;
+extern uint16_t   ucMRevBuf[MB_NumbWordRev];
+extern uint16_t   usMDiscInStart;
+extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   usMAnalogInStart;
+extern uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+extern uint16_t   usMConfigStart;
+extern uint16_t   ucMConfigBuf[MB_NumbConfig];
+extern uint16_t   usMConfigStartall;
+extern uint16_t   ucMConfigBufall[MB_NumbConfigall];
+extern uint16_t   usMConfigStartSWCrash;
+extern uint16_t   ucMSWCrash[MB_NumbSWCrash];
+
+extern uint16_t	    Ktt,Ktn;
+#endif
+/*************************************************************************
+ * MR801
+ *************************************************************************/
+#if defined (MR801)
+extern uint16_t   ucVLSOutBuf[MB_NumbConfigVLSOut];
+extern uint16_t   ucVLSInBuf[MB_NumbConfigVLSIn];
+extern uint16_t   ucMDateBuf[MB_NumbDate];
+extern uint16_t   ucMRevBuf[MB_NumbWordRev];
+extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+extern uint16_t   ucMConfigBufSW[MB_Size_ConfSW];
+extern uint16_t   ucSystemCfgBuf[MB_NumbSystemCfg];
+extern uint16_t   ucConfigTRMeasBuf[MB_NumbConfigTRMeas];
+extern uint16_t   ucMUstavkiInBuf[MB_NumbUstavki];
+
+extern uint16_t   ucConfigAPWBuf[MB_NumbConfigAPW];
+extern uint16_t   ucConfigAWRBuf[MB_NumbConfigAWR];
+extern uint16_t   ucConfigTRPWRBuf[MB_NumbConfigTRPWR];
+
+extern uint16_t   usMDateStart;
+extern uint16_t   usMRevStart;
+extern uint16_t   usMDiscInStart;
+extern uint16_t   usMAnalogInStart;
+extern uint16_t   usMConfigStartSW;
+extern uint16_t   usConfigUstavkiStart;			// группа уставок
+extern uint16_t   usConfigAutomatStart;			// параметры автоматики
+extern uint16_t   usConfigVLSInStart;			// чтение конфигурации входных логических сигналов
+extern uint16_t   usConfigVLSOutStart;			// чтение конфигурации выходных логических сигналов
+extern uint16_t   usConfigAPWStart;				// конфигурация АПВ
+extern uint16_t   usConfigAWRStart;				// конфигурация АВР
+extern uint16_t   usSystemCfgStart;				// параметры системы
+extern uint16_t   usConfigTRMeasStart;			// конфигурация измерительного транса
+extern uint16_t   usConfigTRPWRStart;			// конфигурация силового транса
+
+#endif
+/*************************************************************************
+ * MR901 902
+ *************************************************************************/
+#if defined (MR901) || defined (MR902)
+extern uint16_t   ucVLSOutBuf[MB_NumbConfigVLSOut];
+extern uint16_t   ucVLSInBuf[MB_NumbConfigVLSIn];
+extern uint16_t   ucMDateBuf[MB_NumbDate];
+extern uint16_t   ucMRevBuf[MB_NumbWordRev];
+extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+extern uint16_t   ucMConfigBufSW[MB_Size_ConfSW];
+extern uint16_t   ucSystemCfgBuf[MB_NumbSystemCfg];
+extern uint16_t   ucConfigTRMeasBuf[MB_NumbConfigTRMeas];
+extern uint16_t   ucMUstavkiInBuf[MB_NumbUstavki];
+
+extern uint16_t   ucConfigAPWBuf[MB_NumbConfigAPW];
+extern uint16_t   ucConfigAWRBuf[MB_NumbConfigAWR];
+extern uint16_t   ucConfigTRPWRBuf[MB_NumbConfigTRPWR];
+
+extern uint16_t   usMDateStart;
+extern uint16_t   usMRevStart;
+extern uint16_t   usMDiscInStart;
+extern uint16_t   usMAnalogInStart;
+extern uint16_t   usMConfigStartSW;
+extern uint16_t   usConfigUstavkiStart;			// группа уставок
+extern uint16_t   usConfigAutomatStart;			// параметры автоматики
+extern uint16_t   usConfigVLSInStart;			// чтение конфигурации входных логических сигналов
+extern uint16_t   usConfigVLSOutStart;			// чтение конфигурации выходных логических сигналов
+extern uint16_t   usConfigAPWStart;				// конфигурация АПВ
+extern uint16_t   usConfigAWRStart;				// конфигурация АВР
+extern uint16_t   usSystemCfgStart;				// параметры системы
+extern uint16_t   usConfigTRMeasStart;			// конфигурация измерительного транса
+extern uint16_t   usConfigTRPWRStart;			// конфигурация силового транса
 
 #endif
 
+//-------------------------------------------------------------------
+extern	uint8_t		ReadNmb;					// текущий номер блока для чтения из модбас
+extern	uint16_t	NumbBlokReadMB;				// текущий кусок блока для чтения из модбас
+
 extern osMutexId 	xIEC850StartMutex;		// мьютекс готовности к запуску TCP/IP
 extern uint8_t		IP_ADDR[4];
+extern volatile uint8_t	MAC_ADDR[6];
 /* ----------------------- Defines ------------------------------------------*/
 #define MB_PDU_REQ_READ_ADDR_OFF                ( MB_PDU_DATA_OFF + 0 )
 #define MB_PDU_REQ_READ_REGCNT_OFF              ( MB_PDU_DATA_OFF + 2 )
@@ -354,17 +501,22 @@ eMBMasterReqErrCode		eMBMasterReqReadHoldingRegister( UCHAR ucSndAddr, USHORT us
     return eErrStatus;
 }
 /***********************************************************************************
- * чтение регистров из MB
+ * MR771 eMBMasterFuncReadRegisters
  ***********************************************************************************/
 #if defined (MR771)
 eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
 {
+	extern uint64_t nextSynchTime;
+	extern bool resynch;
+
     UCHAR          *ucMBFrame;
     uint16_t          usRegAddress;
     uint16_t          usRegCount;
     uint16_t		StartMemForSave;
     uint16_t		MemForSave;
-//    extern osMutexId xIEC850ServerStartMutex;
+
+    extern osMutexId 	xIEC850StartMutex;		// мьютекс готовности к запуску TCP/IP
+    extern uint8_t		IP_ADDR[4];
 
     eMBException    eStatus = MB_EX_NONE;
     eMBErrorCode    eRegStatus;
@@ -388,115 +540,129 @@ eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
         if( ( usRegCount >= 1 ) && ( 2 * usRegCount == pucFrame[MB_PDU_FUNC_READ_BYTECNT_OFF] ) )
         {
         	MemForSave = usRegAddress-1;// & 0xFF00;
-        	// проверим в какую область памяти писать
 
-        	if (MemForSave == MB_StartRevNaddr){		// ревизия
-                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMRevBuf, MB_StartRevNaddr, MB_NumbWordRev );		// сохраняем данные в хранилище
+//----------------------------------------------------------------
+//- проверим в какую область памяти писать -----------------------
+//----------------------------------------------------------------
+
+// ревизия
+        	if (usMRevStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMRevBuf, usMRevStart, MB_NumbWordRev );		// сохраняем данные в хранилище
                 if( eRegStatus == MB_ENOERR ){
-                    IedServer_lockDataModel(iedServer);
-                    IedServer_updateVisibleStringAttributeValue(iedServer, IEDMODEL_GenericIO_LLN0_NamPlt_swRev, (char *)&ucMRevBuf[8]);
-                    IedServer_updateVisibleStringAttributeValue(iedServer, IEDMODEL_GenericIO_LLN0_NamPlt_d,(char *)ucMRevBuf);
-                    IedServer_updateVisibleStringAttributeValue(iedServer, IEDMODEL_GenericIO_LLN0_NamPlt_configRev,(char *)"1");
-                    IedServer_unlockDataModel(iedServer);
-
-                	USART_TRACE_GREEN("Версия: '%s'\n",(char *)ucMRevBuf);
+                	USART_TRACE_GREEN("%d. Версия: '%s'\n",ReadNmb,(char *)ucMRevBuf);
                 }else {
             		USART_TRACE_RED("ошибка получения версии из MODBUS\n");
             		eStatus = MB_EX_ILLEGAL_DATA_VALUE;
                 }
-        	}else
-        	if (MemForSave == MB_StartDiscreetaddr){	// дискреты
-                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMDiscInBuf, MB_StartDiscreetaddr, MB_NumbDiscreet );		// сохраняем данные в хранилище
+                ReadNmb++;
+        	}
+// дискреты
+        	else if (usMDiscInStart== MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMDiscInBuf, usMDiscInStart, MB_NumbDiscreet );		// сохраняем данные в хранилище
                 if( eRegStatus == MB_ENOERR ){
                 //	USART_TRACE_GREEN("БД дискретных.\n");
                 }
-        	}else
-            if (MemForSave == MB_StartAnalogINaddr){	// аналоги
-                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMAnalogInBuf, MB_StartAnalogINaddr, MB_NumbAnalog);		// сохраняем данные в хранилище
+                ReadNmb++;
+        	}
+// аналоги
+        	else if ( usMAnalogInStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMAnalogInBuf, usMAnalogInStart, MB_NumbAnalog);		// сохраняем данные в хранилище
                 if( eRegStatus == MB_ENOERR ){
                 //	USART_TRACE_GREEN("БД аналогов.\n");
                 }
-        	}else
-            if (MemForSave == MB_NOfConfig){			// смещение активных уставок
-                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,(USHORT *)&ConfigOffset,MB_NOfConfig, 1);				// сохраняем данные в хранилище
-                if( eRegStatus == MB_ENOERR ){
-                	USART_TRACE_GREEN("Группа уставок: %u\n",ConfigOffset+1);
-                	usMConfigStartTrans = MB_StartConfig + MB_offset_ConfTrans + (ConfigOffset * MB_IncNumbOfConfig);		// адрес уставок транса
-                	USART_TRACE_GREEN("адрес группы: 0x%.4X\n",usMConfigStartTrans);
-                }
-        	}else
-        	if (MemForSave == usMConfigStartTrans){
-                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,ucMConfigBufTrans,usMConfigStartTrans, MB_Size_ConfTrans);						// сохраняем данные в хранилище
-                if( eRegStatus == MB_ENOERR ){
-                	USART_TRACE_GREEN("Получили конфигурацию измерительного трансформатора.\n");
-                	USART_TRACE("Канал тока:       ");
-                	uint8_t i;
-                	for(i=0;i<MB_Size_ConfTrans/2;i++){
-                		USART_0TRACE("0x%.4X ",ucMConfigBufTrans[i]);
-                	}
-            		USART_0TRACE("\n");
-                	USART_TRACE("Канал напряжения: ");
-                	for(i=MB_Size_ConfTrans/2;i<MB_Size_ConfTrans;i++){
-                		USART_0TRACE("0x%.4X ",ucMConfigBufTrans[i]);
-                	}
-            		USART_0TRACE("\n");
-            	} else{
-            		USART_TRACE_RED("ошибка получения конфигурации измерительного трансформатора.\n");
-            		eStatus = MB_EX_ILLEGAL_DATA_VALUE;
-            	}
-            }else
-        		/*
-            if (MemForSave == (MB_StartConfig+ConfigOffset+MB_offset_Ktt)){
-        	//case	(MB_StartConfig+ConfigOffset+MB_offset_Ktt):	// уставки
-                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,(USHORT *)&Ktt, MB_StartConfig + ConfigOffset + MB_offset_Ktt, 1);		// сохраняем данные в хранилище
-                if( eRegStatus == MB_ENOERR ){
-                	USART_TRACE_GREEN("Первичный ток ТТ: %u адрес: 0x%X\n",Ktt,(MB_StartConfig + ConfigOffset + MB_offset_Ktt));
-                }
-            //    break;
-            }else
-            if (MemForSave == (MB_StartConfig+ConfigOffset+MB_offset_Ktn)){
-        	//case	(MB_StartConfig+ConfigOffset+MB_offset_Ktn):	// уставки
-                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,(USHORT *)&Ktn, MB_StartConfig + ConfigOffset + MB_offset_Ktn, 1);		// сохраняем данные в хранилище
-                if( eRegStatus == MB_ENOERR ){
-                	USART_TRACE_GREEN("Коэффициент ТН: %u адрес: 0x%X\n",Ktn,(MB_StartConfig + ConfigOffset + MB_offset_Ktn));
-                }
-            //    break;
-            }else
-            	*/
-            if (MemForSave == MB_StartConfigNaddr){		// уставки IP адрес
-                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMConfigNaddrBuf, MB_StartConfigNaddr, MB_NumbConfigNaddr);			// сохраняем данные в хранилище
+                ReadNmb++;
+        	}
+//  конфигурация системы
+        	else if ( usSystemCfgStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucSystemCfgBuf, usSystemCfgStart, MB_NumbSystemCfg);
                 if( eRegStatus == MB_ENOERR ){	// меняем IP адрес
-                	if (Hal_setIPFromMB_Date(ucMConfigNaddrBuf)){
+                	USART_TRACE_GREEN("%d. Получили конфиг системы.\n",ReadNmb);
+
+                	int8_t	resSetIP = Hal_setIPFromMB_Date((uint16_t*)&ucSystemCfgBuf[MB_offset_IP]);
+                	if (resSetIP == 0){
                 					// если всё норм то нужно сообщить о готовности работать IP
-                					// USART_TRACE_GREEN("получили IP:%d %d %d %d \n", IP_ADDR[0], IP_ADDR[1], IP_ADDR[2], IP_ADDR[3]);
-                					//osMutexRelease(xIEC850StartMutex);
-                	} else{
+                					USART_TRACE_GREEN("%d.получили из MODBUS IP:%d.%d.%d.%d \n",ReadNmb, IP_ADDR[0], IP_ADDR[1], IP_ADDR[2], IP_ADDR[3]);
+                					// перезапустим таск
+                					if (MAC_ADDR[0] && MAC_ADDR[1] && MAC_ADDR[2]){
+                						ReStartIEC850_task();
+                 					}
+
+                					osMutexRelease(xIEC850StartMutex);
+                	} else
+                	if (resSetIP == -1){
                 		USART_TRACE_RED("ошибка получения IP из MODBUS\n");
                 		eStatus = MB_EX_ILLEGAL_DATA_VALUE;
+                	} else
+                	if (resSetIP == 2){	// совпадение с прошлым включением
+                		USART_TRACE_GREEN("IP из MODBUS совпадает с константой.\n");
+    					osMutexRelease(xIEC850StartMutex);
+
                 	}
                 }
-            }else
-            if (MemForSave == MB_StartDateNaddr){		// часы
-                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMDateBuf, MB_StartDateNaddr, MB_NumbDate);
+                ReadNmb++;
+        	}
+// чтение текущего времени
+        	else if ( usMDateStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMDateBuf, usMDateStart, MB_NumbDate);				// сохраняем данные в хранилище
                 if( eRegStatus == MB_ENOERR ){
                 	Hal_setTimeFromMB_Date(ucMDateBuf);
-                	USART_TRACE_GREEN("Получили время.\n");
+                	nextSynchTime = Hal_getTimeInMs() + msInDay;				// следующая пересинхронизация часов
+                	USART_TRACE_GREEN("%d. Получили время:0x%X следующая синхронизация:0x%X\n",ReadNmb,(unsigned int)Hal_getTimeInMs(),(unsigned int)nextSynchTime);
+                	resynch = true;
                 }
-            }else
-			if (MemForSave == usMConfigSW){	// конфигурация выключателя
-                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMConfigSWBuf, usMConfigSW, MB_Size_ConfSW);
+                ReadNmb++;
+        	}
+// чтение конфигурации выключателя
+        	else if ( usMConfigStartSW == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMConfigBufSW, usMConfigStartSW, MB_Size_ConfSW);
                 if( eRegStatus == MB_ENOERR ){
-                	USART_TRACE_GREEN("Получили конфигурацию выключателя.\n");
-                	Hal_setConfSWFromMB_Date(ucMConfigSWBuf);
+                	USART_TRACE_GREEN("%d. Получили конфиг выключателя.\n",ReadNmb);
                 }
-			}else
-			if (MemForSave == usMConfigSystem){	// конфигурация системы
-                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMConfigSystemBuf, usMConfigSystem, MB_Size_ConfSysytem);
-                if( eRegStatus == MB_ENOERR ){
-//                	osMutexRelease(xIEC850ServerStartMutex);
-                	USART_TRACE_GREEN("Получили конфигурацию системы.\n");
-                }
+                ReadNmb++;
+        	}
+
+// чтение номера группы уставок
+        	else if ( usSGStart == MemForSave){
+				eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,ucSGBuf, MemForSave, MB_NumbSG);
+				if( eRegStatus == MB_ENOERR ){
+					USART_TRACE_GREEN("%d. Получили номер группы уставок. (%d)\n",ReadNmb,ucSGBuf[0]+1);
+				}
+				ReadNmb++;
 			}
+// чтение группы уставок
+			else if (( usConfigUstavkiStart <= MemForSave) &&(MemForSave < (usConfigUstavkiStart+MB_NumbUstavki-1))){
+
+				uint8_t			SizeAnswer;
+				xModbus_Get_SizeAnswer((uint8_t *)&SizeAnswer);
+				SizeAnswer -= SizeAddr+SizeFunct+1+SizeCRC;
+				SizeAnswer = SizeAnswer>>1;
+				eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,(USHORT *)&ucMUstavkiInBuf[MemForSave-usConfigUstavkiStart], MemForSave, SizeAnswer);
+
+				if( eRegStatus == MB_ENOERR ){
+					USART_TRACE_GREEN("%d-%d. Получили группы уставок.(0x%X)\n",ReadNmb,NumbBlokReadMB,MemForSave);
+					NumbBlokReadMB++;
+				}
+
+			}
+// чтение параметров автоматики
+			else if (( usConfigAutomatStart <= MemForSave) &&(MemForSave < (usConfigAutomatStart+MB_NumbAutomat-1))){
+
+				uint8_t			SizeAnswer;
+				xModbus_Get_SizeAnswer((uint8_t *)&SizeAnswer);
+				SizeAnswer -= SizeAddr+SizeFunct+1+SizeCRC;
+				SizeAnswer = SizeAnswer>>1;
+				eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,(USHORT *)&ucMAutomatBuf[MemForSave-usConfigAutomatStart], MemForSave, SizeAnswer);
+
+				if( eRegStatus == MB_ENOERR ){
+					USART_TRACE_GREEN("%d-%d. Получили параметры автоматики.(0x%X)\n",ReadNmb,NumbBlokReadMB,MemForSave);
+					NumbBlokReadMB++;
+				}
+			}
+
+//----------------------------------------------------------------
+//----------------------------------------------------------------
+//----------------------------------------------------------------
+
             if( eRegStatus != MB_ENOERR )
             {
                 eStatus = prveMBError2Exception( eRegStatus );
@@ -514,9 +680,227 @@ eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
     }
     return eStatus;
 }
-#elif defined (MR5_700)
+#endif
+
+/***********************************************************************************
+ * MR761 MR762 MR763
+ ***********************************************************************************/
+#if defined (MR761) || defined (MR762) || defined (MR763)
 eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
 {
+	extern uint64_t nextSynchTime;
+	extern bool resynch;
+
+    UCHAR          *ucMBFrame;
+    uint16_t          usRegAddress;
+    uint16_t          usRegCount;
+    uint16_t		StartMemForSave;
+    uint16_t		MemForSave;
+
+    extern osMutexId 	xIEC850StartMutex;		// мьютекс готовности к запуску TCP/IP
+    extern uint8_t		IP_ADDR[4];
+
+    eMBException    eStatus = MB_EX_NONE;
+    eMBErrorCode    eRegStatus;
+
+    /* If this request is broadcast, and it's read mode. This request don't need execute. */
+    if ( xMBMasterRequestIsBroadcast() )
+    {
+    	eStatus = MB_EX_NONE;
+    }
+    else if( *usLen >= MB_PDU_SIZE_MIN + MB_PDU_FUNC_READ_SIZE_MIN )
+    {
+		vMBMasterGetPDUSndBuf(&ucMBFrame);											// берём из передающего буфера адрес в памяти чтобы высчитать куда положить в принятую память
+        usRegAddress = ( USHORT )( ucMBFrame[MB_PDU_REQ_READ_ADDR_OFF] << 8 );
+        usRegAddress |= ( USHORT )( ucMBFrame[MB_PDU_REQ_READ_ADDR_OFF + 1] );
+        usRegAddress++;
+
+        usRegCount = ( USHORT )( ucMBFrame[MB_PDU_REQ_READ_REGCNT_OFF] << 8 );
+        usRegCount |= ( USHORT )( ucMBFrame[MB_PDU_REQ_READ_REGCNT_OFF + 1] );
+
+        //  Проверим если количество регистров является действительным.
+        if( ( usRegCount >= 1 ) && ( 2 * usRegCount == pucFrame[MB_PDU_FUNC_READ_BYTECNT_OFF] ) )
+        {
+        	MemForSave = usRegAddress-1;// & 0xFF00;
+
+//----------------------------------------------------------------
+//- проверим в какую область памяти писать -----------------------
+//----------------------------------------------------------------
+
+// ревизия
+        	if (usMRevStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMRevBuf, usMRevStart, MB_NumbWordRev );		// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Версия: '%s'\n",ReadNmb,(char *)ucMRevBuf);
+                }else {
+            		USART_TRACE_RED("ошибка получения версии из MODBUS\n");
+            		eStatus = MB_EX_ILLEGAL_DATA_VALUE;
+                }
+                ReadNmb++;
+        	}
+// дискреты
+        	else if (usMDiscInStart== MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMDiscInBuf, usMDiscInStart, MB_NumbDiscreet );		// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                //	USART_TRACE_GREEN("БД дискретных.\n");
+                }
+                ReadNmb++;
+        	}
+// аналоги
+        	else if ( usMAnalogInStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMAnalogInBuf, usMAnalogInStart, MB_NumbAnalog);		// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                //	USART_TRACE_GREEN("БД аналогов.\n");
+                }
+                ReadNmb++;
+        	}
+//  конфигурация системы
+        	else if ( usSystemCfgStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucSystemCfgBuf, usSystemCfgStart, MB_NumbSystemCfg);
+                if( eRegStatus == MB_ENOERR ){	// меняем IP адрес
+                	int8_t	resSetIP = Hal_setIPFromMB_Date((uint16_t*)&ucSystemCfgBuf[MB_offset_IP]);
+                	if (resSetIP == 0){
+                					// если всё норм то нужно сообщить о готовности работать IP
+                					USART_TRACE_GREEN("%d.получили из MODBUS IP:%d.%d.%d.%d \n",ReadNmb, IP_ADDR[0], IP_ADDR[1], IP_ADDR[2], IP_ADDR[3]);
+                					// перезапустим таск
+                					if (MAC_ADDR[0] && MAC_ADDR[1] && MAC_ADDR[2]){
+                						ReStartIEC850_task();
+                 					}
+
+                					osMutexRelease(xIEC850StartMutex);
+                	} else
+                	if (resSetIP == -1){
+                		USART_TRACE_RED("ошибка получения IP из MODBUS\n");
+                		eStatus = MB_EX_ILLEGAL_DATA_VALUE;
+                	} else
+                	if (resSetIP == 2){	// совпадение с прошлым включением
+                		USART_TRACE_GREEN("IP из MODBUS совпадает с константой.\n");
+    					osMutexRelease(xIEC850StartMutex);
+
+                	}
+                }
+                ReadNmb++;
+        	}
+// чтение текущего времени
+        	else if ( usMDateStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMDateBuf, usMDateStart, MB_NumbDate);				// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                	Hal_setTimeFromMB_Date(ucMDateBuf);
+                	nextSynchTime = Hal_getTimeInMs() + msInDay;				// следующая пересинхронизация часов
+                	USART_TRACE_GREEN("%d. Получили время:0x%X следующая синхронизация:0x%X\n",ReadNmb,(unsigned int)Hal_getTimeInMs(),(unsigned int)nextSynchTime);
+                	resynch = true;
+                }
+                ReadNmb++;
+        	}
+// чтение конфигурации выключателя
+        	else if ( usMConfigStartSW == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMConfigBufSW, usMConfigStartSW, MB_Size_ConfSW);
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Получили конфиг выключателя.\n",ReadNmb);
+                }
+                ReadNmb++;
+        	}
+// чтение конфигурации АПВ
+        	else if ( usConfigAPWStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucConfigAPWBuf, usConfigAPWStart, MB_NumbConfigAPW);
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Получили конфиг АПВ.\n",ReadNmb);
+                }
+                ReadNmb++;
+        	}
+
+// чтение всех уставок измерительного транса
+        	else if ( usConfigTRMeasStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucConfigTRMeasBuf, usConfigTRMeasStart, MB_NumbConfigTRMeas);
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Получили конфиг измерительного транса.\n",ReadNmb);
+                }
+                ReadNmb++;
+        	}
+// чтение конфигурации входных логических сигналов
+        	else if ( usConfigVLSInStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucVLSInBuf, usConfigVLSInStart, MB_NumbConfigVLSIn);
+
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Получили конфиг входных логических сигналов.\n",ReadNmb);
+                }
+                NumbBlokReadMB=0;
+                ReadNmb++;
+
+                //ReadNmb++;
+                //ReadNmb++;
+        	}
+// чтение конфигурации выходных логических сигналов
+			else if ((usConfigVLSOutStart <= MemForSave) && (MemForSave < (usConfigVLSOutStart+MB_NumbConfigVLSOut-1))){
+				uint8_t			SizeAnswer;
+				xModbus_Get_SizeAnswer((uint8_t *)&SizeAnswer);
+				SizeAnswer -= SizeAddr+SizeFunct+1+SizeCRC;
+				SizeAnswer = SizeAnswer>>1;
+	            eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,(USHORT *)&ucVLSOutBuf[MemForSave-usConfigVLSOutStart], MemForSave, SizeAnswer);
+
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Получили конфиг вЫходных логических сигналов. (0x%X)\n",ReadNmb,MemForSave);
+                	NumbBlokReadMB++;
+                }
+                //ReadNmb++;
+			}
+// чтение основной или резервной группы уставок
+			else if (( usConfigUstavkiStart <= MemForSave) &&(MemForSave < (usConfigUstavkiStart+MB_NumbUstavki-1))){
+
+				uint8_t			SizeAnswer;
+				xModbus_Get_SizeAnswer((uint8_t *)&SizeAnswer);
+				SizeAnswer -= SizeAddr+SizeFunct+1+SizeCRC;
+				SizeAnswer = SizeAnswer>>1;
+	            eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,(USHORT *)&ucMUstavkiInBuf[MemForSave-usConfigUstavkiStart], MemForSave, SizeAnswer);
+
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Получили группы уставок.(0x%X)\n",ReadNmb,MemForSave);
+                	NumbBlokReadMB++;
+                }
+                //ReadNmb++;
+			}
+// чтение параметров автоматики
+			else if ( usConfigAutomatStart == MemForSave){
+
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Получили параметры автоматики.\n",ReadNmb);
+                }
+                NumbBlokReadMB=0;
+                ReadNmb++;
+			}
+
+//----------------------------------------------------------------
+//----------------------------------------------------------------
+//----------------------------------------------------------------
+
+            if( eRegStatus != MB_ENOERR )
+            {
+                eStatus = prveMBError2Exception( eRegStatus );
+            }
+        }
+        else
+        {
+            eStatus = MB_EX_ILLEGAL_DATA_VALUE;
+        }
+    }
+    else
+    {
+        /* Can't be a valid request because the length is incorrect. */
+        eStatus = MB_EX_ILLEGAL_DATA_VALUE;
+    }
+    return eStatus;
+}
+#endif
+
+/***********************************************************************************
+ * MR5_700
+ ***********************************************************************************/
+#if defined (MR5_700)
+eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
+{
+	extern uint64_t nextSynchTime;
+	extern bool resynch;
+
     UCHAR          *ucMBFrame;
     uint16_t          usRegAddress;
     uint16_t          usRegCount;
@@ -589,11 +973,155 @@ eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
         	case	MB_StartConfigNaddr:		// уставки IP адрес
                 eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMConfigBuf, MB_StartConfigNaddr, MB_NumbConfig);			// сохраняем данные в хранилище
                 if( eRegStatus == MB_ENOERR ){	// меняем IP адрес
-                	if (Hal_setIPFromMB_Date(ucMConfigBuf)){
+                	int8_t	resSetIP = Hal_setIPFromMB_Date(ucMConfigBuf);
+                	if (resSetIP == 0){
                 					// если всё норм то нужно сообщить о готовности работать IP
-                					//USART_TRACE_BLUE("получили из MODBUS IP:%d.%d.%d.%d \n", IP_ADDR[0], IP_ADDR[1], IP_ADDR[2], IP_ADDR[3]);
-                					//osMutexRelease(xIEC850StartMutex);
-                	} else{
+                					USART_TRACE_BLUE("получили из MODBUS IP:%d.%d.%d.%d \n", IP_ADDR[0], IP_ADDR[1], IP_ADDR[2], IP_ADDR[3]);
+                					// перезапустим таск
+                					if (MAC_ADDR[0] && MAC_ADDR[1] && MAC_ADDR[2]){
+                						ReStartIEC850_task();
+                 					}
+
+                					osMutexRelease(xIEC850StartMutex);
+                	} else
+                	if (resSetIP == -1){
+                		USART_TRACE_RED("ошибка получения IP из MODBUS\n");
+                		eStatus = MB_EX_ILLEGAL_DATA_VALUE;
+                	} else
+                	if (resSetIP == 2){	// совпадение с прошлым включением
+                		USART_TRACE_GREEN("IP из MODBUS совпадает с константой.\n");
+    					osMutexRelease(xIEC850StartMutex);
+
+                	}
+                }
+                break;
+
+        	case	MB_StartDateNaddr:		// часы
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMDateBuf, MB_StartDateNaddr, MB_NumbDate);				// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                	Hal_setTimeFromMB_Date(ucMDateBuf);
+                	USART_TRACE_GREEN("Получили время:0x%X\n",(unsigned int)Hal_getTimeInMs());
+                	nextSynchTime = Hal_getTimeInMs() + msInDay;				// следующая пересинхронизация часов
+                	USART_TRACE_GREEN("следующая синхронизация:0x%X\n",(unsigned int)nextSynchTime);
+                	resynch = true;
+
+                }
+                break;
+
+        	case	MB_StartConfig:		// уставки
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMConfigBufall, MB_StartConfig, MB_NumbConfigall);		// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("Получили уставки.\n");
+                } else{
+                	USART_TRACE_RED("Не получили уставки.\n");
+                }
+                break;
+        	}
+
+            if( eRegStatus != MB_ENOERR )
+            {
+                eStatus = prveMBError2Exception( eRegStatus );
+            }
+        }
+        else
+        {
+            eStatus = MB_EX_ILLEGAL_DATA_VALUE;
+        }
+    }
+    else
+    {
+        /* Can't be a valid request because the length is incorrect. */
+        eStatus = MB_EX_ILLEGAL_DATA_VALUE;
+    }
+    return eStatus;
+}
+#endif
+/***********************************************************************************
+ * MR5_600
+ ***********************************************************************************/
+#if defined (MR5_600)
+eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
+{
+	extern uint64_t nextSynchTime;
+	extern bool resynch;
+
+    UCHAR          *ucMBFrame;
+    uint16_t          usRegAddress;
+    uint16_t          usRegCount;
+    uint16_t		StartMemForSave;
+    uint16_t		MemForSave;
+
+    extern osMutexId 	xIEC850StartMutex;		// мьютекс готовности к запуску TCP/IP
+    extern uint8_t		IP_ADDR[4];
+
+    eMBException    eStatus = MB_EX_NONE;
+    eMBErrorCode    eRegStatus;
+
+    /* If this request is broadcast, and it's read mode. This request don't need execute. */
+    if ( xMBMasterRequestIsBroadcast() )
+    {
+    	eStatus = MB_EX_NONE;
+    }
+    else if( *usLen >= MB_PDU_SIZE_MIN + MB_PDU_FUNC_READ_SIZE_MIN )
+    {
+		vMBMasterGetPDUSndBuf(&ucMBFrame);											// берём из передающего буфера адрес в памяти чтобы высчитать куда положить в принятую память
+        usRegAddress = ( USHORT )( ucMBFrame[MB_PDU_REQ_READ_ADDR_OFF] << 8 );
+        usRegAddress |= ( USHORT )( ucMBFrame[MB_PDU_REQ_READ_ADDR_OFF + 1] );
+        usRegAddress++;
+
+        usRegCount = ( USHORT )( ucMBFrame[MB_PDU_REQ_READ_REGCNT_OFF] << 8 );
+        usRegCount |= ( USHORT )( ucMBFrame[MB_PDU_REQ_READ_REGCNT_OFF + 1] );
+
+        //  Проверим если количество регистров является действительным.
+        if( ( usRegCount >= 1 ) && ( 2 * usRegCount == pucFrame[MB_PDU_FUNC_READ_BYTECNT_OFF] ) )
+        {
+        	MemForSave = usRegAddress-1;// & 0xFF00;
+        	// проверим в какую область памяти писать
+        	switch (MemForSave) {
+
+        	case	MB_StartRevNaddr:					// ревизия
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMRevBuf, MB_StartRevNaddr, MB_NumbWordRev );		// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("Версия: '%s'\n",(char *)ucMRevBuf);
+                }else {
+            		USART_TRACE_RED("ошибка получения версии из MODBUS\n");
+            		eStatus = MB_EX_ILLEGAL_DATA_VALUE;
+                }
+                break;
+        	case	MB_StartDiscreetaddr:				// дискреты
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMDiscInBuf, MB_StartDiscreetaddr, MB_NumbDiscreet );		// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                //	USART_TRACE_GREEN("БД дискретных.\n");
+                }
+                break;
+        	case	MB_StartAnalogINaddr:				// аналоги
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMAnalogInBuf, MB_StartAnalogINaddr, MB_NumbAnalog);		// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                //	USART_TRACE_GREEN("БД аналогов.\n");
+                }
+                break;
+
+       	case	(MB_StartConfig + MB_offset_Ktn):	// уставки
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,(USHORT *)&Ktn, MB_StartConfig + MB_offset_Ktn, 1);			// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("Коэффициент ТН: %u\n",Ktn);
+                }
+                break;
+
+        	case	MB_StartConfigNaddr:		// уставки IP адрес
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMConfigBuf, MB_StartConfigNaddr, MB_NumbConfig);			// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){	// меняем IP адрес
+                	if (Hal_setIPFromMB_Date(ucMConfigBuf) == 0){
+                					// если всё норм то нужно сообщить о готовности работать IP
+                					USART_TRACE_BLUE("получили из MODBUS IP:%d.%d.%d.%d \n", IP_ADDR[0], IP_ADDR[1], IP_ADDR[2], IP_ADDR[3]);
+                					// перезапустим таск
+                					if (MAC_ADDR[0] && MAC_ADDR[1] && MAC_ADDR[2]){
+                						ReStartIEC850_task();
+                 					}
+
+                					osMutexRelease(xIEC850StartMutex);
+                	} else
+                	if (Hal_setIPFromMB_Date(ucMConfigBuf) == -1){
                 		USART_TRACE_RED("ошибка получения IP из MODBUS\n");
                 		eStatus = MB_EX_ILLEGAL_DATA_VALUE;
                 	}
@@ -604,7 +1132,158 @@ eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
                 eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMDateBuf, MB_StartDateNaddr, MB_NumbDate);				// сохраняем данные в хранилище
                 if( eRegStatus == MB_ENOERR ){
                 	Hal_setTimeFromMB_Date(ucMDateBuf);
-                	USART_TRACE_GREEN("Получили время.\n");
+                	USART_TRACE_GREEN("MB: Получили время:0x%X\n",(unsigned int)Hal_getTimeInMs());
+                	nextSynchTime = Hal_getTimeInMs() + msInDay;				// следующая пересинхронизация часов
+                	USART_TRACE_GREEN("MB: следующая синхронизация:0x%X\n",(unsigned int)nextSynchTime);
+                	resynch = true;
+
+                }
+                break;
+
+        	case	MB_StartConfig:		// уставки
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMConfigBufall, MB_StartConfig, MB_NumbConfigall);		// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("Получили уставки.\n");
+                } else{
+                	USART_TRACE_RED("Не получили уставки.\n");
+                }
+                break;
+        	default:
+        		eRegStatus = MB_ENOERR;
+            break;
+        	}
+
+            if( eRegStatus != MB_ENOERR )
+            {
+                eStatus = prveMBError2Exception( eRegStatus );
+            }
+        }
+        else
+        {
+            eStatus = MB_EX_ILLEGAL_DATA_VALUE;
+        }
+    }
+    else
+    {
+        /* Can't be a valid request because the length is incorrect. */
+        eStatus = MB_EX_ILLEGAL_DATA_VALUE;
+    }
+    return eStatus;
+}
+#endif // ! defined (MR5_xxx)
+/***********************************************************************************
+ * MR5_500
+ ***********************************************************************************/
+#if defined (MR5_500)
+eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
+{
+	extern uint64_t nextSynchTime;
+	extern bool resynch;
+
+    UCHAR          *ucMBFrame;
+    uint16_t          usRegAddress;
+    uint16_t          usRegCount;
+    uint16_t		StartMemForSave;
+    uint16_t		MemForSave;
+
+    extern osMutexId 	xIEC850StartMutex;		// мьютекс готовности к запуску TCP/IP
+    extern uint8_t		IP_ADDR[4];
+
+    eMBException    eStatus = MB_EX_NONE;
+    eMBErrorCode    eRegStatus;
+
+    /* If this request is broadcast, and it's read mode. This request don't need execute. */
+    if ( xMBMasterRequestIsBroadcast() )
+    {
+    	eStatus = MB_EX_NONE;
+    }
+    else if( *usLen >= MB_PDU_SIZE_MIN + MB_PDU_FUNC_READ_SIZE_MIN )
+    {
+		vMBMasterGetPDUSndBuf(&ucMBFrame);											// берём из передающего буфера адрес в памяти чтобы высчитать куда положить в принятую память
+        usRegAddress = ( USHORT )( ucMBFrame[MB_PDU_REQ_READ_ADDR_OFF] << 8 );
+        usRegAddress |= ( USHORT )( ucMBFrame[MB_PDU_REQ_READ_ADDR_OFF + 1] );
+        usRegAddress++;
+
+        usRegCount = ( USHORT )( ucMBFrame[MB_PDU_REQ_READ_REGCNT_OFF] << 8 );
+        usRegCount |= ( USHORT )( ucMBFrame[MB_PDU_REQ_READ_REGCNT_OFF + 1] );
+
+        //  Проверим если количество регистров является действительным.
+        if( ( usRegCount >= 1 ) && ( 2 * usRegCount == pucFrame[MB_PDU_FUNC_READ_BYTECNT_OFF] ) )
+        {
+        	MemForSave = usRegAddress-1;// & 0xFF00;
+        	// проверим в какую область памяти писать
+        	switch (MemForSave) {
+
+        	case	MB_StartRevNaddr:					// ревизия
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMRevBuf, MB_StartRevNaddr, MB_NumbWordRev );		// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("Версия: '%s'\n",(char *)ucMRevBuf);
+                }else {
+            		USART_TRACE_RED("ошибка получения версии из MODBUS\n");
+            		eStatus = MB_EX_ILLEGAL_DATA_VALUE;
+                }
+                break;
+        	case	MB_StartDiscreetaddr:				// дискреты
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMDiscInBuf, MB_StartDiscreetaddr, MB_NumbDiscreet );		// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                //	USART_TRACE_GREEN("БД дискретных.\n");
+                }
+                break;
+        	case	MB_StartAnalogINaddr:				// аналоги
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMAnalogInBuf, MB_StartAnalogINaddr, MB_NumbAnalog);		// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                //	USART_TRACE_GREEN("БД аналогов.\n");
+                }
+                break;
+
+        	case	(MB_StartConfig + MB_offset_Ktt):	// уставки
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,(USHORT *)&Ktt, MB_StartConfig + MB_offset_Ktt, 1);			// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("Первичный ток ТТ: %u\n",Ktt);
+                }
+                break;
+        	case	(MB_StartConfig + MB_offset_Ktn):	// уставки
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,(USHORT *)&Ktn, MB_StartConfig + MB_offset_Ktn, 1);			// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("Коэффициент ТН: %u\n",Ktn);
+                }
+                break;
+
+        	case	MB_StartConfigNaddr:		// уставки IP адрес
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMConfigBuf, MB_StartConfigNaddr, MB_NumbConfig);			// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){	// меняем IP адрес
+                	int8_t	resSetIP = Hal_setIPFromMB_Date(ucMConfigBuf);
+                	if (resSetIP == 0){
+                					// если всё норм то нужно сообщить о готовности работать IP
+                					USART_TRACE_BLUE("получили из MODBUS IP:%d.%d.%d.%d \n", IP_ADDR[0], IP_ADDR[1], IP_ADDR[2], IP_ADDR[3]);
+                					// перезапустим таск
+                					if (MAC_ADDR[0] && MAC_ADDR[1] && MAC_ADDR[2]){
+                						ReStartIEC850_task();
+                 					}
+
+                					osMutexRelease(xIEC850StartMutex);
+                	} else
+                	if (resSetIP == -1){
+                		USART_TRACE_RED("ошибка получения IP из MODBUS\n");
+                		eStatus = MB_EX_ILLEGAL_DATA_VALUE;
+                	} else
+                	if (resSetIP == 2){	// совпадение с прошлым включением
+                		USART_TRACE_GREEN("IP из MODBUS совпадает с константой.\n");
+    					osMutexRelease(xIEC850StartMutex);
+
+                	}
+                }
+                break;
+
+        	case	MB_StartDateNaddr:		// часы
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMDateBuf, MB_StartDateNaddr, MB_NumbDate);				// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                	Hal_setTimeFromMB_Date(ucMDateBuf);
+                	USART_TRACE_GREEN("Получили время:0x%X\n",(unsigned int)Hal_getTimeInMs());
+                	nextSynchTime = Hal_getTimeInMs() + msInDay;				// следующая пересинхронизация часов
+                	USART_TRACE_GREEN("следующая синхронизация:0x%X\n",(unsigned int)nextSynchTime);
+                	resynch = true;
+
                 }
                 break;
 
@@ -637,6 +1316,478 @@ eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
 }
 #endif
 
+/*************************************************************************
+ * MR801
+ *************************************************************************/
+#if defined (MR801)
+eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
+{
+	extern uint64_t nextSynchTime;
+	extern bool resynch;
+
+    UCHAR          *ucMBFrame;
+    uint16_t          usRegAddress;
+    uint16_t          usRegCount;
+    uint16_t		StartMemForSave;
+    uint16_t		MemForSave;
+
+    extern osMutexId 	xIEC850StartMutex;		// мьютекс готовности к запуску TCP/IP
+    extern uint8_t		IP_ADDR[4];
+
+    eMBException    eStatus = MB_EX_NONE;
+    eMBErrorCode    eRegStatus;
+
+    /* If this request is broadcast, and it's read mode. This request don't need execute. */
+    if ( xMBMasterRequestIsBroadcast() )
+    {
+    	eStatus = MB_EX_NONE;
+    }
+    else if( *usLen >= MB_PDU_SIZE_MIN + MB_PDU_FUNC_READ_SIZE_MIN )
+    {
+		vMBMasterGetPDUSndBuf(&ucMBFrame);											// берём из передающего буфера адрес в памяти чтобы высчитать куда положить в принятую память
+        usRegAddress = ( USHORT )( ucMBFrame[MB_PDU_REQ_READ_ADDR_OFF] << 8 );
+        usRegAddress |= ( USHORT )( ucMBFrame[MB_PDU_REQ_READ_ADDR_OFF + 1] );
+        usRegAddress++;
+
+        usRegCount = ( USHORT )( ucMBFrame[MB_PDU_REQ_READ_REGCNT_OFF] << 8 );
+        usRegCount |= ( USHORT )( ucMBFrame[MB_PDU_REQ_READ_REGCNT_OFF + 1] );
+
+        //  Проверим если количество регистров является действительным.
+        if( ( usRegCount >= 1 ) && ( 2 * usRegCount == pucFrame[MB_PDU_FUNC_READ_BYTECNT_OFF] ) )
+        {
+        	MemForSave = usRegAddress-1;// & 0xFF00;
+
+//----------------------------------------------------------------
+//- проверим в какую область памяти писать -----------------------
+//----------------------------------------------------------------
+
+// ревизия
+        	if (usMRevStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMRevBuf, usMRevStart, MB_NumbWordRev );		// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Версия: '%s'\n",ReadNmb,(char *)ucMRevBuf);
+                }else {
+            		USART_TRACE_RED("ошибка получения версии из MODBUS\n");
+            		eStatus = MB_EX_ILLEGAL_DATA_VALUE;
+                }
+                ReadNmb++;
+        	}
+// дискреты
+        	else if (usMDiscInStart== MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMDiscInBuf, usMDiscInStart, MB_NumbDiscreet );		// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                //	USART_TRACE_GREEN("БД дискретных.\n");
+                }
+                ReadNmb++;
+        	}
+// аналоги
+        	else if ( usMAnalogInStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMAnalogInBuf, usMAnalogInStart, MB_NumbAnalog);		// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                //	USART_TRACE_GREEN("БД аналогов.\n");
+                }
+                ReadNmb++;
+        	}
+//  конфигурация системы
+        	else if ( usSystemCfgStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucSystemCfgBuf, usSystemCfgStart, MB_NumbSystemCfg);
+                if( eRegStatus == MB_ENOERR ){	// меняем IP адрес
+                	int8_t	resSetIP = Hal_setIPFromMB_Date((uint16_t*)&ucSystemCfgBuf[MB_offset_IP]);
+                	if (resSetIP == 0){
+                					// если всё норм то нужно сообщить о готовности работать IP
+                					USART_TRACE_GREEN("%d.получили из MODBUS IP:%d.%d.%d.%d \n",ReadNmb, IP_ADDR[0], IP_ADDR[1], IP_ADDR[2], IP_ADDR[3]);
+                					// перезапустим таск
+                					if (MAC_ADDR[0] && MAC_ADDR[1] && MAC_ADDR[2]){
+                						ReStartIEC850_task();
+                 					}
+
+                					osMutexRelease(xIEC850StartMutex);
+                	} else
+                	if (resSetIP == -1){
+                		USART_TRACE_RED("ошибка получения IP из MODBUS\n");
+                		eStatus = MB_EX_ILLEGAL_DATA_VALUE;
+                	} else
+                	if (resSetIP == 2){	// совпадение с прошлым включением
+                		USART_TRACE_GREEN("IP из MODBUS совпадает с константой.\n");
+    					osMutexRelease(xIEC850StartMutex);
+
+                	}
+                }
+                ReadNmb++;
+        	}
+// чтение текущего времени
+        	else if ( usMDateStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMDateBuf, usMDateStart, MB_NumbDate);				// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                	Hal_setTimeFromMB_Date(ucMDateBuf);
+                	nextSynchTime = Hal_getTimeInMs() + msInDay;				// следующая пересинхронизация часов
+                	USART_TRACE_GREEN("%d. Получили время:0x%X следующая синхронизация:0x%X\n",ReadNmb,(unsigned int)Hal_getTimeInMs(),(unsigned int)nextSynchTime);
+                	resynch = true;
+                }
+                ReadNmb++;
+        	}
+// чтение конфигурации выключателя
+        	else if ( usMConfigStartSW == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMConfigBufSW, usMConfigStartSW, MB_Size_ConfSW);
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Получили конфиг выключателя.\n",ReadNmb);
+                }
+                ReadNmb++;
+        	}
+// чтение конфигурации АПВ
+        	else if ( usConfigAPWStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucConfigAPWBuf, usConfigAPWStart, MB_NumbConfigAPW);
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Получили конфиг АПВ.\n",ReadNmb);
+                }
+                ReadNmb++;
+        	}
+// чтение конфигурации АВР+ЛЗШ
+        	else if ( usConfigAWRStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucConfigAWRBuf, usConfigAWRStart, MB_NumbConfigAWR);
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Получили конфиг АВР+ЛЗШ.\n",ReadNmb);
+                	uint8_t	i;
+                	for(i=0;i<MB_NumbConfigAWR;i++) USART_0TRACE("0x%.4X ",ucConfigAWRBuf[i]);
+                	USART_0TRACE("\n");
+
+                }
+                ReadNmb++;
+    		}
+// чтение всех уставок силового транса
+        	else if ( usConfigTRPWRStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucConfigTRPWRBuf, usConfigTRPWRStart, MB_NumbConfigTRPWR);
+
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Получили уставки силового транса.\n",ReadNmb);
+                	uint8_t	i;
+                	for(i=0;i<MB_NumbConfigTRPWR;i++) USART_0TRACE("0x%.4X ",ucConfigTRPWRBuf[i]);
+                	USART_0TRACE("\n");
+
+                }
+                ReadNmb++;
+			}
+// чтение всех уставок измерительного транса
+        	else if ( usConfigTRMeasStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucConfigTRMeasBuf, usConfigTRMeasStart, MB_NumbConfigTRMeas);
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Получили конфиг измерительного транса.\n",ReadNmb);
+                	uint8_t	i;
+                	for(i=0;i<MB_NumbConfigTRMeas;i++) USART_0TRACE("0x%.4X ",ucConfigTRMeasBuf[i]);
+                	USART_0TRACE("\n");
+                }
+                ReadNmb++;
+        	}
+// чтение конфигурации входных логических сигналов
+        	else if ( usConfigVLSInStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucVLSInBuf, usConfigVLSInStart, MB_NumbConfigVLSIn);
+
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Получили конфиг входных логических сигналов.\n",ReadNmb);
+                }
+                NumbBlokReadMB=0;
+                ReadNmb++;
+
+                //ReadNmb++;
+                //ReadNmb++;
+        	}
+// чтение конфигурации выходных логических сигналов
+			else if ((MemForSave >= usConfigVLSOutStart) && (MemForSave < (usConfigVLSOutStart+MB_NumbConfigVLSOut-1))){
+				uint8_t			SizeAnswer;
+				xModbus_Get_SizeAnswer((uint8_t *)&SizeAnswer);
+				SizeAnswer -= SizeAddr+SizeFunct+1+SizeCRC;
+				SizeAnswer = SizeAnswer>>1;
+	            eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,(USHORT *)&ucVLSOutBuf[MemForSave-usConfigVLSOutStart], MemForSave, SizeAnswer);
+
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d-%d. Получили конфиг вЫходных логических сигналов. (0x%X)\n",ReadNmb,NumbBlokReadMB,MemForSave);
+                	NumbBlokReadMB++;
+                }
+                //ReadNmb++;
+			}
+// чтение основной или резервной группы уставок
+			else if (( usConfigUstavkiStart <= MemForSave) &&(MemForSave < (usConfigUstavkiStart+MB_NumbUstavki-1))){
+
+				uint8_t			SizeAnswer;
+				xModbus_Get_SizeAnswer((uint8_t *)&SizeAnswer);
+				SizeAnswer -= SizeAddr+SizeFunct+1+SizeCRC;
+				SizeAnswer = SizeAnswer>>1;
+	            eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,(USHORT *)&ucMUstavkiInBuf[MemForSave-usConfigUstavkiStart], MemForSave, SizeAnswer);
+
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d-%d. Получили группы уставок.(0x%X)\n",ReadNmb,NumbBlokReadMB,MemForSave);
+                	NumbBlokReadMB++;
+                }
+                //ReadNmb++;
+			}
+// чтение параметров автоматики
+			else if ( usConfigAutomatStart == MemForSave){
+
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Получили параметры автоматики.\n",ReadNmb);
+                }
+                NumbBlokReadMB=0;
+                ReadNmb++;
+			}
+
+//----------------------------------------------------------------
+//----------------------------------------------------------------
+//----------------------------------------------------------------
+
+            if( eRegStatus != MB_ENOERR )
+            {
+                eStatus = prveMBError2Exception( eRegStatus );
+            }
+        }
+        else
+        {
+            eStatus = MB_EX_ILLEGAL_DATA_VALUE;
+        }
+    }
+    else
+    {
+        /* Can't be a valid request because the length is incorrect. */
+        eStatus = MB_EX_ILLEGAL_DATA_VALUE;
+    }
+    return eStatus;
+}
+#endif
+/*************************************************************************
+ * MR901 MR902
+ *************************************************************************/
+#if defined (MR901) || defined (MR902)
+eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
+{
+	extern uint64_t nextSynchTime;
+	extern bool resynch;
+
+    UCHAR          *ucMBFrame;
+    uint16_t          usRegAddress;
+    uint16_t          usRegCount;
+    uint16_t		StartMemForSave;
+    uint16_t		MemForSave;
+
+    extern osMutexId 	xIEC850StartMutex;		// мьютекс готовности к запуску TCP/IP
+    extern uint8_t		IP_ADDR[4];
+
+    eMBException    eStatus = MB_EX_NONE;
+    eMBErrorCode    eRegStatus;
+
+    /* If this request is broadcast, and it's read mode. This request don't need execute. */
+    if ( xMBMasterRequestIsBroadcast() )
+    {
+    	eStatus = MB_EX_NONE;
+    }
+    else if( *usLen >= MB_PDU_SIZE_MIN + MB_PDU_FUNC_READ_SIZE_MIN )
+    {
+		vMBMasterGetPDUSndBuf(&ucMBFrame);											// берём из передающего буфера адрес в памяти чтобы высчитать куда положить в принятую память
+        usRegAddress = ( USHORT )( ucMBFrame[MB_PDU_REQ_READ_ADDR_OFF] << 8 );
+        usRegAddress |= ( USHORT )( ucMBFrame[MB_PDU_REQ_READ_ADDR_OFF + 1] );
+        usRegAddress++;
+
+        usRegCount = ( USHORT )( ucMBFrame[MB_PDU_REQ_READ_REGCNT_OFF] << 8 );
+        usRegCount |= ( USHORT )( ucMBFrame[MB_PDU_REQ_READ_REGCNT_OFF + 1] );
+
+        //  Проверим если количество регистров является действительным.
+        if( ( usRegCount >= 1 ) && ( 2 * usRegCount == pucFrame[MB_PDU_FUNC_READ_BYTECNT_OFF] ) )
+        {
+        	MemForSave = usRegAddress-1;// & 0xFF00;
+
+//----------------------------------------------------------------
+//- проверим в какую область памяти писать -----------------------
+//----------------------------------------------------------------
+
+// ревизия
+        	if (usMRevStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMRevBuf, usMRevStart, MB_NumbWordRev );		// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Версия: '%s'\n",ReadNmb,(char *)ucMRevBuf);
+                }else {
+            		USART_TRACE_RED("ошибка получения версии из MODBUS\n");
+            		eStatus = MB_EX_ILLEGAL_DATA_VALUE;
+                }
+                ReadNmb++;
+        	}
+// дискреты
+        	else if (usMDiscInStart== MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMDiscInBuf, usMDiscInStart, MB_NumbDiscreet );		// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                //	USART_TRACE_GREEN("БД дискретных.\n");
+                }
+                ReadNmb++;
+        	}
+// аналоги
+        	else if ( usMAnalogInStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMAnalogInBuf, usMAnalogInStart, MB_NumbAnalog);		// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                //	USART_TRACE_GREEN("БД аналогов.\n");
+                }
+                ReadNmb++;
+        	}
+//  конфигурация системы
+        	else if ( usSystemCfgStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucSystemCfgBuf, usSystemCfgStart, MB_NumbSystemCfg);
+                if( eRegStatus == MB_ENOERR ){	// меняем IP адрес
+                	int8_t	resSetIP = Hal_setIPFromMB_Date((uint16_t*)&ucSystemCfgBuf[MB_offset_IP]);
+                	if (resSetIP == 0){
+                					// если всё норм то нужно сообщить о готовности работать IP
+                					USART_TRACE_GREEN("%d.получили из MODBUS IP:%d.%d.%d.%d \n",ReadNmb, IP_ADDR[0], IP_ADDR[1], IP_ADDR[2], IP_ADDR[3]);
+                					// перезапустим таск
+                					if (MAC_ADDR[0] && MAC_ADDR[1] && MAC_ADDR[2]){
+                						ReStartIEC850_task();
+                 					}
+
+                					osMutexRelease(xIEC850StartMutex);
+                	} else
+                	if (resSetIP == -1){
+                		USART_TRACE_RED("ошибка получения IP из MODBUS\n");
+                		eStatus = MB_EX_ILLEGAL_DATA_VALUE;
+                	} else
+                	if (resSetIP == 2){	// совпадение с прошлым включением
+                		USART_TRACE_GREEN("IP из MODBUS совпадает с константой.\n");
+    					osMutexRelease(xIEC850StartMutex);
+
+                	}
+                }
+                ReadNmb++;
+        	}
+// чтение текущего времени
+        	else if ( usMDateStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMDateBuf, usMDateStart, MB_NumbDate);				// сохраняем данные в хранилище
+                if( eRegStatus == MB_ENOERR ){
+                	Hal_setTimeFromMB_Date(ucMDateBuf);
+                	nextSynchTime = Hal_getTimeInMs() + msInDay;				// следующая пересинхронизация часов
+                	USART_TRACE_GREEN("%d. Получили время:0x%X следующая синхронизация:0x%X\n",ReadNmb,(unsigned int)Hal_getTimeInMs(),(unsigned int)nextSynchTime);
+                	resynch = true;
+                }
+                ReadNmb++;
+        	}
+// чтение конфигурации выключателя
+        	else if ( usMConfigStartSW == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMConfigBufSW, usMConfigStartSW, MB_Size_ConfSW);
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Получили конфиг выключателя.\n",ReadNmb);
+                }
+                ReadNmb++;
+        	}
+// чтение конфигурации АПВ
+        	else if ( usConfigAPWStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucConfigAPWBuf, usConfigAPWStart, MB_NumbConfigAPW);
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Получили конфиг АПВ.\n",ReadNmb);
+                }
+                ReadNmb++;
+        	}
+// чтение конфигурации АВР+ЛЗШ
+        	else if ( usConfigAWRStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucConfigAWRBuf, usConfigAWRStart, MB_NumbConfigAWR);
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Получили конфиг АВР+ЛЗШ.\n",ReadNmb);
+                	uint8_t	i;
+                	for(i=0;i<MB_NumbConfigAWR;i++) USART_0TRACE("0x%.4X ",ucConfigAWRBuf[i]);
+                	USART_0TRACE("\n");
+
+                }
+                ReadNmb++;
+    		}
+// чтение всех уставок силового транса
+        	else if ( usConfigTRPWRStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucConfigTRPWRBuf, usConfigTRPWRStart, MB_NumbConfigTRPWR);
+
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Получили уставки силового транса.\n",ReadNmb);
+                	uint8_t	i;
+                	for(i=0;i<MB_NumbConfigTRPWR;i++) USART_0TRACE("0x%.4X ",ucConfigTRPWRBuf[i]);
+                	USART_0TRACE("\n");
+
+                }
+                ReadNmb++;
+			}
+// чтение всех уставок измерительного транса
+        	else if ( usConfigTRMeasStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucConfigTRMeasBuf, usConfigTRMeasStart, MB_NumbConfigTRMeas);
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Получили конфиг измерительного транса.\n",ReadNmb);
+                	uint8_t	i;
+                	for(i=0;i<MB_NumbConfigTRMeas;i++) USART_0TRACE("0x%.4X ",ucConfigTRMeasBuf[i]);
+                	USART_0TRACE("\n");
+                }
+                ReadNmb++;
+        	}
+// чтение конфигурации входных логических сигналов
+        	else if ( usConfigVLSInStart == MemForSave){
+                eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucVLSInBuf, usConfigVLSInStart, MB_NumbConfigVLSIn);
+
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Получили конфиг входных логических сигналов.\n",ReadNmb);
+                }
+                NumbBlokReadMB=0;
+                ReadNmb++;
+
+                //ReadNmb++;
+                //ReadNmb++;
+        	}
+// чтение конфигурации выходных логических сигналов
+			else if ((MemForSave >= usConfigVLSOutStart) && (MemForSave < (usConfigVLSOutStart+MB_NumbConfigVLSOut-1))){
+				uint8_t			SizeAnswer;
+				xModbus_Get_SizeAnswer((uint8_t *)&SizeAnswer);
+				SizeAnswer -= SizeAddr+SizeFunct+1+SizeCRC;
+				SizeAnswer = SizeAnswer>>1;
+	            eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,(USHORT *)&ucVLSOutBuf[MemForSave-usConfigVLSOutStart], MemForSave, SizeAnswer);
+
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d-%d. Получили конфиг вЫходных логических сигналов. (0x%X)\n",ReadNmb,NumbBlokReadMB,MemForSave);
+                	NumbBlokReadMB++;
+                }
+                //ReadNmb++;
+			}
+// чтение основной или резервной группы уставок
+			else if (( usConfigUstavkiStart <= MemForSave) &&(MemForSave < (usConfigUstavkiStart+MB_NumbUstavki-1))){
+
+				uint8_t			SizeAnswer;
+				xModbus_Get_SizeAnswer((uint8_t *)&SizeAnswer);
+				SizeAnswer -= SizeAddr+SizeFunct+1+SizeCRC;
+				SizeAnswer = SizeAnswer>>1;
+	            eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,(USHORT *)&ucMUstavkiInBuf[MemForSave-usConfigUstavkiStart], MemForSave, SizeAnswer);
+
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d-%d. Получили группы уставок.(0x%X)\n",ReadNmb,NumbBlokReadMB,MemForSave);
+                	NumbBlokReadMB++;
+                }
+                //ReadNmb++;
+			}
+// чтение параметров автоматики
+			else if ( usConfigAutomatStart == MemForSave){
+
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d. Получили параметры автоматики.\n",ReadNmb);
+                }
+                NumbBlokReadMB=0;
+                ReadNmb++;
+			}
+
+//----------------------------------------------------------------
+//----------------------------------------------------------------
+//----------------------------------------------------------------
+
+            if( eRegStatus != MB_ENOERR )
+            {
+                eStatus = prveMBError2Exception( eRegStatus );
+            }
+        }
+        else
+        {
+            eStatus = MB_EX_ILLEGAL_DATA_VALUE;
+        }
+    }
+    else
+    {
+        /* Can't be a valid request because the length is incorrect. */
+        eStatus = MB_EX_ILLEGAL_DATA_VALUE;
+    }
+    return eStatus;
+}
+#endif
 #endif
 
 #if MB_FUNC_READWRITE_HOLDING_ENABLED > 0

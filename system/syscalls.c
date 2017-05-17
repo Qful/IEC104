@@ -27,6 +27,7 @@ extern int __io_putstrDMA(char *ptr, int len) __attribute__((weak));
 
 extern int __io_putchar(int ch) __attribute__((weak));
 extern int __io_getchar(void) __attribute__((weak));
+extern int __io_putfromTask(char *ptr, int len) __attribute__((weak));
 
 #ifndef FreeRTOS
   register char * stack_ptr asm("sp");
@@ -108,6 +109,7 @@ int _write(int file, char *ptr, int len)
 {
 	// используем DMA для передачи
 	__io_putstrDMA(ptr, len);
+//	__io_putfromTask(ptr, len);
 /*
 	int DataIdx;
 

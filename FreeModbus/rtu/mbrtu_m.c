@@ -46,6 +46,8 @@
 
 #include "modbus.h"
 
+#include "main.h"
+
 #if MB_MASTER_RTU_ENABLED > 0
 /* ----------------------- Defines ------------------------------------------*/
 #define MB_SER_PDU_SIZE_MIN     4       /*!< Minimum size of a Modbus RTU frame. */
@@ -165,7 +167,7 @@ eMBMasterRTUStop( void )
  *************************************************************************/
 eMBErrorCode		eMBMasterRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USHORT * pusLength )
 {
-    eMBErrorCode    eStatus = MB_ENOERR;
+    eMBErrorCode    eStatus = MB_ERECV;
 
     ENTER_CRITICAL_SECTION(  );
     assert_param( usMasterRcvBufferPos < MB_SER_PDU_SIZE_MAX );
@@ -188,6 +190,9 @@ eMBErrorCode		eMBMasterRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USH
         eStatus = MB_EIO;
     }
 
+    //vMBMasterPortTimersDisable( );				// уже таймер не нужен, приняли же.
+   // xMBMasterPortEventPost(EV_MASTER_FRAME_RECEIVED);
+
     EXIT_CRITICAL_SECTION(  );
     return eStatus;
 }
@@ -198,7 +203,7 @@ eMBErrorCode		eMBMasterRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USH
 eMBErrorCode
 eMBMasterRTUSend( UCHAR ucSlaveAddress, const UCHAR * pucFrame, USHORT usLength )
 {
-    eMBErrorCode    eStatus = MB_ENOERR;
+    eMBErrorCode    eStatus = MB_ESENT;
     USHORT          usCRC16;
 
     if ( ucSlaveAddress > MB_MASTER_TOTAL_SLAVE_NUM ) return MB_EINVAL;
@@ -206,7 +211,7 @@ eMBMasterRTUSend( UCHAR ucSlaveAddress, const UCHAR * pucFrame, USHORT usLength 
     ENTER_CRITICAL_SECTION(  );
 
     // Если приемник в режиме ожидания.
-    if( eRcvState == STATE_M_RX_IDLE && eSndState == STATE_M_TX_IDLE)		//&& eSndState == STATE_M_TX_IDLE добавил т.к. возможна передача до таймаута ответа
+    if( (eRcvState == STATE_M_RX_IDLE || eRcvState == STATE_M_RX_RCV)&& eSndState == STATE_M_TX_IDLE)		//&& eSndState == STATE_M_TX_IDLE добавил т.к. возможна передача до таймаута ответа
     {
         // Первый байт  до PDU это slave address.
         pucMasterSndBufferCur = ( UCHAR * ) pucFrame - 1;
@@ -230,6 +235,10 @@ eMBMasterRTUSend( UCHAR ucSlaveAddress, const UCHAR * pucFrame, USHORT usLength 
     else
     {
         eStatus = MB_EIO;					// I/O ошибка.
+        // временно для проверки. нужно найти причину застревания на приеме. висит статус STATE_M_RX_RCV
+    	USART_TRACE_RED("I/O ошибка. r:%u t:%u\n",eRcvState,eSndState);
+
+		eRcvState = STATE_M_RX_IDLE;
     }
     EXIT_CRITICAL_SECTION(  );
     return eStatus;
@@ -269,6 +278,7 @@ xMBMasterRTUReceiveFSM( void )
         if(usMasterRcvBufferPos < MB_SER_PDU_SIZE_MAX )	eRcvState = STATE_M_RX_RCV;			// приняли фрейм.
         else    										eRcvState = STATE_M_RX_ERROR;		// Если символов больше чем макс. возможный размер фрейма, то ошибка фрейма.
 
+        xMBMasterPortEventPost(EV_MASTER_FRAME_RECEIVED);			// всё, приняли. Не будем ждать окончания таймаута приема
         break;
 
     }

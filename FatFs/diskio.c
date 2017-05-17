@@ -39,6 +39,7 @@
 #include "diskio.h"
 #include "ff_gen_drv.h"
 
+#include "stm32f4xx_hal.h"
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
@@ -132,11 +133,53 @@ DRESULT disk_ioctl(BYTE pdrv, BYTE cmd, void *buff)
   * @brief  Gets Time from RTC 
   * @param  None
   * @retval Time in DWORD
+  *
+ * информаци€ о файле, размер и врем€ изменени€
+ *
+ * биты 0Ч4 Ч счЄтчик секунд (по две), допустимы значени€ 0Ч29, то есть 0Ч58 секунд;
+ * биты 5Ч10 Ч минуты, допустимы значени€ 0Ч59;
+ * биты 11Ч15 Ч часы, допустимы значени€ 0Ч23.
+  *
   */
 DWORD get_fattime (void)
 {
-  return 0;
-}
+	RTC_TimeTypeDef sTime;
+	DWORD	sectmp=0;
 
+	extern 	RTC_HandleTypeDef hrtc;
+
+	HAL_RTC_GetTime(&hrtc, &sTime, 0);			// „итаем врем€
+
+	 sectmp |= (DWORD)sTime.Seconds/2;
+	 sectmp |= (DWORD)sTime.Minutes<<5;
+	 sectmp |= (DWORD)sTime.Hours<<11;
+
+	return	sectmp;
+
+}
+/**
+* ƒвухбайтова€ отметка даты имеет следующий формат:
+* биты 0Ч4 Ч день мес€ца, допускаютс€ значени€ 1Ч31;
+* биты 5Ч8 Ч мес€ц года, допускаютс€ значени€ 1Ч12;
+* биты 9Ч15 Ч год, счита€ от 1980 года (Ђэпоха MS-DOSї), возможны значени€ от 0 до 127 включительно, то есть 1980Ч2107 годы.
+* ƒва байта, отвечающие отметке времени, распредел€ютс€ так:
+*/
+
+DWORD get_fatdate (void)
+{
+	RTC_DateTypeDef sDate;
+	DWORD	sectmp=0;
+
+	extern 	RTC_HandleTypeDef hrtc;
+
+	HAL_RTC_GetDate(&hrtc, &sDate, 0);			// „итаем врем€
+
+	 sectmp |= (DWORD)sDate.Date;
+	 sectmp |= (DWORD)(sDate.Month)<<5;
+	 sectmp |= (DWORD)(sDate.Year)<<9;
+
+	return	sectmp;
+
+}
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 

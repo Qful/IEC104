@@ -209,6 +209,8 @@ MmsServer_waitReady(MmsServer self, unsigned int timeoutMs);
 void
 MmsServer_handleIncomingMessages(MmsServer self);
 
+void
+MmsServer_GetClientList(uint8_t *pcWriteBuffer, MmsServer self);
 /**
  * \brief Stop the server (for non-threaded operation mode)
  *

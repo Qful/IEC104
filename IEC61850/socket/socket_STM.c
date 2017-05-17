@@ -53,9 +53,11 @@ struct sServerSocket {
 
 struct sSocket {
     int fd;
-    uint32_t connectTimeout;
+//    uint32_t connectTimeout;
 };
 
+
+struct udp_pcb *upcb;
 
 /*************************************************************************
  * inet_ntop4
@@ -108,12 +110,15 @@ Handleset_waitReady(HandleSet self, unsigned int timeoutMs)
        /*
         * Для поверки состояния не-блокирующих сокетов можно воспользоваться функцией select.
         * Функция select() способна проверять состояние нескольких дескрипторов сокетов (или файлов) сразу.
-        * Первый параметр функции – количество проверяемых дескрипторов.
-        * Второй, третий и четвертый параметры функции представляют собой наборы дескрипторов, которые следует проверять,
+        *
+        * 1 параметр - количество проверяемых дескрипторов.
+        * 2, 3 и 4   - параметры функции представляют собой наборы дескрипторов, которые следует проверять,
         * соответственно, на готовность к [чтению, записи и на наличие исключительных ситуаций].
         * Сама функция select() – блокирующая, она возвращает управление, если хотя бы один из проверяемых сокетов
         * готов к выполнению соответствующей операции. В качестве последнего параметра функции select() можно указать интервал времени,
         * по прошествии которого она вернет управление в любом случае.
+        *
+        *
         *  select(количество, чтению, записи, исключительных ситуаций, &timeout);
         */
        result = select(self->maxHandle + 1, &self->handles, NULL, NULL, &timeout);
@@ -131,7 +136,7 @@ void
 Handleset_addSocket(HandleSet self, const Socket sock)
 {
    if (self != NULL && sock != NULL && sock->fd != -1) {
-       FD_SET(sock->fd, &self->handles);
+       FD_SET(sock->fd, &self->handles);			// добавим sock->fd в self->handles для проверки.
        if (sock->fd > self->maxHandle) {
            self->maxHandle = sock->fd;
        }
@@ -144,6 +149,8 @@ Socket
 TcpSocket_create()
 {
     Socket self = GLOBAL_MALLOC(sizeof(struct sSocket));
+
+//   	USART_TRACE_GREEN("Выделил память для Socket: 0x%x\n",self);
 
     self->fd = -1;
 //    self->connectTimeout = 5000;
@@ -175,11 +182,10 @@ Socket	ServerSocket_accept(ServerSocket self)
     size = sizeof(remotehost);
 
     Socket conSocket = NULL;
-//    fd = accept(self->fd, NULL, NULL );			// Смотрим, произошло ли подключение. alloc_socket() создает м возвращает номер сокета в массиве сокетов.
+//    fd = accept(self->fd, NULL, NULL );			// Смотрим, произошло ли подключение. alloc_socket() создает и возвращает номер сокета в массиве сокетов.
     fd = accept(self->fd,(struct sockaddr *)&remotehost, (socklen_t *)&size);
 
     if (fd >= 0) {								// если было подключение
-    	USART_TRACE_GREEN("-------------------------------------\n");
     	USART_TRACE_GREEN("Подключение к серверу. Сокет: %u\n",fd);
 
         conSocket = TcpSocket_create();			// выделим память
@@ -235,6 +241,12 @@ ServerSocket_setBacklog(ServerSocket self, int backlog)
 }
 /*************************************************************************
  * Socket_read
+ * когда recv() возвращает 0... Это вовсе не значит, что было принято 0 байт. Это означает, что соединение закрыто.
+ *
+ * Еще одно замечание касается буфера приема. recv() полностью полагается на программиста в части слежения за правильностью размеров буферов.
+ *  Т.е. если передать в качестве третьего параметра значение, большее, чем фактическая длина буфера,
+ *  то скорее всего мы получим Segmentation Fault. Даже если этого не случится, то у нас в программе
+ *  появится «бомба замедленного действия», которая рано или поздно «бабахнет».
  *************************************************************************/
 int
 Socket_read(Socket self, uint8_t* buf, int size)
@@ -249,30 +261,37 @@ Socket_read(Socket self, uint8_t* buf, int size)
     if (read_bytes == 0){
 //		USART_TRACE_RED("Соединение закрыто.\n");
         return -2;
-    }else{
-		USART_TRACE_GREEN("прочитал данные: %i\n",read_bytes);
-    }
+    }else
+    if (read_bytes < 0) {//(read_bytes == -1) {
 
-
-    if (read_bytes == -1) {
         int error = errno;
 
-        switch (error) {
+    	USART_TRACE_RED("ошибка чтения из сокета %i errno:%i\n",self->fd,error);
 
-            case EAGAIN:
+
+       switch (error) {
+
+            case EAGAIN:		// EAGAIN	Ресурс временно недоступен. Можно попробовать повторить вызов
                 return 0;
-            case EBADF:
+            case EBADF:			// EBADF	Неправильный дескриптор файла это аналог WSAENOTSOCK
                 return -1;
 
             default:
                 return -1;
         }
+    }else{
+
+    	//		USART_TRACE_GREEN("прочитал данные: %i\n",read_bytes);
     }
 
     return read_bytes;
 }
 /*************************************************************************
  * Socket_write
+ *
+ *  Если случилось так, что send() вернула число меньшее, чем len, то нам надо снова вызвать send()
+ *  передав в качестве второго параметра указатель на оставшуюся часть данных и соответствующим образом
+ *  изменив len. И так до тех пор, пока все данные не будут благополучно помещены в исходящую очередь.
  *************************************************************************/
 int
 Socket_write(Socket self, uint8_t* buf, int size)
@@ -280,8 +299,18 @@ Socket_write(Socket self, uint8_t* buf, int size)
     if (self->fd == -1)
         return -1;
 
+    int n = 0;
+    while (n < size)
+    {
+      int sent = send(self->fd, buf + n, size - n, MSG_NOSIGNAL); // client? допустим, мы на сервере! :)
+      if (sent < 0)
+    	  return -1;	       // если произошла ошибка, здесь мы должны прервать выполнение цикла
+      n += sent;
+    }
+
+    return size;
     // MSG_NOSIGNAL - prevent send to signal SIGPIPE when peer unexpectedly closed the socket
-    return send(self->fd, buf, size, MSG_NOSIGNAL);
+//    return send(self->fd, buf, size, MSG_NOSIGNAL);
 }
 
 /*************************************************************************
@@ -354,7 +383,7 @@ char*	Socket_getPeerAddress(Socket self){
 /*************************************************************************
  * prepareServerAddress
  *************************************************************************/
-static bool
+bool
 prepareServerAddress(const char* address, int port, struct sockaddr_in* sockaddr)
 {
 
@@ -425,7 +454,7 @@ ServerSocket		TcpServerSocket_create(const char* address, int port)
 
     // создадим TCP сокет, если не создался вернем 0
     if ((fd = socket(AF_INET, SOCK_STREAM, 0)) >= 0) {
-        struct sockaddr_in serverAddress;
+        struct sockaddr_in serverAddress,serverAddressHTTP;
 
         if (!prepareServerAddress(address, port, &serverAddress)) {
             close(fd);
@@ -448,6 +477,7 @@ ServerSocket		TcpServerSocket_create(const char* address, int port)
             serverSocket->backLog = 0;
         }
         else {
+        	USART_TRACE_RED("ошибка открытия порта.\n");
             close(fd);
             return NULL ;
         }
@@ -463,6 +493,46 @@ ServerSocket		TcpServerSocket_create(const char* address, int port)
 }
 
 /*************************************************************************
+ * UDPClientSocket_create
+ * Создаем UDP сокет, настроим порт.
+ *************************************************************************/
+ServerSocket	UDPClientSocket_create(const char* address, int port)
+{
+    ServerSocket serverSocket = NULL;
+
+    int fd;
+
+    // создадим сокет, если не создался вернем 0
+    if ((fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) >= 0) {
+        struct sockaddr_in serverAddress;
+        if (!prepareServerAddress(address, port, &serverAddress)) {
+            close(fd);
+            return NULL;
+        }
+
+        if (bind(fd, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) >= 0) {		// привяжем порт к адресу
+
+			serverSocket = GLOBAL_MALLOC(sizeof(struct sServerSocket));
+            serverSocket->fd = fd;
+            serverSocket->backLog = 0;
+        }
+        else {
+        	USART_TRACE_RED("ошибка открытия порта.\n");
+            close(fd);
+            return NULL ;
+        }
+
+        int optionReuseAddr = 1;
+
+        setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char *) &optionReuseAddr, sizeof(int));
+        int optionTimeOut = sockTimeOut;
+        setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *) &optionTimeOut, sizeof(int));		// таймаут для netconn
+
+    }
+
+    return serverSocket;
+}
+/*************************************************************************
  * closeAndShutdownSocket
  *************************************************************************/
 static void
@@ -470,11 +540,12 @@ closeAndShutdownSocket(int socketFd)
 {
     if (socketFd != -1) {
 
-        if (DEBUG_SOCKET)
-            printf("socket_STM.c: call shutdown for %i!\n", socketFd);
+        if (DEBUG_SOCKET){
+        	USART_TRACE_BLUE("call shutdown for socket: %i\n\n", socketFd);
+        }
 
         // shutdown is required to unblock read or accept in another thread!
-        shutdown(socketFd, SHUT_RDWR);
+        shutdown(socketFd, SHUT_RDWR);					// shutdown не освобождает дескриптор, а только перекомфигурит
 
         close(socketFd);
     }
@@ -487,11 +558,13 @@ ServerSocket_destroy(ServerSocket self)
 {
     int fd = self->fd;
 
+ //  	USART_TRACE_BLUE("ISO_SERVER: Закрыли ServerSocket:%u (0x%x)\n",fd,self);
+
     self->fd = -1;
 
     closeAndShutdownSocket(fd);
 
-    Thread_sleep(10);
+//    Thread_sleep(10);
 
     GLOBAL_FREEMEM(self);
 }
@@ -503,11 +576,21 @@ Socket_destroy(Socket self)
 {
     int fd = self->fd;
 
+   	USART_TRACE_BLUE("ISO_SERVER: Закрыли Socket:%u (0x%x)\n",fd,self);
+
     self->fd = -1;
 
     closeAndShutdownSocket(fd);
 
-    Thread_sleep(10);
+ //   Thread_sleep(10);				// зачем пауза не знаю
 
     GLOBAL_FREEMEM(self);
+}
+
+/*************************************************************************
+ * GetSocket_num
+ *************************************************************************/
+int	GetSocket_num(Socket self)
+{
+    return self->fd;
 }

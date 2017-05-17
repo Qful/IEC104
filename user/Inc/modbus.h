@@ -106,6 +106,8 @@
 #define RT_WAITING_FOREVER              -1              /**< Block forever until get resource. */
 #define RT_WAITING_NO                   0               /**< Non-block. */
 
+#define		MaxSizeBlok		0x7C						// максимум что можно передать в одном пакете
+
 #define		SizeAddr		1
 #define		SizeFunct		1
 #define		SizeCRC			2
@@ -121,7 +123,7 @@ BOOL	xModbus_Set_SizeAnswer( uint8_t Size );
 BOOL	xModbus_Get_SizeAnswer( uint8_t * Size );
 
 BOOL	Hal_setTimeFromMB_Date( uint16_t *MDateBuf );		// функция установки часов из буфера модбас
-BOOL	Hal_setIPFromMB_Date( uint16_t * MDateBuf );		// функция установки IP адреса из буфера модбас
+int8_t	Hal_setIPFromMB_Date( uint16_t * MDateBuf );		// функция установки IP адреса из буфера модбас
 BOOL	Hal_setConfSWFromMB_Date ( uint16_t * MDateBuf );	// функция установки конфига выключателя в нужных узлах из буфера модбас
 
 void     vMBMODBUSPortRxDisable( void );

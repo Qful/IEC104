@@ -27,6 +27,8 @@
 
 #include "main.h"
 
+#include "httpServer.h"
+
 #ifndef DEBUG_ISO_SERVER
 #ifdef DEBUG
 #define DEBUG_ISO_SERVER 1
@@ -43,13 +45,22 @@
 
 #include "iso_server_private.h"
 
+#include "sntpclient.h"
+
 #ifndef CONFIG_MAXIMUM_TCP_CLIENT_CONNECTIONS
 #define CONFIG_MAXIMUM_TCP_CLIENT_CONNECTIONS 5
 #endif
 
-#define TCP_PORT 			102
+#define HTTP_PORT			HTTP_Port
+#define TCP_PORT 			IEC850_Port
 #define SECURE_TCP_PORT 	3782
-#define BACKLOG 			5			// ожидающие подключение.
+#define BACKLOG 			5			// ожидающие подключение.  похоже можно только = 1 в lwIP
+
+extern uint8_t		SNTP_IP_ADDR[4];
+extern int16_t	SNTP_Period;
+
+uint64_t nextSynchTimeNTP = 0;
+bool resynchNTP_ready = true;
 
 struct sIsoServer {
     IsoServerState state;
@@ -62,6 +73,13 @@ struct sIsoServer {
 #if (CONFIG_MMS_THREADLESS_STACK != 1)
     Thread serverThread;
 #endif
+
+    Socket 		NTPSocket;
+    int 		NTPPort;
+    uint64_t 	NTPPeriod;
+
+    Socket 	SecureserverSocket;
+    int 	SecurePort;
 
     Socket serverSocket;
     int tcpPort;
@@ -146,6 +164,11 @@ addClientConnection(IsoServer self, IsoConnection connection)
 
 }
 
+/*****************************************************************************
+ *
+ * @param self
+ * @param connection
+ */
 static void
 removeClientConnection(IsoServer self, IsoConnection connection)
 {
@@ -308,10 +331,8 @@ static bool		setupIsoServer(IsoServer self)
     bool success = true;
 
     self->serverSocket = (Socket) TcpServerSocket_create(self->localIpAddress, self->tcpPort);			// создали TCP сокет назначили IP и открыли порт
+  	USART_TRACE_GREEN("ISO_SERVER: localIpAddress: %s tcpPort: %u\n", self->localIpAddress,(int)self->tcpPort);
 
-    if (DEBUG_ISO_SERVER){
-    	USART_TRACE_GREEN("ISO_SERVER: localIpAddress: %s tcpPort: %u\n", self->localIpAddress,(int)self->tcpPort);
-    }
 
     if (self->serverSocket == NULL) {
         self->state = ISO_SVR_STATE_ERROR;
@@ -323,12 +344,28 @@ static bool		setupIsoServer(IsoServer self)
     ServerSocket_setBacklog((ServerSocket) self->serverSocket, BACKLOG);			// установим очередь ожидающих
     ServerSocket_listen((ServerSocket) self->serverSocket);							// Начинаем слушать входящие подключения
 
+    //---------
+
+    self->SecureserverSocket = (Socket) TcpServerSocket_create(self->localIpAddress, HTTP_PORT);	//self->SecurePort
+   	USART_TRACE_GREEN("ISO_SERVER: localIpAddress: %s tcpPort: %u\n", self->localIpAddress,(int)HTTP_PORT);
+
+    ServerSocket_setBacklog((ServerSocket) self->SecureserverSocket, BACKLOG);		// установим очередь ожидающих
+    ServerSocket_listen((ServerSocket) self->SecureserverSocket);					// Начинаем слушать входящие подключения
+
     self->state = ISO_SVR_STATE_RUNNING;
 
+
+	if (nextSynchTimeNTP == 0) nextSynchTimeNTP = Hal_getTimeInMs();		// если первый заход, то засинронизируем часы
+
+    self->NTPPeriod = stNTPPeriod;
+    self->NTPPort = NTP_PORT;
+    self->NTPSocket = (Socket) UDPClientSocket_create (self->localIpAddress, 0);	// открываем порт для приема NTP пакетов от сервера NTP
+
+//   	USART_TRACE_GREEN("ISO_SERVER: SNTPServer: %s Port: %u\n", &NTP_IP,(int)NTP_PORT);
+
 #if (CONFIG_MAXIMUM_TCP_CLIENT_CONNECTIONS != -1)
-    if (DEBUG_ISO_SERVER){
-    	USART_TRACE_BLUE("ISO_SERVER: server is limited to %i client connections.\n", (int) CONFIG_MAXIMUM_TCP_CLIENT_CONNECTIONS);
-    }
+
+    	USART_TRACE_BLUE("ISO_SERVER: Предел сервера %i соединения.\n", (int) CONFIG_MAXIMUM_TCP_CLIENT_CONNECTIONS);
 #endif
 
 exit_function:
@@ -379,33 +416,99 @@ handleIsoConnections(IsoServer self)
 static void
 handleIsoConnectionsThreadless(IsoServer self)
 {
-    Socket connectionSocket;
+    Socket connectionSocket,connectionSocketHTTP;
+
+    handleNTPConnectionsThreadless(self);					// Клиент NTP
 
     if ((connectionSocket = ServerSocket_accept((ServerSocket) self->serverSocket)) != NULL) {				// было ли подключение к серверу? если да то вернем сокет для текущего подключения
 
+    	USART_TRACE_GREEN("соединение на 102 порт.\n");
+
+
 #if (CONFIG_MAXIMUM_TCP_CLIENT_CONNECTIONS != -1)
         if (private_IsoServer_getConnectionCounter(self) >= CONFIG_MAXIMUM_TCP_CLIENT_CONNECTIONS) {		// если число клиентов превышает. то закроем соединение сразу.
-            if (DEBUG_ISO_SERVER){
-            	USART_TRACE_RED("ISO_SERVER: Достигли максимума клиентов, отключаем его.\n");
-            }
+            USART_TRACE_RED("ISO_SERVER: Достигли максимума клиентов, отключаем его.\n");
+//TODO: исправить и убрать эту хрень
+            USART_TRACE_RED("перезапускаем, т.к. реально столько клиентов нет на объекте\n");
 
+        	NVIC_SystemReset();
+//--------------------------
             Socket_destroy(connectionSocket);
             handleClientConnections(self);
             return;
         }
 #endif
 
-        USART_TRACE("Создадим соединение. Выделим память для него.\n");
+ //       USART_TRACE("Создадим соединение. Выделим память для него.\n");
         IsoConnection isoConnection = IsoConnection_create(connectionSocket, self);							// создаем Iso соединение к серверу.
         addClientConnection(self, isoConnection);															// инкрементим счетчик подключений self->connectionCounter++;
 
         self->connectionHandler(ISO_CONNECTION_OPENED, self->connectionHandlerParameter, isoConnection);	// Вызываем isoConnectionIndicationHandler(); для Iso соединения
         																									// isoConnectionIndicationHandler(IsoConnectionIndication indication, void* parameter, IsoConnection connection);
     }
-//	USART_TRACE_RED("handleClientConnections....\n");
     handleClientConnections(self);				// Парсим если открыто. тут же даёт ответ в порт, если сюда не попали то и ответа не будет.
+
+    //++HTTP++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    // соединение на 80 порт
+    if ((connectionSocketHTTP = ServerSocket_accept((ServerSocket) self->SecureserverSocket)) != NULL) {
+    	// если было соединение, то ServerSocket_accept выделяет память для сокета в котором указан его номер и connectTimeout(пока не испульзую)
+    	// но я никогда не закрываю это соединение!!!!!
+    	USART_TRACE_GREEN("соединение на 80 порт.\n");
+
+        http_server_serve(connectionSocketHTTP);
+    } else{
+//    	USART_TRACE_GREEN("монитор 80 порт без соединения.\n");
+//        http_server_serve(connectionSocketHTTP);
+    }
+    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    /*
+    //++Клиент NTP++++++++++++++++++++++++++++++++++++++++++++++
+    // делаем запрос с нужной периодичностью.
+    if(SNTP_Period){
+		uint64_t currentTime = Hal_getTimeInMs();
+		portCHAR NTP_IP[16];
+		sprintf(NTP_IP,"%d.%d.%d.%d",SNTP_IP_ADDR[0],SNTP_IP_ADDR[1],SNTP_IP_ADDR[2],SNTP_IP_ADDR[3]);
+		if (currentTime > nextSynchTimeNTP) {
+			int ret = sntp_client_serve(self->NTPSocket,(const char*)&NTP_IP,self->NTPPort,Write);
+			nextSynchTimeNTP = Hal_getTimeInMs() + SNTP_Period*60*1000;//*60*1000;								// следующая пересинхронизация через 5 секунд если не пришел ответ
+			if (ret == 0) resynchNTP_ready = false;
+		}//else{
+			if (resynchNTP_ready == false){
+				resynchNTP_ready = (bool)sntp_client_serve(self->NTPSocket,(const char*)&NTP_IP,self->NTPPort,Read);
+				if (resynchNTP_ready){
+					nextSynchTimeNTP = Hal_getTimeInMs() + SNTP_Period*60*1000;//*60*1000;		// следующая пересинхронизация
+				}
+			}
+		//}
+	}
+    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*/
 }
 
+void		handleNTPConnectionsThreadless(IsoServer self)
+{
+    //++Клиент NTP++++++++++++++++++++++++++++++++++++++++++++++
+    // делаем запрос с нужной периодичностью.
+    if(SNTP_Period){
+		uint64_t currentTime = Hal_getTimeInMs();
+		portCHAR NTP_IP[16];
+		sprintf(NTP_IP,"%d.%d.%d.%d",SNTP_IP_ADDR[0],SNTP_IP_ADDR[1],SNTP_IP_ADDR[2],SNTP_IP_ADDR[3]);
+		if (currentTime > nextSynchTimeNTP) {
+			int ret = sntp_client_serve(self->NTPSocket,(const char*)&NTP_IP,self->NTPPort,Write);
+			nextSynchTimeNTP = Hal_getTimeInMs() + SNTP_Period*60*1000;//*60*1000;								// следующая пересинхронизация через 5 секунд если не пришел ответ
+			if (ret == 0) resynchNTP_ready = false;
+		}//else{
+			if (resynchNTP_ready == false){
+				resynchNTP_ready = (bool)sntp_client_serve(self->NTPSocket,(const char*)&NTP_IP,self->NTPPort,Read);
+				if (resynchNTP_ready){
+					nextSynchTimeNTP = Hal_getTimeInMs() + SNTP_Period*60*1000;//*60*1000;		// следующая пересинхронизация
+				}
+			}
+		//}
+	}
+    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+}
 #if (CONFIG_MMS_THREADLESS_STACK != 1)
 // only required for multi-threaded server!
 static void
@@ -600,10 +703,9 @@ IsoServer_startListeningThreadless(IsoServer self)
 
 /*****************************************************************************************************
  * IsoServer_waitReady
- * проверяем состояние сокетов
+ * проверяем состояние всех активных сокетов
  *****************************************************************************************************/
-int
-IsoServer_waitReady(IsoServer self, unsigned int timeoutMs)
+int		IsoServer_waitReady(IsoServer self, unsigned int timeoutMs)
 {
    int result;
 
@@ -641,10 +743,10 @@ IsoServer_waitReady(IsoServer self, unsigned int timeoutMs)
 #else
            int i;
 
-           for (i = 0; i < CONFIG_MAXIMUM_TCP_CLIENT_CONNECTIONS; i++) {
+           for (i = 0; i < CONFIG_MAXIMUM_TCP_CLIENT_CONNECTIONS; i++) {						// добавим все активные сокеты для проверки select() на наличие принятых данных
                if (self->openClientConnections[i] != NULL) {
-                   if (IsoConnection_isRunning(self->openClientConnections[i])) {
-                       IsoConnection_addHandleSet(self->openClientConnections[i], handles);
+                   if (IsoConnection_isRunning(self->openClientConnections[i])) {				// если клиент есть
+                       IsoConnection_addHandleSet(self->openClientConnections[i], handles);		// добавим его для проверки
                    }
                    else {
 #if ((CONFIG_MMS_SINGLE_THREADED == 1) || (CONFIG_MMS_THREADLESS_STACK == 1))
@@ -663,7 +765,52 @@ IsoServer_waitReady(IsoServer self, unsigned int timeoutMs)
 #endif /* (CONFIG_MAXIMUM_TCP_CLIENT_CONNECTIONS == -1) */
            Handleset_addSocket(handles, self->serverSocket);
            result = Handleset_waitReady(handles, timeoutMs);			// проверка состояния сокетов
-           Handleset_destroy(handles);
+           Handleset_destroy(handles);									// очистим
+       } else {
+           result = -1;
+       }
+   } else {
+       result = -1;
+   }
+
+   return result;
+}
+/*****************************************************************************************************
+ * IsoServer_OnewaitReady
+ * проверяем состояние одного активного сокета
+ *****************************************************************************************************/
+int		IsoServer_OnewaitReady(IsoServer self, int num, unsigned int timeoutMs)
+{
+   int result;
+
+   if (self->state == ISO_SVR_STATE_RUNNING) {
+       HandleSet handles;
+
+       handles = Handleset_new();
+       if (handles != NULL) {
+
+           int i;
+
+           for (i = 0; i < CONFIG_MAXIMUM_TCP_CLIENT_CONNECTIONS; i++) {						// добавим все активные сокеты для проверки select() на наличие принятых данных
+               if (self->openClientConnections[i] != NULL) {
+                   if (IsoConnection_isRunning(self->openClientConnections[i])) {				// если клиент есть
+
+
+                	   if (num == IsoConnection_getSocketFd(self->openClientConnections[i])){
+                		   IsoConnection_addHandleSet(self->openClientConnections[i], handles);		// добавим его для проверки
+                	   }
+                   }
+                   else {
+                	   USART_TRACE_RED("waitReady:IsoConnection_destroy: %u\n",i);
+                       IsoConnection_destroy(self->openClientConnections[i]);
+                       self->openClientConnections[i] = NULL;
+                   }
+               }
+           }
+
+           Handleset_addSocket(handles, self->serverSocket);
+           result = Handleset_waitReady(handles, timeoutMs);			// проверка состояния сокетов
+           Handleset_destroy(handles);									// очистим
        } else {
            result = -1;
        }
@@ -680,6 +827,22 @@ IsoServer_processIncomingMessages(IsoServer self)
 {
     if (self->state == ISO_SVR_STATE_RUNNING)
         handleIsoConnectionsThreadless(self);
+}
+
+void
+IsoServer_processGetClientList(uint8_t *pcWriteBuffer,IsoServer self)
+{
+	   int i;
+		*pcWriteBuffer = 0x00;
+
+	    for (i = 0; i < CONFIG_MAXIMUM_TCP_CLIENT_CONNECTIONS; i++) {
+	        if (self->openClientConnections[i] != NULL) {
+
+				sprintf((char *)pcWriteBuffer, "%i:%s\r\n",i,IsoConnection_getPeerAddress(self->openClientConnections[i]));
+				pcWriteBuffer += strlen((char *)pcWriteBuffer );
+
+	        }
+	    }
 }
 
 static void
@@ -786,8 +949,7 @@ private_IsoServer_decreaseConnectionCounter(IsoServer self)
 
     self->connectionCounter--;
 
-    if (DEBUG_ISO_SERVER)
-        printf("IsoServer: decrease connection counter to %i!\n", self->connectionCounter);
+    USART_TRACE_BLUE("Осталось подключений: %i\n", self->connectionCounter);
 
 #if (CONFIG_MMS_THREADLESS_STACK != 1) && (CONFIG_MMS_SINGLE_THREADED == 0)
     Semaphore_post(self->connectionCounterMutex);

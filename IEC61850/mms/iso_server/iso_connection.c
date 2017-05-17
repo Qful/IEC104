@@ -79,6 +79,8 @@ struct sIsoConnection
     AcseConnection* acseConnection;
 
     char* clientAddress;
+// ------ подсчет ошибок коннекта
+    uint32_t	ConnectError;
 
 #if (CONFIG_MMS_THREADLESS_STACK != 1)
     Thread thread;
@@ -91,9 +93,7 @@ struct sIsoConnection
 static void
 finalizeIsoConnection(IsoConnection self)
 {
-    if (DEBUG_ISO_SERVER){
-    	USART_TRACE_BLUE("ISO_SERVER: finalizeIsoConnection --> close transport connection\n");
-    }
+    USART_TRACE_BLUE("ISO_SERVER: finalizeIsoConnection --> close transport connection\n");
 
     IsoServer_closeConnection(self->isoServer, self);
     if (self->socket != NULL)
@@ -118,8 +118,8 @@ finalizeIsoConnection(IsoConnection self)
     GLOBAL_FREEMEM(self->clientAddress);
     IsoServer isoServer = self->isoServer;
     GLOBAL_FREEMEM(self);
-    if (DEBUG_ISO_SERVER)
-        printf("ISO_SERVER: connection %p closed\n", self);
+
+   	USART_TRACE_BLUE("ISO_SERVER: connection %p closed\n", self);
 
     private_IsoServer_decreaseConnectionCounter(isoServer);
 }
@@ -143,33 +143,42 @@ IsoConnection_addHandleSet(const IsoConnection self, HandleSet handles)
 void	IsoConnection_handleTcpConnection(IsoConnection self)
 {
 #if (CONFIG_MMS_SINGLE_THREADED == 0)
-    if (IsoServer_waitReady(self->isoServer, 10) < 1)
+	// проверка сразу всех сокетов. Ёто нам не надо, мы же заходим дл€ каждого сокета сюда.
+//	int statwait = IsoServer_waitReady(self->isoServer, 0);				// врем€ в блокировки 10
+	int statwait = IsoServer_OnewaitReady(self->isoServer,GetSocket_num(self->socket),0);
+    if (statwait < 1){
         goto exit_function;
+    }
+//	USART_TRACE_GREEN("число дескрипторов с данными %i сокет %i\n",(unsigned int)statwait,(unsigned int)GetSocket_num(self->socket));
+
 #endif /* (CONFIG_MMS_SINGLE_THREADED == 0) */
 
-    // после коннекта очередного клиента. выходит сюда с пустым буфером
     TpktState tpktState = CotpConnection_readToTpktBuffer(self->cotpConnection);
 
     if (tpktState == TPKT_CLOSE){	// закрыл соединение
         self->state = ISO_CON_STATE_STOPPED;
 		USART_TRACE_RED("TPKT_CLOSE! ISO_CON_STATE_STOPPED. 0x%x\n",(unsigned int)self);
-    }
+    } else
 
-    if (tpktState == TPKT_ERROR){	// ошибка TPKP
- //       goto exit_function;
-        //TODO: goto exit_function; убрать и сделать поленоценную проверку сото€ни€ соединени€
+    if (tpktState == TPKT_ERROR){	// неблокированна€ функци€ должна это возвращать.
+		USART_TRACE_RED("TPKT_ERROR. клиент:'%s' адрес:0x%x\n",self->clientAddress,(unsigned int)self);
 
- //       self->state = ISO_CON_STATE_STOPPED;
-		USART_TRACE_RED("TPKT_ERROR! 0x%x\n",(unsigned int)self);
+    	self->ConnectError++;
+    	if (self->ConnectError > LIMITERRORCONNECT){
+    		self->ConnectError = 0;
+			self->state = ISO_CON_STATE_STOPPED;
+			USART_TRACE_RED("TPKT_ERROR! клиент:'%s' адрес:0x%x\n",self->clientAddress,(unsigned int)self);
+    	}
 
-    }
-
-    if (tpktState != TPKT_PACKET_COMPLETE)
         goto exit_function;
+    }else
+    if (tpktState != TPKT_PACKET_COMPLETE){
+        goto exit_function;
+    }
 
-    //USART_TRACE_BLUE("ISO_SERVER: COTP start parsing\n");
 
     CotpIndication cotpIndication = CotpConnection_parseIncomingMessage(self->cotpConnection);
+
 
     switch (cotpIndication) {
     case COTP_MORE_FRAGMENTS_FOLLOW:
@@ -195,7 +204,7 @@ void	IsoConnection_handleTcpConnection(IsoConnection self)
         {
             ByteBuffer* cotpPayload = CotpConnection_getPayload(self->cotpConnection);
 
-            if (DEBUG_ISO_SERVER){
+            if (DEBUG_ISO_SERVER_MY){
             	USART_TRACE_BLUE("ISO_SERVER: COTP data indication (payload size = %i)\n", cotpPayload->size);
             }
 
@@ -304,12 +313,12 @@ void	IsoConnection_handleTcpConnection(IsoConnection self)
                 }
                 break;
             case SESSION_DATA:
-                if (DEBUG_ISO_SERVER){
+                if (DEBUG_ISO_SERVER_MY){
                 	USART_TRACE_BLUE("ISO_SERVER: iso_connection: session data indication\n");
                 }
 
                 if (!IsoPresentation_parseUserData(self->presentation, sessionUserData)) {
-                    if (DEBUG_ISO_SERVER){
+                    if (DEBUG_ISO_SERVER_MY){
                     	USART_TRACE_RED("ISO_SERVER: presentation layer error. ISO_CON_STATE_STOPPED.\n");
                     }
 					self->state = ISO_CON_STATE_STOPPED;
@@ -317,7 +326,7 @@ void	IsoConnection_handleTcpConnection(IsoConnection self)
                 }
 
                 if (self->presentation->nextContextId == self->presentation->mmsContextId) {
-                    if (DEBUG_ISO_SERVER){
+                    if (DEBUG_ISO_SERVER_MY){
                     	USART_TRACE_BLUE("ISO_SERVER: iso_connection: mms message\n");
                     }
 
@@ -379,7 +388,7 @@ void	IsoConnection_handleTcpConnection(IsoConnection self)
                 }
                 else {
                     if (DEBUG_ISO_SERVER)
-                        printf("ISO_SERVER: iso_connection: unknown presentation layer context!");
+                    	USART_TRACE_RED("ISO_SERVER: iso_connection: unknown presentation layer context! nextContextId(%u) != mmsContextId(%u)\n",self->presentation->nextContextId, self->presentation->mmsContextId);
                 }
 
                 break;
@@ -483,7 +492,7 @@ IsoConnection
 IsoConnection_create(Socket socket, IsoServer isoServer)
 {
     IsoConnection self = (IsoConnection) GLOBAL_CALLOC(1, sizeof(struct sIsoConnection));
-    USART_TRACE("¬ыделил пам€ть дл€ IsoConnection: %x\n",(unsigned int)self);
+//    USART_TRACE("¬ыделил пам€ть дл€ IsoConnection: 0x%x\n",(unsigned int)self);
     self->socket = socket;
     self->receiveBuffer = (uint8_t*) GLOBAL_MALLOC(RECEIVE_BUF_SIZE);
     self->sendBuffer = (uint8_t*) GLOBAL_MALLOC(SEND_BUF_SIZE);
@@ -492,6 +501,8 @@ IsoConnection_create(Socket socket, IsoServer isoServer)
     self->isoServer = isoServer;
     self->state = ISO_CON_STATE_RUNNING;
     self->clientAddress = Socket_getPeerAddress(self->socket);
+
+    self->ConnectError = 0;						//счетчик ошибок
 
 #if (CONFIG_MMS_THREADLESS_STACK != 1)
     self->isInsideCallback = false;
@@ -519,9 +530,9 @@ IsoConnection_create(Socket socket, IsoServer isoServer)
     AcseConnection_init(self->acseConnection, IsoServer_getAuthenticator(self->isoServer),
             IsoServer_getAuthenticatorParameter(self->isoServer));
 
-    if (DEBUG_ISO_SERVER)
-        printf("ISO_SERVER: IsoConnection: Start to handle connection for client %s\n", self->clientAddress);
-
+    //if (DEBUG_ISO_SERVER){
+    	USART_TRACE_BLUE("IsoConnection: —оздали коннект с клиентом: %s\n", self->clientAddress);
+    //}
 #if (CONFIG_MMS_SINGLE_THREADED == 0)
 #if (CONFIG_MMS_THREADLESS_STACK == 0)
     self->thread = Thread_create((ThreadExecutionFunction) handleTcpConnection, self, true);			// создаЄм и запускаем задачу дл€ каждого соединени€.
@@ -535,8 +546,7 @@ IsoConnection_create(Socket socket, IsoServer isoServer)
 void
 IsoConnection_destroy(IsoConnection self)
 {
-    if (DEBUG_ISO_SERVER)
-        printf("ISO_SERVER: destroy called for IsoConnection.\n");
+	USART_TRACE_BLUE("ISO_SERVER: destroy called for IsoConnection.\n");
 
     finalizeIsoConnection(self);
 }
@@ -545,6 +555,11 @@ char*
 IsoConnection_getPeerAddress(IsoConnection self)
 {
     return self->clientAddress;
+}
+
+int	IsoConnection_getSocketFd(IsoConnection self)
+{
+    return GetSocket_num(self->socket);
 }
 
 void
@@ -588,10 +603,11 @@ IsoConnection_sendMessage(IsoConnection self, ByteBuffer* message, bool handlerM
     indication = CotpConnection_sendDataMessage(self->cotpConnection, sessionBuffer);
 
     if (DEBUG_ISO_SERVER) {
-        if (indication != COTP_OK)
-            printf("ISO_SERVER: IsoConnection_sendMessage failed!\n");
-        else
-            printf("ISO_SERVER: IsoConnection_sendMessage success!\n");
+        if (indication != COTP_OK) {
+        	USART_TRACE_RED("ISO_SERVER: IsoConnection_sendMessage failed!\n");
+        } else {
+        	USART_TRACE_BLUE("ISO_SERVER: IsoConnection_sendMessage success!\n");
+        }
     }
 
 #if (CONFIG_MMS_THREADLESS_STACK != 1)
@@ -607,6 +623,7 @@ void
 IsoConnection_close(IsoConnection self)
 {
     if (self->state != ISO_CON_STATE_STOPPED) {
+
         Socket socket = self->socket;
         self->state = ISO_CON_STATE_STOPPED;
         self->socket = NULL;

@@ -68,7 +68,7 @@
 //#define HAL_I2S_MODULE_ENABLED   
 //#define HAL_IWDG_MODULE_ENABLED
 //#define HAL_LTDC_MODULE_ENABLED   
-//#define HAL_RNG_MODULE_ENABLED   
+#define HAL_RNG_MODULE_ENABLED
 #define HAL_RTC_MODULE_ENABLED
 //#define HAL_SAI_MODULE_ENABLED   
 //#define HAL_SD_MODULE_ENABLED   
@@ -254,8 +254,8 @@
  /* Definition of the Ethernet driver buffers size and count */
  #define ETH_RX_BUF_SIZE                ETH_MAX_PACKET_SIZE /* buffer size for receive               */
  #define ETH_TX_BUF_SIZE                ETH_MAX_PACKET_SIZE /* buffer size for transmit              */
- #define ETH_RXBUFNB                    ((uint32_t)4)       /* 4 Rx buffers of size ETH_RX_BUF_SIZE  */	// тут было 4-е я уменьшил из-за нехватки памяти
- #define ETH_TXBUFNB                    ((uint32_t)4)       /* 4 Tx buffers of size ETH_TX_BUF_SIZE  */	// тут было 4-е я уменьшил из-за нехватки памяти
+ #define ETH_RXBUFNB                    ((uint32_t)5)       /* 4 Rx buffers of size ETH_RX_BUF_SIZE  */	// тут было 4-е я уменьшил из-за нехватки памяти
+ #define ETH_TXBUFNB                    ((uint32_t)5)       /* 4 Tx buffers of size ETH_TX_BUF_SIZE  */	// тут было 4-е я уменьшил из-за нехватки памяти
 
  /* Section 2: PHY configuration section */
 
@@ -264,7 +264,7 @@
 
 #define PHY_RESET_DELAY                 ((uint32_t)0x000000FF)
 /* PHY Configuration delay */
-#define PHY_CONFIG_DELAY                ((uint32_t)0x00000FFF)			//FFF
+#define PHY_CONFIG_DELAY                ((uint32_t)0x00000001)			//0x00000FFF			пауза после инита PHY контроллера
 
 #define PHY_READ_TO                     ((uint32_t)0x0000FFFF)
 #define PHY_WRITE_TO                    ((uint32_t)0x0000FFFF)

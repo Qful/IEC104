@@ -49,8 +49,10 @@ extern "C" {
  * @{
  */
 
-typedef void* FileHandle;
+//typedef void* FileHandle;
+typedef FIL* FileHandle;
 typedef struct sDirectoryHandle* DirectoryHandle;
+//typedef DIR* DirectoryHandle;
 
 #ifndef CONFIG_SYSTEM_FILE_SEPARATOR
 #define CONFIG_SYSTEM_FILE_SEPARATOR '/'

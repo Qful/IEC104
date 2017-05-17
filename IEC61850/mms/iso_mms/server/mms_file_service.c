@@ -127,7 +127,11 @@ static void
 createExtendedFilename(char* extendedFileName, char* fileName)
 {
     strcpy(extendedFileName, CONFIG_VIRTUAL_FILESTORE_BASEPATH);
-    strncat(extendedFileName, fileName, sizeof(CONFIG_VIRTUAL_FILESTORE_BASEPATH) + 256);
+    if ((fileName[0] != 0) && (fileName[0] != '/')) {
+    	strncat(extendedFileName,"/",1);
+    }
+	strncat(extendedFileName, fileName, sizeof(CONFIG_VIRTUAL_FILESTORE_BASEPATH) + 256);
+
 }
 
 static bool
@@ -346,6 +350,8 @@ mmsServer_handleFileOpenRequest(
                 frsm->fileHandle = fileHandle;
                 frsm->readPosition = filePosition;
                 frsm->frsmId = getNextFrsmId(connection);
+                // добавил размер файла из-за несовместимости структур
+               // frsm->fileSize = fileHandle->fsize;
 
                 createFileOpenResponse(invokeId, response, filename, frsm);
             }
@@ -495,36 +501,37 @@ encodeFileSpecification(uint8_t tag, char* fileSpecification, uint8_t* buffer, i
 static int
 addFileEntriesToResponse(uint8_t* buffer, int bufPos, int maxBufSize, char* directoryName, char** continueAfterFileName, bool* moreFollows)
 {
-	int directoryNameLength = strlen(directoryName);
+	int directoryNameLength = strlen(directoryName);								// размер имени директории
 
-    DirectoryHandle directory = openDirectory(directoryName);
+    DirectoryHandle directory = openDirectory(directoryName);						// открываем директорию
 
-    if (directory != NULL) {
+    if (directory != NULL) {														// если открылась
 
         bool isDirectory;
-        char* fileName = FileSystem_readDirectory(directory, &isDirectory);
+        char* fileName = FileSystem_readDirectory(directory, &isDirectory);			// читаем очередной элемент директории
 
-        while (fileName != NULL) {
+        while (fileName != NULL) {													// если есть элемент
         	directoryName[directoryNameLength] = 0;
 
         	if (directoryNameLength > 0) {
-        		if (directoryName[directoryNameLength - 1] != '/')
+        		if (directoryName[directoryNameLength - 1] != '/')					// если в конце нету '/' то добавим
         			strcat(directoryName, "/");
         	}
 
-        	strcat(directoryName, fileName);
+//        	strcat(directoryName,"/");		// не хватает между папкой и файлом
+        	strcat(directoryName, fileName);										// прицепим к концу имя файла
 
-            bufPos = addFileEntriesToResponse(buffer, bufPos, maxBufSize, directoryName, continueAfterFileName, moreFollows);
+            bufPos = addFileEntriesToResponse(buffer, bufPos, maxBufSize, directoryName, continueAfterFileName, moreFollows);	// полезем в субдиректорию почемуто с именем файла
 
             if (*moreFollows == true)
                 break;
 
-            fileName = FileSystem_readDirectory(directory, &isDirectory);
-        }
+            fileName = FileSystem_readDirectory(directory, &isDirectory);			// читаем очередной элемент директории
+        }// читаем до конца директории.
 
         FileSystem_closeDirectory(directory);
     }
-    else {
+    else {																			// если нет такой директории
 
         if (*continueAfterFileName != NULL) {
             if (strcmp(*continueAfterFileName, directoryName) == 0) {
@@ -536,7 +543,7 @@ addFileEntriesToResponse(uint8_t* buffer, int bufPos, int maxBufSize, char* dire
 
             uint32_t fileSize;
 
-            if (getFileInfo(directoryName, &fileSize, &msTime)) {
+            if (getFileInfo(directoryName, &fileSize, &msTime)) {					// читаем свойства
                 char gtString[30];
 
                 Conversions_msTimeToGeneralizedTime(msTime, (uint8_t*) gtString);

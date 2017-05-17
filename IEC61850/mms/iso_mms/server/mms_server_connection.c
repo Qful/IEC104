@@ -115,32 +115,53 @@ handleConfirmedRequestPdu(
 
 #if (MMS_JOURNAL_SERVICE == 1)
             case 0x41: /* read-journal */
+                if (DEBUG_MMS_SERVER){
+                	USART_TRACE_MAGENTA("MMS_SERVER: read-journal-request\n");
+                }
                 mmsServer_handleReadJournalRequest(self, buffer, bufPos, bufPos + length, invokeId, response);
                 break;
 #endif /* (MMS_JOURNAL_SERVICE == 1) */
 
 #if (MMS_FILE_SERVICE == 1)
 		    case 0x48: /* file-open-request */
+                if (DEBUG_MMS_SERVER){
+                	USART_TRACE_MAGENTA("MMS_SERVER: file-open-request\n");
+                }
 		        mmsServer_handleFileOpenRequest(self, buffer, bufPos, bufPos + length, invokeId, response);
 		        break;
 
 		    case 0x49: /* file-read-request */
+                if (DEBUG_MMS_SERVER){
+                	USART_TRACE_MAGENTA("MMS_SERVER: file-read-request\n");
+                }
 		        mmsServer_handleFileReadRequest(self, buffer, bufPos, bufPos + length, invokeId, response);
 		        break;
 
 		    case 0x4a: /* file-close-request */
+                if (DEBUG_MMS_SERVER){
+                	USART_TRACE_MAGENTA("MMS_SERVER: file-close-request\n");
+                }
 		        mmsServer_handleFileCloseRequest(self, buffer, bufPos, bufPos + length, invokeId, response);
 		        break;
 
 		    case 0x4b: /* file-rename-request */
+                if (DEBUG_MMS_SERVER){
+                	USART_TRACE_MAGENTA("MMS_SERVER: file-rename-request\n");
+                }
                 mmsServer_handleFileRenameRequest(self, buffer, bufPos, bufPos + length, invokeId, response);
                 break;
 
 		    case 0x4c: /* file-delete-request */
+                if (DEBUG_MMS_SERVER){
+                	USART_TRACE_MAGENTA("MMS_SERVER: file-delete-request\n");
+                }
 		        mmsServer_handleFileDeleteRequest(self, buffer, bufPos, bufPos + length, invokeId, response);
 		        break;
 
 		    case 0x4d: /* file-directory-request */
+                if (DEBUG_MMS_SERVER){
+                	USART_TRACE_MAGENTA("MMS_SERVER: file-directory-request\n");
+                }
 		        mmsServer_handleFileDirectoryRequest(self, buffer, bufPos, bufPos + length, invokeId, response);
 		        break;
 #endif /* MMS_FILE_SERVICE == 1 */
@@ -155,19 +176,26 @@ handleConfirmedRequestPdu(
             switch(tag) {
             case 0x02: /* invoke Id */
                 invokeId = BerDecoder_decodeUint32(buffer, length, bufPos);
-                if (DEBUG_MMS_SERVER)
-                    printf("MMS_SERVER: received request with invokeId: %i\n", invokeId);
+                if (DEBUG_MMS_SERVER){
+                	USART_TRACE_MAGENTA("MMS_SERVER: received request with invokeId: %i\n", invokeId);
+                }
                 self->lastInvokeId = invokeId;
                 break;
 
 #if (MMS_STATUS_SERVICE == 1)
             case 0x80: /* status-request */
+            	if (DEBUG_MMS_SERVER){
+            		USART_TRACE_MAGENTA("MMS_SERVER: status-request\n");
+            	}
                 mmsServer_handleStatusRequest(self, buffer, bufPos, invokeId, response);
                 break;
 #endif /* MMS_STATUS_SERVICE == 1 */
 
 #if (MMS_GET_NAME_LIST == 1)
             case 0xa1: /* get-name-list-request */
+            	if (DEBUG_MMS_SERVER){
+            		USART_TRACE_MAGENTA("MMS_SERVER: get-name-list-request\n");
+            	}
                 mmsServer_handleGetNameListRequest(self, buffer, bufPos, bufPos + length,
                         invokeId, response);
                 break;
@@ -175,17 +203,26 @@ handleConfirmedRequestPdu(
 
 #if (MMS_IDENTIFY_SERVICE == 1)
             case 0x82: /* identify */
+            	if (DEBUG_MMS_SERVER){
+            		USART_TRACE_MAGENTA("MMS_SERVER: identify-request\n");
+            	}
                 mmsServer_handleIdentifyRequest(self, invokeId, response);
                 break;
 #endif /* MMS_IDENTIFY_SERVICE == 1 */
 
             case 0xa4: /* read-request */
+            	if (DEBUG_MMS_SERVER){
+            		USART_TRACE_MAGENTA("MMS_SERVER: read-request\n");
+            	}
                 mmsServer_handleReadRequest(self, buffer, bufPos, bufPos + length,
                         invokeId, response);
                 break;
 
 #if (MMS_WRITE_SERVICE == 1)
             case 0xa5: /* write-request */
+            	if (DEBUG_MMS_SERVER){
+            		USART_TRACE_MAGENTA("MMS_SERVER: write-request\n");
+            	}
                 mmsServer_handleWriteRequest(self, buffer, bufPos, bufPos + length,
                                 invokeId, response);
                 break;
@@ -193,15 +230,19 @@ handleConfirmedRequestPdu(
 
 #if (MMS_GET_VARIABLE_ACCESS_ATTRIBUTES == 1)
             case 0xa6: /* get-variable-access-attributes-request */
-                mmsServer_handleGetVariableAccessAttributesRequest(self,
-                        buffer, bufPos, bufPos + length,
-                        invokeId, response);
+            	if (DEBUG_MMS_SERVER){
+            		USART_TRACE_MAGENTA("MMS_SERVER: get-variable-access-attributes-request\n");
+            	}
+                mmsServer_handleGetVariableAccessAttributesRequest(self, buffer, bufPos, bufPos + length, invokeId, response);
                 break;
 #endif /* MMS_GET_VARIABLE_ACCESS_ATTRIBUTES == 1 */
 
 
 #if (MMS_DYNAMIC_DATA_SETS == 1)
             case 0xab: /* define-named-variable-list */
+            	if (DEBUG_MMS_SERVER){
+            		USART_TRACE_MAGENTA("MMS_SERVER: define-named-variable-list-request\n");
+            	}
                 mmsServer_handleDefineNamedVariableListRequest(self,
                         buffer, bufPos, bufPos + length,
                         invokeId, response);
@@ -211,6 +252,9 @@ handleConfirmedRequestPdu(
 
 #if (MMS_GET_DATA_SET_ATTRIBUTES == 1)
             case 0xac: /* get-named-variable-list-attributes-request */
+            	if (DEBUG_MMS_SERVER){
+            		USART_TRACE_MAGENTA("MMS_SERVER: get-named-variable-list-attributes-request\n");
+            	}
                 mmsServer_handleGetNamedVariableListAttributesRequest(self,
                         buffer, bufPos, bufPos + length,
                         invokeId, response);
@@ -219,6 +263,9 @@ handleConfirmedRequestPdu(
 
 #if (MMS_DYNAMIC_DATA_SETS == 1)
             case 0xad: /* delete-named-variable-list-request */
+            	if (DEBUG_MMS_SERVER){
+            		USART_TRACE_MAGENTA("MMS_SERVER: delete-named-variable-list-request\n");
+            	}
                 mmsServer_handleDeleteNamedVariableListRequest(self,
                         buffer, bufPos, bufPos + length,
                         invokeId, response);

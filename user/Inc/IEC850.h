@@ -20,6 +20,10 @@
 
 #include "stack_config.h"
 
+/* FatFs includes component */
+#include "ff_gen_drv.h"
+#include "sram_diskio.h"
+
 #define RECEIVE_BUF_SIZE 	MMS_MAXIMUM_PDU_SIZE
 #define SEND_BUF_SIZE 		MMS_MAXIMUM_PDU_SIZE
 
@@ -86,7 +90,9 @@
 #define CTLMODELEDENUM_DirectWithEnhancedSecurity		3
 #define CTLMODELEDENUM_SboWithEnhancedSecurity			4
 
-void StartIEC850Task(void const * argument);
-uint64_t 		Hal_getTimeInMs (void);
+void 		ReStartIEC850_task(void);
+void 		StartIEC850Task(void const * argument);
+uint64_t 	Hal_getTimeInMs (void);
+
 
 #endif /* IEC850_H_ */

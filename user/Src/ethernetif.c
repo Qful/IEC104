@@ -297,29 +297,19 @@ static void low_level_init(struct netif *netif)
   uint32_t regvalue = 0;
   HAL_StatusTypeDef hal_eth_init_status;
   
-/* Init ETH */
+// Init ETH
 
-//  uint8_t MACAddr[6]= { MAC_ADDR0, MAC_ADDR1, MAC_ADDR2, MAC_ADDR3, MAC_ADDR4, MAC_ADDR5 };
-//  uint8_t MACAddr[6]= { MAC_ADDR[0], MAC_ADDR[1], MAC_ADDR[2], MAC_ADDR[3], MAC_ADDR[4], MAC_ADDR[5] };
   heth.Instance = ETH;
-  heth.Init.AutoNegotiation = ETH_AUTONEGOTIATION_ENABLE;//ETH_AUTONEGOTIATION_DISABLE;//ETH_AUTONEGOTIATION_ENABLE
+  heth.Init.AutoNegotiation = ETH_AUTONEGOTIATION_ENABLE;
   heth.Init.Speed = ETH_SPEED_100M;
   heth.Init.DuplexMode = ETH_MODE_FULLDUPLEX;
-  heth.Init.PhyAddress = 1;//KSZ8873_PHY1_ADDRESS;
-  heth.Init.MACAddr = &MAC_ADDR[0];//&MACAddr[0];
-  heth.Init.RxMode = ETH_RXINTERRUPT_MODE;//ETH_RXPOLLING_MODE;//ETH_RXINTERRUPT_MODE;
+  heth.Init.PhyAddress = 1;
+  heth.Init.MACAddr = &MAC_ADDR[0];
+  heth.Init.RxMode = ETH_RXINTERRUPT_MODE;
   heth.Init.ChecksumMode = ETH_CHECKSUM_BY_HARDWARE;
-/* TODO:
- * для боевого борда переключить на ETH_MEDIA_INTERFACE_MII
- */
-#ifdef STM32F407xx			// ETH_MEDIA_INTERFACE_RMII
-  heth.Init.MediaInterface = ETH_MEDIA_INTERFACE_RMII;
-#endif
-#ifdef STM32F417xx			// ETH_MEDIA_INTERFACE_MII
   heth.Init.MediaInterface = ETH_MEDIA_INTERFACE_MII;
-#endif
-  hal_eth_init_status = HAL_ETH_Init(&heth);
 
+  hal_eth_init_status = HAL_ETH_Init(&heth);
 
   if (hal_eth_init_status == HAL_OK)
   {
@@ -331,17 +321,17 @@ static void low_level_init(struct netif *netif)
 
   }
 
-  /* Initialize Tx Descriptors list: Chain Mode */
+  // Initialize Tx Descriptors list: Chain Mode
   HAL_ETH_DMATxDescListInit(&heth, DMATxDscrTab, &Tx_Buff[0][0], ETH_TXBUFNB);
      
-  /* Initialize Rx Descriptors list: Chain Mode  */
+  // Initialize Rx Descriptors list: Chain Mode
   HAL_ETH_DMARxDescListInit(&heth, DMARxDscrTab, &Rx_Buff[0][0], ETH_RXBUFNB);
  
 #if LWIP_ARP || LWIP_ETHERNET 
-  /* set MAC hardware address length */
+  // set MAC hardware address length
   netif->hwaddr_len = ETHARP_HWADDR_LEN;
   
-  /* set MAC hardware address */
+  // set MAC hardware address
   netif->hwaddr[0] =  heth.Init.MACAddr[0];
   netif->hwaddr[1] =  heth.Init.MACAddr[1];
   netif->hwaddr[2] =  heth.Init.MACAddr[2];
@@ -359,22 +349,22 @@ static void low_level_init(struct netif *netif)
   #else 
     netif->flags |= NETIF_FLAG_BROADCAST;
   #endif /* LWIP_ARP */
-  
+
+#if LWIP_IGMP
+  netif->flags |= NETIF_FLAG_IGMP;
+#endif /* LWIP_IGMP */
+
 /* create a binary semaphore used for informing ethernetif of frame reception */
   osSemaphoreDef(SEM);
   s_xSemaphore = osSemaphoreCreate(osSemaphore(SEM) , 1 );
 
-  USART_TRACE_MAGENTA("osSemaphoreCreate:0x%X\n",s_xSemaphore);
-
-  USART_TRACE_MAGENTA("(EthIf) create the task that handles the ETH_MAC\n");
-/* create the task that handles the ETH_MAC */
+  USART_TRACE_MAGENTA("Создали семафор для EthIf :0x%X\n",s_xSemaphore);
+  USART_TRACE_MAGENTA("запускаем таск который будет принимать данные из ETH_MAC\n");
+// запускаем таск который будет принимать данные через семафор из прерывания ETH_MAC
   osThreadDef(EthIf, ethernetif_input, osPriorityRealtime, 0, INTERFACE_THREAD_STACK_SIZE);
   osThreadCreate (osThread(EthIf), netif);
  
   /* Enable MAC and DMA transmission and reception */
-
-  USART_TRACE_MAGENTA("Enable MAC and DMA transmission and reception.\n");
-
   HAL_ETH_Start(&heth);
   
 #ifndef KSZ8873
@@ -611,7 +601,7 @@ void ethernetif_input( void const * argument )
         	ret_error = netif->input( p, netif);
           if (ret_error != ERR_OK )							// вызываем функцию приема данных она же: (err_t)tcpip_input(struct pbuf *p, struct netif *inp)
           {
-//        	  printf("tcpip_input ERROR : %i \n", ret_error);
+        	  printf("ethernetif input ERROR : %i \n", ret_error);
               pbuf_free(p);
           }else{
 //              printf("tcpip_input no error. pbuf: 0x%x\n",(unsigned int)p);
@@ -773,10 +763,14 @@ void ethernetif_set_link(void const *argument)
          // проверяем LINK статус.
          if((regvalue & PHY_LINKED_STATUS)!= (uint16_t)RESET)
          {
+        	 USART_TRACE_BLUE("netif_set_link_up....\n");
+
            netif_set_link_up(link_arg->netif);
          }
          else
          {
+           	 USART_TRACE_BLUE("netif_set_link_down....\n");
+
            netif_set_link_down(link_arg->netif);
          }
          /*! Check whether the link is up or down*/

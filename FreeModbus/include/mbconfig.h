@@ -118,7 +118,7 @@ PR_BEGIN_EXTERN_C
  * in this time,the master will process this timeout error. Then master can send other frame */
 
 //   Если мастер отправить не широковещательный кадр, то будет ждать ответа это время. Если slave не ответил за это время то timeout error. Затем может послать другой кадр.
-#define MB_MASTER_TIMEOUT_MS_RESPOND            (100 )
+#define MB_MASTER_TIMEOUT_MS_RESPOND            (70 )	//
 
 /*! \brief The total slaves in Modbus Master system. Default 16.
  * \note : The slave ID must be continuous from 1.*/

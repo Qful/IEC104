@@ -57,6 +57,8 @@
 
 #include "modbus.h"
 
+extern uint8_t		writeNmb;
+
 #if MB_MASTER_RTU_ENABLED > 0 || MB_MASTER_ASCII_ENABLED > 0
 
 #ifndef MB_PORT_HAS_CLOSE
@@ -275,7 +277,7 @@ eMBMasterPoll( void )
 
     int             			i , j;
     eMBErrorCode    			eStatus = MB_ENOERR;
-    eMBMasterEventType    		eEvent;
+    eMBMasterEventType    		eEvent = 0;
     eMBMasterErrorEventType 	errorType;
 
     if( eMBState != STATE_ENABLED )        return MB_EILLSTATE;	 	// проверим, готов ли модбас для работы
@@ -298,12 +300,13 @@ eMBMasterPoll( void )
         case EV_MASTER_FRAME_RECEIVED:															// Приняли фрейм, проверим на целостность и обработаем
 			eStatus = peMBMasterFrameReceiveCur( &ucRcvAddress, &ucMBFrame, &usLength );
 
-			if ( ( eStatus == MB_ENOERR ) && ( ucRcvAddress == ucMBMasterGetDestAddress() ) )	// Проверим, нам ли пакет и принят без ошибок.
+			if ( ( eStatus == MB_ERECV ) && ( ucRcvAddress == ucMBMasterGetDestAddress() ) )	// Проверим, нам ли пакет и принят без ошибок.
 			{
 				( void ) xMBMasterPortEventPost( EV_MASTER_EXECUTE );							// если нам, то переходим к дальнейшей работе с данными.
 			}
 			else
 			{
+//				eStatus = MB_ERECVDATAERROR;
 				vMBMasterSetErrorType(EV_ERROR_RECEIVE_DATA);									// если не нам или ошибки то идём в обработчик ошибок.
 				( void ) xMBMasterPortEventPost( EV_MASTER_ERROR_PROCESS );
 			}
@@ -332,6 +335,7 @@ eMBMasterPoll( void )
 						//  xMasterFuncHandlers[i].pxHandler(ucMBFrame, &usLength);	// обработчик для конкретной функции.
 						//  выбирается в зависимости от
 						// ----------------------------------------------------------------------------------------------
+						eStatus = MB_ERECVDATA;		//говорим о готовности принимать новые данные
 
 						// If master request is broadcast, the master need execute function for all slave.
 						if ( xMBMasterRequestIsBroadcast() ) {
@@ -363,7 +367,11 @@ eMBMasterPoll( void )
 
         case EV_MASTER_FRAME_SENT:				// передача в порт
         	vMBMasterGetPDUSndBuf( &ucMBFrame );																		//ucMBFrame - буфер для передачи в MODBUS
+
 			eStatus = peMBMasterFrameSendCur( ucMBMasterGetDestAddress(), ucMBFrame, usMBMasterGetPDUSndLength() );		//подготовка пакета и активация передачи.
+			if (eStatus == MB_EIO ){
+	        	USART_TRACE_RED("MODBUS ERROR_SENT_DATA I/O.\n");        	// ошибка отправки пакета. не принят или отправляется предыдущий пакет.
+			}
              break;
 
         case EV_MASTER_ERROR_PROCESS:			// колбэки по ошибкам.
@@ -388,8 +396,10 @@ eMBMasterPoll( void )
 			vMBMasterRunResRelease();
         	break;
         }
+    } else{
+    	return MB_NOTASK;
     }
-    return MB_ENOERR;
+    return eStatus;
 }
 
 /* Get whether the Modbus Master is run in master mode.*/

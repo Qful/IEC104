@@ -128,6 +128,8 @@ Handleset_destroy(HandleSet self);
 ServerSocket
 TcpServerSocket_create(const char* address, int port);
 
+ServerSocket
+UDPClientSocket_create(const char* address, int port);
 
 void
 ServerSocket_listen(ServerSocket self);
@@ -272,6 +274,9 @@ Socket_getPeerAddress(Socket self);
 void
 Socket_destroy(Socket self);
 
+int	GetSocket_num(Socket self);
+
+bool		prepareServerAddress(const char* address, int port, struct sockaddr_in* sockaddr);
 /*! @} */
 
 /*! @} */

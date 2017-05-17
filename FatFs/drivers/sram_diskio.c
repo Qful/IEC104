@@ -28,41 +28,47 @@
 /* Includes ------------------------------------------------------------------*/
 #include <string.h>
 #include "ff_gen_drv.h"
-#include "ExtSPImem.h"
+#include "libiec61850_platform_includes.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 
-// размер блока = 8 страницам
-//#define BLOCK_SIZE                 PAGE_SIZE //*8
+#define SRAM_OK         0x00
+#define SRAM_ERROR      0x01
+
+//#define SRAM_DEVICE_ADDR  ((uint32_t)0x64000000)		// адрес виртуального диска
+#define SRAM_DEVICE_SIZE  256 * 512  					//размер диска 65Kбайт			128 * 512
+
+/* Block Size in Bytes */
+#define BLOCK_SIZE                512
+
+void*	SRAM_DEVICE_ADDR;
 
 /* Private variables ---------------------------------------------------------*/
-MEMDeviceIDTypeDef 		SPIMemoryID;
-//uint16_t				SPIPageSize = PAGE_SIZE_512;					// размер страницы памяти
 /* Disk status */
 static volatile DSTATUS Stat = STA_NOINIT;
 
 /* Private function prototypes -----------------------------------------------*/
-DSTATUS SPIDISK_initialize (void);
-DSTATUS SPIDISK_status (void);
-DRESULT SPIDISK_read (BYTE*, DWORD, UINT);
+DSTATUS SRAMDISK_initialize (void);
+DSTATUS SRAMDISK_status (void);
+DRESULT SRAMDISK_read (BYTE*, DWORD, UINT);
 #if _USE_WRITE == 1
-  DRESULT SPIDISK_write (const BYTE*, DWORD, UINT);
+  DRESULT SRAMDISK_write (const BYTE*, DWORD, UINT);
 #endif /* _USE_WRITE == 1 */
 #if _USE_IOCTL == 1
-  DRESULT SPIDISK_ioctl (BYTE, void*);
+  DRESULT SRAMDISK_ioctl (BYTE, void*);
 #endif /* _USE_IOCTL == 1 */
   
-Diskio_drvTypeDef  SPIDISK_Driver =
+Diskio_drvTypeDef  SRAMDISK_Driver =
 {
-		SPIDISK_initialize,
-		SPIDISK_status,
-		SPIDISK_read,
+  SRAMDISK_initialize,
+  SRAMDISK_status,
+  SRAMDISK_read, 
 #if  _USE_WRITE == 1
-		SPIDISK_write,
+  SRAMDISK_write,
 #endif /* _USE_WRITE == 1 */  
 #if  _USE_IOCTL == 1
-		SPIDISK_ioctl,
+  SRAMDISK_ioctl,
 #endif /* _USE_IOCTL == 1 */
 };
 
@@ -73,57 +79,52 @@ Diskio_drvTypeDef  SPIDISK_Driver =
   * @param  None
   * @retval DSTATUS: Operation status
   */
-DSTATUS SPIDISK_initialize(void)
+DSTATUS SRAMDISK_initialize(void)
 {
-
   Stat = STA_NOINIT;
   
-  /* Configure the SPI device */
-  AT45DB161D_spi_init();			// Инит SPI памяти
-  MEM_ID_Read(&SPIMemoryID);
-  if (AT45DB_StatusRegisterRead() & 1 ) SPIMemoryID.PageSize = PAGE_SIZE_512; else SPIMemoryID.PageSize = PAGE_SIZE_528;
+  /* Configure the SRAM device */
+//  BSP_SRAM_Init();
+  
+  // выделим память для диска размером SRAM_DEVICE_SIZE
+  SRAM_DEVICE_ADDR = GLOBAL_MALLOC(SRAM_DEVICE_SIZE);
+
   Stat &= ~STA_NOINIT;
   return Stat;
 }
 
-/*************************************************************************
- * SPIDISK_status
- * читаем статус диска
- * и защиту от записи
- * в 0ом бите можно узнать размер страницы. 0 - 512байт ; 1 - 528байт
- *************************************************************************/
-DSTATUS SPIDISK_status(void)
+/**
+  * @brief  Gets Disk Status
+  * @param  None
+  * @retval DSTATUS: Operation status
+  */
+DSTATUS SRAMDISK_status(void)
 {
   Stat = STA_NOINIT;
-  uint8_t	statreg;
   
-  statreg = AT45DB_StatusRegisterRead();
-  if((statreg>>7) & 1)		// проверим RDY флаг
-	  Stat &= ~STA_NOINIT;
-
-  if((statreg>>1) & 1)		// проверим защиту от записи
-	  Stat &= STA_PROTECT;
+  Stat &= ~STA_NOINIT;
 
   return Stat;
 }
 
 /**
   * @brief  Reads Sector(s) 
-  * @param  *buff: буфер для сохранения данных
-  * @param  sector: номер сектора(512байт) для чтения (LBA)
-  * @param  count: количество секторов(512байт) для чтения (1..128)
+  * @param  *buff: Data buffer to store read data
+  * @param  sector: Sector address (LBA)
+  * @param  count: Number of sectors to read (1..128)
   * @retval DRESULT: Operation result
   */
-DRESULT SPIDISK_read(BYTE *buff, DWORD sector, UINT count)
+DRESULT SRAMDISK_read(BYTE *buff, DWORD sector, UINT count)
 {
-	  DRESULT res = RES_OK;
-
-	  if(!Block_memory_read((uint8_t*)buff,sector ,PAGE_SIZE_512/*SPIMemoryID.PageSize*/,count))
-	  //if(BSP_SD_ReadBlocks((uint32_t*)buff, (uint64_t) (sector * BLOCK_SIZE),BLOCK_SIZE, count) != MSD_OK)
-	  {
-	    res = RES_ERROR;
-	  }
-	  return res;
+  uint32_t BufferSize = (BLOCK_SIZE * count); 
+  uint8_t *pSramAddress = (uint8_t *) (SRAM_DEVICE_ADDR + (sector * BLOCK_SIZE)); 
+  
+  for(; BufferSize != 0; BufferSize--)
+  {
+    *buff++ = *(volatile uint8_t *)pSramAddress++;
+  } 
+  
+  return RES_OK;
 }
 
 /**
@@ -134,16 +135,20 @@ DRESULT SPIDISK_read(BYTE *buff, DWORD sector, UINT count)
   * @retval DRESULT: Operation result
   */
 #if _USE_WRITE == 1
-DRESULT SPIDISK_write(const BYTE *buff, DWORD sector, UINT count)
+DRESULT SRAMDISK_write(const BYTE *buff, DWORD sector, UINT count)
 {
-	  DRESULT res = RES_OK;
+  uint32_t BufferSize = (BLOCK_SIZE * count);// + count;
+  uint8_t *pSramAddress = (uint8_t *) (SRAM_DEVICE_ADDR + (sector * BLOCK_SIZE)); 
+  
+//  USART_TRACE_RED("*pSramAddress: 0x%x, BufferSize: 0x%x\n",pSramAddress,BufferSize);
 
-	  if(!Block_memory_write((uint8_t*)buff,sector ,PAGE_SIZE_512/*SPIMemoryID.PageSize*/,count))
-//	  if(BSP_SD_WriteBlocks((uint32_t*)buff, (uint64_t)(sector * BLOCK_SIZE), BLOCK_SIZE, count) != MSD_OK)
-	  {
-	    res = RES_ERROR;
-	  }
-	  return res;
+  for(; BufferSize != 0; BufferSize--)
+  {
+//    *(volatile uint8_t *)pSramAddress++ = *buff++;
+	  *(__IO uint8_t *)pSramAddress++ = *buff++;
+  } 
+  
+  return RES_OK;
 }
 #endif /* _USE_WRITE == 1 */
 
@@ -154,7 +159,7 @@ DRESULT SPIDISK_write(const BYTE *buff, DWORD sector, UINT count)
   * @retval DRESULT: Operation result
   */
 #if _USE_IOCTL == 1
-DRESULT SPIDISK_ioctl(BYTE cmd, void *buff)
+DRESULT SRAMDISK_ioctl(BYTE cmd, void *buff)
 {
   DRESULT res = RES_ERROR;
   
@@ -167,22 +172,21 @@ DRESULT SPIDISK_ioctl(BYTE cmd, void *buff)
     res = RES_OK;
     break;
   
-  // Get number of sectors on the disk (DWORD)
-  // Число секторов на диске
+  /* Get number of sectors on the disk (DWORD) */
   case GET_SECTOR_COUNT :
-    *(DWORD*)buff = 0x40<<SPIMemoryID.DensityCode;//SECTOR_COUNT;//SPI_DEVICE_SIZE/SPIPageSize;				// 4096
+    *(DWORD*)buff = SRAM_DEVICE_SIZE / BLOCK_SIZE;
     res = RES_OK;
     break;
   
   /* Get R/W sector size (WORD) */
   case GET_SECTOR_SIZE :
-    *(WORD*)buff = PAGE_SIZE_512/*SPIMemoryID.PageSize*/;								// пишем блоками по 512
+    *(WORD*)buff = BLOCK_SIZE;
     res = RES_OK;
     break;
   
   /* Get erase block size in unit of sector (DWORD) */
   case GET_BLOCK_SIZE :
-    *(DWORD*)buff = PAGE_SIZE_512/*SPIMemoryID.PageSize*/;								// стирать можно и странично=512, блочно=4096, секторами=128Kbyte
+    *(DWORD*)buff = BLOCK_SIZE;
     break;
   
   default:

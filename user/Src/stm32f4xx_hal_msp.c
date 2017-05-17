@@ -147,6 +147,8 @@ GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
 
 HAL_GPIO_Init(db161d_CS_GPIO_PORT, &GPIO_InitStruct);
 
+MEM_Chipselect(GPIO_PIN_SET);
+
 
   if(hspi->Instance==SPI1)
   {
@@ -329,8 +331,8 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
 
  void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi)
 {
-	USART_0TRACE("\n");
-	USART_TRACE_RED("int---HAL_SPI_ErrorCallback---\n");
+//	USART_0TRACE("\n");
+//	USART_TRACE_RED("int---HAL_SPI_ErrorCallback---\n");
 
 }
 

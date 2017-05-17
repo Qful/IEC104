@@ -33,7 +33,7 @@
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-extern Diskio_drvTypeDef  SPIDISK_Driver;
+extern Diskio_drvTypeDef  SRAMDISK_Driver;
 
 #endif /* __SRAM_DISKIO_H */
 

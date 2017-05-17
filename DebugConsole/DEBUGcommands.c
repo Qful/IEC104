@@ -126,7 +126,7 @@ static const CLI_Command_Definition_t xParameterEcho =
 void vRegisterDEBUGCommands( void )
 {
 	// регистрируем команды консоли
-	FreeRTOS_CLIRegisterCommand( &xls );					//отображающа€ список файлов и подкатологов, наход€щихс€ в конкретном каталоге
+	FreeRTOS_CLIRegisterCommand( &xls );						//отображающа€ список файлов и подкатологов, наход€щихс€ в конкретном каталоге
 	FreeRTOS_CLIRegisterCommand( &xreboot );					//отображающа€ список файлов и подкатологов, наход€щихс€ в конкретном каталоге
 
 	FreeRTOS_CLIRegisterCommand( &xFreeMem );

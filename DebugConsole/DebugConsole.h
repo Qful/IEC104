@@ -7,6 +7,7 @@
  */
 //void DEBUGConsoleTask( void *pvParameters );
 void DEBUGConsoleTask(void const * argument);
+void DEBUGUSARTOUTTask(void const * argument);
 
 void	xDEBUGRTUReceiveFSM( void );			// колбэк прерывания по приему
 void	xDEBUGRTUTransmitFSM( void );			// колбэк прерывания по передаче

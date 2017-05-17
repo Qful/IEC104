@@ -37,6 +37,7 @@
 #include "main.h"
 #include "lwip/ip_addr.h"
 
+extern uint16_t	GLOBAL_QUALITY;
 
 #ifndef DEBUG_IED_SERVER
 #define DEBUG_IED_SERVER 0
@@ -643,6 +644,12 @@ IedServer_processIncomingData(IedServer self)
 }
 
 void
+IedServer_getClientconections(uint8_t *pcWriteBuffer, IedServer self)
+{
+	MmsServer_GetClientList(pcWriteBuffer, self->mmsServer);
+}
+
+void
 IedServer_stopThreadless(IedServer self)
 {
     if (self->running) {
@@ -926,9 +933,11 @@ IedServer_updateAttributeValue(IedServer self, DataAttribute* dataAttribute, Mms
     }
 }
 
-void
+//void
+int
 IedServer_updateFloatAttributeValue(IedServer self, DataAttribute* dataAttribute, float value)
 {
+	int	ret = 0;
     assert(MmsValue_getType(dataAttribute->mmsValue) == MMS_FLOAT);
     assert(dataAttribute != NULL);
     assert(self != NULL);
@@ -941,12 +950,17 @@ IedServer_updateFloatAttributeValue(IedServer self, DataAttribute* dataAttribute
     else {
         MmsValue_setFloat(dataAttribute->mmsValue, value);
         checkForChangedTriggers(self, dataAttribute);
+        ret = true;
     }
+    return	ret;
 }
 
-void
+//void
+int
 IedServer_updateInt32AttributeValue(IedServer self, DataAttribute* dataAttribute, int32_t value)
 {
+	int	ret = 0;
+
     assert(MmsValue_getType(dataAttribute->mmsValue) == MMS_INTEGER);
     assert(dataAttribute != NULL);
     assert(self != NULL);
@@ -960,12 +974,17 @@ IedServer_updateInt32AttributeValue(IedServer self, DataAttribute* dataAttribute
         MmsValue_setInt32(dataAttribute->mmsValue, value);
 
         checkForChangedTriggers(self, dataAttribute);
+        ret = true;
     }
+    return	ret;
 }
 
-void
+//void
+int
 IedServer_updateInt64AttributeValue(IedServer self, DataAttribute* dataAttribute, int64_t value)
 {
+	int	ret = 0;
+
     assert(MmsValue_getType(dataAttribute->mmsValue) == MMS_INTEGER);
     assert(dataAttribute != NULL);
     assert(self != NULL);
@@ -979,7 +998,9 @@ IedServer_updateInt64AttributeValue(IedServer self, DataAttribute* dataAttribute
         MmsValue_setInt64(dataAttribute->mmsValue, value);
 
         checkForChangedTriggers(self, dataAttribute);
+        ret = true;
     }
+    return	ret;
 }
 
 void
@@ -1001,9 +1022,12 @@ IedServer_updateUnsignedAttributeValue(IedServer self, DataAttribute* dataAttrib
     }
 }
 
-void
+//void
+int
 IedServer_updateBitStringAttributeValue(IedServer self, DataAttribute* dataAttribute, uint32_t value)
 {
+	int	ret = 0;
+
     assert(MmsValue_getType(dataAttribute->mmsValue) == MMS_BIT_STRING);
     assert(dataAttribute != NULL);
     assert(self != NULL);
@@ -1015,14 +1039,19 @@ IedServer_updateBitStringAttributeValue(IedServer self, DataAttribute* dataAttri
     }
     else {
         MmsValue_setBitStringFromInteger(dataAttribute->mmsValue, value);
-
         checkForChangedTriggers(self, dataAttribute);
+    	ret = true;
     }
+    return	ret;
 }
 
-void
+//void
+// возврвщает true если были изменения в данных
+int
 IedServer_updateBooleanAttributeValue(IedServer self, DataAttribute* dataAttribute, bool value)
 {
+	int	ret = 0;
+
     assert(self != NULL);
     assert(dataAttribute != NULL);
     assert(MmsValue_getType(dataAttribute->mmsValue) == MMS_BOOLEAN);
@@ -1034,10 +1063,12 @@ IedServer_updateBooleanAttributeValue(IedServer self, DataAttribute* dataAttribu
         checkForUpdateTrigger(self, dataAttribute);
     }
     else {
+    	ret = true;
         MmsValue_setBoolean(dataAttribute->mmsValue, value);
 
         checkForChangedTriggers(self, dataAttribute);
     }
+    return	ret;
 }
 
 void
@@ -1098,6 +1129,7 @@ IedServer_updateTimestampAttributeValue(IedServer self, DataAttribute* dataAttri
 void
 IedServer_updateQuality(IedServer self, DataAttribute* dataAttribute, Quality quality)
 {
+	Quality qual = quality | GLOBAL_QUALITY;
     assert(strcmp(dataAttribute->name, "q") == 0);
     assert(MmsValue_getType(dataAttribute->mmsValue) == MMS_BIT_STRING);
     assert(MmsValue_getBitStringSize(dataAttribute->mmsValue) >= 12);
@@ -1105,8 +1137,8 @@ IedServer_updateQuality(IedServer self, DataAttribute* dataAttribute, Quality qu
 
     uint32_t oldQuality = MmsValue_getBitStringAsInteger(dataAttribute->mmsValue);
 
-    if (oldQuality != (uint32_t) quality) {
-        MmsValue_setBitStringFromInteger(dataAttribute->mmsValue, (uint32_t) quality);
+    if (oldQuality != (uint32_t) qual) {
+        MmsValue_setBitStringFromInteger(dataAttribute->mmsValue, (uint32_t) qual);
 
 #if (CONFIG_INCLUDE_GOOSE_SUPPORT == 1)
         MmsMapping_triggerGooseObservers(self->mmsMapping, dataAttribute->mmsValue);
@@ -1369,10 +1401,11 @@ IedServer_setGooseInterfaceId(IedServer self, const char* interfaceId)
  * IedServer_updateBITSTRINGAttributeValue
  * Обновление значения (BitStrin)value в dataAttribute
  *************************************************************************/
-void	IedServer_updateBitStrinAttributeValue(IedServer self, DataAttribute* dataAttribute, uint32_t value)
+//void
+int	IedServer_updateBitStrinAttributeValue(IedServer self, DataAttribute* dataAttribute, uint32_t value)
 {
-
-	if (!dataAttribute->mmsValue) return;
+	int	ret = 0;
+	if (!dataAttribute->mmsValue) return -1;
     uint32_t currentValue = MmsValue_getBitStringAsInteger(dataAttribute->mmsValue);
 
     if (currentValue == value) {											// если значение такое как и было, то добавим инфу в структуру отчетов об обновлении.
@@ -1381,6 +1414,8 @@ void	IedServer_updateBitStrinAttributeValue(IedServer self, DataAttribute* dataA
     else {																	// если значение отличается, то установим новое значение.
     	MmsValue_setBitStringFromInteger(dataAttribute->mmsValue, (uint32_t) value);
         checkForChangedTriggers(self, dataAttribute);						// добавим инфу в структуру отчетов об изменении данных.
+        ret = 1;
     }
+    return ret;
 }
 

@@ -10,17 +10,25 @@
 #define STACK_CONFIG_H_
 
 /* print debugging information with printf */
-#define DEBUG 					1
-#define DEBUG_MMS_SERVER 		0
-#define DEBUG_MMS_CLIENT		1
-#define	DEBUG_IED_SERVER		0
-#define	DEBUG_ISO_SERVER		0
-#define	DEBUG_SOCKET			1
-#define	DEBUG_GOOSE_PUBLISHER	1
+#define DEBUG 					1	//1
+#define DEBUG_MMS_SERVER 		0	//0
+#define DEBUG_MMS_CLIENT		0	//0
+#define	DEBUG_IED_SERVER		0	//0
+#define	DEBUG_ISO_SERVER		0	//0
+#define	DEBUG_ISO_SERVER_MY		0	//0
+#define	DEBUG_SOCKET			1	//1
+#define	DEBUG_GOOSE_PUBLISHER	1	//1
+#define DEBUG_COTP				0	//0
+
+
+#define	DEBUG_REPORT_SERVER		0	//0
+
 
 #define STATIC_MODEL 			1
 
 #define sockTimeOut				5
+
+#define 	LIMITERRORCONNECT	0						// счетчик ошибок приема из сокета
 
 /* Maximum MMS PDU SIZE - default is 65000 */
 #define MMS_MAXIMUM_PDU_SIZE 			16384//4096//2048						//1200//4096//8192//2048
@@ -69,10 +77,10 @@
 #define CONFIG_TCP_KEEPALIVE_CNT 		2
 
 /* maximum COTP (ISO 8073) TPDU size - valid range is 1024 - 16384 */
-#define CONFIG_COTP_MAX_TPDU_SIZE 		4096//1024
+#define CONFIG_COTP_MAX_TPDU_SIZE 		4096//4096//1024
 
 /* timeout while reading from TCP stream in ms */
-#define CONFIG_TCP_READ_TIMEOUT_MS 		1000				//1000
+//#define CONFIG_TCP_READ_TIMEOUT_MS 		1000				//1000
 
 // поддержка GOOSE в сборке -------------------------------------------------------------------------------------------
 /* Set to 1 to include GOOSE support in the build. Otherwise set to 0 */
@@ -122,8 +130,10 @@
 /* include support for IEC 61850 reporting services */
 #define CONFIG_IEC61850_REPORT_SERVICE 		1
 
-/* support buffered report control blocks with ResvTms field */
-#define CONFIG_IEC61850_BRCB_WITH_RESVTMS 	0
+/* support buffered report control blocks with ResvTms field
+ * Был выключен. Для ARIS нужно включить, он использует поле RESVTMS
+ * */
+#define CONFIG_IEC61850_BRCB_WITH_RESVTMS 	1								//1
 
 /* The default buffer size of buffered RCBs in bytes */
 #define CONFIG_REPORTING_DEFAULT_REPORT_BUFFER_SIZE 	4096
@@ -141,10 +151,10 @@
 
 //------------------------------------------------------------------------------------------------------------------------
 /* MMS virtual file store base path - where MMS file services are looking for files */
-#define CONFIG_VIRTUAL_FILESTORE_BASEPATH "./vmd-filestore/"
+#define CONFIG_VIRTUAL_FILESTORE_BASEPATH  "MMSfiles"
 
 /* Maximum number of open file per MMS connection (for MMS file read service) */
-#define CONFIG_MMS_MAX_NUMBER_OF_OPEN_FILES_PER_CONNECTION 	5
+#define CONFIG_MMS_MAX_NUMBER_OF_OPEN_FILES_PER_CONNECTION 		3
 
 //------------------------------------------------------------------------------------------------------------------------
 /* Maximum number of the domain specific data sets - this also includes the static (pre-configured) and dynamic data sets */
@@ -160,7 +170,12 @@
 #define CONFIG_MMS_MAX_NUMBER_OF_DATA_SET_MEMBERS 				100
 //------------------------------------------------------------------------------------------------------------------------
 
+/* Set to 1 to compile for edition 1 server - default is 0 to compile for edition 2
+ * 1 - выключим OWNER из структуры
+ * */
+#define CONFIG_IEC61850_EDITION_1 		0
 
+//------------------------------------------------------------------------------------------------------------------------
 
 /* Enable reporting - Note reporting also includes datasets */
 #define CONFIG_REPORTING 	1
@@ -179,7 +194,7 @@
 #define MMS_GET_DATA_SET_ATTRIBUTES 		1
 #define MMS_STATUS_SERVICE 					0
 #define MMS_IDENTIFY_SERVICE 				0
-#define MMS_FILE_SERVICE 					1
+#define MMS_FILE_SERVICE 					1		//1
 #endif /* MMS_DEFAULT_PROFILE */
 
 #if (MMS_WRITE_SERVICE != 1)
@@ -196,8 +211,11 @@
 #define CONFIG_MMS_SUPPORT_VMD_SCOPE_NAMED_VARIABLES 	0
 
 /* Sort getNameList response according to the MMS specified collation order - this is required by the standard
- * Set to 0 only for performance reasons and when no certification is required! */
-#define CONFIG_MMS_SORT_NAME_LIST 						1
+ * Set to 0 only for performance reasons and when no certification is required!
+ * Сортировка по алфавиту списка на запрос getNameList
+ * если =1 то ARIS выдаёт ошибку неправильный порядок данных но всё вродибы работает норм.
+ * */
+#define CONFIG_MMS_SORT_NAME_LIST 						0			//1 - работало норм, но ARIS дурит голову
 
 #define CONFIG_INCLUDE_PLATFORM_SPECIFIC_HEADERS 		0
 

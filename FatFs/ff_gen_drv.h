@@ -38,6 +38,7 @@
 #include "ff.h"
 #include "ffconf.h"
 
+#include <stdint.h>
 /* Exported types ------------------------------------------------------------*/
 
 typedef struct
@@ -45,12 +46,12 @@ typedef struct
   DSTATUS (*disk_initialize) (void);                     /*!< Initialize Disk Drive                     */
   DSTATUS (*disk_status)     (void);                     /*!< Get Disk Status                           */
   DRESULT (*disk_read)       (BYTE*, DWORD, UINT);       /*!< Read Sector(s)                            */
-#if _USE_WRITE == 1
+//#if _USE_WRITE == 1
   DRESULT (*disk_write)      (const BYTE*, DWORD, UINT); /*!< Write Sector(s) when _USE_WRITE = 0       */
-#endif /* _USE_WRITE == 1 */
-#if _USE_IOCTL == 1
+//#endif /* _USE_WRITE == 1 */
+//#if _USE_IOCTL == 1
   DRESULT (*disk_ioctl)      (BYTE, void*);              /*!< I/O control operation when _USE_IOCTL = 1 */
-#endif /* _USE_IOCTL == 1 */
+//#endif /* _USE_IOCTL == 1 */
 }Diskio_drvTypeDef;
 
 

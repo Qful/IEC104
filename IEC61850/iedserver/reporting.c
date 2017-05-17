@@ -2354,9 +2354,9 @@ sendNextReportEntry(ReportControl* self)
 
     self->reportBuffer->nextToTransmit = self->reportBuffer->nextToTransmit->next;
 
-    if (DEBUG_IED_SERVER)
-        printf("IED_SERVER: sendNextReportEntry: memory(used/size): %i/%i\n",
-                (int) (ma.currentPtr - ma.memoryBlock), ma.size);
+    if (DEBUG_REPORT_SERVER){
+    	USART_TRACE_Yellow("IED_SERVER: sendNextReportEntry: memory(used/size): %i/%i\n",(int) (ma.currentPtr - ma.memoryBlock), ma.size);
+    }
 
 #if (DEBUG_IED_SERVER == 1)
     printf("IED_SERVER: reporting.c nextToTransmit: %p\n", self->reportBuffer->nextToTransmit);
@@ -2367,8 +2367,9 @@ sendNextReportEntry(ReportControl* self)
 
 return_out_of_memory:
 
-    if (DEBUG_IED_SERVER)
-        printf("IED_SERVER: sendNextReportEntry failed - memory allocation problem!\n");
+    if (DEBUG_REPORT_SERVER){
+    	USART_TRACE_RED("IED_SERVER: sendNextReportEntry failed - memory allocation problem!\n");
+    }
 
     //TODO set some flag to notify application here
 
@@ -2410,16 +2411,23 @@ processEventsForReport(ReportControl* rc, uint64_t currentTimeInMs)
                 if (rc->triggered) {
                     if (rc->buffered)
                         enqueueReport(rc, false, false, currentTimeInMs);
-                    else
+                    else{
                         sendReport(rc, false, false);
-
+						if (DEBUG_REPORT_SERVER) {
+							USART_TRACE_Yellow("REPORT_SERVER: отправили GI отчет: buffered:%u triggered:%u intgPd:%u gi:$u\n",rc->buffered,rc->triggered,rc->intgPd,rc->gi);
+						}
+                    }
                     rc->triggered = false;
                 }
 
                 if (rc->buffered)
                     enqueueReport(rc, false, true, currentTimeInMs);
-                else
+                else{
                     sendReport(rc, false, true);
+					if (DEBUG_REPORT_SERVER) {
+						USART_TRACE_Yellow("REPORT_SERVER: отправили GI отчет: buffered:%u triggered:%u intgPd:%u gi:$u\n",rc->buffered,rc->triggered,rc->intgPd,rc->gi);
+					}
+                }
 
                 rc->gi = false;
 
@@ -2436,9 +2444,12 @@ processEventsForReport(ReportControl* rc, uint64_t currentTimeInMs)
                     if (rc->triggered) {
                         if (rc->buffered)
                             enqueueReport(rc, false, false, currentTimeInMs);
-                        else
+                        else {
                             sendReport(rc, false, false);
-
+							if (DEBUG_REPORT_SERVER) {
+								USART_TRACE_Yellow("REPORT_SERVER: отправили INTEGRITY отчет: buffered:%u triggered:%u intgPd:%u\n",rc->buffered,rc->triggered,rc->intgPd);
+							}
+                        }
                         rc->triggered = false;
                     }
 
@@ -2446,8 +2457,12 @@ processEventsForReport(ReportControl* rc, uint64_t currentTimeInMs)
 
                     if (rc->buffered)
                         enqueueReport(rc, true, false, currentTimeInMs);
-                    else
+                    else{
                         sendReport(rc, true, false);
+						if (DEBUG_REPORT_SERVER) {
+							USART_TRACE_Yellow("REPORT_SERVER: отправили INTEGRITY отчет: buffered:%u triggered:%u intgPd:%u\n",rc->buffered,rc->triggered,rc->intgPd);
+						}
+                    }
 
                     rc->triggered = false;
                 }
@@ -2459,15 +2474,22 @@ processEventsForReport(ReportControl* rc, uint64_t currentTimeInMs)
 
                 if (rc->buffered)
                     enqueueReport(rc, false, false, currentTimeInMs);
-                else
+                else {
                     sendReport(rc, false, false);
+					if (DEBUG_REPORT_SERVER) {
+						USART_TRACE_Yellow("REPORT_SERVER: отправили отчет: buffered:%u triggered:%u\n",rc->buffered,rc->triggered);
+					}
+                }
+
 
                 rc->triggered = false;
             }
         }
 
-        if (rc->buffered && rc->enabled)
+        if (rc->buffered && rc->enabled) {
             sendNextReportEntry(rc);
+        }
+
     }
 
 

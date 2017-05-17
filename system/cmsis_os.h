@@ -97,12 +97,12 @@
 #include <stddef.h>
 #include "core_cmFunc.h"
 	
-#include "FreeRTOS.h"
-#include "task.h"
-#include "timers.h"
-#include "queue.h"
-#include "semphr.h"
-#include "event_groups.h"
+#include "../FreeRTOS/include/FreeRTOS.h"
+#include "../FreeRTOS/include/task.h"
+#include "../FreeRTOS/include/timers.h"
+#include "../FreeRTOS/include/queue.h"
+#include "../FreeRTOS/include/semphr.h"
+#include "../FreeRTOS/include/event_groups.h"
 
 /**
 \page cmsis_os_h Header File Template: cmsis_os.h

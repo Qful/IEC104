@@ -344,11 +344,19 @@ createNameListResponse(
             if (strcmp((char*) (element->data), continueAfter) == 0) {
                 startElement = element;
                 break;
+            }else{
+    			if (DEBUG_MMS_SERVER){
+    				printf("element:(%s)\n",element->data);
+    			}
             }
         }
 
         if (startElement == NULL) {
             mmsServer_createServiceErrorPdu(invokeId, response, MMS_ERROR_ACCESS_OBJECT_ACCESS_UNSUPPORTED);
+
+			if (DEBUG_MMS_SERVER){
+				USART_TRACE_RED("MMS_SERVER: createNameListResponse. MMS_ERROR_ACCESS_OBJECT_ACCESS_UNSUPPORTED\n");
+			}
             return;
         }
     }
@@ -528,9 +536,17 @@ mmsServer_handleGetNameListRequest(
 
 			LinkedList nameList = getNameListDomainSpecific(connection, domainSpecificName);
 
-			if (nameList == NULL)
+			if (nameList == NULL){
+
+				if (DEBUG_MMS_SERVER){
+					USART_TRACE_RED("MMS_SERVER: nameList == NULL. responseERROR NON_EXISTENT\n");
+				}
 				mmsServer_createServiceErrorPdu(invokeId, response, MMS_ERROR_ACCESS_OBJECT_NON_EXISTENT);
+			}
 			else {
+				if (DEBUG_MMS_SERVER){
+					USART_TRACE_GREEN("MMS_SERVER: nameList != NULL. createNameListResponse: 0x%x\n",nameList);
+				}
 				createNameListResponse(connection, invokeId, nameList, response, continueAfterId);
 				LinkedList_destroy(nameList);
 			}

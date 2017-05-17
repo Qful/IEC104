@@ -29,6 +29,9 @@
 
 #include "lwip/dhcp.h"
 
+// Файловая система
+#include "ff.h"
+
 /* часы --*/
 #include "clocks.h"
 
@@ -47,7 +50,7 @@
 //#include "acse.h"
 #include "iso_server.h"
 #include "iec61850_server.h"
-#include "static_model.h"
+
 #include "mms_mapping.h"
 
 #include "iec61850_cdc.h"
@@ -55,6 +58,27 @@
 
 #include "mms_server_connection.h"
 
+#if defined (MR5_700)
+#include "static_model_MR5_700.h"
+#endif
+#if defined (MR5_600)
+#include "static_model_MR5_600.h"
+#endif
+#if defined (MR5_500)
+#include "static_model_MR5_500.h"
+#endif
+#if defined (MR771)
+#include "static_model_MR771.h"
+#endif
+#if defined (MR801)
+#include "static_model_MR801.h"
+#endif
+#if defined (MR901) || defined (MR902)
+#include "static_model_MR901_902.h"
+#endif
+#if defined (MR761) || defined (MR762) || defined (MR763)
+#include "static_model_MR76x.h"
+#endif
 //#include "MmsPdu.h"
 
 #include "goose_receiver.h"
@@ -65,18 +89,36 @@
 #include "modbus.h"
 
 
+
 #define WEBSERVER_THREAD_PRIO    ( tskIDLE_PRIORITY + 4 )
 /* Variables -----------------------------------------------------------------*/
+// виртуальный диск
+FATFS RAMDISKFatFs;  /* File system object for RAM disk logical drive */
+char RAMDISKPath[4]; /* RAM disk logical drive path */
+uint8_t	buffer[100];
+
+BYTE Buff[4096] __attribute__ ((aligned (4))) ;	/* Working buffer */
+
+
+
+// сеть
 extern volatile uint8_t	MAC_ADDR[6];
 extern uint8_t		IP_ADDR[4];
 extern uint8_t		NETMASK_ADDR[4];
 extern uint8_t		GW_ADDR[4];
+
+extern uint8_t		writeNmb;
+extern	uint8_t	  writeNmbSG;			// номер группы уставок.
+
 
 //extern IedServer iedServer;
 IedServer iedServer = NULL;
 
 static int running = 0;
 
+
+uint64_t nextSynchTime = 0;
+bool resynch = false;
 
 extern struct netconn *newconn850;
 extern struct netif 	gnetif;
@@ -147,6 +189,7 @@ void	gooseListener(GooseSubscriber subscriber, void* parameter)
 /*************************************************************************
  * CheckHandlerResult
  *************************************************************************/
+/*
 static CheckHandlerResult	checkHandler(void* parameter, MmsValue* ctlVal, bool test, bool interlockCheck, ClientConnection connection)
 {
     printf("check handler called!\n");
@@ -154,20 +197,21 @@ static CheckHandlerResult	checkHandler(void* parameter, MmsValue* ctlVal, bool t
     if (interlockCheck)
         printf("  with interlock check bit set!\n");
 
-    if (parameter == IEDMODEL_GGIO_INGGIO1_SPCSO1)
+    if (parameter == &iedModel_GGIO_INGGIO1_SPCSO1)
         return CONTROL_ACCEPTED;
 
-    if (parameter == IEDMODEL_GGIO_INGGIO1_SPCSO2)
+    if (parameter == &iedModel_GGIO_INGGIO1_SPCSO2)
         return CONTROL_ACCEPTED;
 
-    if (parameter == IEDMODEL_GGIO_INGGIO1_SPCSO3)
+    if (parameter == &iedModel_GGIO_INGGIO1_SPCSO3)
         return CONTROL_ACCEPTED;
 
-    if (parameter == IEDMODEL_GGIO_INGGIO1_SPCSO4)
+    if (parameter == &iedModel_GGIO_INGGIO1_SPCSO4)
         return CONTROL_ACCEPTED;
 
     return CONTROL_OBJECT_UNDEFINED;
 }
+*/
 /*************************************************************************
  * connectionHandler
  *************************************************************************/
@@ -186,7 +230,7 @@ static void	connectionHandler (IedServer self, ClientConnection connection, bool
 static MmsDataAccessError	writeAccessHandler (DataAttribute* dataAttribute, MmsValue* value, ClientConnection connection, void* parameter)
 {
 	/*
-    if (dataAttribute == IEDMODEL_Inverter_ZINV1_OutVarSet_setMag_f) { //IEDMODEL_GenericIO_GGIO1_NamPlt_vendor
+    if (dataAttribute == IED&iedModel_erter_ZINV1_OutVarSet_setMag_f) { //&iedModel_GenericIO_GGIO1_NamPlt_vendor
 
         float newValue = MmsValue_toFloat(value);
 
@@ -208,10 +252,17 @@ static MmsDataAccessError	writeAccessHandler (DataAttribute* dataAttribute, MmsV
  *************************************************************************/
 void StartIEC850Task(void const * argument){
 
+	long p3;
+
 extern osThreadId IEC850TaskHandle;
 
-
-	iedServer = IedServer_create(&iedModel);	// создадим IED электронное устройство
+/*
+	IP_ADDR[0] = 192;
+	IP_ADDR[1] = 168;
+	IP_ADDR[2] = 0;
+	IP_ADDR[3] = 252;
+*/
+//	iedServer = IedServer_create(&iedModel);	// создадим IED электронное устройство
 
 	osMutexRelease(xIEC850ServerStartMutex);
 
@@ -221,6 +272,8 @@ extern osThreadId IEC850TaskHandle;
 	    	// не запустился, всё нам конец.
 			USART_TRACE_RED("не запустился, всё нам конец.\n");
 	    }
+
+	    iedServer = IedServer_create(&iedModel);							// создадим IED электронное устройство
 	    USART_TRACE_GREEN("Получили IP, запускаем сервак.\n");
 	    // 2. конфигурим сервер открываем порт.
 		IsoServer isoServer = IedServer_getIsoServer(iedServer);
@@ -247,6 +300,77 @@ extern osThreadId IEC850TaskHandle;
 // 4. запускаем стейтмашину 61850
 	    USART_TRACE_GREEN("запускаем стейтмашину 61850\n");
 
+// -----------------------------------------------------------------------------
+
+	    if(FATFS_LinkDriver(&SRAMDISK_Driver, RAMDISKPath) == 0)				  // Link the RAM disk I/O driver SPIDISK_Driver   SRAMDISK_Driver
+	    {
+	      if(f_mount(&RAMDISKFatFs, (TCHAR const*)RAMDISKPath, 0) != FR_OK)	      // Монтируем диск
+	      {
+	  	    USART_TRACE_RED("Ошибка монтирования диска\n");
+	      }
+	      else
+	      {
+	       // if(f_mkfs((TCHAR const*)RAMDISKPath, 0, 0) != FR_OK)
+	    	  if(f_mkfs((const TCHAR*)RAMDISKPath, FM_FAT, 0, Buff, sizeof Buff)!= FR_OK)	// форматируем диск
+	        {
+		  	    USART_TRACE_RED("Ошибка форматирования диска\n");
+	        }
+	        else
+	        {
+		  	    USART_TRACE_GREEN("Диск создан успешно\n");
+		  	  if (f_mkdir("MMSfiles") != FR_OK){
+			  	    USART_TRACE_RED("Ошибка создания каталога MMSfiles\n");
+		  	  } else
+		  	  {
+			  	    USART_TRACE_GREEN("каталог MMSfiles/ создан успешно\n");
+
+			 // 	   DIR dirHandle;
+			 // 	  if(f_opendir(&dirHandle, (TCHAR const*)"MMSfiles") == FR_OK){				// Open directory
+			 // 		USART_TRACE("сменили каталог 0:/MMSfiles>\n");
+			 // 	  }
+
+			  		//portENTER_CRITICAL();
+			  	    {
+			  	    	FIL 	Myfile;
+
+						if(f_open(&Myfile,"0:/MMSfiles/Jurnal.bin", FA_CREATE_ALWAYS | FA_WRITE) == FR_OK){
+							USART_TRACE("Создали файл Jurnal.bin\n");
+							if(f_write(&Myfile,"HurnalLog_test_0102030405", sizeof("HurnalLog_test_0102030405"), NULL) == FR_OK){
+								USART_TRACE("записали в него.\n");
+								f_close(&Myfile);
+							}
+						}
+
+						if(f_open(&Myfile,"0:/MMSfiles/Error.bin", FA_CREATE_ALWAYS | FA_WRITE) == FR_OK){
+							USART_TRACE("Создали файл Error.bin\n");
+							if(f_write(&Myfile,"JurnalError_test_0102030405", sizeof("JurnalError_test_0102030405"), NULL) == FR_OK){
+								USART_TRACE("записали в него.\n");
+								f_close(&Myfile);
+							}
+						}
+			  	    }
+			  	   // portEXIT_CRITICAL();
+
+
+			  		uint8_t res;
+			  	    FATFS *fs;
+			  	    DWORD fre_clust, fre_sect, tot_sect;
+
+
+			  	    /* Get volume information and free clusters of drive 1 */
+			  	    res = f_getfree(RAMDISKPath, &fre_clust, &fs);
+
+			  	    /* Get total sectors and free sectors */
+			  	    tot_sect = (fs->n_fatent - 2) * fs->csize;
+			  	    fre_sect = fre_clust * fs->csize;
+
+			  	    /* Print the free space (assuming 512 bytes/sector) */
+			  	    printf("Размер диска %lu KB. Свободно %lu KB \n", tot_sect / 2, fre_sect / 2);
+		  	  }
+	        }
+	      }
+	    }
+// -----------------------------------------------------------------------------
 	    Port_Off(LED1);
 
 	for(;;) {
@@ -255,12 +379,8 @@ extern osThreadId IEC850TaskHandle;
 		// -------------------------------------------------------------------------------------------------------------------
 		//iedServer = IedServer_create(&iedModel);								// создадим IED электронное устройство
 		// включаем парольный доступ
-#ifdef	UseOSmem
-		AcseAuthenticationParameter auth = pvPortMalloc(sizeof(AcseAuthenticationParameter));
-#else
-		AcseAuthenticationParameter auth = malloc(sizeof(AcseAuthenticationParameter));
-#endif
-		// server_example4
+		AcseAuthenticationParameter auth = GLOBAL_MALLOC(sizeof(AcseAuthenticationParameter));
+
 		char* password = "testpw";
 	    auth->mechanism = ACSE_AUTH_PASSWORD;
 	    auth->value.password.octetString = (uint8_t*) password;
@@ -272,22 +392,38 @@ extern osThreadId IEC850TaskHandle;
 		// Функции контроля над объектами, при управлении от клиента
 		// -------------------------------------------------------------------------------------------------------------------
 
-		// контроль за объектом IEDMODEL_GenericIO_GGIO1_Ind1. Указываем на функцию-обработчик controlHandlerForBinaryOutput и параметр (IEDMODEL_GenericIO_GGIO1_Ind1) если функция обрабатывает несколько объектов.
+		// контроль за объектом &iedModel_GenericIO_GGIO1_Ind1. Указываем на функцию-обработчик controlHandlerForBinaryOutput и параметр (&iedModel_GenericIO_GGIO1_Ind1) если функция обрабатывает несколько объектов.
 		// управление выключателем
-		IedServer_setControlHandler(iedServer, IEDMODEL_CTRL_CSWI1_Pos, (ControlHandler) controlHandlerForBinaryOutput,IEDMODEL_CTRL_CSWI1_Pos_Oper);
 
-		IedServer_setControlHandler(iedServer, IEDMODEL_GGIO_LEDGGIO1_SPCSO1, (ControlHandler) controlHandlerForBinaryOutput,IEDMODEL_GGIO_LEDGGIO1_SPCSO1_Oper);
-		IedServer_setControlHandler(iedServer, IEDMODEL_CTRL_GGIO1_SPCSO1, (ControlHandler) controlHandlerForBinaryOutput,IEDMODEL_CTRL_GGIO1_SPCSO1_Oper);
-		IedServer_setControlHandler(iedServer, IEDMODEL_CTRL_GGIO1_SPCSO2, (ControlHandler) controlHandlerForBinaryOutput,IEDMODEL_CTRL_GGIO1_SPCSO2_Oper);
-		IedServer_setControlHandler(iedServer, IEDMODEL_CTRL_GGIO1_SPCSO3, (ControlHandler) controlHandlerForBinaryOutput,IEDMODEL_CTRL_GGIO1_SPCSO3_Oper);
+#if defined (MR761) || defined (MR762) || defined (MR763)
+	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_CSWI1_Pos, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_CSWI1_Pos_Oper);
+	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_XCBR1_Mod,(ControlHandler) controlHandlerForBinaryOutput, &iedModel_CTRL_XCBR1_Mod_Oper);
+#endif
+#if defined (MR771)
+	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_CSWI1_Pos, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_CSWI1_Pos_Oper);
+	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_XCBR1_Mod,(ControlHandler) controlHandlerForBinaryOutput, &iedModel_CTRL_XCBR1_Mod_Oper);
+#endif
+#if defined (MR801)
+	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_CSWI1_Pos, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_CSWI1_Pos_Oper);
+	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_XCBR1_Mod,(ControlHandler) controlHandlerForBinaryOutput, &iedModel_CTRL_XCBR1_Mod_Oper);
+#endif
+#if defined (MR5_700)
+	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_CSWI1_Pos, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_CSWI1_Pos_Oper);
+	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_XCBR1_Mod,(ControlHandler) controlHandlerForBinaryOutput, &iedModel_CTRL_XCBR1_Mod_Oper);
+#endif
+#if defined (MR5_500)
+	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_CSWI1_Pos, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_CSWI1_Pos_Oper);
+	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_XCBR1_Mod,(ControlHandler) controlHandlerForBinaryOutput, &iedModel_CTRL_XCBR1_Mod_Oper);
+#endif
 
-
-//	    IedServer_setControlHandler(iedServer, IEDMODEL_GGIO_INGGIO1_SPCSO1,(ControlHandler) controlHandlerForBinaryOutput, IEDMODEL_GGIO_INGGIO1_SPCSO1);
-	    IedServer_setControlHandler(iedServer, IEDMODEL_CTRL_XCBR1_Mod,(ControlHandler) controlHandlerForBinaryOutput, IEDMODEL_CTRL_XCBR1_Mod_Oper);
+	    IedServer_setControlHandler(iedServer, &iedModel_GGIO_LEDGGIO1_SPCSO1, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_GGIO_LEDGGIO1_SPCSO1_Oper);
+		IedServer_setControlHandler(iedServer, &iedModel_CTRL_GGIO1_SPCSO1, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_GGIO1_SPCSO1_Oper);
+		IedServer_setControlHandler(iedServer, &iedModel_CTRL_GGIO1_SPCSO2, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_GGIO1_SPCSO2_Oper);
+		IedServer_setControlHandler(iedServer, &iedModel_CTRL_GGIO1_SPCSO3, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_GGIO1_SPCSO3_Oper);
 
 
 	    /* this is optional - performs operative checks */
-	    IedServer_setPerformCheckHandler(iedServer, IEDMODEL_GGIO_INGGIO1_SPCSO1, checkHandler, IEDMODEL_GGIO_INGGIO1_SPCSO1);
+	 //   IedServer_setPerformCheckHandler(iedServer, &iedModel_GGIO_INGGIO1_SPCSO1, checkHandler, &iedModel_GGIO_INGGIO1_SPCSO1);
 /*****************************************************************************************************
  *
  * многоклиентский доступ
@@ -304,9 +440,7 @@ extern osThreadId IEC850TaskHandle;
 		#endif
 
 			//--------------- SG -------------------------
-		    SettingGroupControlBlock* sgcb = LogicalDevice_getSettingGroupControlBlock(IEDMODEL_Generic_LD0);
-
-		    loadActiveSgValues(sgcb->actSG);
+		    SettingGroupControlBlock* sgcb = LogicalDevice_getSettingGroupControlBlock(&iedModel_Generic_LD0);
 
 		    IedServer_setActiveSettingGroupChangedHandler(iedServer, sgcb, activeSgChangedHandler, NULL);
 		    IedServer_setEditSettingGroupChangedHandler(iedServer, sgcb, editSgChangedHandler, NULL);
@@ -342,9 +476,9 @@ extern osThreadId IEC850TaskHandle;
 
 
 			printf("memory gap = %u\r\n", xPortGetFreeHeapSize());
-			printf("task count = %u\r\n", uxTaskGetNumberOfTasks());
+			printf("task count = %u\r\n",(unsigned int)uxTaskGetNumberOfTasks());
 			static signed char taskInfoBuf[48 * 8];
-			vTaskGetRunTimeStats(taskInfoBuf );
+			vTaskGetRunTimeStats((char *)taskInfoBuf);
 			printf("%s\r\n", taskInfoBuf);
 
 			while (running) {
@@ -392,26 +526,57 @@ void	controlHandlerForBinaryOutput(void* parameter, MmsValue* value, bool test)
 
 	    bool newState = MmsValue_getBoolean(value);
 
+#if defined (MR761) || defined (MR762) || defined (MR763)
 	    // выключатель
-	    if (parameter == IEDMODEL_CTRL_CSWI1_Pos_Oper)	{
-	    	USART_TRACE_GREEN("команда управления выключателем IEDMODEL_CTRL_CSWI1_Pos_Oper\n");
+	    if (parameter == &iedModel_CTRL_CSWI1_Pos_Oper)	{
+	    	USART_TRACE_GREEN("команда управления выключателем &iedModel_CTRL_CSWI1_Pos_Oper\n");
 	    	CSWI_Pos_Oper_Set(newState, timeStamp);
 	    }
+#endif
+#if defined (MR771)
+	    // выключатель
+	    if (parameter == &iedModel_CTRL_CSWI1_Pos_Oper)	{
+	    	USART_TRACE_GREEN("команда управления выключателем &iedModel_CTRL_CSWI1_Pos_Oper\n");
+	    	CSWI_Pos_Oper_Set(newState, timeStamp);
+	    }
+#endif
+#if defined (MR801)
+	    // выключатель
+	    if (parameter == &iedModel_CTRL_CSWI1_Pos_Oper)	{
+	    	USART_TRACE_GREEN("команда управления выключателем &iedModel_CTRL_CSWI1_Pos_Oper\n");
+	    	CSWI_Pos_Oper_Set(newState, timeStamp);
+	    }
+#endif
+#if defined (MR5_700)
+	    // выключатель
+	    if (parameter == &iedModel_CTRL_CSWI1_Pos_Oper)	{
+	    	USART_TRACE_GREEN("команда управления выключателем &iedModel_CTRL_CSWI1_Pos_Oper\n");
+	    	CSWI_Pos_Oper_Set(newState, timeStamp);
+	    }
+#endif
+#if defined (MR5_500)
+	    // выключатель
+	    if (parameter == &iedModel_CTRL_CSWI1_Pos_Oper)	{
+	    	USART_TRACE_GREEN("команда управления выключателем &iedModel_CTRL_CSWI1_Pos_Oper\n");
+	    	CSWI_Pos_Oper_Set(newState, timeStamp);
+	    }
+#endif
+
 	    // Сброс индикации
-	    if (parameter == IEDMODEL_GGIO_LEDGGIO1_SPCSO1_Oper)	{
+	    if (parameter == &iedModel_GGIO_LEDGGIO1_SPCSO1_Oper)	{
 	    	USART_TRACE_GREEN("Сброс индикации\n");
 	    	GGIO_LEDGGIO1_SPCSO1_Oper(newState, timeStamp);
 	    }
 
-	    if (parameter == IEDMODEL_CTRL_GGIO1_SPCSO1_Oper)	{
+	    if (parameter == &iedModel_CTRL_GGIO1_SPCSO1_Oper)	{
 	    	USART_TRACE_GREEN("Сброс флага новой неисправности\n");
 	    	GGIO_SPCSO1_Oper(newState, timeStamp);
 	    }
-	    if (parameter == IEDMODEL_CTRL_GGIO1_SPCSO2_Oper)	{
+	    if (parameter == &iedModel_CTRL_GGIO1_SPCSO2_Oper)	{
 	    	USART_TRACE_GREEN("Сброс флага новой записи в журнале системы\n");
 	    	GGIO_SPCSO2_Oper(newState, timeStamp);
 	    }
-	    if (parameter == IEDMODEL_CTRL_GGIO1_SPCSO3_Oper)	{
+	    if (parameter == &iedModel_CTRL_GGIO1_SPCSO3_Oper)	{
 	    	USART_TRACE_GREEN("Сброс флага новой записи в журнале аварий\n");
 	    	GGIO_SPCSO3_Oper(newState, timeStamp);
 	    }
@@ -468,31 +633,36 @@ static void Netif_Config(char* ipAddress,char* Mask, char* Gateway)
     /* When the netif link is down this function must be called */
     netif_set_down(&gnetif);
   }
-
-  /* Set the link callback function, this function is called on change of link status*/
+/*
+  // Set the link callback function, this function is called on change of link status
   netif_set_link_callback(&gnetif, ethernetif_update_config);
 
-  /* create a binary semaphore used for informing ethernetif of frame reception */
+  // create a binary semaphore used for informing ethernetif of frame reception
   osSemaphoreDef(Netif_SEM);
   Netif_LinkSemaphore = osSemaphoreCreate(osSemaphore(Netif_SEM) , 1 );
 
   link_arg.netif = &gnetif;
   link_arg.semaphore = Netif_LinkSemaphore;
-  /* Create the Ethernet link handler thread */
+  // Create the Ethernet link handler thread
   USART_TRACE_MAGENTA("(LinkThr) Create the Ethernet link handler thread.\n");
 #if defined(__GNUC__)
-  osThreadDef(LinkThr, ethernetif_set_link, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 5);
+  osThreadDef(LinkThr, ethernetif_set_link, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 2);	// configMINIMAL_STACK_SIZE * 5 уменьшил
 #else
   osThreadDef(LinkThr, ethernetif_set_link, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 2);
 #endif
   osThreadCreate (osThread(LinkThr), &link_arg);
+
+*/
 }
 
-//--------------------------------------------------------------------
-
+/***********************************************************************
+ * activeSgChangedHandler
+ * изменение номера ActSG группы уставок из ethernet.
+ * закидываем команду записи номера в модбас
+ ***********************************************************************/
 static bool	activeSgChangedHandler (void* parameter, SettingGroupControlBlock* sgcb,	 uint8_t newActSg, ClientConnection connection)
 {
-    printf("Switch to setting group %i\n", (int) newActSg);
+	USART_TRACE_BLUE("Switch to setting group %i\n", (int) newActSg);
 
     loadActiveSgValues(newActSg);
 
@@ -501,7 +671,7 @@ static bool	activeSgChangedHandler (void* parameter, SettingGroupControlBlock* s
 
 static bool	editSgChangedHandler (void* parameter, SettingGroupControlBlock* sgcb,  uint8_t newEditSg, ClientConnection connection)
 {
-    printf("Set edit setting group to %i\n", (int) newEditSg);
+	USART_TRACE_BLUE("Set edit setting group to %i\n", (int) newEditSg);
 
     loadEditSgValues(newEditSg);
 
@@ -509,22 +679,49 @@ static bool	editSgChangedHandler (void* parameter, SettingGroupControlBlock* sgc
 }
 static void	editSgConfirmedHandler(void* parameter, SettingGroupControlBlock* sgcb,	uint8_t editSg)
 {
-    printf("Received edit sg confirm for sg %i\n", editSg);
+	USART_TRACE_BLUE("Received edit sg confirm for sg %i\n", editSg);
 
-     if (IedServer_getActiveSettingGroup(iedServer, sgcb) == editSg) {
-        loadActiveSgValues(editSg);
-    }
+ //    if (IedServer_getActiveSettingGroup(iedServer, sgcb) == editSg) {
+ //       loadActiveSgValues(editSg);
+ //   }
 }
 //--------------------------------------------------------------------
 static void		loadActiveSgValues (int actSG)
 {
+#if defined (MR761) || defined (MR762) || defined (MR763)
+		writeNmbSG = actSG;
+		writeNmb = 7;
+#endif
+#if defined (MR771)
+		writeNmbSG = actSG;
+		writeNmb = 7;
+#endif
+#if defined (MR801)
+		writeNmbSG = actSG;
+		if (actSG == 1) 	writeNmb = 7;
+		else
+		if (actSG == 2) 	writeNmb = 8;
+#endif
+#if defined (MR901) || defined (MR902)
+		writeNmbSG = actSG;
+		if (actSG == 1) 	writeNmb = 7;
+		else
+		if (actSG == 2) 	writeNmb = 8;
+#endif
+#if defined (MR5_500) || defined (MR5_600) || defined (MR5_700)
+		writeNmbSG = actSG;
+	if (actSG == 1) 	writeNmb = 7;
+	else
+	if (actSG == 2) 	writeNmb = 8;
+#endif
+
 
 	// тут функция переключения группы уставок с вычитыванием всех
-  // IedServer_updateInt32AttributeValue(iedServer, IEDMODEL_LD0_LLN0_RstTms_setVal, 1);
+  // IedServer_updateInt32AttributeValue(iedServer, &iedModel_LD0_LLN0_RstTms_setVal, 1);
 }
 //--------------------------------------------------------------------
 static void		loadEditSgValues (int editSG)
 {
-//    IedServer_updateInt32AttributeValue(iedServer, IEDMODEL_SE_LD0_LLN0_RstTms_setVal, 2);
+//    IedServer_updateInt32AttributeValue(iedServer, &iedModel_SE_LD0_LLN0_RstTms_setVal, 2);
 }
 

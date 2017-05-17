@@ -652,9 +652,15 @@ CotpConnection_readToTpktBuffer(CotpConnection* self)
         if (readBytes == -2) {
             goto exit_closed;
         }
+        if (readBytes == 0){
 
-        if (readBytes < 0)
+            goto exit_closed;
+        }else
+        if (readBytes < 0){								// вернула ошибку приема.
+            if (DEBUG_COTP)
+            	printf("TPKT: readBytes:%i\n",readBytes);
             goto exit_tpkperror;
+        }
 
         if (DEBUG_COTP) {
             if (readBytes > 0)
@@ -671,12 +677,14 @@ CotpConnection_readToTpktBuffer(CotpConnection* self)
                     printf("TPKT: header complete (msg size = %i)\n", self->packetSize);
 
                 if (self->packetSize > bufferSize) {
-                    if (DEBUG_COTP) printf("TPKT: packet too large\n");
+                    if (DEBUG_COTP)
+                    	printf("TPKT: packet too large\n");
                     goto exit_error;
                 }
             }
             else {
-                if (DEBUG_COTP) printf("TPKT: failed to decode TPKT header.\n");
+                if (DEBUG_COTP)
+                	printf("TPKT: failed to decode TPKT header.\n");
                 goto exit_error;
             }
         }
@@ -686,36 +694,43 @@ CotpConnection_readToTpktBuffer(CotpConnection* self)
 
     readBytes = Socket_read(self->socket, buffer + bufPos, self->packetSize - bufPos);
 
-    if (readBytes < 0)
+    if (readBytes < 0){
+        if (DEBUG_COTP)
+        	printf("TPKT: readBytes:%i ",readBytes);
         goto exit_tpkperror;
+    }
 
     bufPos += readBytes;
 
     if (bufPos < self->packetSize)
        goto exit_waiting;
 
-    if (DEBUG_COTP) printf("TPKT: message complete (size = %i)\n", self->packetSize);
+    if (DEBUG_COTP)
+    	printf("TPKT_PACKET_COMPLETE: message complete (size = %i)\n", self->packetSize);
 
     self->readBuffer->size = bufPos;
     return TPKT_PACKET_COMPLETE;
 
 exit_tpkperror:
-        if (DEBUG_COTP) printf("TPKT: socket error\n");
-        return TPKT_ERROR;
+    if (DEBUG_COTP)
+      	printf("TPKT_ERROR: socket error\n");
+    return TPKT_ERROR;
 
 exit_closed:
-    if (DEBUG_COTP) printf("TPKT: socket closed\n");
+    if (DEBUG_COTP)
+    	printf("TPKT_CLOSE: socket closed\n");
     return TPKT_CLOSE;
 
 exit_error:
-    if (DEBUG_COTP) printf("TPKT: Error parsing message\n");
+    if (DEBUG_COTP)
+    	printf("TPKT_ERROR: Error parsing message\n");
     return TPKT_ERROR;
 
 exit_waiting:
 
     if (DEBUG_COTP)
         if (bufPos != 0)
-            printf("TPKT: waiting (read %i of %i)\n", bufPos, self->packetSize);
+            printf("TPKT_WAITING: waiting (read %i of %i)\n", bufPos, self->packetSize);
 
     self->readBuffer->size = bufPos;
     return TPKT_WAITING;
