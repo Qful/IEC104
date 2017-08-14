@@ -106,6 +106,12 @@ extern volatile uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
 extern uint16_t   usMAnalogInStart;
 extern volatile uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
 #endif
+#if defined (MR851)
+extern uint16_t   usMDiscInStart;			// адрес
+extern volatile uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   usMAnalogInStart;
+extern volatile uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+#endif
 #if defined (MR901) || defined (MR902)
 extern uint16_t   usMDiscInStart;			// адрес
 extern volatile uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
@@ -815,6 +821,23 @@ BOOL	Hal_setTimeFromMB_Date( uint16_t * MDateBuf ){
 	return	TRUE;
 }
 /********************************************************************************************************
+ * Hal_Verify_Rev
+ * проверка ревизии.
+ *********************************************************************************************************/
+int8_t	Hal_Verify_Rev( uint8_t * MDateBuf ){
+	int8_t ret = false;
+	uint8_t* Revs = (uint8_t*)&_swREV;
+
+	if ((Revs[0] == 'M') && (Revs[1] == 'R') && (Revs[2] == '5') ) return true;
+
+	if ((MDateBuf[3] == Revs[2]) && (MDateBuf[4] == Revs[3]) && (MDateBuf[5] == Revs[4])) {
+		ret = true;
+	}else{
+		USART_TRACE_RED("связной для:%s запускаем сервер для перепрошивки.\n",Revs);
+	}
+	return ret;
+}
+/********************************************************************************************************
  * Hal_setIPFromMB_Date
  * установка IP адреса из буфера MODBUS
  *********************************************************************************************************/
@@ -822,7 +845,7 @@ int8_t	Hal_setIPFromMB_Date( uint16_t * MDateBuf ){
 extern uint8_t		IP_ADDR[4];
 
 
-	if (	MDateBuf[0] == 0xffff && MDateBuf[1] == 0xffff)	{
+	if ((MDateBuf[0] == 0xffff && MDateBuf[1] == 0xffff) || (MDateBuf[0] == 0 && MDateBuf[1] == 0))	{
 		return	-1;
 	}else
 	if (	(IP_ADDR[3] == (MDateBuf[0] & 0xFF)) &&
@@ -840,6 +863,10 @@ extern uint8_t		IP_ADDR[4];
 		IP_ADDR[1] = MDateBuf[1] & 0xFF;
 		IP_ADDR[0] = MDateBuf[1]>>8 & 0xFF;
 
+		// адресок то стрёмный, ставим дефолтный
+		if ((IP_ADDR[0] == 0) || (IP_ADDR[1] == 0) || (IP_ADDR[0] == 0xFF) || (IP_ADDR[1] == 0xFF) || (IP_ADDR[2] == 0xFF)|| (IP_ADDR[3] == 0xFF)){
+			  IP_ADDR[0] = 192;IP_ADDR[1] = 168;IP_ADDR[2] = 0;IP_ADDR[3] = 254;
+		}
 
 		//Flash_Write((uint8_t *)&IP_ADDR[0],(uint8_t *)&userConfig[_IfIPaddr],4);	// Пишем IP во внутреннюю флэш
 		memory_write_to_mem((uint8_t *)&IP_ADDR[0],_IfIPaddr,4);

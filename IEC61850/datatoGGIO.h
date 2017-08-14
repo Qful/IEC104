@@ -17,5 +17,8 @@ void	Set_SSLGGIO	(uint8_t num, uint64_t currentTime );
 void	Set_VLSGGIO	(uint8_t num, uint64_t currentTime );
 void	Set_LSGGIO	(uint8_t num, uint64_t currentTime );
 
+void	Set_NBLKGGIO	(uint8_t num, uint64_t currentTime );
+
+
 void	Set_LEDGGIO	(uint8_t num, uint64_t currentTime );
 #endif /* DATATOGGIO_H_ */

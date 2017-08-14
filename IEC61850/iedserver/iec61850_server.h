@@ -494,7 +494,8 @@ IedServer_getFunctionalConstrainedData(IedServer self, DataObject* dataObject, F
  * \param dataAttribute the data attribute handle
  * \param value MmsValue object used to update the value cached by the server.
  */
-void
+//void
+int
 IedServer_updateAttributeValue(IedServer self, DataAttribute* dataAttribute, MmsValue* value);
 
 /**
@@ -557,7 +558,8 @@ IedServer_updateInt64AttributeValue(IedServer self, DataAttribute* dataAttribute
  * \param dataAttribute the data attribute handle
  * \param value the new unsigned integer value of the data attribute.
  */
-void
+//void
+int
 IedServer_updateUnsignedAttributeValue(IedServer self, DataAttribute* dataAttribute, uint32_t value);
 
 /**
@@ -606,7 +608,8 @@ IedServer_updateBooleanAttributeValue(IedServer self, DataAttribute* dataAttribu
  */
 void
 IedServer_updateVisibleStringAttributeValue(IedServer self, DataAttribute* dataAttribute, char *value);
-
+void
+IedServer_updateMMSStringAttributeValue(IedServer self, DataAttribute* dataAttribute, char *value);
 /**
  * \brief Update the value of an IEC 61850 UTC time (timestamp) data attribute.
  *

@@ -73,6 +73,9 @@
 #if defined (MR801)
 #include "static_model_MR801.h"
 #endif
+#if defined (MR851)
+#include "static_model_MR851.h"
+#endif
 #if defined (MR901) || defined (MR902)
 #include "static_model_MR901_902.h"
 #endif
@@ -92,6 +95,10 @@
 
 #define WEBSERVER_THREAD_PRIO    ( tskIDLE_PRIORITY + 4 )
 /* Variables -----------------------------------------------------------------*/
+extern RTC_TimeTypeDef StartsTime;
+extern RTC_DateTypeDef StartsDate;
+
+
 // виртуальный диск
 FATFS RAMDISKFatFs;  /* File system object for RAM disk logical drive */
 char RAMDISKPath[4]; /* RAM disk logical drive path */
@@ -106,6 +113,9 @@ extern volatile uint8_t	MAC_ADDR[6];
 extern uint8_t		IP_ADDR[4];
 extern uint8_t		NETMASK_ADDR[4];
 extern uint8_t		GW_ADDR[4];
+extern uint8_t		SNTP_IP_ADDR[4];
+extern uint16_t		SNTP_Period;
+extern int8_t		TimeZone_my;
 
 extern uint8_t		writeNmb;
 extern	uint8_t	  writeNmbSG;			// номер группы уставок.
@@ -116,9 +126,9 @@ IedServer iedServer = NULL;
 
 static int running = 0;
 
-
-uint64_t nextSynchTime = 0;
-bool resynch = false;
+uint64_t 	nextSynchTime = 0;
+bool 		resynch = false;
+bool		getJurnals = false;
 
 extern struct netconn *newconn850;
 extern struct netif 	gnetif;
@@ -252,9 +262,9 @@ static MmsDataAccessError	writeAccessHandler (DataAttribute* dataAttribute, MmsV
  *************************************************************************/
 void StartIEC850Task(void const * argument){
 
-	long p3;
-
+long p3;
 extern osThreadId IEC850TaskHandle;
+
 
 /*
 	IP_ADDR[0] = 192;
@@ -273,8 +283,32 @@ extern osThreadId IEC850TaskHandle;
 			USART_TRACE_RED("не запустился, всё нам конец.\n");
 	    }
 
+	    // получили время включеня модуля.
+		  HAL_RTC_GetTime((RTC_HandleTypeDef *)&hrtc, &StartsTime, FORMAT_BIN);
+		  HAL_RTC_GetDate((RTC_HandleTypeDef *)&hrtc, &StartsDate, FORMAT_BIN);
+
+
 	    iedServer = IedServer_create(&iedModel);							// создадим IED электронное устройство
 	    USART_TRACE_GREEN("Получили IP, запускаем сервак.\n");
+
+		Port_Off(LED_out_RED);
+
+	    // проверка на валидность IP адреса
+		  if (IP_ADDR[0] == 0xFF || IP_ADDR[3] == 0xFF || IP_ADDR[0] == 0 || IP_ADDR[1] == 0 ){
+			  IP_ADDR[0] = first_IP_ADDR0;
+			  IP_ADDR[1] = first_IP_ADDR1;
+			  IP_ADDR[2] = first_IP_ADDR2;
+			  IP_ADDR[3] = first_IP_ADDR3;
+		  }
+		// проверка на валидность IP NTP адреса
+		  if (SNTP_IP_ADDR[0] == 0xFF || SNTP_IP_ADDR[3] == 0xFF || SNTP_IP_ADDR[0] == 0 || SNTP_IP_ADDR[1] == 0 ){
+			  SNTP_IP_ADDR[0] = NTP_IP_ADDR0;
+			  SNTP_IP_ADDR[1] = NTP_IP_ADDR1;
+			  SNTP_IP_ADDR[2] = NTP_IP_ADDR2;
+			  SNTP_IP_ADDR[3] = NTP_IP_ADDR3;
+			  SNTP_Period = 0;
+		  }
+
 	    // 2. конфигурим сервер открываем порт.
 		IsoServer isoServer = IedServer_getIsoServer(iedServer);
 		IsoServer_setEthernetParam(isoServer,(char*)IP_ADDR,(char*)NETMASK_ADDR,(char*)GW_ADDR);
@@ -333,17 +367,22 @@ extern osThreadId IEC850TaskHandle;
 			  	    {
 			  	    	FIL 	Myfile;
 
-						if(f_open(&Myfile,"0:/MMSfiles/Jurnal.bin", FA_CREATE_ALWAYS | FA_WRITE) == FR_OK){
+						if(f_open(&Myfile,_SystemNote, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK){
 							USART_TRACE("Создали файл Jurnal.bin\n");
-							if(f_write(&Myfile,"HurnalLog_test_0102030405", sizeof("HurnalLog_test_0102030405"), NULL) == FR_OK){
+							/*
+							if(f_write(&Myfile,"Журнал системы:\n", strlen("Журнал системы:\n"), NULL) == FR_OK){
 								USART_TRACE("записали в него.\n");
 								f_close(&Myfile);
 							}
+							*/
 						}
 
-						if(f_open(&Myfile,"0:/MMSfiles/Error.bin", FA_CREATE_ALWAYS | FA_WRITE) == FR_OK){
+						//AddToFileMessageString(_SystemNote,"testAppend\n");
+						//AddToFileMessageString(_SystemNote,"testAppend1\n");
+
+						if(f_open(&Myfile,_ErrorNote, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK){
 							USART_TRACE("Создали файл Error.bin\n");
-							if(f_write(&Myfile,"JurnalError_test_0102030405", sizeof("JurnalError_test_0102030405"), NULL) == FR_OK){
+							if(f_write(&Myfile,"Журнал аварий:\n", strlen("Журнал аварий:\n"), NULL) == FR_OK){
 								USART_TRACE("записали в него.\n");
 								f_close(&Myfile);
 							}
@@ -416,10 +455,16 @@ extern osThreadId IEC850TaskHandle;
 	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_XCBR1_Mod,(ControlHandler) controlHandlerForBinaryOutput, &iedModel_CTRL_XCBR1_Mod_Oper);
 #endif
 
-	    IedServer_setControlHandler(iedServer, &iedModel_GGIO_LEDGGIO1_SPCSO1, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_GGIO_LEDGGIO1_SPCSO1_Oper);
+#if defined (MR851)
+	    IedServer_setControlHandler(iedServer, &iedModel_RPN_ATCC1_TapChg, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_RPN_ATCC1_TapChg_Oper);
+	    IedServer_setControlHandler(iedServer, &iedModel_RPN_ATCC1_ParOp, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_RPN_ATCC1_ParOp_Oper);
+
+#endif
+
 		IedServer_setControlHandler(iedServer, &iedModel_CTRL_GGIO1_SPCSO1, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_GGIO1_SPCSO1_Oper);
 		IedServer_setControlHandler(iedServer, &iedModel_CTRL_GGIO1_SPCSO2, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_GGIO1_SPCSO2_Oper);
 		IedServer_setControlHandler(iedServer, &iedModel_CTRL_GGIO1_SPCSO3, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_GGIO1_SPCSO3_Oper);
+		IedServer_setControlHandler(iedServer, &iedModel_CTRL_GGIO1_SPCSO4, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_GGIO1_SPCSO4_Oper);
 
 
 	    /* this is optional - performs operative checks */
@@ -506,25 +551,31 @@ extern osThreadId IEC850TaskHandle;
  *************************************************************************/
 void	controlHandlerForBinaryOutput(void* parameter, MmsValue* value, bool test)
 {
+	MmsType		TypeCMD;
+	bool 		newState;
+	uint16_t 	newStateBitstr = 0;
 	USART_TRACE_GREEN("controlHandlerForBinaryOutput MMS_BOOLEAN:\n");
 
-	 if (MmsValue_getType(value) == MMS_BOOLEAN) {
-		 USART_TRACE("принята команда контроля MMS_BOOLEAN:\n");
+	TypeCMD = MmsValue_getType(value);
+	switch(TypeCMD){
 
-	        if (MmsValue_getBoolean(value)){
-	        	USART_TRACE_GREEN("on\n");
-	        }
-	        else {
-	        	USART_TRACE_RED("off\n");
-	        }
-	    }
-	 else{
-		 USART_TRACE_RED("команда не MMS_BOOLEAN\n");
-	 }
+	case	MMS_BOOLEAN:
+		 	 	 	 	 USART_TRACE("принята команда контроля MMS_BOOLEAN:\n");
+		 	 	 	 	 if (MmsValue_getBoolean(value))	{USART_TRACE_GREEN("on\n");}
+		 	 	 	 	 else  {USART_TRACE_RED("off\n");}
+
+		 	 	 	 	  newState = MmsValue_getBoolean(value);
+		break;
+	case	MMS_BIT_STRING:
+						 newStateBitstr = MmsValue_getBitStringAsInteger(value);
+		break;
+	default:
+		 USART_TRACE_RED("команда не опознана\n");
+		break;
+	}
 
 	    uint64_t timeStamp = Hal_getTimeInMs();
 
-	    bool newState = MmsValue_getBoolean(value);
 
 #if defined (MR761) || defined (MR762) || defined (MR763)
 	    // выключатель
@@ -547,6 +598,17 @@ void	controlHandlerForBinaryOutput(void* parameter, MmsValue* value, bool test)
 	    	CSWI_Pos_Oper_Set(newState, timeStamp);
 	    }
 #endif
+#if defined (MR851)
+	    // привод
+	    if (parameter == &iedModel_RPN_ATCC1_TapChg_Oper)	{
+	    	USART_TRACE_GREEN("команда управления приводом.\n");
+	    	ATCC_TapChg_Pos_Oper_Set(newStateBitstr, timeStamp);
+	    }
+	    if (parameter == &iedModel_RPN_ATCC1_ParOp_Oper)	{
+	    	USART_TRACE_GREEN("команда управления дист. режимом.\n");
+	    	ATCC_ParOp_Pos_Oper(newState, timeStamp);
+	    }
+#endif
 #if defined (MR5_700)
 	    // выключатель
 	    if (parameter == &iedModel_CTRL_CSWI1_Pos_Oper)	{
@@ -562,11 +624,7 @@ void	controlHandlerForBinaryOutput(void* parameter, MmsValue* value, bool test)
 	    }
 #endif
 
-	    // Сброс индикации
-	    if (parameter == &iedModel_GGIO_LEDGGIO1_SPCSO1_Oper)	{
-	    	USART_TRACE_GREEN("Сброс индикации\n");
-	    	GGIO_LEDGGIO1_SPCSO1_Oper(newState, timeStamp);
-	    }
+
 
 	    if (parameter == &iedModel_CTRL_GGIO1_SPCSO1_Oper)	{
 	    	USART_TRACE_GREEN("Сброс флага новой неисправности\n");
@@ -577,11 +635,15 @@ void	controlHandlerForBinaryOutput(void* parameter, MmsValue* value, bool test)
 	    	GGIO_SPCSO2_Oper(newState, timeStamp);
 	    }
 	    if (parameter == &iedModel_CTRL_GGIO1_SPCSO3_Oper)	{
-	    	USART_TRACE_GREEN("Сброс флага новой записи в журнале аварий\n");
+	    	USART_TRACE_GREEN("Сброс блокировки\n");
 	    	GGIO_SPCSO3_Oper(newState, timeStamp);
 	    }
 
-
+	    // Сброс индикации
+	    if (parameter == &iedModel_CTRL_GGIO1_SPCSO4_Oper)	{
+	    	USART_TRACE_GREEN("Сброс индикации\n");
+	    	GGIO_LEDGGIO1_SPCSO1_Oper(newState, timeStamp);
+	    }
 }
 
 /**
@@ -725,3 +787,58 @@ static void		loadEditSgValues (int editSG)
 //    IedServer_updateInt32AttributeValue(iedServer, &iedModel_SE_LD0_LLN0_RstTms_setVal, 2);
 }
 
+/***********************************************************************
+ * AddToFileMessageString
+ * добавим в конец файла строку
+ ***********************************************************************/
+int		AddToFileMessageString(const TCHAR* file, TCHAR* message){
+
+  	FIL 	Myfile;
+  	int		ret;
+
+	if(f_open(&Myfile,file, FA_OPEN_APPEND | FA_WRITE) == FR_OK){
+		if(f_write(&Myfile,message, strlen(message), NULL) == FR_OK){
+			f_close(&Myfile);
+			ret = true;
+
+		}else ret = false;
+	}else ret = false;
+
+	return	ret;
+}
+/***********************************************************************
+ * AddToFileMessageWord
+ * добавим в конец файла сырые байты
+ * numb - число байт
+ ***********************************************************************/
+int		AddToFileMessageWord(const TCHAR* file, uint8_t* Data,uint16_t numb,uint8_t	mode){
+
+  	FIL 	Myfile;
+  	int		ret,i;
+	RTC_TimeTypeDef sTime;
+	RTC_DateTypeDef sDate;
+
+	HAL_RTC_GetTime((RTC_HandleTypeDef *)&hrtc, &sTime, FORMAT_BIN);			// Читаем время
+	HAL_RTC_GetDate((RTC_HandleTypeDef *)&hrtc, &sDate, FORMAT_BIN);			// читаем дату
+
+
+	if(f_open(&Myfile,file, mode) == FR_OK){
+
+		//f_lseek(&Myfile,0);		// затирает символы под собой
+
+		for(i=0;i<numb;i++){
+			f_write(&Myfile,(void*)&Data[i+1], 1, NULL);
+			f_write(&Myfile,(void*)&Data[i], 1, NULL);
+			i++;
+		}
+
+		// сначала прочитаем размер файла, если превышает лимит, то отрежем хвост
+		//f_lseek(&Myfile,8*128);		// перейдём на конец и лишнее обрежем
+		//f_truncate(&Myfile);
+	f_close(&Myfile);
+
+	set_timestampFile((char *)file,sDate.Year,sDate.Month,sDate.Date,sTime.Hours,sTime.Minutes,sTime.Seconds);
+	}else ret = false;
+
+	return	ret;
+}

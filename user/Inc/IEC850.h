@@ -66,6 +66,7 @@
  */
 
 // Атрибут STVALINT32 может иметь значения: ....
+// MOD BEH
 #define STVALINT32_ON 				1
 #define STVALINT32_BLOCKED 			2
 #define STVALINT32_TEST 			3
@@ -73,6 +74,7 @@
 #define STVALINT32_OFF 				5
 
 // Атрибут STVALINT32 может иметь значения: ....
+// HEALTH
 #define STVALINT32_OK 				1
 #define STVALINT32_Warning 			2
 #define STVALINT32_Alarm 			3
@@ -82,6 +84,24 @@
 #define STVALCODEDENUM_OFF 				1
 #define STVALCODEDENUM_ON 				2
 #define STVALCODEDENUM_BADSTATE			3
+
+// Атрибут STVALINT32 может иметь значения: ....
+#define STVALCODEDENUM_UNKNOWN			0
+#define STVALCODEDENUM_FORWARD			1
+#define STVALCODEDENUM_BACKWARD			2
+#define STVALCODEDENUM_BOTH				3
+
+// Атрибут STVALINT32 может иметь значения: ....
+#define STVALBITSTRING_STOP				0
+#define STVALBITSTRING_HIGHER			1
+#define STVALBITSTRING_LOWER			2
+#define STVALBITSTRING_RESERVED			3
+
+
+// Атрибут STVALINT32 может иметь значения: ....
+#define STVALCODEDENUM_POS_NEG_ZERO		0
+#define STVALCODEDENUM_DIR_QUAD_ZERO	1
+
 
 // Атрибут ctlModelENUM может иметь значения: ....
 #define CTLMODELEDENUM_statusOnly						0
@@ -93,6 +113,7 @@
 void 		ReStartIEC850_task(void);
 void 		StartIEC850Task(void const * argument);
 uint64_t 	Hal_getTimeInMs (void);
-
+int			AddToFileMessageString(const TCHAR* file, TCHAR* message);
+int			AddToFileMessageWord(const TCHAR* file, uint8_t* Data,uint16_t numb,uint8_t	mode);
 
 #endif /* IEC850_H_ */

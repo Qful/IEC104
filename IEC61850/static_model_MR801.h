@@ -528,22 +528,6 @@ extern DataAttribute iedModel_GGIO_LEDGGIO1_Ind16_stVal;
 extern DataAttribute iedModel_GGIO_LEDGGIO1_Ind16_q;
 extern DataAttribute iedModel_GGIO_LEDGGIO1_Ind16_t;
 
-//SPCSO1
-extern DataObject iedModel_GGIO_LEDGGIO1_SPCSO1;
-extern DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_q;
-extern DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_t;
-extern DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_d;
-extern DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_stVal;
-extern DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_ctlModel;
-extern DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper;
-extern DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_ctlVal;
-extern DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_origin;
-extern DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_origin_orCat;
-extern DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_origin_orIdent;
-extern DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_ctlNum;
-extern DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_T;
-extern DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_Test;
-extern DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_Check;
 //-----------------------------------------------------
 extern LogicalNode iedModel_GGIO_INGGIO1;
 
@@ -1309,6 +1293,15 @@ extern DataAttribute iedModel_MES_MMXU4_phV_neut_q;
 extern DataAttribute iedModel_MES_MMXU4_phV_neut_t;
 extern DataAttribute iedModel_MES_MMXU4_phV_neut_db;
 extern DataAttribute iedModel_MES_MMXU4_phV_neut_zeroDb;
+
+extern DataObject iedModel_MES_MMXU4_phV_neut1;
+extern DataAttribute iedModel_MES_MMXU4_phV_neut1_cVal;
+extern DataAttribute iedModel_MES_MMXU4_phV_neut1_cVal_mag;
+extern DataAttribute iedModel_MES_MMXU4_phV_neut1_cVal_mag_f;
+extern DataAttribute iedModel_MES_MMXU4_phV_neut1_q;
+extern DataAttribute iedModel_MES_MMXU4_phV_neut1_t;
+extern DataAttribute iedModel_MES_MMXU4_phV_neut1_db;
+extern DataAttribute iedModel_MES_MMXU4_phV_neut1_zeroDb;
 
 // PPV
 extern DataObject iedModel_MES_MMXU4_PPV;
@@ -4012,6 +4005,23 @@ extern DataAttribute iedModel_CTRL_GGIO1_SPCSO3_Oper_ctlNum;
 extern DataAttribute iedModel_CTRL_GGIO1_SPCSO3_Oper_T;
 extern DataAttribute iedModel_CTRL_GGIO1_SPCSO3_Oper_Test;
 extern DataAttribute iedModel_CTRL_GGIO1_SPCSO3_Oper_Check;
+
+//SPCSO4
+extern DataObject iedModel_CTRL_GGIO1_SPCSO4;
+extern DataAttribute iedModel_CTRL_GGIO1_SPCSO4_q;
+extern DataAttribute iedModel_CTRL_GGIO1_SPCSO4_t;
+extern DataAttribute iedModel_CTRL_GGIO1_SPCSO4_d;
+extern DataAttribute iedModel_CTRL_GGIO1_SPCSO4_stVal;
+extern DataAttribute iedModel_CTRL_GGIO1_SPCSO4_ctlModel;
+extern DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper;
+extern DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_ctlVal;
+extern DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_origin;
+extern DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_origin_orCat;
+extern DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_origin_orIdent;
+extern DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_ctlNum;
+extern DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_T;
+extern DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_Test;
+extern DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_Check;
 
 
 #endif /* STATIC_MODEL_H_ */

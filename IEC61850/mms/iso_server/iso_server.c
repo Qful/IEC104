@@ -51,13 +51,20 @@
 #define CONFIG_MAXIMUM_TCP_CLIENT_CONNECTIONS 5
 #endif
 
+#define SSH_PORT			SSH_Port
 #define HTTP_PORT			HTTP_Port
 #define TCP_PORT 			IEC850_Port
 #define SECURE_TCP_PORT 	3782
 #define BACKLOG 			5			// ожидающие подключение.  похоже можно только = 1 в lwIP
 
 extern uint8_t		SNTP_IP_ADDR[4];
-extern int16_t	SNTP_Period;
+extern int16_t		SNTP_Period;
+
+Socket 		connectionSocket,connectionSocketHTTP,connectionSocketSSH=0;
+Socket		SocketSSH;
+bool		SSHReady = false;
+uint64_t 	SSHTimer;				// таймер отладочного порта
+#define		_10min			100 * 600 *10
 
 uint64_t nextSynchTimeNTP = 0;
 bool resynchNTP_ready = true;
@@ -80,6 +87,10 @@ struct sIsoServer {
 
     Socket 	SecureserverSocket;
     int 	SecurePort;
+
+    Socket 	SSHserverSocket;
+    int 	SSHPort;
+
 
     Socket serverSocket;
     int tcpPort;
@@ -352,6 +363,18 @@ static bool		setupIsoServer(IsoServer self)
     ServerSocket_setBacklog((ServerSocket) self->SecureserverSocket, BACKLOG);		// установим очередь ожидающих
     ServerSocket_listen((ServerSocket) self->SecureserverSocket);					// Начинаем слушать входящие подключения
 
+    //---------
+
+
+    self->SSHserverSocket = (Socket) TcpServerSocket_create(self->localIpAddress, SSH_PORT);	//self->SecurePort
+   	USART_TRACE_GREEN("ISO_SERVER: localIpAddress: %s SSHPort: %u\n", self->localIpAddress,(int)SSH_PORT);
+
+    ServerSocket_setBacklog((ServerSocket) self->SSHserverSocket, BACKLOG);		// установим очередь ожидающих
+    ServerSocket_listen((ServerSocket) self->SSHserverSocket);					// Начинаем слушать входящие подключения
+
+    //---------
+
+
     self->state = ISO_SVR_STATE_RUNNING;
 
 
@@ -416,10 +439,11 @@ handleIsoConnections(IsoServer self)
 static void
 handleIsoConnectionsThreadless(IsoServer self)
 {
-    Socket connectionSocket,connectionSocketHTTP;
 
     handleNTPConnectionsThreadless(self);					// Клиент NTP
-
+/***********************************************************************************************************
+ * 102
+ ***********************************************************************************************************/
     if ((connectionSocket = ServerSocket_accept((ServerSocket) self->serverSocket)) != NULL) {				// было ли подключение к серверу? если да то вернем сокет для текущего подключения
 
     	USART_TRACE_GREEN("соединение на 102 порт.\n");
@@ -448,6 +472,9 @@ handleIsoConnectionsThreadless(IsoServer self)
     }
     handleClientConnections(self);				// Парсим если открыто. тут же даёт ответ в порт, если сюда не попали то и ответа не будет.
 
+/***********************************************************************************************************
+ * 80
+ ***********************************************************************************************************/
     //++HTTP++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // соединение на 80 порт
     if ((connectionSocketHTTP = ServerSocket_accept((ServerSocket) self->SecureserverSocket)) != NULL) {
@@ -461,6 +488,31 @@ handleIsoConnectionsThreadless(IsoServer self)
 //        http_server_serve(connectionSocketHTTP);
     }
     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+/***********************************************************************************************************
+ * 23
+ ***********************************************************************************************************/
+
+	if ((connectionSocketSSH = ServerSocket_accept((ServerSocket) self->SSHserverSocket)) != NULL) {
+		USART_TRACE_GREEN("соединение на 23 порт.\n");
+		SSHReady = true;
+		SocketSSH = connectionSocketSSH;
+		//SSH_server_serve(connectionSocketSSH);
+		// откроем на 10 минут
+		SSHTimer = Hal_getTimeInMs();
+	} else{
+		if (SocketSSH){
+			if  ((Hal_getTimeInMs() - SSHTimer) > _10min){
+				USART_TRACE_RED("закрыли 23 порт по таймауту.\n");
+				Socket_destroy(SocketSSH);
+				SocketSSH = 0;
+				SSHReady = false;
+			}
+		}
+
+	}
+
+
+	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     /*
     //++Клиент NTP++++++++++++++++++++++++++++++++++++++++++++++

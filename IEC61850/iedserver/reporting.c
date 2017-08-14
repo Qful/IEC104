@@ -2468,7 +2468,7 @@ processEventsForReport(ReportControl* rc, uint64_t currentTimeInMs)
                 }
             }
         }
-
+        // отчет по изменению состояния.
         if (rc->triggered) {
             if (currentTimeInMs >= rc->reportTime) {
 

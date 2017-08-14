@@ -51,6 +51,46 @@
 #define MB_NumbUstavki			MB_StartUstavkiaddr1-MB_StartUstavkiaddr0			// размер блока уставок			0x1D5
 
 
+// конфигурация защиты по сопротивлению ----------------------------------------------
+#define MB_StartConfig_Z	   	0x11B4 - MB_StartConfig			// конфигурация
+#define MB_NumbConfigZ			120								// 120 слов
+
+#define MB_offset_Z1_Conf		0x00							// конфигурация
+#define MB_offset_Z2_Conf		MB_offset_Z1_Conf + 12			// конфигурация
+#define MB_offset_Z3_Conf		MB_offset_Z1_Conf + 24			// конфигурация
+#define MB_offset_Z4_Conf		MB_offset_Z1_Conf + 36			// конфигурация
+#define MB_offset_Z5_Conf		MB_offset_Z1_Conf + 48			// конфигурация
+#define MB_offset_Z6_Conf		MB_offset_Z1_Conf + 60			// конфигурация
+#define MB_offset_Z7_Conf		MB_offset_Z1_Conf + 72			// конфигурация
+#define MB_offset_Z8_Conf		MB_offset_Z1_Conf + 84			// конфигурация
+#define MB_offset_Z9_Conf		MB_offset_Z1_Conf + 96			// конфигурация
+#define MB_offset_Z10_Conf		MB_offset_Z1_Conf + 108			// конфигурация
+
+#define MB_offset_Z1_InBlok		MB_offset_Z1_Conf + 0x02		// вход блокировки
+#define MB_offset_Z2_InBlok		MB_offset_Z2_Conf + 0x02		// вход блокировки
+#define MB_offset_Z3_InBlok		MB_offset_Z3_Conf + 0x02		// вход блокировки
+#define MB_offset_Z4_InBlok		MB_offset_Z4_Conf + 0x02		// вход блокировки
+#define MB_offset_Z5_InBlok		MB_offset_Z5_Conf + 0x02		// вход блокировки
+#define MB_offset_Z6_InBlok		MB_offset_Z6_Conf + 0x02		// вход блокировки
+#define MB_offset_Z7_InBlok		MB_offset_Z7_Conf + 0x02		// вход блокировки
+#define MB_offset_Z8_InBlok		MB_offset_Z8_Conf + 0x02		// вход блокировки
+#define MB_offset_Z9_InBlok		MB_offset_Z9_Conf + 0x02		// вход блокировки
+#define MB_offset_Z10_InBlok	MB_offset_Z10_Conf + 0x02		// вход блокировки
+
+#define MB_bOffset_Z_Config_Stat		0b11<<0
+
+#define MB_bOffset_Z_Config_KachBlk		1<<13
+
+
+#define MB_bits_Napravl					5						// позиция битов
+#define MB_bOffset_Z_Config_Napravl		0b11<<5
+
+#define MB_bOffset_Z_Config_Napravl_up	1<<5			// направление прямое
+#define MB_bOffset_Z_Config_Napravl_dn	1<<6			// направление обратное
+
+#define MB_bOffset_Z_Config_kontur		0b111<<8		// Контур
+
+
 // конфигурация АПВ  в группе уставок ----------------------------------------------
 #define MB_StartConfigAPW	   	0x1264 - MB_StartConfig			// конфигурация АПВ
 #define MB_NumbConfigAPW		10				// 10 слов
@@ -58,7 +98,7 @@
 #define MB_offset_ConfAPW		0x00			// конфигурация АПВ
 #define MB_offset_InBlok		0x01			// вход блокировки
 
-#define MB_bOffset_APW_Config_Stat		0b11<<0
+#define MB_bOffset_APW_Config_Stat		0b111
 
 // конфигурация измерительного транса  в группе уставок------------------------------------------
 #define MB_StartConfigTRMeas	   	0x1278 - MB_StartConfig				// конфигурация  измерительного транса
@@ -67,7 +107,8 @@
 #define MB_offset_Kttf			0				// Ittф
 #define MB_offset_Kttn			1				// Ittn
 #define MB_offset_Ktnf			8				// ТТНП
-#define MB_offset_Ktnn			9				// ТТНHП
+#define MB_offset_Ktnnp			9				// ТТНHП
+#define MB_offset_Ktnnp1		10				// ТТНHП1
 
 // конфигурация входных логических сигналов   в группе уставок-------------------------------------
 #define MB_StartConfigVLSIn			0x1288 - MB_StartConfig
@@ -91,6 +132,9 @@
 // биты
 #define MB_bOffset_MTZ_I_Config_Stat		0b11<<0						// состояние
 
+#define MB_bOffset_MTZ_I_Config_Napravl_up			1<<6				// направление прямое
+#define MB_bOffset_MTZ_I_Config_Napravl_dn			1<<7				// направление обратное
+
 
 #define MB_offset_Ig_I1		0x104A - MB_StartUstavkiaddr0		// адрес конфигурации ступени МТЗ защиты
 #define MB_offset_Ig_I2		MB_offset_Ig_I1+10
@@ -110,6 +154,9 @@
 #define MB_bOffset_Ig_I_Config_Stat		0b11<<0						// состояние
 #define MB_bOffset_Ig_I_Config_Logic	0b11<<_bLogicOffset			// логика
 
+#define MB_bOffset_Ig_I_Config_Napravl_up			1<<6				// направление прямое
+#define MB_bOffset_Ig_I_Config_Napravl_dn			1<<7				// направление обратное
+
 
 // конфигурация токовой защиты от обрыва провода  ----------------------------------------------
 #define MB_offsetConfigI2I1	   	0x109A - MB_StartUstavkiaddr0			// конфигурация
@@ -118,31 +165,217 @@
 
 #define MB_bOffset_I2I1_Config_Stat		0b11<<0
 
+// конфигурация защиты от повышения напряжения -------------------------------------------------
+// U
+#define MB_offset_Uup_U1		0x10A4 - MB_StartUstavkiaddr0		// адрес конфигурации защиты напряжения
+#define MB_offset_Uup_U2		MB_offset_Uup_U1+8
+#define MB_offset_Uup_U3		MB_offset_Uup_U1+16
+#define MB_offset_Uup_U4		MB_offset_Uup_U1+24
+
+#define MB_offset_Udn_U1		0x10C4 - MB_StartUstavkiaddr0		// адрес конфигурации защиты напряжения
+#define MB_offset_Udn_U2		MB_offset_Udn_U1+8
+#define MB_offset_Udn_U3		MB_offset_Udn_U1+16
+#define MB_offset_Udn_U4		MB_offset_Udn_U1+24
+
+//конфигурация защит по напряжению
+#define MB_offset_Uup_U_Config		0							// Конфигурация
+#define MB_offset_Udn_U_Config		0
+// биты
+#define MB_bOffset_Uup_U_Config_Stat		0b11<<0				// состояние
+#define MB_bOffset_Udn_U_Config_Stat		0b11<<0
+
+// F
+#define MB_offset_Fup_1		0x10E4 - MB_StartUstavkiaddr0		// адрес конфигурации защиты частоте
+#define MB_offset_Fup_2		MB_offset_Fup_1+8
+#define MB_offset_Fup_3		MB_offset_Fup_1+16
+#define MB_offset_Fup_4		MB_offset_Fup_1+24
+
+#define MB_offset_Fdn_1		0x1104 - MB_StartUstavkiaddr0		// адрес конфигурации защиты про частоте
+#define MB_offset_Fdn_2		MB_offset_Fdn_1+8
+#define MB_offset_Fdn_3		MB_offset_Fdn_1+16
+#define MB_offset_Fdn_4		MB_offset_Fdn_1+24
+
+//конфигурация защит по частоте
+#define MB_offset_Fup_Config		0							// Конфигурация
+#define MB_offset_Fdn_Config		0
+// биты
+#define MB_bOffset_Fup_Config_Stat		0b11<<0					// состояние
+#define MB_bOffset_Fdn_Config_Stat		0b11<<0
+
+//конфигурация тепловых защит  -------------------------------------------------
+#define MB_offset_Qup_1					0x1124 - MB_StartUstavkiaddr0
+#define MB_offset_Qup_2					MB_offset_Qup_1 + 4
+
+#define MB_offset_Qup_Config			0						// Конфигурация
+// биты
+#define MB_bOffset_Qup_Config_Stat		0b11					// состояние
+
+//блокировка по тепловой модели  -------------------------------------------------
+#define MB_offset_BlkQ					0x112C - MB_StartUstavkiaddr0
+
+#define MB_offset_BlkQ_Config			0						// Конфигурация
+// биты
+#define MB_bOffset_BlkQ_Config_Stat		0b11					// состояние
+
+//конфигурация внешних защит -------------------------------------------------
+#define MB_offset_Ext_1		0x1134 - MB_StartUstavkiaddr0		// адрес конфигурации ступени МТЗ защиты
+#define MB_offset_Ext_2		MB_offset_Ext_1+8
+#define MB_offset_Ext_3		MB_offset_Ext_2+8
+#define MB_offset_Ext_4		MB_offset_Ext_3+8
+#define MB_offset_Ext_5		MB_offset_Ext_4+8
+#define MB_offset_Ext_6		MB_offset_Ext_5+8
+#define MB_offset_Ext_7		MB_offset_Ext_6+8
+#define MB_offset_Ext_8		MB_offset_Ext_7+8
+#define MB_offset_Ext_9		MB_offset_Ext_8+8
+#define MB_offset_Ext_10	MB_offset_Ext_9+8
+#define MB_offset_Ext_11	MB_offset_Ext_10+8
+#define MB_offset_Ext_12	MB_offset_Ext_11+8
+#define MB_offset_Ext_13	MB_offset_Ext_12+8
+#define MB_offset_Ext_14	MB_offset_Ext_13+8
+#define MB_offset_Ext_15	MB_offset_Ext_14+8
+#define MB_offset_Ext_16	MB_offset_Ext_15+8
+
+//конфигурация
+#define MB_offset_Ext_Config		0			// Конфигурация
+// биты
+#define MB_bOffset_Ext_Config_Stat		0b11<<0						// состояние
+
+// конфигурация Cинхронизма УППН -------------------------------------------------
+#define MB_StartConfigKS_UPPN		0x1408 - MB_StartUstavkiaddr0		// адрес конфигурации защиты напряжения
+
+//конфигурация
+#define MB_offset_KS_Config			0			// Конфигурация
+#define MB_offset_KS_Man_Config		8			// Конфигурация для ручного включения
+#define MB_offset_KS_Auto_Config	14			// Конфигурация для автоматического включения
+
+// биты
+#define MB_bOffset_KS_Config_Stat		1<<0		// состояние
+
+// структура сопротивлений для определения местя повреждения ---------------------------------------
+#define MB_StartConfig_Z_CrashDetect		0x141E - MB_StartUstavkiaddr0		// адрес конфигурации
+
+#define MB_offset_Z_CrashDetect_X1f				MB_StartConfig_Z_CrashDetect + 0
+#define MB_offset_Z_CrashDetect_X2f				MB_StartConfig_Z_CrashDetect + 1
+#define MB_offset_Z_CrashDetect_X3f				MB_StartConfig_Z_CrashDetect + 2
+#define MB_offset_Z_CrashDetect_X4f				MB_StartConfig_Z_CrashDetect + 3
+#define MB_offset_Z_CrashDetect_X5f				MB_StartConfig_Z_CrashDetect + 4
+
+
+//конфигурация
+#define MB_offset_Z_CrashDetect_Config			9			// Конфигурация
+// биты
+#define MB_bOffset_Z_CrashDetect_Config_Stat	0b00001111	// участки повреждений
+
+
 //----------------------------------------------------------------------------------------------
 // база данных дискретных сигналов
 //----------------------------------------------------------------------------------------------
 #define MB_StartDiscreetaddr   	0x0D00			// адрес и размер для комманд чтения (3,4)
-#define MB_NumbDiscreet   		0x27			// 0x22
+#define MB_NumbDiscreet   		0x29			// 0x22
 
 
 #define MB_offset_ErrorOFF		0x14		// аварийное отключение
 #define MB_bOffsetErrorOFF		1<<4		// аварийное отключение
 
 #define MB_offset_SysNote		0x13		// Новая запись журнала системы
-#define MB_bOffsetSysNote		1<<0xC		// Новая запись журнала системы
+#define MB_bOffsetSysNote		1<<0x0C		// Новая запись журнала системы
 
 #define MB_offset_SysNote		0x13		// Новая запись журнала аварий
-#define MB_bOffsetErrorNote		1<<0xD		// Новая запись журнала аварий
+#define MB_bOffsetErrorNote		1<<0x0D		// Новая запись журнала аварий
 
 #define MB_offset_Jurnals		0x13		// Наличиенеисправности по журналу системы
-#define MB_bOffsetError			1<<0xF		// Наличиенеисправности по журналу системы
+#define MB_bOffsetError			1<<0x0F		// Наличиенеисправности по журналу системы
 
 // ---------------------------------
 
 // --Discreet --
-#define MB_offsetDiscreet_1_16	0x00
-#define MB_offsetDiscreet_17_32	0x01
-#define MB_offsetDiscreet_33_40	0x02
+#define MB_offsetDiscreet_1		0x0
+#define MB_offsetDiscreet_2		0x0
+#define MB_offsetDiscreet_3		0x0
+#define MB_offsetDiscreet_4		0x0
+#define MB_offsetDiscreet_5		0x0
+#define MB_offsetDiscreet_6		0x0
+#define MB_offsetDiscreet_7		0x0
+#define MB_offsetDiscreet_8		0x0
+#define MB_offsetDiscreet_9		0x0
+#define MB_offsetDiscreet_10	0x0
+#define MB_offsetDiscreet_11	0x0
+#define MB_offsetDiscreet_12	0x0
+#define MB_offsetDiscreet_13	0x0
+#define MB_offsetDiscreet_14	0x0
+#define MB_offsetDiscreet_15	0x0
+#define MB_offsetDiscreet_16	0x0
+#define MB_offsetDiscreet_17	0x1
+#define MB_offsetDiscreet_18	0x1
+#define MB_offsetDiscreet_19	0x1
+#define MB_offsetDiscreet_20	0x1
+#define MB_offsetDiscreet_21	0x1
+#define MB_offsetDiscreet_22	0x1
+#define MB_offsetDiscreet_23	0x1
+#define MB_offsetDiscreet_24	0x1
+#define MB_offsetDiscreet_25	0x1
+#define MB_offsetDiscreet_26	0x1
+#define MB_offsetDiscreet_27	0x1
+#define MB_offsetDiscreet_28	0x1
+#define MB_offsetDiscreet_29	0x1
+#define MB_offsetDiscreet_30	0x1
+#define MB_offsetDiscreet_31	0x1
+#define MB_offsetDiscreet_32	0x1
+#define MB_offsetDiscreet_33	0x2
+#define MB_offsetDiscreet_34	0x2
+#define MB_offsetDiscreet_35	0x2
+#define MB_offsetDiscreet_36	0x2
+#define MB_offsetDiscreet_37	0x2
+#define MB_offsetDiscreet_38	0x2
+#define MB_offsetDiscreet_39	0x2
+#define MB_offsetDiscreet_40	0x2
+
+#define MB_offsetDiscreet_41	0x0E
+#define MB_offsetDiscreet_42	0x0E
+
+#define MB_bOffset_Discreet_1		1<<0
+#define MB_bOffset_Discreet_2		1<<1
+#define MB_bOffset_Discreet_3		1<<2
+#define MB_bOffset_Discreet_4		1<<3
+#define MB_bOffset_Discreet_5		1<<4
+#define MB_bOffset_Discreet_6		1<<5
+#define MB_bOffset_Discreet_7		1<<6
+#define MB_bOffset_Discreet_8		1<<7
+#define MB_bOffset_Discreet_9		1<<8
+#define MB_bOffset_Discreet_10		1<<9
+#define MB_bOffset_Discreet_11		1<<10
+#define MB_bOffset_Discreet_12		1<<11
+#define MB_bOffset_Discreet_13		1<<12
+#define MB_bOffset_Discreet_14		1<<13
+#define MB_bOffset_Discreet_15		1<<14
+#define MB_bOffset_Discreet_16		1<<15
+#define MB_bOffset_Discreet_17		1<<0
+#define MB_bOffset_Discreet_18		1<<1
+#define MB_bOffset_Discreet_19		1<<2
+#define MB_bOffset_Discreet_20		1<<3
+#define MB_bOffset_Discreet_21		1<<4
+#define MB_bOffset_Discreet_22		1<<5
+#define MB_bOffset_Discreet_23		1<<6
+#define MB_bOffset_Discreet_24		1<<7
+#define MB_bOffset_Discreet_25		1<<8
+#define MB_bOffset_Discreet_26		1<<9
+#define MB_bOffset_Discreet_27		1<<10
+#define MB_bOffset_Discreet_28		1<<11
+#define MB_bOffset_Discreet_29		1<<12
+#define MB_bOffset_Discreet_30		1<<13
+#define MB_bOffset_Discreet_31		1<<14
+#define MB_bOffset_Discreet_32		1<<15
+#define MB_bOffset_Discreet_33		1<<0
+#define MB_bOffset_Discreet_34		1<<1
+#define MB_bOffset_Discreet_35		1<<2
+#define MB_bOffset_Discreet_36		1<<3
+#define MB_bOffset_Discreet_37		1<<4
+#define MB_bOffset_Discreet_38		1<<5
+#define MB_bOffset_Discreet_39		1<<6
+#define MB_bOffset_Discreet_40		1<<7
+
+#define MB_bOffset_Discreet_41		1<<0
+#define MB_bOffset_Discreet_42		1<<1
 
 // -Relay --
 #define MB_offsetRelay_1		0x10
@@ -243,6 +476,12 @@
 #define MB_offsetLED_11r		0x13
 #define MB_offsetLED_12r		0x13
 
+#define MB_offsetLED_13			0x13
+#define MB_offsetLED_14			0x13
+#define MB_offsetLED_15			0x14
+#define MB_offsetLED_16			0x14
+
+
 #define MB_bOffset_LED_1g		1<<0x2
 #define MB_bOffset_LED_2g		1<<0x4
 #define MB_bOffset_LED_3g		1<<0x6
@@ -268,6 +507,11 @@
 #define MB_bOffset_LED_10r		1<<0x5
 #define MB_bOffset_LED_11r		1<<0x7
 #define MB_bOffset_LED_12r		1<<0x9
+
+#define MB_bOffset_LED_13		1<<0x0A
+#define MB_bOffset_LED_14		1<<0x0B
+#define MB_bOffset_LED_15		1<<1
+#define MB_bOffset_LED_16		1<<2
 
 // SSL -------------------------------
 #define MB_offsetSSL_1			0x04
@@ -416,6 +660,7 @@
 #define MB_offset_IO_I_4		0x08
 #define MB_offset_IO_I_5		0x08
 #define MB_offset_IO_I_6		0x08
+#define MB_offset_IO_I_7		0x08	// И0 I<7
 
 #define MB_b_IO_I1		1<<0xC		// И0 I>1
 #define MB_b_IO_I2		1<<0xE		// И0 I>2
@@ -423,6 +668,7 @@
 #define MB_b_IO_I4		1<<0x2		// И0 I>4
 #define MB_b_IO_I5		1<<0x4		// И0 I>5
 #define MB_b_IO_I6		1<<0x6		// И0 I>6
+#define MB_b_IO_I7		1<<0x8		// И0 I<7
 
 #define MB_offset_SRAB_I_1		0x07
 #define MB_offset_SRAB_I_2		0x07
@@ -430,6 +676,7 @@
 #define MB_offset_SRAB_I_4		0x08
 #define MB_offset_SRAB_I_5		0x08
 #define MB_offset_SRAB_I_6		0x08
+#define MB_offset_SRAB_I_7		0x08	// СРАБ I<7
 
 #define MB_b_SRAB_I1		1<<0xD		// СРАБ I>1
 #define MB_b_SRAB_I2		1<<0xF		// СРАБ I>2
@@ -437,6 +684,7 @@
 #define MB_b_SRAB_I4		1<<0x3		// СРАБ I>4
 #define MB_b_SRAB_I5		1<<0x5		// СРАБ I>5
 #define MB_b_SRAB_I6		1<<0x7		// СРАБ I>6
+#define MB_b_SRAB_I7		1<<0x9		// СРАБ I<7
 
 // I*> --
 #define MB_offset_IO_Ig_1		0x08
@@ -497,22 +745,23 @@
 #define MB_offset_dirErrorPTOC_I2	0x26
 
 // биты направления и достоверности мощности
-#define MB_b_direction_In		1<<0xA		// направления
+#define MB_b_direction_In		1<<0xA		// направление
 #define MB_b_direction_Ia		1<<0x0
 #define MB_b_direction_Ib		1<<0x2
 #define MB_b_direction_Ic		1<<0x4
 #define MB_b_direction_I0		1<<0x6
 #define MB_b_direction_I2		1<<0x8
 
-#define MB_b_dirError_In		1<<0xB		// ошибка направления
+											// ошибка направления
 #define MB_b_dirError_Ia		1<<0x1
 #define MB_b_dirError_Ib		1<<0x3
 #define MB_b_dirError_Ic		1<<0x5
 #define MB_b_dirError_I0		1<<0x7
 #define MB_b_dirError_I2		1<<0x9
+#define MB_b_dirError_In		1<<0xB
 
 // Z ---
-#define MB_offset_dirPTOC_Za		0x26	// направления
+#define MB_offset_dirPTOC_Za		0x26	// направление
 #define MB_offset_dirPTOC_Zb		0x26
 #define MB_offset_dirPTOC_Zc		0x27
 #define MB_offset_dirErrorPTOC_Za	0x26	// ошибка направления
@@ -547,52 +796,74 @@
 #define MB_offset_IO_Uup_2		0x09
 #define MB_offset_IO_Uup_3		0x0A
 #define MB_offset_IO_Uup_4		0x0A
-
 #define MB_offset_SRAB_Uup_1	0x09
-#define MB_offset_SRAB_Uup_2	0x0A
+#define MB_offset_SRAB_Uup_2	0x09
 #define MB_offset_SRAB_Uup_3	0x0A
 #define MB_offset_SRAB_Uup_4	0x0A
+
+#define MB_b_IO_Uup1		1<<0xC		// И0 U>1
+#define MB_b_IO_Uup2		1<<0xE		// И0 U>2
+#define MB_b_IO_Uup3		1<<0x0		// И0 U>3
+#define MB_b_IO_Uup4		1<<0x2		// И0 U>4
+#define MB_b_SRAB_Uup1		1<<0xD		// СРАБ U>1
+#define MB_b_SRAB_Uup2		1<<0xF		// СРАБ U>2
+#define MB_b_SRAB_Uup3		1<<0x1		// СРАБ U>3
+#define MB_b_SRAB_Uup4		1<<0x3		// СРАБ U>4
 
 #define MB_offset_IO_Udn_1		0x0A
 #define MB_offset_IO_Udn_2		0x0A
 #define MB_offset_IO_Udn_3		0x0A
 #define MB_offset_IO_Udn_4		0x0A
-
 #define MB_offset_SRAB_Udn_1	0x0A
 #define MB_offset_SRAB_Udn_2	0x0A
 #define MB_offset_SRAB_Udn_3	0x0A
 #define MB_offset_SRAB_Udn_4	0x0A
 
-#define MB_b_IO_Uup1		1<<0xD		// И0 U>1
-#define MB_b_IO_Uup2		1<<0xF		// И0 U>2
-#define MB_b_IO_Uup3		1<<0x1		// И0 U>3
-#define MB_b_IO_Uup4		1<<0x3		// И0 U>4
+#define MB_b_IO_Udn1		1<<0x4		// И0 U<1
+#define MB_b_IO_Udn2		1<<0x6		// И0 U<2
+#define MB_b_IO_Udn3		1<<0x8		// И0 U<3
+#define MB_b_IO_Udn4		1<<0xA		// И0 U<4
+#define MB_b_SRAB_Udn1		1<<0x5		// СРАБ U<1
+#define MB_b_SRAB_Udn2		1<<0x7		// СРАБ U<2
+#define MB_b_SRAB_Udn3		1<<0x9		// СРАБ U<3
+#define MB_b_SRAB_Udn4		1<<0xB		// СРАБ U<4
 
-#define MB_b_SRAB_Uup1		1<<0xE		// СРАБ U>1
-#define MB_b_SRAB_Uup2		1<<0x0		// СРАБ U>2
-#define MB_b_SRAB_Uup3		1<<0x2		// СРАБ U>3
-#define MB_b_SRAB_Uup4		1<<0x4		// СРАБ U>4
+// Q --
 
-#define MB_b_IO_Udn1		1<<0x5		// И0 U<1
-#define MB_b_IO_Udn2		1<<0x7		// И0 U<2
-#define MB_b_IO_Udn3		1<<0x9		// И0 U<3
-#define MB_b_IO_Udn4		1<<0xB		// И0 U<4
+#define MB_offset_IO_Qup_1		0x0B
+#define MB_offset_IO_Qup_2		0x0B
+#define MB_offset_IO_BlkQ		0x0B
 
-#define MB_b_SRAB_Udn1		1<<0x6		// СРАБ U<1
-#define MB_b_SRAB_Udn2		1<<0x8		// СРАБ U<2
-#define MB_b_SRAB_Udn3		1<<0xA		// СРАБ U<3
-#define MB_b_SRAB_Udn4		1<<0xC		// СРАБ U<4
+#define MB_offset_SRAB_Qup_1		0x0B
+#define MB_offset_SRAB_Qup_2		0x0B
+#define MB_offset_SRAB_BlkQ			0x0B
+
+#define MB_b_IO_Qup_1		1<<0xC		// И0 Q>1
+#define MB_b_IO_Qup_2		1<<0xD		// И0 Q>2
+#define MB_b_IO_BlkQ		1<<0xE		// И0 Q>2
+
+#define MB_b_SRAB_Qup_1		1<<0xC		// И0 Q>1
+#define MB_b_SRAB_Qup_2		1<<0xD		// И0 Q>2
+#define MB_b_SRAB_BlkQ		1<<0xE		// И0 Q>2
 
 // F --
 #define MB_offset_IO_Fup_1		0x0A
 #define MB_offset_IO_Fup_2		0x0A
 #define MB_offset_IO_Fup_3		0x0B
 #define MB_offset_IO_Fup_4		0x0B
-
 #define MB_offset_SRAB_Fup_1	0x0A
-#define MB_offset_SRAB_Fup_2	0x0B
+#define MB_offset_SRAB_Fup_2	0x0A
 #define MB_offset_SRAB_Fup_3	0x0B
 #define MB_offset_SRAB_Fup_4	0x0B
+
+#define MB_b_IO_Fup1		1<<0xC		// И0 F>1
+#define MB_b_IO_Fup2		1<<0xE		// И0 F>2
+#define MB_b_IO_Fup3		1<<0x0		// И0 F>3
+#define MB_b_IO_Fup4		1<<0x2		// И0 F>4
+#define MB_b_SRAB_Fup1		1<<0xD		// СРАБ F>1
+#define MB_b_SRAB_Fup2		1<<0xF		// СРАБ F>2
+#define MB_b_SRAB_Fup3		1<<0x1		// СРАБ F>3
+#define MB_b_SRAB_Fup4		1<<0x3		// СРАБ F>4
 
 #define MB_offset_IO_Fdn_1		0x0B
 #define MB_offset_IO_Fdn_2		0x0B
@@ -603,25 +874,14 @@
 #define MB_offset_SRAB_Fdn_3	0x0B
 #define MB_offset_SRAB_Fdn_4	0x0B
 
-#define MB_b_IO_Fup1		1<<0xD		// И0 F>1
-#define MB_b_IO_Fup2		1<<0xF		// И0 F>2
-#define MB_b_IO_Fup3		1<<0x1		// И0 F>3
-#define MB_b_IO_Fup4		1<<0x3		// И0 F>4
-
-#define MB_b_SRAB_Fup1		1<<0xE		// СРАБ F>1
-#define MB_b_SRAB_Fup2		1<<0x0		// СРАБ F>2
-#define MB_b_SRAB_Fup3		1<<0x2		// СРАБ F>3
-#define MB_b_SRAB_Fup4		1<<0x4		// СРАБ F>4
-
-#define MB_b_IO_Fdn1		1<<0x5		// И0 F<1
-#define MB_b_IO_Fdn2		1<<0x7		// И0 F<2
-#define MB_b_IO_Fdn3		1<<0x9		// И0 F<3
-#define MB_b_IO_Fdn4		1<<0xB		// И0 F<4
-
-#define MB_b_SRAB_Fdn1		1<<0x6		// СРАБ F<1
-#define MB_b_SRAB_Fdn2		1<<0x8		// СРАБ F<2
-#define MB_b_SRAB_Fdn3		1<<0xA		// СРАБ F<3
-#define MB_b_SRAB_Fdn4		1<<0xC		// СРАБ F<4
+#define MB_b_IO_Fdn1		1<<0x4		// И0 F<1
+#define MB_b_IO_Fdn2		1<<0x6		// И0 F<2
+#define MB_b_IO_Fdn3		1<<0x8		// И0 F<3
+#define MB_b_IO_Fdn4		1<<0xA		// И0 F<4
+#define MB_b_SRAB_Fdn1		1<<0x5		// СРАБ F<1
+#define MB_b_SRAB_Fdn2		1<<0x7		// СРАБ F<2
+#define MB_b_SRAB_Fdn3		1<<0x9		// СРАБ F<3
+#define MB_b_SRAB_Fdn4		1<<0xB		// СРАБ F<4
 
 // внешняя
 #define MB_offset_SRAB_ext_1		0x0F
@@ -639,7 +899,7 @@
 #define MB_offset_SRAB_ext_13		0x0F
 #define MB_offset_SRAB_ext_14		0x0F
 #define MB_offset_SRAB_ext_15		0x0F
-#define MB_offset_SRAB_ext_16		0x1А
+#define MB_offset_SRAB_ext_16		0x0F
 
 #define MB_b_SRAB_ext_1			1<<0
 #define MB_b_SRAB_ext_2			1<<1
@@ -668,8 +928,23 @@
 #define MB_b_SW_ON_APW				1<<0x0D			// включенике выключателя по АПВ
 
 //УРОВ
-//#define MB_offset_UROV				0x0B
-//#define MB_b_Rab_UROV				1<<0x0E
+#define MB_offset_UROV1				0x0E			//Раб. УРОВ1
+#define MB_b_Rab_UROV1				1<<0x02
+
+#define MB_offset_UROV2				0x0E			//Раб. УРОВ2
+#define MB_b_Rab_UROV2				1<<0x03
+
+#define MB_offset_UROVBLK			0x0E			//Блокировка УРОВ
+#define MB_b_Blk_UROV				1<<0x04
+
+//Усл ОС УС
+#define MB_offset_UslOsUS			0x0D
+#define MB_b_offset_UslOsUS			0b11<<5
+
+//Усл ОС УС
+#define MB_offset_Kach				0x0D			// качание
+#define MB_b_offset_Kach			1<<0xB
+
 
 // Z ----
 #define MB_IO_offsetZ_1			0x06
@@ -716,21 +991,35 @@
 #define MB_offset_errorM5		0x16
 
 #define MB_bOffsetModule1		1<<7			// Наличие неисправности модуля 1
-#define MB_bOffsetModule2		1<<8			// Наличие неисправности модуля 2
-#define MB_bOffsetModule3		1<<9			// Наличие неисправности модуля 3
-#define MB_bOffsetModule4		1<<10			// Наличие неисправности модуля 4 аналог
+#define MB_bOffsetModule2		1<<8			// Наличие неисправности модуля 2 8-дискр 8-реле
+#define MB_bOffsetModule3		1<<9			// Наличие неисправности модуля 3 16 дискретов
+#define MB_bOffsetModule4		1<<10			// Наличие неисправности модуля 4 16-дискр 16-реле
 #define MB_bOffsetModule5		1<<11			// Наличие неисправности модуля 5 аналог
 #define MB_bOffsetUstavki		1<<12			// Наличие неисправности уставок
+
+// ---------------------------------
+#define MB_offsetHardFaults1	0x17			// неисправность выключателя
+
+#define MB_bOffsetErrorSWAll	0b11111100
+#define MB_bOffsetErrorSWExt1	1<<2
+#define MB_bOffsetErrorBKExt1	1<<3
+#define MB_bOffsetErrorSWctrl1	1<<4
+#define MB_bOffsetErrorUROV1	1<<5
+#define MB_bOffsetErrorCtrl1	1<<6
+#define MB_bOffsetErrorCtrl2	1<<7
 
 
 // ----------------------------------------------------------------------------------------------
 #define MB_StartAnalogINaddr   	0x0E00		// база данных аналогов
-#define MB_NumbAnalog   		45			// 96 слов
+#define MB_NumbAnalog   		98			// 264 слов
 
 
 #define MB_offset_Ia			0
 #define MB_offset_Ib			1
 #define MB_offset_Ic			2
+
+#define MB_offset_I1			4
+#define MB_offset_I2			5
 
 #define MB_offset_In			6
 
@@ -745,10 +1034,25 @@
 #define MB_offset_Ubc			17
 #define MB_offset_Ucd			18
 
+#define MB_offset_U1			20
+#define MB_offset_U2			21
+#define MB_offset_I3I0			22
+#define MB_offset_U3U0			23
+
+#define MB_offset_SG			23		// номер активной группы
+
 #define MB_offset_Hz			24		// F
 #define MB_offset_TotW			26		// P 2слова
 #define MB_offset_TotVAr		28		// Q 2слова
 #define MB_offset_TotPF			30		// cos
+
+#define MB_offset_OMP			31		// ОМП
+
+#define MB_offset_Q_stats		94		// Состояние тепловой модели
+
+#define MB_offset_dU			95		// dU
+#define MB_offset_dfi			96		// dfi
+#define MB_offset_dF			97		// dF
 
 // ----------------------------------------------------------------------------------------------
 #define MB_StartDateNaddr   	0x0200
@@ -765,9 +1069,16 @@
 #define MB_selectGroupe4		0x0004
 #define MB_selectGroupe5		0x0005
 
+// ресурс выключателя ------------------------------------------------------------------------------
+#define MB_Sw_CNT				0x0410
+#define MB_NumbSw_CNT	   		8
+
+#define MB_offset_Oper_cnt		0		// число оперативных переключений
+#define MB_offset_Error_cnt		1		// число аварийных отключений
+
 // ----------------------------------------------------------------------------------------------
 #define MB_StartRevNaddr   		0x0500		// версия 17 слов
-#define MB_NumbWordRev	   		17
+#define MB_NumbWordRev	   		16			//
 
 // - запись в прибор -----------------------------
 #define MB_addr_SysNote_OFF		0x0D01

@@ -271,8 +271,8 @@ FRESULT f_open (FIL* fp, const TCHAR* path, BYTE mode);				/* Open or create a f
 FRESULT f_close (FIL* fp);											/* Close an open file object */
 FRESULT f_read (FIL* fp, void* buff, UINT btr, UINT* br);			/* Read data from the file */
 FRESULT f_write (FIL* fp, const void* buff, UINT btw, UINT* bw);	/* Write data to the file */
-FRESULT f_lseek (FIL* fp, FSIZE_t ofs);								/* Move file pointer of the file object */
-FRESULT f_truncate (FIL* fp);										/* Truncate the file */
+FRESULT f_lseek (FIL* fp, FSIZE_t ofs);								/* перемещение по файлу позиции чтения/записи, увеличение размера файла (Expand file size)*/
+FRESULT f_truncate (FIL* fp);										/* обрезка файла (Truncate file size)*/
 FRESULT f_sync (FIL* fp);											/* Flush cached data of the writing file */
 FRESULT f_opendir (DIR* dp, const TCHAR* path);						/* Open a directory */
 FRESULT f_closedir (DIR* dp);										/* Close an open directory */
@@ -284,7 +284,7 @@ FRESULT f_unlink (const TCHAR* path);								/* Delete an existing file or direc
 FRESULT f_rename (const TCHAR* path_old, const TCHAR* path_new);	/* Rename/Move a file or directory */
 FRESULT f_stat (const TCHAR* path, FILINFO* fno);					/* Get file status */
 FRESULT f_chmod (const TCHAR* path, BYTE attr, BYTE mask);			/* Change attribute of a file/dir */
-FRESULT f_utime (const TCHAR* path, const FILINFO* fno);			/* Change timestamp of a file/dir */
+FRESULT f_utime (const TCHAR* path, const FILINFO* fno);			/* поменять время/дату Change timestamp of a file/dir */
 FRESULT f_chdir (const TCHAR* path);								/* Change current directory */
 FRESULT f_chdrive (const TCHAR* path);								/* Change current drive */
 FRESULT f_getcwd (TCHAR* buff, UINT len);							/* Get current directory */
@@ -297,10 +297,23 @@ FRESULT f_mount (FATFS* fs, const TCHAR* path, BYTE opt);			/* Mount/Unmount a l
 FRESULT f_mkfs (const TCHAR* path, BYTE opt, DWORD au, void* work, UINT len);	/* Create a FAT volume */
 FRESULT f_fdisk (BYTE pdrv, const DWORD* szt, void* work);			/* Divide a physical drive into some partitions */
 int f_putc (TCHAR c, FIL* fp);										/* Put a character to the file */
-int f_puts (const TCHAR* str, FIL* cp);								/* Put a string to the file */
-int f_printf (FIL* fp, const TCHAR* str, ...);						/* Put a formatted string to the file */
+int f_puts (const TCHAR* str, FIL* cp);								/* записать строку Put a string to the file */
+int f_printf (FIL* fp, const TCHAR* str, ...);						/* записать форматированную строку Put a formatted string to the file */
 TCHAR* f_gets (TCHAR* buff, int len, FIL* fp);						/* Get a string from the file */
-
+/*
+ *  f_printf(&fil, "%d", 1234);            // "1234"
+    f_printf(&fil, "%6d,%3d%%", -200, 5);  // " -200, 5%"
+    f_printf(&fil, "%-6u", 100);           // "100 "
+    f_printf(&fil, "%ld", 12345678L);      // "12345678"
+    f_printf(&fil, "%04x", 0xA3);          // "00a3"
+    f_printf(&fil, "%08LX", 0x123ABC);     // "00123ABC"
+    f_printf(&fil, "%016b", 0x550F);       // "0101010100001111"
+    f_printf(&fil, "%s", "String");        // "String"
+    f_printf(&fil, "%-4s", "abc");         // "abc "
+    f_printf(&fil, "%4s", "abc");          // " abc"
+    f_printf(&fil, "%c", 'a');             // "a"
+    f_printf(&fil, "%f", 10.0);            // f_printf не поддерживает числа с плавающей запятой
+ */
 #define f_eof(fp) ((int)((fp)->fptr == (fp)->obj.objsize))
 #define f_error(fp) ((fp)->err)
 #define f_tell(fp) ((fp)->fptr)
@@ -321,6 +334,7 @@ TCHAR* f_gets (TCHAR* buff, int len, FIL* fp);						/* Get a string from the fil
 /* RTC function */
 #if !_FS_READONLY && !_FS_NORTC
 DWORD get_fattime (void);
+FRESULT set_timestampFile (char *obj,int year,int month,    int mday,    int hour,    int min,    int sec);
 #endif
 
 /* Unicode support functions */

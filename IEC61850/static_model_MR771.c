@@ -28,6 +28,15 @@ extern DataSet iedModelds_LD0_LLN0_dataset7;
 extern DataSet iedModelds_LD0_LLN0_dataset8;
 extern DataSet iedModelds_LD0_LLN0_dataset9;
 extern DataSet iedModelds_LD0_LLN0_dataset10;
+extern DataSet iedModelds_LD0_LLN0_dataset11;
+extern DataSet iedModelds_LD0_LLN0_dataset12;
+extern DataSet iedModelds_LD0_LLN0_dataset13;
+extern DataSet iedModelds_LD0_LLN0_dataset14;
+extern DataSet iedModelds_LD0_LLN0_dataset15;
+extern DataSet iedModelds_LD0_LLN0_dataset16;
+extern DataSet iedModelds_LD0_LLN0_dataset17;
+extern DataSet iedModelds_LD0_LLN0_dataset18;
+extern DataSet iedModelds_LD0_LLN0_dataset19;
 
 // report
 extern ReportControlBlock iedModel_LD0_LLN0_report0;
@@ -41,117 +50,270 @@ extern ReportControlBlock iedModel_LD0_LLN0_report7;
 extern ReportControlBlock iedModel_LD0_LLN0_report8;
 extern ReportControlBlock iedModel_LD0_LLN0_report9;
 extern ReportControlBlock iedModel_LD0_LLN0_report10;
+extern ReportControlBlock iedModel_LD0_LLN0_report11;
+extern ReportControlBlock iedModel_LD0_LLN0_report12;
+extern ReportControlBlock iedModel_LD0_LLN0_report13;
+extern ReportControlBlock iedModel_LD0_LLN0_report14;
+extern ReportControlBlock iedModel_LD0_LLN0_report15;
+extern ReportControlBlock iedModel_LD0_LLN0_report16;
+extern ReportControlBlock iedModel_LD0_LLN0_report17;
+extern ReportControlBlock iedModel_LD0_LLN0_report18;
+extern ReportControlBlock iedModel_LD0_LLN0_report19;
+extern ReportControlBlock iedModel_LD0_LLN0_report20;
 
 // gse
 extern GSEControlBlock iedModel_LD0_LLN0_gse0;
 extern GSEControlBlock iedModel_LD0_LLN0_gse1;
 
 //-----
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda0;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda1;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda2;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda3;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda4;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda5;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda6;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda7;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda8;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda9;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda10;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda11;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda12;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda13;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda14;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda15;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda16;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda17;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda18;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda19;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda20;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda21;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda22;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda23;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda24;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda25;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda26;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda27;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda28;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda29;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda30;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda31;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda32;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda33;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda34;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda35;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda36;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda37;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda38;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda39;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda40;
-extern	DataSetEntry iedModelds_LD0_LLN0_dataset_fcda41;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda0;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda1;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda2;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda3;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda4;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda5;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda6;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda7;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda8;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda9;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda10;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda11;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda12;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda13;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda14;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda15;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda16;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda17;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda18;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda19;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda20;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda21;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda22;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda23;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda24;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda25;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda26;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda27;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda28;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda29;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda30;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda31;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda32;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda33;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda34;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda35;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda36;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda37;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda38;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda39;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda40;
+extern	DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda41;
+
+extern DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda0;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda1;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda2;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda3;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda4;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda5;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda6;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda7;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda8;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda9;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda10;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda11;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda12;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda13;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda14;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda15;
+
+extern DataSetEntry iedModelds_LD0_LLN0_dataset2_fcda0;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset2_fcda1;
+
+extern DataSetEntry iedModelds_LD0_LLN0_dataset3_fcda0;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset3_fcda1;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset3_fcda2;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset3_fcda3;
+
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda0;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda1;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda2;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda3;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda4;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda5;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda6;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda7;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda8;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda9;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda10;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda11;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda12;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda13;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda14;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda15;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda16;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda17;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda18;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda19;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda20;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda21;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda22;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda23;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda24;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda25;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda26;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda27;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda28;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda29;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda30;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda31;
+
+extern DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda0;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda1;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda2;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda3;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda4;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda5;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda6;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda7;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda8;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda9;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda10;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda11;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda12;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda13;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda14;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda15;
+
+extern DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda0;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda1;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda2;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda3;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda4;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda5;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda6;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda7;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda8;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda9;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda10;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda11;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda12;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda13;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda14;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda15;
 
 
-extern DataSetEntry iedModelds_LD0_MMXU1_fcda0;
-extern DataSetEntry iedModelds_LD0_MMXU1_fcda1;
-extern DataSetEntry iedModelds_LD0_MMXU1_fcda2;
-extern DataSetEntry iedModelds_LD0_MMXU1_fcda3;
-extern DataSetEntry iedModelds_LD0_MMXU1_fcda4;
-extern DataSetEntry iedModelds_LD0_MMXU1_fcda5;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda0;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda1;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda2;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda3;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda4;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda5;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda6;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda7;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda8;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda9;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda10;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda11;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda12;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda13;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda14;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda15;
 
-extern DataSetEntry iedModelds_LD0_MMXU2_fcda0;
-extern DataSetEntry iedModelds_LD0_MMXU2_fcda1;
-extern DataSetEntry iedModelds_LD0_MMXU2_fcda2;
-extern DataSetEntry iedModelds_LD0_MMXU2_fcda3;
-extern DataSetEntry iedModelds_LD0_MMXU2_fcda4;
-extern DataSetEntry iedModelds_LD0_MMXU2_fcda5;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda0;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda1;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda2;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda3;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda4;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda5;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda6;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda7;
 
-extern DataSetEntry iedModelds_LD0_MMXU3_fcda0;
-extern DataSetEntry iedModelds_LD0_MMXU3_fcda1;
-extern DataSetEntry iedModelds_LD0_MMXU3_fcda2;
-extern DataSetEntry iedModelds_LD0_MMXU3_fcda3;
-extern DataSetEntry iedModelds_LD0_MMXU3_fcda4;
-extern DataSetEntry iedModelds_LD0_MMXU3_fcda5;
 
-extern DataSetEntry iedModelds_LD0_MMXU4_fcda0;
-extern DataSetEntry iedModelds_LD0_MMXU4_fcda1;
-extern DataSetEntry iedModelds_LD0_MMXU4_fcda2;
-extern DataSetEntry iedModelds_LD0_MMXU4_fcda3;
-extern DataSetEntry iedModelds_LD0_MMXU4_fcda4;
-extern DataSetEntry iedModelds_LD0_MMXU4_fcda5;
-extern DataSetEntry iedModelds_LD0_MMXU4_fcda6;
-extern DataSetEntry iedModelds_LD0_MMXU4_fcda7;
-extern DataSetEntry iedModelds_LD0_MMXU4_fcda8;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda0;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda1;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda2;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda3;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda4;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda5;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda6;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda7;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda8;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda9;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda10;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda11;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda12;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda13;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda14;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda15;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda16;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda17;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda18;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda19;
 
-extern DataSetEntry iedModelds_LD0_MMXU5_fcda0;
-extern DataSetEntry iedModelds_LD0_MMXU5_fcda1;
-extern DataSetEntry iedModelds_LD0_MMXU5_fcda2;
-extern DataSetEntry iedModelds_LD0_MMXU5_fcda3;
-extern DataSetEntry iedModelds_LD0_MMXU5_fcda4;
-extern DataSetEntry iedModelds_LD0_MMXU5_fcda5;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset10_fcda0;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset10_fcda1;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset10_fcda2;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset10_fcda3;
 
-extern DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda0;
-extern DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda1;
-extern DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda2;
-extern DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda3;
-extern DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda4;
-extern DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda5;
-extern DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda6;
-extern DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda7;
-extern DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda8;
-extern DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda9;
-extern DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda10;
-extern DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda11;
-extern DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda12;
-extern DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda13;
-extern DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda14;
-extern DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda15;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda0;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda1;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda2;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda3;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda4;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda5;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda6;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda7;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda8;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda9;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda10;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda11;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda12;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda13;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda14;
 
-extern DataSetEntry iedModelds_LD0_LLN0_dataset_D4_fcda0;
-extern DataSetEntry iedModelds_LD0_LLN0_dataset_D4_fcda1;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset12_fcda0;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset12_fcda1;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset12_fcda2;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset12_fcda3;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset12_fcda4;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset12_fcda5;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset12_fcda6;
 
-extern DataSetEntry iedModelds_LD0_LLN0_dataset_D5_fcda0;
-extern DataSetEntry iedModelds_LD0_LLN0_dataset_D5_fcda1;
-extern DataSetEntry iedModelds_LD0_LLN0_dataset_D5_fcda2;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset13_fcda0;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset13_fcda1;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset13_fcda2;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset13_fcda3;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset13_fcda4;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset13_fcda5;
+
+extern DataSetEntry iedModelds_LD0_LLN0_dataset14_fcda0;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset14_fcda1;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset14_fcda2;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset14_fcda3;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset14_fcda4;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset14_fcda5;
+
+
+extern DataSetEntry iedModelds_LD0_LLN0_dataset15_fcda0;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset15_fcda1;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset15_fcda2;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset15_fcda3;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset15_fcda4;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset15_fcda5;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset15_fcda6;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset15_fcda7;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset15_fcda8;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset15_fcda9;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset15_fcda10;
+
+extern DataSetEntry iedModelds_LD0_LLN0_dataset16_fcda0;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset16_fcda1;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset16_fcda2;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset16_fcda3;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset16_fcda4;
+extern DataSetEntry iedModelds_LD0_LLN0_dataset16_fcda5;
+
+
 
 
 /***********************************************************************
@@ -1536,6 +1698,12 @@ DataAttribute iedModel_PROT_BLKPTTR1_TmpRI_t;
 DataAttribute iedModel_PROT_BLKPTTR1_TmpRI_db;
 DataAttribute iedModel_PROT_BLKPTTR1_TmpRI_zeroDb;
 
+DataObject iedModel_PROT_BLKPTTR1_Str;
+DataAttribute iedModel_PROT_BLKPTTR1_Str_general;
+DataAttribute iedModel_PROT_BLKPTTR1_Str_dirGeneral;
+DataAttribute iedModel_PROT_BLKPTTR1_Str_q;
+DataAttribute iedModel_PROT_BLKPTTR1_Str_t;
+
 DataObject iedModel_PROT_BLKPTTR1_Op;
 DataAttribute iedModel_PROT_BLKPTTR1_Op_general;
 DataAttribute iedModel_PROT_BLKPTTR1_Op_q;
@@ -1574,6 +1742,12 @@ DataAttribute iedModel_PROT_QPTTR1_TmpRI_t;
 DataAttribute iedModel_PROT_QPTTR1_TmpRI_db;
 DataAttribute iedModel_PROT_QPTTR1_TmpRI_zeroDb;
 
+DataObject iedModel_PROT_QPTTR1_Str;
+DataAttribute iedModel_PROT_QPTTR1_Str_general;
+DataAttribute iedModel_PROT_QPTTR1_Str_dirGeneral;
+DataAttribute iedModel_PROT_QPTTR1_Str_q;
+DataAttribute iedModel_PROT_QPTTR1_Str_t;
+
 DataObject iedModel_PROT_QPTTR1_Op;
 DataAttribute iedModel_PROT_QPTTR1_Op_general;
 DataAttribute iedModel_PROT_QPTTR1_Op_q;
@@ -1611,6 +1785,12 @@ DataAttribute iedModel_PROT_QPTTR2_TmpRI_q;
 DataAttribute iedModel_PROT_QPTTR2_TmpRI_t;
 DataAttribute iedModel_PROT_QPTTR2_TmpRI_db;
 DataAttribute iedModel_PROT_QPTTR2_TmpRI_zeroDb;
+
+DataObject iedModel_PROT_QPTTR2_Str;
+DataAttribute iedModel_PROT_QPTTR2_Str_general;
+DataAttribute iedModel_PROT_QPTTR2_Str_dirGeneral;
+DataAttribute iedModel_PROT_QPTTR2_Str_q;
+DataAttribute iedModel_PROT_QPTTR2_Str_t;
 
 DataObject iedModel_PROT_QPTTR2_Op;
 DataAttribute iedModel_PROT_QPTTR2_Op_general;
@@ -1735,6 +1915,11 @@ DataObject    iedModel_PROT_RBRF1_OpEx;
 DataAttribute iedModel_PROT_RBRF1_OpEx_general;
 DataAttribute iedModel_PROT_RBRF1_OpEx_q;
 DataAttribute iedModel_PROT_RBRF1_OpEx_t;
+
+DataObject iedModel_PROT_RBRF1_OpIn;
+DataAttribute iedModel_PROT_RBRF1_OpIn_general;
+DataAttribute iedModel_PROT_RBRF1_OpIn_q;
+DataAttribute iedModel_PROT_RBRF1_OpIn_t;
 /*
 //----------------------------------------------------------------------------
 // RBRF2
@@ -1826,11 +2011,55 @@ DataAttribute iedModel_PROT_RPSB1_Str_general;
 DataAttribute iedModel_PROT_RPSB1_Str_q;
 DataAttribute iedModel_PROT_RPSB1_Str_t;
 
-DataObject iedModel_PROT_RPSB1_BlkZn;
-DataAttribute iedModel_PROT_RPSB1_BlkZn_general;
-DataAttribute iedModel_PROT_RPSB1_BlkZn_q;
-DataAttribute iedModel_PROT_RPSB1_BlkZn_t;
+DataObject iedModel_PROT_RPSB1_BlkZn1;
+DataAttribute iedModel_PROT_RPSB1_BlkZn1_general;
+DataAttribute iedModel_PROT_RPSB1_BlkZn1_q;
+DataAttribute iedModel_PROT_RPSB1_BlkZn1_t;
 
+DataObject iedModel_PROT_RPSB1_BlkZn2;
+DataAttribute iedModel_PROT_RPSB1_BlkZn2_general;
+DataAttribute iedModel_PROT_RPSB1_BlkZn2_q;
+DataAttribute iedModel_PROT_RPSB1_BlkZn2_t;
+
+DataObject iedModel_PROT_RPSB1_BlkZn3;
+DataAttribute iedModel_PROT_RPSB1_BlkZn3_general;
+DataAttribute iedModel_PROT_RPSB1_BlkZn3_q;
+DataAttribute iedModel_PROT_RPSB1_BlkZn3_t;
+
+DataObject iedModel_PROT_RPSB1_BlkZn4;
+DataAttribute iedModel_PROT_RPSB1_BlkZn4_general;
+DataAttribute iedModel_PROT_RPSB1_BlkZn4_q;
+DataAttribute iedModel_PROT_RPSB1_BlkZn4_t;
+
+DataObject iedModel_PROT_RPSB1_BlkZn5;
+DataAttribute iedModel_PROT_RPSB1_BlkZn5_general;
+DataAttribute iedModel_PROT_RPSB1_BlkZn5_q;
+DataAttribute iedModel_PROT_RPSB1_BlkZn5_t;
+
+DataObject iedModel_PROT_RPSB1_BlkZn6;
+DataAttribute iedModel_PROT_RPSB1_BlkZn6_general;
+DataAttribute iedModel_PROT_RPSB1_BlkZn6_q;
+DataAttribute iedModel_PROT_RPSB1_BlkZn6_t;
+
+DataObject iedModel_PROT_RPSB1_BlkZn7;
+DataAttribute iedModel_PROT_RPSB1_BlkZn7_general;
+DataAttribute iedModel_PROT_RPSB1_BlkZn7_q;
+DataAttribute iedModel_PROT_RPSB1_BlkZn7_t;
+
+DataObject iedModel_PROT_RPSB1_BlkZn8;
+DataAttribute iedModel_PROT_RPSB1_BlkZn8_general;
+DataAttribute iedModel_PROT_RPSB1_BlkZn8_q;
+DataAttribute iedModel_PROT_RPSB1_BlkZn8_t;
+
+DataObject iedModel_PROT_RPSB1_BlkZn9;
+DataAttribute iedModel_PROT_RPSB1_BlkZn9_general;
+DataAttribute iedModel_PROT_RPSB1_BlkZn9_q;
+DataAttribute iedModel_PROT_RPSB1_BlkZn9_t;
+
+DataObject iedModel_PROT_RPSB1_BlkZn10;
+DataAttribute iedModel_PROT_RPSB1_BlkZn10_general;
+DataAttribute iedModel_PROT_RPSB1_BlkZn10_q;
+DataAttribute iedModel_PROT_RPSB1_BlkZn10_t;
 //----------------------------------------------------------------------------
 // PDIS1
 //----------------------------------------------------------------------------
@@ -1980,7 +2209,7 @@ DataAttribute iedModel_PROT_PDIS4_Str_q;
 DataAttribute iedModel_PROT_PDIS4_Str_t;
 
 //----------------------------------------------------------------------------
-// PDIS1
+// PDIS5
 //----------------------------------------------------------------------------
 LogicalNode iedModel_PROT_PDIS5;
 
@@ -2017,7 +2246,7 @@ DataAttribute iedModel_PROT_PDIS5_Str_q;
 DataAttribute iedModel_PROT_PDIS5_Str_t;
 
 //----------------------------------------------------------------------------
-// PDIS1
+// PDIS6
 //----------------------------------------------------------------------------
 LogicalNode iedModel_PROT_PDIS6;
 
@@ -2902,6 +3131,29 @@ DataAttribute iedModel_CTRL_PTRC_Op_t;
 // GGIO1
 //----------------------------------------------------------------------------
 LogicalNode iedModel_CTRL_GGIO1;
+
+DataObject iedModel_CTRL_GGIO1_Mod;
+DataAttribute iedModel_CTRL_GGIO1_Mod_q;
+DataAttribute iedModel_CTRL_GGIO1_Mod_t;
+DataAttribute iedModel_CTRL_GGIO1_Mod_stVal;
+DataAttribute iedModel_CTRL_GGIO1_Mod_ctlModel;
+
+DataObject iedModel_CTRL_GGIO1_Beh;
+DataAttribute iedModel_CTRL_GGIO1_Beh_stVal;
+DataAttribute iedModel_CTRL_GGIO1_Beh_q;
+DataAttribute iedModel_CTRL_GGIO1_Beh_t;
+
+DataObject iedModel_CTRL_GGIO1_Health;
+DataAttribute iedModel_CTRL_GGIO1_Health_stVal;
+DataAttribute iedModel_CTRL_GGIO1_Health_q;
+DataAttribute iedModel_CTRL_GGIO1_Health_t;
+
+DataObject iedModel_CTRL_GGIO1_NamPlt;
+DataAttribute iedModel_CTRL_GGIO1_NamPlt_vendor;
+DataAttribute iedModel_CTRL_GGIO1_NamPlt_swRev;
+DataAttribute iedModel_CTRL_GGIO1_NamPlt_d;
+
+
 DataObject iedModel_CTRL_GGIO1_SPCSO1;
 DataAttribute iedModel_CTRL_GGIO1_SPCSO1_q;
 DataAttribute iedModel_CTRL_GGIO1_SPCSO1_t;
@@ -2951,6 +3203,21 @@ DataAttribute iedModel_CTRL_GGIO1_SPCSO3_Oper_T;
 DataAttribute iedModel_CTRL_GGIO1_SPCSO3_Oper_Test;
 DataAttribute iedModel_CTRL_GGIO1_SPCSO3_Oper_Check;
 
+DataObject iedModel_CTRL_GGIO1_SPCSO4;
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_q;
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_t;
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_d;
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_stVal;
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_ctlModel;
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper;
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_ctlVal;
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_origin;
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_origin_orCat;
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_origin_orIdent;
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_ctlNum;
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_T;
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_Test;
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_Check;
 // ---------------------------------------------------------------------------------------------------------
 // 0     0  0000   000
 // 00   00  0     0
@@ -3200,12 +3467,12 @@ DataAttribute iedModel_MES_MSQI1_NamPlt_d;
 
 // SeqA
 DataObject iedModel_MES_MSQI1_SeqA;
-DataObject iedModel_MES_MSQI1_SeqA_I0;
-DataAttribute iedModel_MES_MSQI1_SeqA_I0_cVal;
-DataAttribute iedModel_MES_MSQI1_SeqA_I0_cVal_mag;
-DataAttribute iedModel_MES_MSQI1_SeqA_I0_cVal_mag_f;
-DataAttribute iedModel_MES_MSQI1_SeqA_I0_q;
-DataAttribute iedModel_MES_MSQI1_SeqA_I0_t;
+DataObject iedModel_MES_MSQI1_SeqA_I1;
+DataAttribute iedModel_MES_MSQI1_SeqA_I1_cVal;
+DataAttribute iedModel_MES_MSQI1_SeqA_I1_cVal_mag;
+DataAttribute iedModel_MES_MSQI1_SeqA_I1_cVal_mag_f;
+DataAttribute iedModel_MES_MSQI1_SeqA_I1_q;
+DataAttribute iedModel_MES_MSQI1_SeqA_I1_t;
 
 DataObject iedModel_MES_MSQI1_SeqA_I2;
 DataAttribute iedModel_MES_MSQI1_SeqA_I2_cVal;
@@ -3225,12 +3492,12 @@ DataAttribute iedModel_MES_MSQI1_SeqA_SeqT;
 
 // SeqU
 DataObject iedModel_MES_MSQI1_SeqU;
-DataObject iedModel_MES_MSQI1_SeqU_U0;
-DataAttribute iedModel_MES_MSQI1_SeqU_U0_cVal;
-DataAttribute iedModel_MES_MSQI1_SeqU_U0_cVal_mag;
-DataAttribute iedModel_MES_MSQI1_SeqU_U0_cVal_mag_f;
-DataAttribute iedModel_MES_MSQI1_SeqU_U0_q;
-DataAttribute iedModel_MES_MSQI1_SeqU_U0_t;
+DataObject iedModel_MES_MSQI1_SeqU_U1;
+DataAttribute iedModel_MES_MSQI1_SeqU_U1_cVal;
+DataAttribute iedModel_MES_MSQI1_SeqU_U1_cVal_mag;
+DataAttribute iedModel_MES_MSQI1_SeqU_U1_cVal_mag_f;
+DataAttribute iedModel_MES_MSQI1_SeqU_U1_q;
+DataAttribute iedModel_MES_MSQI1_SeqU_U1_t;
 
 DataObject iedModel_MES_MSQI1_SeqU_U2;
 DataAttribute iedModel_MES_MSQI1_SeqU_U2_cVal;
@@ -3239,12 +3506,12 @@ DataAttribute iedModel_MES_MSQI1_SeqU_U2_cVal_mag_f;
 DataAttribute iedModel_MES_MSQI1_SeqU_U2_q;
 DataAttribute iedModel_MES_MSQI1_SeqU_U2_t;
 
-DataObject iedModel_MES_MSQI1_SeqU_3U0;
-DataAttribute iedModel_MES_MSQI1_SeqU_3U0_cVal;
-DataAttribute iedModel_MES_MSQI1_SeqU_3U0_cVal_mag;
-DataAttribute iedModel_MES_MSQI1_SeqU_3U0_cVal_mag_f;
-DataAttribute iedModel_MES_MSQI1_SeqU_3U0_q;
-DataAttribute iedModel_MES_MSQI1_SeqU_3U0_t;
+DataObject iedModel_MES_MSQI1_SeqU_U3U0;
+DataAttribute iedModel_MES_MSQI1_SeqU_U3U0_cVal;
+DataAttribute iedModel_MES_MSQI1_SeqU_U3U0_cVal_mag;
+DataAttribute iedModel_MES_MSQI1_SeqU_U3U0_cVal_mag_f;
+DataAttribute iedModel_MES_MSQI1_SeqU_U3U0_q;
+DataAttribute iedModel_MES_MSQI1_SeqU_U3U0_t;
 
 DataAttribute iedModel_MES_MSQI1_SeqU_SeqT;
 
@@ -3646,22 +3913,7 @@ DataAttribute iedModel_GGIO_LEDGGIO1_Ind16_stVal;
 DataAttribute iedModel_GGIO_LEDGGIO1_Ind16_q;
 DataAttribute iedModel_GGIO_LEDGGIO1_Ind16_t;
 
-//SPCSO1
-DataObject iedModel_GGIO_LEDGGIO1_SPCSO1;
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_q;
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_t;
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_d;
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_stVal;
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_ctlModel;
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper;
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_ctlVal;
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_origin;
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_origin_orCat;
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_origin_orIdent;
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_ctlNum;
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_T;
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_Test;
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_Check;
+
 //SPCSO2
 DataObject iedModel_GGIO_LEDGGIO1_SPCSO2;
 DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO2_q;
@@ -4365,7 +4617,7 @@ DataAttribute iedModel_GGIO_LSGGIO1_Ind16_t;
 
 
 IedModel iedModel = {
-    "MR771",
+	_swREV,//"MR771",
     &iedModel_Generic_LD0,
     &iedModelds_LD0_LLN0_dataset0,				// DataSet
     &iedModel_LD0_LLN0_report0,					// ReportControlBlock
@@ -5179,27 +5431,10 @@ DataAttribute iedModel_GGIO_LEDGGIO1_Ind15_stVal = { DataAttributeModelType, "st
 DataAttribute iedModel_GGIO_LEDGGIO1_Ind15_q = { DataAttributeModelType, "q", (ModelNode*) &iedModel_GGIO_LEDGGIO1_Ind15, (ModelNode*) &iedModel_GGIO_LEDGGIO1_Ind15_t, NULL, 0, IEC61850_FC_ST, IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_LEDGGIO1_Ind15_t = { DataAttributeModelType, "t", (ModelNode*) &iedModel_GGIO_LEDGGIO1_Ind15, NULL, NULL, 0, IEC61850_FC_ST, IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 // --------------------------------------------------------
-DataObject iedModel_GGIO_LEDGGIO1_Ind16 = { DataObjectModelType, "Ind16", (ModelNode*) &iedModel_GGIO_LEDGGIO1, (ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1, (ModelNode*) &iedModel_GGIO_LEDGGIO1_Ind16_stVal, 0};
+DataObject iedModel_GGIO_LEDGGIO1_Ind16 = { DataObjectModelType, "Ind16", (ModelNode*) &iedModel_GGIO_LEDGGIO1, (ModelNode*) NULL, (ModelNode*) &iedModel_GGIO_LEDGGIO1_Ind16_stVal, 0};
 DataAttribute iedModel_GGIO_LEDGGIO1_Ind16_stVal = { DataAttributeModelType, "stVal", (ModelNode*) &iedModel_GGIO_LEDGGIO1_Ind16, (ModelNode*) &iedModel_GGIO_LEDGGIO1_Ind16_q, NULL, 0, IEC61850_FC_ST, IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED | TRG_OPT_GI, NULL,0};
 DataAttribute iedModel_GGIO_LEDGGIO1_Ind16_q = { DataAttributeModelType, "q", (ModelNode*) &iedModel_GGIO_LEDGGIO1_Ind16, (ModelNode*) &iedModel_GGIO_LEDGGIO1_Ind16_t, NULL, 0, IEC61850_FC_ST, IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_LEDGGIO1_Ind16_t = { DataAttributeModelType, "t", (ModelNode*) &iedModel_GGIO_LEDGGIO1_Ind16, NULL, NULL, 0, IEC61850_FC_ST, IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-
-// --------------------------------------------------------
-DataObject iedModel_GGIO_LEDGGIO1_SPCSO1 						= {    DataObjectModelType,     "SPCSO1",     	(ModelNode*) &iedModel_GGIO_LEDGGIO1,     		NULL,    (ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1_q,0};
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1, 		(ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1, 		(ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1_d,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_d 				= {    DataAttributeModelType,  "d",       		(ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1, 		(ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1_stVal,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1, 		(ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_ctlModel 			= {   DataAttributeModelType,   "ctlModel",		(ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1, 		(ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1_Oper, NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper 				= {    DataAttributeModelType,  "Oper",    		(ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1,   	NULL,    (ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_ctlVal,    0,    IEC61850_FC_CO,    IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_ctlVal 			= {    DataAttributeModelType,  "ctlVal",  	(ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1_Oper, (ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_origin,    NULL,    0,    IEC61850_FC_CO,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_origin 			= {    DataAttributeModelType,  "origin",  	(ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1_Oper, (ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_ctlNum,    (ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_origin_orCat,    0,    IEC61850_FC_CO,    IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_origin_orCat 	= {    DataAttributeModelType,  "orCat",   	(ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_origin,    (ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_origin_orIdent,    NULL,    0,    IEC61850_FC_CO,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_origin_orIdent 	= {    DataAttributeModelType,  "orIdent", 	(ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_origin,    NULL,    NULL,    0,    IEC61850_FC_CO,    IEC61850_OCTET_STRING_64, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_ctlNum 			= {    DataAttributeModelType,  "ctlNum",  	(ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1_Oper, (ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_T,    NULL,    0,    IEC61850_FC_CO,    IEC61850_INT8U, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_T 				= {    DataAttributeModelType,  "T",    	(ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1_Oper, (ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_Test,    NULL,    0,    IEC61850_FC_CO,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_Test 			= {    DataAttributeModelType,  "Test",    	(ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1_Oper, (ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_Check,    NULL,    0,    IEC61850_FC_CO,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_LEDGGIO1_SPCSO1_Oper_Check 			= {    DataAttributeModelType,  "Check",    (ModelNode*) &iedModel_GGIO_LEDGGIO1_SPCSO1_Oper, NULL,    NULL,    0,    IEC61850_FC_CO,    IEC61850_CHECK, TRG_OPT_NO, NULL,0};
 
 /*************************************************************************
  * SSL32GGIO1
@@ -5807,14 +6042,14 @@ DataAttribute iedModel_MES_MSQI1_NamPlt_swRev	 	= { DataAttributeModelType,    "
 DataAttribute iedModel_MES_MSQI1_NamPlt_d 			= { DataAttributeModelType,    "d",    (ModelNode*) &iedModel_MES_MSQI1_NamPlt,    NULL,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
 
 // SeqA
-DataObject iedModel_MES_MSQI1_SeqA 					= { DataObjectModelType, "SeqA", (ModelNode*) &iedModel_MES_MMXU1, (ModelNode*) &iedModel_MES_MSQI1_SeqU, (ModelNode*) &iedModel_MES_MSQI1_SeqA_I0, 0 };
+DataObject iedModel_MES_MSQI1_SeqA 					= { DataObjectModelType, "SeqA", (ModelNode*) &iedModel_MES_MMXU1, (ModelNode*) &iedModel_MES_MSQI1_SeqU, (ModelNode*) &iedModel_MES_MSQI1_SeqA_I1, 0 };
 
-DataObject iedModel_MES_MSQI1_SeqA_I0 				= { DataObjectModelType, "I0", (ModelNode*) &iedModel_MES_MSQI1_SeqA, (ModelNode*)&iedModel_MES_MSQI1_SeqA_I2, (ModelNode*) &iedModel_MES_MSQI1_SeqA_I0_cVal, 0 };
-DataAttribute iedModel_MES_MSQI1_SeqA_I0_cVal 		= { DataAttributeModelType, "cVal", (ModelNode*) &iedModel_MES_MSQI1_SeqA_I0, (ModelNode*) &iedModel_MES_MSQI1_SeqA_I0_q, (ModelNode*) &iedModel_MES_MSQI1_SeqA_I0_cVal_mag, 0,  IEC61850_FC_MX, IEC61850_CONSTRUCTED,TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_MES_MSQI1_SeqA_I0_cVal_mag 	= { DataAttributeModelType, "mag", (ModelNode*) &iedModel_MES_MSQI1_SeqA_I0_cVal, NULL, (ModelNode*) &iedModel_MES_MSQI1_SeqA_I0_cVal_mag_f, 0,  IEC61850_FC_MX, IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_MES_MSQI1_SeqA_I0_cVal_mag_f = { DataAttributeModelType, "f", (ModelNode*) &iedModel_MES_MSQI1_SeqA_I0_cVal_mag, NULL, NULL, 0,  IEC61850_FC_MX, IEC61850_FLOAT32,0, NULL,0};
-DataAttribute iedModel_MES_MSQI1_SeqA_I0_q 			= { DataAttributeModelType, "q", (ModelNode*) &iedModel_MES_MSQI1_SeqA_I0, (ModelNode*) &iedModel_MES_MSQI1_SeqA_I0_t, NULL, 0,  IEC61850_FC_MX, IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
-DataAttribute iedModel_MES_MSQI1_SeqA_I0_t 			= { DataAttributeModelType, "t", (ModelNode*) &iedModel_MES_MSQI1_SeqA_I0, NULL, NULL, 0,  IEC61850_FC_MX, IEC61850_TIMESTAMP, 0, NULL,0};
+DataObject iedModel_MES_MSQI1_SeqA_I1 				= { DataObjectModelType, "I1", (ModelNode*) &iedModel_MES_MSQI1_SeqA, (ModelNode*)&iedModel_MES_MSQI1_SeqA_I2, (ModelNode*) &iedModel_MES_MSQI1_SeqA_I1_cVal, 0 };
+DataAttribute iedModel_MES_MSQI1_SeqA_I1_cVal 		= { DataAttributeModelType, "cVal", (ModelNode*) &iedModel_MES_MSQI1_SeqA_I1, (ModelNode*) &iedModel_MES_MSQI1_SeqA_I1_q, (ModelNode*) &iedModel_MES_MSQI1_SeqA_I1_cVal_mag, 0,  IEC61850_FC_MX, IEC61850_CONSTRUCTED,TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_MES_MSQI1_SeqA_I1_cVal_mag 	= { DataAttributeModelType, "mag", (ModelNode*) &iedModel_MES_MSQI1_SeqA_I1_cVal, NULL, (ModelNode*) &iedModel_MES_MSQI1_SeqA_I1_cVal_mag_f, 0,  IEC61850_FC_MX, IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_MES_MSQI1_SeqA_I1_cVal_mag_f = { DataAttributeModelType, "f", (ModelNode*) &iedModel_MES_MSQI1_SeqA_I1_cVal_mag, NULL, NULL, 0,  IEC61850_FC_MX, IEC61850_FLOAT32,0, NULL,0};
+DataAttribute iedModel_MES_MSQI1_SeqA_I1_q 			= { DataAttributeModelType, "q", (ModelNode*) &iedModel_MES_MSQI1_SeqA_I1, (ModelNode*) &iedModel_MES_MSQI1_SeqA_I1_t, NULL, 0,  IEC61850_FC_MX, IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
+DataAttribute iedModel_MES_MSQI1_SeqA_I1_t 			= { DataAttributeModelType, "t", (ModelNode*) &iedModel_MES_MSQI1_SeqA_I1, NULL, NULL, 0,  IEC61850_FC_MX, IEC61850_TIMESTAMP, 0, NULL,0};
 
 DataObject iedModel_MES_MSQI1_SeqA_I2 				= { DataObjectModelType, "I2", (ModelNode*) &iedModel_MES_MSQI1_SeqA, (ModelNode*)&iedModel_MES_MSQI1_SeqA_3I0, (ModelNode*) &iedModel_MES_MSQI1_SeqA_I2_cVal, 0 };
 DataAttribute iedModel_MES_MSQI1_SeqA_I2_cVal 		= { DataAttributeModelType, "cVal", (ModelNode*) &iedModel_MES_MSQI1_SeqA_I2, (ModelNode*) &iedModel_MES_MSQI1_SeqA_I2_q, (ModelNode*) &iedModel_MES_MSQI1_SeqA_I2_cVal_mag, 0,  IEC61850_FC_MX, IEC61850_CONSTRUCTED,TRG_OPT_NO, NULL,0};
@@ -5833,28 +6068,28 @@ DataAttribute iedModel_MES_MSQI1_SeqA_3I0_t 		= { DataAttributeModelType, "t", (
 DataAttribute iedModel_MES_MSQI1_SeqA_SeqT 			= { DataAttributeModelType, "SeqT", (ModelNode*) &iedModel_MES_MSQI1_SeqA, NULL , NULL, 0,  IEC61850_FC_MX, IEC61850_ENUMERATED,TRG_OPT_NO, NULL,0};
 
 // SeqU
-DataObject iedModel_MES_MSQI1_SeqU 					= { DataObjectModelType, "SeqU", (ModelNode*) &iedModel_MES_MMXU1, NULL, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U0, 0 };
+DataObject iedModel_MES_MSQI1_SeqU 					= { DataObjectModelType, "SeqU", (ModelNode*) &iedModel_MES_MMXU1, NULL, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U1, 0 };
 
-DataObject iedModel_MES_MSQI1_SeqU_U0 				= { DataObjectModelType, "U0", (ModelNode*) &iedModel_MES_MSQI1_SeqU, (ModelNode*)&iedModel_MES_MSQI1_SeqU_U2, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U0_cVal, 0 };
-DataAttribute iedModel_MES_MSQI1_SeqU_U0_cVal 		= { DataAttributeModelType, "cVal", (ModelNode*) &iedModel_MES_MSQI1_SeqU_U0, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U0_q, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U0_cVal_mag, 0,  IEC61850_FC_MX, IEC61850_CONSTRUCTED,TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_MES_MSQI1_SeqU_U0_cVal_mag 	= { DataAttributeModelType, "mag", (ModelNode*) &iedModel_MES_MSQI1_SeqU_U0_cVal, NULL, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U0_cVal_mag_f, 0,  IEC61850_FC_MX, IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_MES_MSQI1_SeqU_U0_cVal_mag_f = { DataAttributeModelType, "f", (ModelNode*) &iedModel_MES_MSQI1_SeqU_U0_cVal_mag, NULL, NULL, 0,  IEC61850_FC_MX, IEC61850_FLOAT32,0, NULL,0};
-DataAttribute iedModel_MES_MSQI1_SeqU_U0_q 			= { DataAttributeModelType, "q", (ModelNode*) &iedModel_MES_MSQI1_SeqU_U0, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U0_t, NULL, 0,  IEC61850_FC_MX, IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
-DataAttribute iedModel_MES_MSQI1_SeqU_U0_t 			= { DataAttributeModelType, "t", (ModelNode*) &iedModel_MES_MSQI1_SeqU_U0, NULL, NULL, 0,  IEC61850_FC_MX, IEC61850_TIMESTAMP, 0, NULL,0};
+DataObject iedModel_MES_MSQI1_SeqU_U1 				= { DataObjectModelType, "U1", (ModelNode*) &iedModel_MES_MSQI1_SeqU, (ModelNode*)&iedModel_MES_MSQI1_SeqU_U2, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U1_cVal, 0 };
+DataAttribute iedModel_MES_MSQI1_SeqU_U1_cVal 		= { DataAttributeModelType, "cVal", (ModelNode*) &iedModel_MES_MSQI1_SeqU_U1, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U1_q, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U1_cVal_mag, 0,  IEC61850_FC_MX, IEC61850_CONSTRUCTED,TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_MES_MSQI1_SeqU_U1_cVal_mag 	= { DataAttributeModelType, "mag", (ModelNode*) &iedModel_MES_MSQI1_SeqU_U1_cVal, NULL, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U1_cVal_mag_f, 0,  IEC61850_FC_MX, IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_MES_MSQI1_SeqU_U1_cVal_mag_f = { DataAttributeModelType, "f", (ModelNode*) &iedModel_MES_MSQI1_SeqU_U1_cVal_mag, NULL, NULL, 0,  IEC61850_FC_MX, IEC61850_FLOAT32,0, NULL,0};
+DataAttribute iedModel_MES_MSQI1_SeqU_U1_q 			= { DataAttributeModelType, "q", (ModelNode*) &iedModel_MES_MSQI1_SeqU_U1, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U1_t, NULL, 0,  IEC61850_FC_MX, IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
+DataAttribute iedModel_MES_MSQI1_SeqU_U1_t 			= { DataAttributeModelType, "t", (ModelNode*) &iedModel_MES_MSQI1_SeqU_U1, NULL, NULL, 0,  IEC61850_FC_MX, IEC61850_TIMESTAMP, 0, NULL,0};
 
-DataObject iedModel_MES_MSQI1_SeqU_U2 				= { DataObjectModelType, "U2", (ModelNode*) &iedModel_MES_MSQI1_SeqU, (ModelNode*)&iedModel_MES_MSQI1_SeqU_3U0, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U2_cVal, 0 };
+DataObject iedModel_MES_MSQI1_SeqU_U2 				= { DataObjectModelType, "U2", (ModelNode*) &iedModel_MES_MSQI1_SeqU, (ModelNode*)&iedModel_MES_MSQI1_SeqU_U3U0, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U2_cVal, 0 };
 DataAttribute iedModel_MES_MSQI1_SeqU_U2_cVal 		= { DataAttributeModelType, "cVal", (ModelNode*) &iedModel_MES_MSQI1_SeqU_U2, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U2_q, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U2_cVal_mag, 0,  IEC61850_FC_MX, IEC61850_CONSTRUCTED,TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_MES_MSQI1_SeqU_U2_cVal_mag 	= { DataAttributeModelType, "mag", (ModelNode*) &iedModel_MES_MSQI1_SeqU_U2_cVal, NULL, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U2_cVal_mag_f, 0,  IEC61850_FC_MX, IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_MES_MSQI1_SeqU_U2_cVal_mag_f = { DataAttributeModelType, "f", (ModelNode*) &iedModel_MES_MSQI1_SeqU_U2_cVal_mag, NULL, NULL, 0,  IEC61850_FC_MX, IEC61850_FLOAT32,0, NULL,0};
 DataAttribute iedModel_MES_MSQI1_SeqU_U2_q 			= { DataAttributeModelType, "q", (ModelNode*) &iedModel_MES_MSQI1_SeqU_U2, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U2_t, NULL, 0,  IEC61850_FC_MX, IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_MES_MSQI1_SeqU_U2_t 			= { DataAttributeModelType, "t", (ModelNode*) &iedModel_MES_MSQI1_SeqU_U2, NULL, NULL, 0,  IEC61850_FC_MX, IEC61850_TIMESTAMP, 0, NULL,0};
 
-DataObject iedModel_MES_MSQI1_SeqU_3U0 				= { DataObjectModelType, "3U0", (ModelNode*) &iedModel_MES_MSQI1_SeqU, (ModelNode*)&iedModel_MES_MSQI1_SeqU_SeqT, (ModelNode*) &iedModel_MES_MSQI1_SeqU_3U0_cVal, 0 };
-DataAttribute iedModel_MES_MSQI1_SeqU_3U0_cVal 		= { DataAttributeModelType, "cVal", (ModelNode*) &iedModel_MES_MSQI1_SeqU_3U0, (ModelNode*) &iedModel_MES_MSQI1_SeqU_3U0_q, (ModelNode*) &iedModel_MES_MSQI1_SeqU_3U0_cVal_mag, 0,  IEC61850_FC_MX, IEC61850_CONSTRUCTED,TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_MES_MSQI1_SeqU_3U0_cVal_mag 	= { DataAttributeModelType, "mag", (ModelNode*) &iedModel_MES_MSQI1_SeqU_3U0_cVal, NULL, (ModelNode*) &iedModel_MES_MSQI1_SeqU_3U0_cVal_mag_f, 0,  IEC61850_FC_MX, IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_MES_MSQI1_SeqU_3U0_cVal_mag_f = { DataAttributeModelType, "f", (ModelNode*) &iedModel_MES_MSQI1_SeqU_3U0_cVal_mag, NULL, NULL, 0,  IEC61850_FC_MX, IEC61850_FLOAT32,0, NULL,0};
-DataAttribute iedModel_MES_MSQI1_SeqU_3U0_q 			= { DataAttributeModelType, "q", (ModelNode*) &iedModel_MES_MSQI1_SeqU_3U0, (ModelNode*) &iedModel_MES_MSQI1_SeqU_3U0_t, NULL, 0,  IEC61850_FC_MX, IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
-DataAttribute iedModel_MES_MSQI1_SeqU_3U0_t 			= { DataAttributeModelType, "t", (ModelNode*) &iedModel_MES_MSQI1_SeqU_3U0, NULL, NULL, 0,  IEC61850_FC_MX, IEC61850_TIMESTAMP, 0, NULL,0};
+DataObject iedModel_MES_MSQI1_SeqU_U3U0 				= { DataObjectModelType, "3U0", (ModelNode*) &iedModel_MES_MSQI1_SeqU, (ModelNode*)&iedModel_MES_MSQI1_SeqU_SeqT, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U3U0_cVal, 0 };
+DataAttribute iedModel_MES_MSQI1_SeqU_U3U0_cVal 		= { DataAttributeModelType, "cVal", (ModelNode*) &iedModel_MES_MSQI1_SeqU_U3U0, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U3U0_q, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U3U0_cVal_mag, 0,  IEC61850_FC_MX, IEC61850_CONSTRUCTED,TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_MES_MSQI1_SeqU_U3U0_cVal_mag 	= { DataAttributeModelType, "mag", (ModelNode*) &iedModel_MES_MSQI1_SeqU_U3U0_cVal, NULL, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U3U0_cVal_mag_f, 0,  IEC61850_FC_MX, IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_MES_MSQI1_SeqU_U3U0_cVal_mag_f = { DataAttributeModelType, "f", (ModelNode*) &iedModel_MES_MSQI1_SeqU_U3U0_cVal_mag, NULL, NULL, 0,  IEC61850_FC_MX, IEC61850_FLOAT32,0, NULL,0};
+DataAttribute iedModel_MES_MSQI1_SeqU_U3U0_q 			= { DataAttributeModelType, "q", (ModelNode*) &iedModel_MES_MSQI1_SeqU_U3U0, (ModelNode*) &iedModel_MES_MSQI1_SeqU_U3U0_t, NULL, 0,  IEC61850_FC_MX, IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
+DataAttribute iedModel_MES_MSQI1_SeqU_U3U0_t 			= { DataAttributeModelType, "t", (ModelNode*) &iedModel_MES_MSQI1_SeqU_U3U0, NULL, NULL, 0,  IEC61850_FC_MX, IEC61850_TIMESTAMP, 0, NULL,0};
 
 DataAttribute iedModel_MES_MSQI1_SeqU_SeqT 			= { DataAttributeModelType, "SeqT", (ModelNode*) &iedModel_MES_MSQI1_SeqU, NULL , NULL, 0,  IEC61850_FC_MX, IEC61850_ENUMERATED,TRG_OPT_NO, NULL,0};
 
@@ -7667,6 +7902,15 @@ DataAttribute iedModel_PROT_BLKPTTR1_TmpRI_t 		= { DataAttributeModelType, "t", 
 DataAttribute iedModel_PROT_BLKPTTR1_TmpRI_db 		= { DataAttributeModelType, "db", (ModelNode*) &iedModel_PROT_BLKPTTR1_TmpRI, (ModelNode*) &iedModel_PROT_BLKPTTR1_TmpRI_zeroDb, NULL, 0, IEC61850_FC_CF, IEC61850_INT32U, 0, NULL,0 };
 DataAttribute iedModel_PROT_BLKPTTR1_TmpRI_zeroDb 	= { DataAttributeModelType, "zeroDb", (ModelNode*) &iedModel_PROT_BLKPTTR1_TmpRI, NULL, NULL, 0, IEC61850_FC_CF, IEC61850_INT32U, 0, NULL,0 };
 
+/*
+// информация о статусе ПУСК
+DataObject iedModel_PROT_BLKPTTR1_Str 	 					= {    DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_BLKPTTR1,  	(ModelNode*)&iedModel_PROT_BLKPTTR1_Op, (ModelNode*) &iedModel_PROT_BLKPTTR1_Str_general,0};
+DataAttribute iedModel_PROT_BLKPTTR1_Str_general 			= {    DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_BLKPTTR1_Str,  (ModelNode*) &iedModel_PROT_BLKPTTR1_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_BLKPTTR1_Str_dirGeneral 		= {    DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_BLKPTTR1_Str,  (ModelNode*) &iedModel_PROT_BLKPTTR1_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_BLKPTTR1_Str_q 				= {    DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_BLKPTTR1_Str,  (ModelNode*) &iedModel_PROT_BLKPTTR1_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_BLKPTTR1_Str_t 				= {    DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_BLKPTTR1_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
+*/
+
 DataObject iedModel_PROT_BLKPTTR1_Op 	 			= {    DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_BLKPTTR1,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_BLKPTTR1_Op_general,0};
 DataAttribute iedModel_PROT_BLKPTTR1_Op_general 		= {    DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_BLKPTTR1_Op,  (ModelNode*) &iedModel_PROT_BLKPTTR1_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_BLKPTTR1_Op_q 			= {    DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_BLKPTTR1_Op,  (ModelNode*) &iedModel_PROT_BLKPTTR1_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
@@ -7697,13 +7941,20 @@ DataAttribute iedModel_PROT_QPTTR1_NamPlt_vendor 	= {    DataAttributeModelType,
 DataAttribute iedModel_PROT_QPTTR1_NamPlt_swRev 	= {    DataAttributeModelType,    "swRev",    (ModelNode*) &iedModel_PROT_QPTTR1_NamPlt,    (ModelNode*) &iedModel_PROT_QPTTR1_NamPlt_d,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_QPTTR1_NamPlt_d 		= {    DataAttributeModelType,    "d",    (ModelNode*) &iedModel_PROT_QPTTR1_NamPlt,    NULL,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
 
-DataObject iedModel_PROT_QPTTR1_TmpRI 				= { DataObjectModelType, "TmpRI", (ModelNode*) &iedModel_MES_MMXU1, (ModelNode*) &iedModel_PROT_QPTTR1_Op, (ModelNode*) &iedModel_PROT_QPTTR1_TmpRI_mag, 0 };
+DataObject iedModel_PROT_QPTTR1_TmpRI 				= { DataObjectModelType, "TmpRI", (ModelNode*) &iedModel_MES_MMXU1, (ModelNode*) &iedModel_PROT_QPTTR1_Str, (ModelNode*) &iedModel_PROT_QPTTR1_TmpRI_mag, 0 };
 DataAttribute iedModel_PROT_QPTTR1_TmpRI_mag 		= { DataAttributeModelType, "mag", (ModelNode*) &iedModel_PROT_QPTTR1_TmpRI, (ModelNode*) &iedModel_PROT_QPTTR1_TmpRI_q, (ModelNode*) &iedModel_PROT_QPTTR1_TmpRI_mag_f, 0,  IEC61850_FC_MX, IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_QPTTR1_TmpRI_mag_f 	= { DataAttributeModelType, "f", (ModelNode*) &iedModel_PROT_QPTTR1_TmpRI_mag, NULL, NULL, 0,  IEC61850_FC_MX, IEC61850_FLOAT32,0, NULL,0};
 DataAttribute iedModel_PROT_QPTTR1_TmpRI_q 		= { DataAttributeModelType, "q", (ModelNode*) &iedModel_PROT_QPTTR1_TmpRI, (ModelNode*) &iedModel_PROT_QPTTR1_TmpRI_t, NULL, 0,  IEC61850_FC_MX, IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_QPTTR1_TmpRI_t 		= { DataAttributeModelType, "t", (ModelNode*) &iedModel_PROT_QPTTR1_TmpRI,  (ModelNode*) &iedModel_PROT_QPTTR1_TmpRI_db, NULL, 0,  IEC61850_FC_MX, IEC61850_TIMESTAMP, 0, NULL,0};
 DataAttribute iedModel_PROT_QPTTR1_TmpRI_db 		= { DataAttributeModelType, "db", (ModelNode*) &iedModel_PROT_QPTTR1_TmpRI, (ModelNode*) &iedModel_PROT_QPTTR1_TmpRI_zeroDb, NULL, 0, IEC61850_FC_CF, IEC61850_INT32U, 0, NULL,0 };
 DataAttribute iedModel_PROT_QPTTR1_TmpRI_zeroDb 	= { DataAttributeModelType, "zeroDb", (ModelNode*) &iedModel_PROT_QPTTR1_TmpRI, NULL, NULL, 0, IEC61850_FC_CF, IEC61850_INT32U, 0, NULL,0 };
+
+// информация о статусе ПУСК
+DataObject iedModel_PROT_QPTTR1_Str 	 					= {    DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_QPTTR1,  	(ModelNode*)&iedModel_PROT_QPTTR1_Op, (ModelNode*) &iedModel_PROT_QPTTR1_Str_general,0};
+DataAttribute iedModel_PROT_QPTTR1_Str_general 			= {    DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_QPTTR1_Str,  (ModelNode*) &iedModel_PROT_QPTTR1_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_QPTTR1_Str_dirGeneral 		= {    DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_QPTTR1_Str,  (ModelNode*) &iedModel_PROT_QPTTR1_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_QPTTR1_Str_q 				= {    DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_QPTTR1_Str,  (ModelNode*) &iedModel_PROT_QPTTR1_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_QPTTR1_Str_t 				= {    DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_QPTTR1_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_QPTTR1_Op 	 			= {    DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_QPTTR1,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_QPTTR1_Op_general,0};
@@ -7736,13 +7987,21 @@ DataAttribute iedModel_PROT_QPTTR2_NamPlt_vendor 	= {    DataAttributeModelType,
 DataAttribute iedModel_PROT_QPTTR2_NamPlt_swRev 	= {    DataAttributeModelType,    "swRev",    (ModelNode*) &iedModel_PROT_QPTTR2_NamPlt,    (ModelNode*) &iedModel_PROT_QPTTR2_NamPlt_d,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_QPTTR2_NamPlt_d 		= {    DataAttributeModelType,    "d",    (ModelNode*) &iedModel_PROT_QPTTR2_NamPlt,    NULL,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
 
-DataObject iedModel_PROT_QPTTR2_TmpRI 				= { DataObjectModelType, "TmpRI", (ModelNode*) &iedModel_MES_MMXU1, (ModelNode*) &iedModel_PROT_QPTTR2_Op, (ModelNode*) &iedModel_PROT_QPTTR2_TmpRI_mag, 0 };
+DataObject iedModel_PROT_QPTTR2_TmpRI 				= { DataObjectModelType, "TmpRI", (ModelNode*) &iedModel_MES_MMXU1, (ModelNode*) &iedModel_PROT_QPTTR2_Str, (ModelNode*) &iedModel_PROT_QPTTR2_TmpRI_mag, 0 };
 DataAttribute iedModel_PROT_QPTTR2_TmpRI_mag 		= { DataAttributeModelType, "mag", (ModelNode*) &iedModel_PROT_QPTTR2_TmpRI, (ModelNode*) &iedModel_PROT_QPTTR2_TmpRI_q, (ModelNode*) &iedModel_PROT_QPTTR2_TmpRI_mag_f, 0,  IEC61850_FC_MX, IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_QPTTR2_TmpRI_mag_f 	= { DataAttributeModelType, "f", (ModelNode*) &iedModel_PROT_QPTTR2_TmpRI_mag, NULL, NULL, 0,  IEC61850_FC_MX, IEC61850_FLOAT32,0, NULL,0};
 DataAttribute iedModel_PROT_QPTTR2_TmpRI_q 		= { DataAttributeModelType, "q", (ModelNode*) &iedModel_PROT_QPTTR2_TmpRI, (ModelNode*) &iedModel_PROT_QPTTR2_TmpRI_t, NULL, 0,  IEC61850_FC_MX, IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_QPTTR2_TmpRI_t 		= { DataAttributeModelType, "t", (ModelNode*) &iedModel_PROT_QPTTR2_TmpRI,  (ModelNode*) &iedModel_PROT_QPTTR2_TmpRI_db, NULL, 0,  IEC61850_FC_MX, IEC61850_TIMESTAMP, 0, NULL,0};
 DataAttribute iedModel_PROT_QPTTR2_TmpRI_db 		= { DataAttributeModelType, "db", (ModelNode*) &iedModel_PROT_QPTTR2_TmpRI, (ModelNode*) &iedModel_PROT_QPTTR2_TmpRI_zeroDb, NULL, 0, IEC61850_FC_CF, IEC61850_INT32U, 0, NULL,0 };
 DataAttribute iedModel_PROT_QPTTR2_TmpRI_zeroDb 	= { DataAttributeModelType, "zeroDb", (ModelNode*) &iedModel_PROT_QPTTR2_TmpRI, NULL, NULL, 0, IEC61850_FC_CF, IEC61850_INT32U, 0, NULL,0 };
+
+// информация о статусе ПУСК
+DataObject iedModel_PROT_QPTTR2_Str 	 					= {    DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_QPTTR2,  	(ModelNode*)&iedModel_PROT_QPTTR2_Op, (ModelNode*) &iedModel_PROT_QPTTR2_Str_general,0};
+DataAttribute iedModel_PROT_QPTTR2_Str_general 			= {    DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_QPTTR2_Str,  (ModelNode*) &iedModel_PROT_QPTTR2_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_QPTTR2_Str_dirGeneral 		= {    DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_QPTTR2_Str,  (ModelNode*) &iedModel_PROT_QPTTR2_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_QPTTR2_Str_q 				= {    DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_QPTTR2_Str,  (ModelNode*) &iedModel_PROT_QPTTR2_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_QPTTR2_Str_t 				= {    DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_QPTTR2_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
+
 
 DataObject iedModel_PROT_QPTTR2_Op 	 			= {    DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_QPTTR2,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_QPTTR2_Op_general,0};
 DataAttribute iedModel_PROT_QPTTR2_Op_general 		= {    DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_QPTTR2_Op,  (ModelNode*) &iedModel_PROT_QPTTR2_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
@@ -7812,12 +8071,12 @@ DataAttribute iedModel_PROT_RSYN1_NamPlt_d = {    DataAttributeModelType,    "d"
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_RSYN1_Rel 	 = {    DataObjectModelType,    "Rel",  (ModelNode*) &iedModel_PROT_RSYN1,  	(ModelNode*)&iedModel_PROT_RSYN1_DifVCIc, (ModelNode*) &iedModel_PROT_RSYN1_Rel_stVal,0};
-DataAttribute iedModel_PROT_RSYN1_Rel_stVal = {    DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_RSYN1_Rel, (ModelNode*) &iedModel_PROT_RSYN1_Rel_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RSYN1_Rel_stVal = {    DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_RSYN1_Rel, (ModelNode*) &iedModel_PROT_RSYN1_Rel_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_RSYN1_Rel_q = {    DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_RSYN1_Rel,  (ModelNode*) &iedModel_PROT_RSYN1_Rel_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_RSYN1_Rel_t = {    DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_RSYN1_Rel,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // DifVCIc
-DataObject iedModel_PROT_RSYN1_DifVCIc 				= { DataObjectModelType, "DifVCIc", (ModelNode*) &iedModel_MES_MMXU1, (ModelNode*) &iedModel_PROT_RSYN1_DifHzCIc, (ModelNode*) &iedModel_PROT_RSYN1_DifVCIc_mag, 0 };
+DataObject iedModel_PROT_RSYN1_DifVCIc 				= { DataObjectModelType, "DifVCIc", (ModelNode*) &iedModel_PROT_RSYN1, (ModelNode*) &iedModel_PROT_RSYN1_DifHzCIc, (ModelNode*) &iedModel_PROT_RSYN1_DifVCIc_mag, 0 };
 DataAttribute iedModel_PROT_RSYN1_DifVCIc_mag 		= { DataAttributeModelType, "mag", (ModelNode*) &iedModel_PROT_RSYN1_DifVCIc, (ModelNode*) &iedModel_PROT_RSYN1_DifVCIc_q, (ModelNode*) &iedModel_PROT_RSYN1_DifVCIc_mag_f, 0,  IEC61850_FC_MX, IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_RSYN1_DifVCIc_mag_f 	= { DataAttributeModelType, "f", (ModelNode*) &iedModel_PROT_RSYN1_DifVCIc_mag, NULL, NULL, 0,  IEC61850_FC_MX, IEC61850_FLOAT32,0, NULL,0};
 DataAttribute iedModel_PROT_RSYN1_DifVCIc_q 		= { DataAttributeModelType, "q", (ModelNode*) &iedModel_PROT_RSYN1_DifVCIc, (ModelNode*) &iedModel_PROT_RSYN1_DifVCIc_t, NULL, 0,  IEC61850_FC_MX, IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
@@ -7826,7 +8085,7 @@ DataAttribute iedModel_PROT_RSYN1_DifVCIc_db 		= { DataAttributeModelType, "db",
 DataAttribute iedModel_PROT_RSYN1_DifVCIc_zeroDb 	= { DataAttributeModelType, "zeroDb", (ModelNode*) &iedModel_PROT_RSYN1_DifVCIc, NULL, NULL, 0, IEC61850_FC_CF, IEC61850_INT32U, 0, NULL,0 };
 
 // DifHzCIc
-DataObject iedModel_PROT_RSYN1_DifHzCIc 				= { DataObjectModelType, "DifHzCIc", (ModelNode*) &iedModel_MES_MMXU1, (ModelNode*) &iedModel_PROT_RSYN1_DifAngCIc, (ModelNode*) &iedModel_PROT_RSYN1_DifHzCIc_mag, 0 };
+DataObject iedModel_PROT_RSYN1_DifHzCIc 				= { DataObjectModelType, "DifHzCIc", (ModelNode*) &iedModel_PROT_RSYN1, (ModelNode*) &iedModel_PROT_RSYN1_DifAngCIc, (ModelNode*) &iedModel_PROT_RSYN1_DifHzCIc_mag, 0 };
 DataAttribute iedModel_PROT_RSYN1_DifHzCIc_mag 		= { DataAttributeModelType, "mag", (ModelNode*) &iedModel_PROT_RSYN1_DifHzCIc, (ModelNode*) &iedModel_PROT_RSYN1_DifHzCIc_q, (ModelNode*) &iedModel_PROT_RSYN1_DifHzCIc_mag_f, 0,  IEC61850_FC_MX, IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_RSYN1_DifHzCIc_mag_f 	= { DataAttributeModelType, "f", (ModelNode*) &iedModel_PROT_RSYN1_DifHzCIc_mag, NULL, NULL, 0,  IEC61850_FC_MX, IEC61850_FLOAT32,0, NULL,0};
 DataAttribute iedModel_PROT_RSYN1_DifHzCIc_q 		= { DataAttributeModelType, "q", (ModelNode*) &iedModel_PROT_RSYN1_DifHzCIc, (ModelNode*) &iedModel_PROT_RSYN1_DifHzCIc_t, NULL, 0,  IEC61850_FC_MX, IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
@@ -7835,7 +8094,7 @@ DataAttribute iedModel_PROT_RSYN1_DifHzCIc_db 		= { DataAttributeModelType, "db"
 DataAttribute iedModel_PROT_RSYN1_DifHzCIc_zeroDb 	= { DataAttributeModelType, "zeroDb", (ModelNode*) &iedModel_PROT_RSYN1_DifHzCIc, NULL, NULL, 0, IEC61850_FC_CF, IEC61850_INT32U, 0, NULL,0 };
 
 //DifAngCIc
-DataObject iedModel_PROT_RSYN1_DifAngCIc 				= { DataObjectModelType, "DifAngCIc", (ModelNode*) &iedModel_MES_MMXU1, (ModelNode*) NULL, (ModelNode*) &iedModel_PROT_RSYN1_DifAngCIc_mag, 0 };
+DataObject iedModel_PROT_RSYN1_DifAngCIc 				= { DataObjectModelType, "DifAngCIc", (ModelNode*) &iedModel_PROT_RSYN1, (ModelNode*) NULL, (ModelNode*) &iedModel_PROT_RSYN1_DifAngCIc_mag, 0 };
 DataAttribute iedModel_PROT_RSYN1_DifAngCIc_mag 		= { DataAttributeModelType, "mag", (ModelNode*) &iedModel_PROT_RSYN1_DifAngCIc, (ModelNode*) &iedModel_PROT_RSYN1_DifAngCIc_q, (ModelNode*) &iedModel_PROT_RSYN1_DifAngCIc_mag_f, 0,  IEC61850_FC_MX, IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_RSYN1_DifAngCIc_mag_f 	= { DataAttributeModelType, "f", (ModelNode*) &iedModel_PROT_RSYN1_DifAngCIc_mag, NULL, NULL, 0,  IEC61850_FC_MX, IEC61850_FLOAT32,0, NULL,0};
 DataAttribute iedModel_PROT_RSYN1_DifAngCIc_q 		= { DataAttributeModelType, "q", (ModelNode*) &iedModel_PROT_RSYN1_DifAngCIc, (ModelNode*) &iedModel_PROT_RSYN1_DifAngCIc_t, NULL, 0,  IEC61850_FC_MX, IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
@@ -7871,10 +8130,15 @@ DataAttribute iedModel_PROT_RBRF1_NamPlt_swRev = {    DataAttributeModelType,   
 DataAttribute iedModel_PROT_RBRF1_NamPlt_d = {    DataAttributeModelType,    "d",    (ModelNode*) &iedModel_PROT_RBRF1_NamPlt,    NULL,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
-DataObject iedModel_PROT_RBRF1_OpEx 	 = {    DataObjectModelType,    		"OpEx",  (ModelNode*) &iedModel_PROT_RBRF1,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_RBRF1_OpEx_general,0};
+DataObject iedModel_PROT_RBRF1_OpEx 	 = {    DataObjectModelType,    		"OpEx",  (ModelNode*) &iedModel_PROT_RBRF1,  	(ModelNode*)&iedModel_PROT_RBRF1_OpIn, (ModelNode*) &iedModel_PROT_RBRF1_OpEx_general,0};
 DataAttribute iedModel_PROT_RBRF1_OpEx_general = {    DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_RBRF1_OpEx,  (ModelNode*) &iedModel_PROT_RBRF1_OpEx_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_RBRF1_OpEx_q = {    DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_RBRF1_OpEx,  (ModelNode*) &iedModel_PROT_RBRF1_OpEx_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_RBRF1_OpEx_t = {    DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_RBRF1_OpEx,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
+
+DataObject iedModel_PROT_RBRF1_OpIn 	 = {    DataObjectModelType,    		"OpIn",  (ModelNode*) &iedModel_PROT_RBRF1,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_RBRF1_OpIn_general,0};
+DataAttribute iedModel_PROT_RBRF1_OpIn_general = {    DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_RBRF1_OpIn,  (ModelNode*) &iedModel_PROT_RBRF1_OpIn_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RBRF1_OpIn_q = {    DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_RBRF1_OpIn,  (ModelNode*) &iedModel_PROT_RBRF1_OpIn_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RBRF1_OpIn_t = {    DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_RBRF1_OpIn,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 /*******************************************************
  * RBRF2
@@ -7966,15 +8230,60 @@ DataAttribute iedModel_PROT_RPSB1_NamPlt_vendor = {    DataAttributeModelType,  
 DataAttribute iedModel_PROT_RPSB1_NamPlt_swRev = {    DataAttributeModelType,    "swRev",    (ModelNode*) &iedModel_PROT_RPSB1_NamPlt,    (ModelNode*) &iedModel_PROT_RPSB1_NamPlt_d,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_RPSB1_NamPlt_d = {    DataAttributeModelType,    "d",    (ModelNode*) &iedModel_PROT_RPSB1_NamPlt,    NULL,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
 
-DataObject iedModel_PROT_RPSB1_Str 	 = {    DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_RPSB1,  	(ModelNode*)&iedModel_PROT_RPSB1_BlkZn, (ModelNode*) &iedModel_PROT_RPSB1_Str_general,0};
+DataObject iedModel_PROT_RPSB1_Str 	 = {    DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_RPSB1,  	(ModelNode*)&iedModel_PROT_RPSB1_BlkZn1, (ModelNode*) &iedModel_PROT_RPSB1_Str_general,0};
 DataAttribute iedModel_PROT_RPSB1_Str_general = {    DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_RPSB1_Str,  (ModelNode*) &iedModel_PROT_RPSB1_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_RPSB1_Str_q = {    DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_RPSB1_Str,  (ModelNode*) &iedModel_PROT_RPSB1_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_RPSB1_Str_t = {    DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_RPSB1_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
-DataObject iedModel_PROT_RPSB1_BlkZn 	 = {    DataObjectModelType,    		"BlkZn",  (ModelNode*) &iedModel_PROT_RPSB1,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_RPSB1_BlkZn_general,0};
-DataAttribute iedModel_PROT_RPSB1_BlkZn_general = {    DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_RPSB1_BlkZn,  (ModelNode*) &iedModel_PROT_RPSB1_BlkZn_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_RPSB1_BlkZn_q = {    DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_RPSB1_BlkZn,  (ModelNode*) &iedModel_PROT_RPSB1_BlkZn_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_RPSB1_BlkZn_t = {    DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_RPSB1_BlkZn,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
+DataObject iedModel_PROT_RPSB1_BlkZn1 	 = {    DataObjectModelType,    		"BlkZn1",  (ModelNode*) &iedModel_PROT_RPSB1,  	(ModelNode*)&iedModel_PROT_RPSB1_BlkZn2, (ModelNode*) &iedModel_PROT_RPSB1_BlkZn1_general,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn1_general = {    DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_RPSB1_BlkZn1,  (ModelNode*) &iedModel_PROT_RPSB1_BlkZn1_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn1_q = {    DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_RPSB1_BlkZn1,  (ModelNode*) &iedModel_PROT_RPSB1_BlkZn1_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn1_t = {    DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_RPSB1_BlkZn1,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
+
+DataObject iedModel_PROT_RPSB1_BlkZn2 	 = {    DataObjectModelType,    		"BlkZn2",  (ModelNode*) &iedModel_PROT_RPSB1,  	(ModelNode*)&iedModel_PROT_RPSB1_BlkZn3, (ModelNode*) &iedModel_PROT_RPSB1_BlkZn2_general,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn2_general = {    DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_RPSB1_BlkZn2,  (ModelNode*) &iedModel_PROT_RPSB1_BlkZn2_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn2_q = {    DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_RPSB1_BlkZn2,  (ModelNode*) &iedModel_PROT_RPSB1_BlkZn2_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn2_t = {    DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_RPSB1_BlkZn2,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
+
+DataObject iedModel_PROT_RPSB1_BlkZn3 	 = {    DataObjectModelType,    		"BlkZn3",  (ModelNode*) &iedModel_PROT_RPSB1,  	(ModelNode*)&iedModel_PROT_RPSB1_BlkZn4, (ModelNode*) &iedModel_PROT_RPSB1_BlkZn3_general,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn3_general = {    DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_RPSB1_BlkZn3,  (ModelNode*) &iedModel_PROT_RPSB1_BlkZn3_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn3_q = {    DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_RPSB1_BlkZn3,  (ModelNode*) &iedModel_PROT_RPSB1_BlkZn3_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn3_t = {    DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_RPSB1_BlkZn3,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
+
+DataObject iedModel_PROT_RPSB1_BlkZn4 	 = {    DataObjectModelType,    		"BlkZn4",  (ModelNode*) &iedModel_PROT_RPSB1,  	(ModelNode*)&iedModel_PROT_RPSB1_BlkZn5, (ModelNode*) &iedModel_PROT_RPSB1_BlkZn4_general,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn4_general = {    DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_RPSB1_BlkZn4,  (ModelNode*) &iedModel_PROT_RPSB1_BlkZn4_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn4_q = {    DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_RPSB1_BlkZn4,  (ModelNode*) &iedModel_PROT_RPSB1_BlkZn4_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn4_t = {    DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_RPSB1_BlkZn4,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
+
+DataObject iedModel_PROT_RPSB1_BlkZn5 	 = {    DataObjectModelType,    		"BlkZn5",  (ModelNode*) &iedModel_PROT_RPSB1,  	(ModelNode*)&iedModel_PROT_RPSB1_BlkZn6, (ModelNode*) &iedModel_PROT_RPSB1_BlkZn5_general,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn5_general = {    DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_RPSB1_BlkZn5,  (ModelNode*) &iedModel_PROT_RPSB1_BlkZn5_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn5_q = {    DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_RPSB1_BlkZn5,  (ModelNode*) &iedModel_PROT_RPSB1_BlkZn5_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn5_t = {    DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_RPSB1_BlkZn5,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
+
+DataObject iedModel_PROT_RPSB1_BlkZn6 	 = {    DataObjectModelType,    		"BlkZn6",  (ModelNode*) &iedModel_PROT_RPSB1,  	(ModelNode*)&iedModel_PROT_RPSB1_BlkZn7, (ModelNode*) &iedModel_PROT_RPSB1_BlkZn6_general,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn6_general = {    DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_RPSB1_BlkZn6,  (ModelNode*) &iedModel_PROT_RPSB1_BlkZn6_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn6_q = {    DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_RPSB1_BlkZn6,  (ModelNode*) &iedModel_PROT_RPSB1_BlkZn6_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn6_t = {    DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_RPSB1_BlkZn6,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
+
+DataObject iedModel_PROT_RPSB1_BlkZn7 	 = {    DataObjectModelType,    		"BlkZn7",  (ModelNode*) &iedModel_PROT_RPSB1,  	(ModelNode*)&iedModel_PROT_RPSB1_BlkZn8, (ModelNode*) &iedModel_PROT_RPSB1_BlkZn7_general,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn7_general = {    DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_RPSB1_BlkZn7,  (ModelNode*) &iedModel_PROT_RPSB1_BlkZn7_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn7_q = {    DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_RPSB1_BlkZn7,  (ModelNode*) &iedModel_PROT_RPSB1_BlkZn7_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn7_t = {    DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_RPSB1_BlkZn7,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
+
+DataObject iedModel_PROT_RPSB1_BlkZn8 	 = {    DataObjectModelType,    		"BlkZn8",  (ModelNode*) &iedModel_PROT_RPSB1,  	(ModelNode*)&iedModel_PROT_RPSB1_BlkZn9, (ModelNode*) &iedModel_PROT_RPSB1_BlkZn8_general,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn8_general = {    DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_RPSB1_BlkZn8,  (ModelNode*) &iedModel_PROT_RPSB1_BlkZn8_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn8_q = {    DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_RPSB1_BlkZn8,  (ModelNode*) &iedModel_PROT_RPSB1_BlkZn8_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn8_t = {    DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_RPSB1_BlkZn8,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
+
+DataObject iedModel_PROT_RPSB1_BlkZn9 	 = {    DataObjectModelType,    		"BlkZn9",  (ModelNode*) &iedModel_PROT_RPSB1,  	(ModelNode*)&iedModel_PROT_RPSB1_BlkZn10, (ModelNode*) &iedModel_PROT_RPSB1_BlkZn9_general,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn9_general = {    DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_RPSB1_BlkZn9,  (ModelNode*) &iedModel_PROT_RPSB1_BlkZn9_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn9_q = {    DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_RPSB1_BlkZn9,  (ModelNode*) &iedModel_PROT_RPSB1_BlkZn9_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn9_t = {    DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_RPSB1_BlkZn9,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
+
+DataObject iedModel_PROT_RPSB1_BlkZn10 	 = {    DataObjectModelType,    		"BlkZn10",  (ModelNode*) &iedModel_PROT_RPSB1,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_RPSB1_BlkZn10_general,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn10_general = {    DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_RPSB1_BlkZn10,  (ModelNode*) &iedModel_PROT_RPSB1_BlkZn10_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn10_q = {    DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_RPSB1_BlkZn10,  (ModelNode*) &iedModel_PROT_RPSB1_BlkZn10_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RPSB1_BlkZn10_t = {    DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_RPSB1_BlkZn10,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 /*******************************************************
  * PDIS1
@@ -8514,9 +8823,32 @@ DataAttribute iedModel_CTRL_PTRC_Op_t 			= { DataAttributeModelType, "t",    (Mo
 
 
 // --------------------------------------------------------
-LogicalNode iedModel_CTRL_GGIO1 							= {    LogicalNodeModelType,    "GGIO1",    (ModelNode*) &iedModel_Generic_CTRL,  NULL ,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1};
+LogicalNode iedModel_CTRL_GGIO1 					= {    LogicalNodeModelType,    "GGIO1",    (ModelNode*) &iedModel_Generic_CTRL,  NULL ,    (ModelNode*) &iedModel_CTRL_GGIO1_Mod};
 
-DataObject iedModel_CTRL_GGIO1_SPCSO1 						= {    DataObjectModelType,     "SPCSO1",     		(ModelNode*) &iedModel_CTRL_GGIO1,     		(ModelNode*)  &iedModel_CTRL_GGIO1_SPCSO2,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1_q,0};
+DataObject iedModel_CTRL_GGIO1_Mod 					= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_CTRL_GGIO1,    (ModelNode*) &iedModel_CTRL_GGIO1_Beh,    (ModelNode*) &iedModel_CTRL_GGIO1_Mod_q,0};
+DataAttribute iedModel_CTRL_GGIO1_Mod_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_CTRL_GGIO1_Mod,(ModelNode*) &iedModel_CTRL_GGIO1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_Mod_t 			= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_CTRL_GGIO1_Mod,(ModelNode*) &iedModel_CTRL_GGIO1_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_Mod_stVal 		= { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_CTRL_GGIO1_Mod,(ModelNode*) &iedModel_CTRL_GGIO1_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_Mod_ctlModel 		= {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_CTRL_GGIO1_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
+
+DataObject iedModel_CTRL_GGIO1_Beh 					= {    DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_CTRL_GGIO1,    (ModelNode*) &iedModel_CTRL_GGIO1_Health,    (ModelNode*) &iedModel_CTRL_GGIO1_Beh_stVal,0};
+DataAttribute iedModel_CTRL_GGIO1_Beh_stVal 		= {    DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_CTRL_GGIO1_Beh,    (ModelNode*) &iedModel_CTRL_GGIO1_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_Beh_q 			= {    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_CTRL_GGIO1_Beh,    (ModelNode*) &iedModel_CTRL_GGIO1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_Beh_t 			= {    DataAttributeModelType,    "t",    (ModelNode*) &iedModel_CTRL_GGIO1_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
+
+DataObject iedModel_CTRL_GGIO1_Health 				= {    DataObjectModelType,    "Health",    (ModelNode*) &iedModel_CTRL_GGIO1,    (ModelNode*) &iedModel_CTRL_GGIO1_NamPlt,    (ModelNode*) &iedModel_CTRL_GGIO1_Health_stVal,0};
+DataAttribute iedModel_CTRL_GGIO1_Health_stVal 		= {    DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_CTRL_GGIO1_Health,    (ModelNode*) &iedModel_CTRL_GGIO1_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_Health_q 			= {    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_CTRL_GGIO1_Health,    (ModelNode*) &iedModel_CTRL_GGIO1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_Health_t 			= {    DataAttributeModelType,    "t",    (ModelNode*) &iedModel_CTRL_GGIO1_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
+
+DataObject iedModel_CTRL_GGIO1_NamPlt 				= {    DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_CTRL_GGIO1,    (ModelNode*)&iedModel_CTRL_GGIO1_SPCSO1 , (ModelNode*) &iedModel_CTRL_GGIO1_NamPlt_vendor,0};
+
+DataAttribute iedModel_CTRL_GGIO1_NamPlt_vendor 	= {    DataAttributeModelType,    "vendor",    (ModelNode*) &iedModel_CTRL_GGIO1_NamPlt,    (ModelNode*) &iedModel_CTRL_GGIO1_NamPlt_swRev,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_NamPlt_swRev 		= {    DataAttributeModelType,    "swRev",    (ModelNode*) &iedModel_CTRL_GGIO1_NamPlt,    (ModelNode*) &iedModel_CTRL_GGIO1_NamPlt_d,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_NamPlt_d 			= {    DataAttributeModelType,    "d",    (ModelNode*) &iedModel_CTRL_GGIO1_NamPlt,    NULL,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
+
+
+DataObject iedModel_CTRL_GGIO1_SPCSO1 					= {    DataObjectModelType,     "SPCSO1",     		(ModelNode*) &iedModel_CTRL_GGIO1,     		(ModelNode*)  &iedModel_CTRL_GGIO1_SPCSO2,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1_q,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO1_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO1_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1_d,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO1_d 				= {    DataAttributeModelType,  "d",       		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1, 		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1_stVal,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
@@ -8548,7 +8880,7 @@ DataAttribute iedModel_CTRL_GGIO1_SPCSO2_Oper_T 				= {    DataAttributeModelTyp
 DataAttribute iedModel_CTRL_GGIO1_SPCSO2_Oper_Test 			= {    DataAttributeModelType,  "Test",    	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2_Oper,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2_Oper_Check,    NULL,    0,    IEC61850_FC_CO,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO2_Oper_Check 			= {    DataAttributeModelType,  "Check",    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2_Oper,    NULL,    NULL,    0,    IEC61850_FC_CO,    IEC61850_CHECK, TRG_OPT_NO, NULL,0};
 
-DataObject iedModel_CTRL_GGIO1_SPCSO3 						= {    DataObjectModelType,     "SPCSO3",     		(ModelNode*) &iedModel_CTRL_GGIO1,     	NULL,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3_q,0};
+DataObject iedModel_CTRL_GGIO1_SPCSO3 						= {    DataObjectModelType,     "SPCSO3",     		(ModelNode*) &iedModel_CTRL_GGIO1,     	(ModelNode*)  &iedModel_CTRL_GGIO1_SPCSO4,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3_q,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO3_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO3_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3_d,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO3_d 				= {    DataAttributeModelType,  "d",       		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3, 		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3_stVal,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
@@ -8566,130 +8898,321 @@ DataAttribute iedModel_CTRL_GGIO1_SPCSO3_Oper_Check 			= {    DataAttributeModel
 
 
 // --------------------------------------------------------
-// --------------------------------------------------------
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda0 = {"GGIO",false,"IN42GGIO1$ST$Ind1", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda1 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda1 = {"GGIO",false,"IN42GGIO1$ST$Ind2", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda2 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda2 = {"GGIO",false,"IN42GGIO1$ST$Ind3", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda3 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda3 = {"GGIO",false,"IN42GGIO1$ST$Ind4", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda4 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda4 = {"GGIO",false,"IN42GGIO1$ST$Ind5", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda5 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda5 = {"GGIO",false,"IN42GGIO1$ST$Ind6", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda6 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda6 = {"GGIO",false,"IN42GGIO1$ST$Ind7", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda7 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda7 = {"GGIO",false,"IN42GGIO1$ST$Ind8", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda8 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda8 = {"GGIO",false,"IN42GGIO1$ST$Ind9", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda9 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda9 = {"GGIO",false,"IN42GGIO1$ST$Ind10", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda10 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda10 = {"GGIO",false,"IN42GGIO1$ST$Ind11", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda11 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda11 = {"GGIO",false,"IN42GGIO1$ST$Ind12", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda12 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda12 = {"GGIO",false,"IN42GGIO1$ST$Ind13", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda13 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda13 = {"GGIO",false,"IN42GGIO1$ST$Ind14", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda14 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda14 = {"GGIO",false,"IN42GGIO1$ST$Ind15", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda15 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda15 = {"GGIO",false,"IN42GGIO1$ST$Ind16", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda16 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda16 = {"GGIO",false,"IN42GGIO1$ST$Ind17", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda17 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda17 = {"GGIO",false,"IN42GGIO1$ST$Ind18", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda18 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda18 = {"GGIO",false,"IN42GGIO1$ST$Ind19", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda19 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda19 = {"GGIO",false,"IN42GGIO1$ST$Ind20", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda20 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda20 = {"GGIO",false,"IN42GGIO1$ST$Ind21", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda21 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda21 = {"GGIO",false,"IN42GGIO1$ST$Ind22", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda22 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda22 = {"GGIO",false,"IN42GGIO1$ST$Ind23", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda23 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda23 = {"GGIO",false,"IN42GGIO1$ST$Ind24", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda24 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda24 = {"GGIO",false,"IN42GGIO1$ST$Ind25", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda25 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda25 = {"GGIO",false,"IN42GGIO1$ST$Ind26", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda26 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda26 = {"GGIO",false,"IN42GGIO1$ST$Ind27", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda27 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda27 = {"GGIO",false,"IN42GGIO1$ST$Ind28", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda28 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda28 = {"GGIO",false,"IN42GGIO1$ST$Ind29", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda29 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda29 = {"GGIO",false,"IN42GGIO1$ST$Ind30", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda30 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda30 = {"GGIO",false,"IN42GGIO1$ST$Ind31", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda31 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda31 = {"GGIO",false,"IN42GGIO1$ST$Ind32", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda32 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda32 = {"GGIO",false,"IN42GGIO1$ST$Ind33", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda33 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda33 = {"GGIO",false,"IN42GGIO1$ST$Ind34", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda34 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda34 = {"GGIO",false,"IN42GGIO1$ST$Ind35", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda35 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda35 = {"GGIO",false,"IN42GGIO1$ST$Ind36", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda36 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda36 = {"GGIO",false,"IN42GGIO1$ST$Ind37", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda37 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda37 = {"GGIO",false,"IN42GGIO1$ST$Ind38", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda38 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda38 = {"GGIO",false,"IN42GGIO1$ST$Ind39", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda39 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda39 = {"GGIO",false,"IN42GGIO1$ST$Ind40", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda40 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda40 = {"GGIO",false,"IN42GGIO1$ST$Ind41", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_fcda41 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_fcda41 = {"GGIO",false,"IN42GGIO1$ST$Ind42", -1, NULL, NULL, NULL };
+DataObject iedModel_CTRL_GGIO1_SPCSO4 						= {    DataObjectModelType,     "SPCSO4",     	(ModelNode*) &iedModel_CTRL_GGIO1,     		NULL,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_q,0};
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4, 		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4, 		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_d,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_d 				= {    DataAttributeModelType,  "d",       		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4, 		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_stVal,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4, 		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_ctlModel 			= {   DataAttributeModelType,   "ctlModel",		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4, 		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper, NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper 				= {    DataAttributeModelType,  "Oper",    		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4,   	NULL,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper_ctlVal,    0,    IEC61850_FC_CO,    IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_ctlVal 			= {    DataAttributeModelType,  "ctlVal",  	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper, (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper_origin,    NULL,    0,    IEC61850_FC_CO,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_origin 			= {    DataAttributeModelType,  "origin",  	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper, (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper_ctlNum,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper_origin_orCat,    0,    IEC61850_FC_CO,    IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_origin_orCat 	= {    DataAttributeModelType,  "orCat",   	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper_origin,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper_origin_orIdent,    NULL,    0,    IEC61850_FC_CO,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_origin_orIdent 	= {    DataAttributeModelType,  "orIdent", 	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper_origin,    NULL,    NULL,    0,    IEC61850_FC_CO,    IEC61850_OCTET_STRING_64, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_ctlNum 			= {    DataAttributeModelType,  "ctlNum",  	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper, (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper_T,    NULL,    0,    IEC61850_FC_CO,    IEC61850_INT8U, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_T 				= {    DataAttributeModelType,  "T",    	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper, (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper_Test,    NULL,    0,    IEC61850_FC_CO,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_Test 			= {    DataAttributeModelType,  "Test",    	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper, (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper_Check,    NULL,    0,    IEC61850_FC_CO,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_Check 			= {    DataAttributeModelType,  "Check",    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper, NULL,    NULL,    0,    IEC61850_FC_CO,    IEC61850_CHECK, TRG_OPT_NO, NULL,0};
 
 
 /***********************************************************************
  * DataSet
  ***********************************************************************/
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda0 = {"GGIO",false,"IN42GGIO1$ST$Ind1", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda1 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda1 = {"GGIO",false,"IN42GGIO1$ST$Ind2", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda2 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda2 = {"GGIO",false,"IN42GGIO1$ST$Ind3", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda3 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda3 = {"GGIO",false,"IN42GGIO1$ST$Ind4", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda4 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda4 = {"GGIO",false,"IN42GGIO1$ST$Ind5", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda5 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda5 = {"GGIO",false,"IN42GGIO1$ST$Ind6", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda6 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda6 = {"GGIO",false,"IN42GGIO1$ST$Ind7", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda7 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda7 = {"GGIO",false,"IN42GGIO1$ST$Ind8", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda8 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda8 = {"GGIO",false,"IN42GGIO1$ST$Ind9", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda9 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda9 = {"GGIO",false,"IN42GGIO1$ST$Ind10", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda10 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda10 = {"GGIO",false,"IN42GGIO1$ST$Ind11", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda11 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda11 = {"GGIO",false,"IN42GGIO1$ST$Ind12", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda12 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda12 = {"GGIO",false,"IN42GGIO1$ST$Ind13", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda13 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda13 = {"GGIO",false,"IN42GGIO1$ST$Ind14", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda14 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda14 = {"GGIO",false,"IN42GGIO1$ST$Ind15", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda15 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda15 = {"GGIO",false,"IN42GGIO1$ST$Ind16", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda16 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda16 = {"GGIO",false,"IN42GGIO1$ST$Ind17", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda17 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda17 = {"GGIO",false,"IN42GGIO1$ST$Ind18", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda18 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda18 = {"GGIO",false,"IN42GGIO1$ST$Ind19", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda19 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda19 = {"GGIO",false,"IN42GGIO1$ST$Ind20", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda20 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda20 = {"GGIO",false,"IN42GGIO1$ST$Ind21", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda21 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda21 = {"GGIO",false,"IN42GGIO1$ST$Ind22", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda22 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda22 = {"GGIO",false,"IN42GGIO1$ST$Ind23", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda23 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda23 = {"GGIO",false,"IN42GGIO1$ST$Ind24", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda24 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda24 = {"GGIO",false,"IN42GGIO1$ST$Ind25", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda25 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda25 = {"GGIO",false,"IN42GGIO1$ST$Ind26", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda26 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda26 = {"GGIO",false,"IN42GGIO1$ST$Ind27", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda27 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda27 = {"GGIO",false,"IN42GGIO1$ST$Ind28", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda28 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda28 = {"GGIO",false,"IN42GGIO1$ST$Ind29", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda29 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda29 = {"GGIO",false,"IN42GGIO1$ST$Ind30", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda30 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda30 = {"GGIO",false,"IN42GGIO1$ST$Ind31", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda31 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda31 = {"GGIO",false,"IN42GGIO1$ST$Ind32", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda32 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda32 = {"GGIO",false,"IN42GGIO1$ST$Ind33", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda33 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda33 = {"GGIO",false,"IN42GGIO1$ST$Ind34", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda34 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda34 = {"GGIO",false,"IN42GGIO1$ST$Ind35", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda35 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda35 = {"GGIO",false,"IN42GGIO1$ST$Ind36", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda36 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda36 = {"GGIO",false,"IN42GGIO1$ST$Ind37", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda37 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda37 = {"GGIO",false,"IN42GGIO1$ST$Ind38", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda38 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda38 = {"GGIO",false,"IN42GGIO1$ST$Ind39", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda39 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda39 = {"GGIO",false,"IN42GGIO1$ST$Ind40", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda40 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda40 = {"GGIO",false,"IN42GGIO1$ST$Ind41", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda41 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda41 = {"GGIO",false,"IN42GGIO1$ST$Ind42", -1, NULL, NULL, NULL };
+#define 	_numDS0		42
+//LLN0.DS1
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda0 = {"GGIO",false,"LED16GGIO1$ST$Ind1", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda1 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda1 = {"GGIO",false,"LED16GGIO1$ST$Ind2", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda2 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda2 = {"GGIO",false,"LED16GGIO1$ST$Ind3", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda3 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda3 = {"GGIO",false,"LED16GGIO1$ST$Ind4", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda4 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda4 = {"GGIO",false,"LED16GGIO1$ST$Ind5", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda5 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda5 = {"GGIO",false,"LED16GGIO1$ST$Ind6", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda6 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda6 = {"GGIO",false,"LED16GGIO1$ST$Ind7", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda7 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda7 = {"GGIO",false,"LED16GGIO1$ST$Ind8", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda8 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda8 = {"GGIO",false,"LED16GGIO1$ST$Ind9", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda9 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda9 = {"GGIO",false,"LED16GGIO1$ST$Ind10", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda10 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda10 = {"GGIO",false,"LED16GGIO1$ST$Ind11", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda11 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda11 = {"GGIO",false,"LED16GGIO1$ST$Ind12", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda12 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda12 = {"GGIO",false,"LED16GGIO1$ST$Ind13", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda13 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda13 = {"GGIO",false,"LED16GGIO1$ST$Ind14", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda14 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda14 = {"GGIO",false,"LED16GGIO1$ST$Ind15", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda15 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda15 = {"GGIO",false,"LED16GGIO1$ST$Ind16", -1, NULL, NULL, NULL };
+#define 	_numDS1		16
 
-DataSetEntry iedModelds_LD0_MMXU1_fcda0 = {"MES",false, "MMXU1$MX$A$phsA",-1,NULL,NULL,&iedModelds_LD0_MMXU1_fcda1};
-DataSetEntry iedModelds_LD0_MMXU1_fcda1 = {"MES",false, "MMXU1$MX$A$phsB",-1,NULL,NULL,&iedModelds_LD0_MMXU1_fcda2};
-DataSetEntry iedModelds_LD0_MMXU1_fcda2 = {"MES",false, "MMXU1$MX$A$phsC",-1,NULL,NULL,&iedModelds_LD0_MMXU1_fcda3};
-DataSetEntry iedModelds_LD0_MMXU1_fcda3 = {"MES",false, "MMXU1$MX$A$neut",-1,NULL,NULL,&iedModelds_LD0_MMXU1_fcda4};
-DataSetEntry iedModelds_LD0_MMXU1_fcda4 = {"MES",false, "MSQI1$MX$SeqA$I0",-1,NULL,NULL,&iedModelds_LD0_MMXU1_fcda5};
-DataSetEntry iedModelds_LD0_MMXU1_fcda5 = {"MES",false, "MSQI1$MX$SeqA$I2",-1,NULL,NULL,NULL};
+//LLN0.DS2
+DataSetEntry iedModelds_LD0_LLN0_dataset2_fcda0 = {"CTRL",false,"XCBR1$ST$Pos", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset2_fcda1 };
+DataSetEntry iedModelds_LD0_LLN0_dataset2_fcda1 = {"CTRL",false,"XCBR1$ST$BlkCIs", -1, NULL, NULL, NULL };
+#define 	_numDS2		2
 
-DataSetEntry iedModelds_LD0_MMXU2_fcda0 = {"MES",false, "MMXU2$MX$A$phsA",-1,NULL,NULL,&iedModelds_LD0_MMXU2_fcda1};
-DataSetEntry iedModelds_LD0_MMXU2_fcda1 = {"MES",false, "MMXU2$MX$A$phsB",-1,NULL,NULL,&iedModelds_LD0_MMXU2_fcda2};
-DataSetEntry iedModelds_LD0_MMXU2_fcda2 = {"MES",false, "MMXU2$MX$A$phsC",-1,NULL,NULL,&iedModelds_LD0_MMXU2_fcda3};
-DataSetEntry iedModelds_LD0_MMXU2_fcda3 = {"MES",false, "MMXU2$MX$A$neut",-1,NULL,NULL,&iedModelds_LD0_MMXU2_fcda4};
-DataSetEntry iedModelds_LD0_MMXU2_fcda4 = {"MES",false, "MSQI2$MX$SeqA$I0",-1,NULL,NULL,&iedModelds_LD0_MMXU2_fcda5};
-DataSetEntry iedModelds_LD0_MMXU2_fcda5 = {"MES",false, "MSQI2$MX$SeqA$I2",-1,NULL,NULL,NULL};
+//LLN0.DS3
+DataSetEntry iedModelds_LD0_LLN0_dataset3_fcda0 = {"CTRL",false,"GGIO1$ST$SPCSO1$stVal", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset3_fcda1 };
+DataSetEntry iedModelds_LD0_LLN0_dataset3_fcda1 = {"CTRL",false,"GGIO1$ST$SPCSO2$stVal", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset3_fcda2 };
+DataSetEntry iedModelds_LD0_LLN0_dataset3_fcda2 = {"CTRL",false,"GGIO1$ST$SPCSO3$stVal", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset3_fcda3 };
+DataSetEntry iedModelds_LD0_LLN0_dataset3_fcda3 = {"CTRL",false,"GGIO1$ST$SPCSO4$stVal", -1, NULL, NULL, NULL };
+#define 	_numDS3		4
 
-DataSetEntry iedModelds_LD0_MMXU3_fcda0 = {"MES",false, "MMXU3$MX$A$phsA",-1,NULL,NULL,&iedModelds_LD0_MMXU3_fcda1};
-DataSetEntry iedModelds_LD0_MMXU3_fcda1 = {"MES",false, "MMXU3$MX$A$phsB",-1,NULL,NULL,&iedModelds_LD0_MMXU3_fcda2};
-DataSetEntry iedModelds_LD0_MMXU3_fcda2 = {"MES",false, "MMXU3$MX$A$phsC",-1,NULL,NULL,&iedModelds_LD0_MMXU3_fcda3};
-DataSetEntry iedModelds_LD0_MMXU3_fcda3 = {"MES",false, "MMXU3$MX$A$neut",-1,NULL,NULL,&iedModelds_LD0_MMXU3_fcda4};
-DataSetEntry iedModelds_LD0_MMXU3_fcda4 = {"MES",false, "MSQI3$MX$SeqA$I0",-1,NULL,NULL,&iedModelds_LD0_MMXU3_fcda5};
-DataSetEntry iedModelds_LD0_MMXU3_fcda5 = {"MES",false, "MSQI3$MX$SeqA$I2",-1,NULL,NULL,NULL};
+//LLN0.DS4
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda0 = {"PROT",false,"IPTOC1$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda1 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda1 = {"PROT",false,"IPTOC2$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda2 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda2 = {"PROT",false,"IPTOC3$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda3 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda3 = {"PROT",false,"IPTOC4$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda4 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda4 = {"PROT",false,"IPTOC5$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda5 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda5 = {"PROT",false,"IPTOC6$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda6 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda6 = {"PROT",false,"IPTOC1$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda7 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda7 = {"PROT",false,"IPTOC2$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda8 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda8 = {"PROT",false,"IPTOC3$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda9 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda9 = {"PROT",false,"IPTOC4$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda10 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda10 ={"PROT",false,"IPTOC5$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda11 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda11 ={"PROT",false,"IPTOC6$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda12 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda12 ={"PROT",false,"IPTUC1$ST$Str", -1, NULL, NULL,&iedModelds_LD0_LLN0_dataset4_fcda13 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda13 ={"PROT",false,"IPTUC1$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda14 };
 
-DataSetEntry iedModelds_LD0_MMXU4_fcda0 = {"MES",false, "MMXU4$MX$PhV$phsA",-1,NULL,NULL,	&iedModelds_LD0_MMXU4_fcda1};
-DataSetEntry iedModelds_LD0_MMXU4_fcda1 = {"MES",false, "MMXU4$MX$PhV$phsB",-1,NULL,NULL,	&iedModelds_LD0_MMXU4_fcda2};
-DataSetEntry iedModelds_LD0_MMXU4_fcda2 = {"MES",false, "MMXU4$MX$PhV$phsC",-1,NULL,NULL,	&iedModelds_LD0_MMXU4_fcda3};
-DataSetEntry iedModelds_LD0_MMXU4_fcda3 = {"MES",false, "MMXU4$MX$PhV$res",-1, NULL,NULL,	&iedModelds_LD0_MMXU4_fcda4};
-DataSetEntry iedModelds_LD0_MMXU4_fcda4 = {"MES",false, "MMXU4$MX$PPV$phsAB",-1,NULL,NULL,	&iedModelds_LD0_MMXU4_fcda5};
-DataSetEntry iedModelds_LD0_MMXU4_fcda5 = {"MES",false, "MMXU4$MX$PPV$phsBC",-1,NULL,NULL,	&iedModelds_LD0_MMXU4_fcda6};
-DataSetEntry iedModelds_LD0_MMXU4_fcda6 = {"MES",false, "MMXU4$MX$PPV$phsCA",-1,NULL,NULL,	&iedModelds_LD0_MMXU4_fcda7};
-DataSetEntry iedModelds_LD0_MMXU4_fcda7 = {"MES",false, "MSQI4$MX$SeqU$U0",-1,NULL,NULL,	&iedModelds_LD0_MMXU4_fcda8};
-DataSetEntry iedModelds_LD0_MMXU4_fcda8 = {"MES",false, "MSQI4$MX$SeqU$U2",-1,NULL,NULL,NULL};
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda14 ={"PROT",false,"I20PTOC1$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda15 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda15 ={"PROT",false,"I20PTOC2$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda16 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda16 ={"PROT",false,"I20PTOC3$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda17 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda17 ={"PROT",false,"I20PTOC4$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda18 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda18 ={"PROT",false,"I20PTOC5$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda19 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda19 ={"PROT",false,"I20PTOC6$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda20 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda20 ={"PROT",false,"I20PTOC7$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda21 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda21 ={"PROT",false,"I20PTOC8$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda22 };
 
-DataSetEntry iedModelds_LD0_MMXU5_fcda0 = {"MES",false, "MMXU5$MX$TotW",-1,NULL,NULL,&iedModelds_LD0_MMXU5_fcda1};
-DataSetEntry iedModelds_LD0_MMXU5_fcda1 = {"MES",false, "MMXU5$MX$TotVAr",-1,NULL,NULL,&iedModelds_LD0_MMXU5_fcda2};
-DataSetEntry iedModelds_LD0_MMXU5_fcda2 = {"MES",false, "MMXU5$MX$TotPF",-1,NULL,NULL,&iedModelds_LD0_MMXU5_fcda3};
-DataSetEntry iedModelds_LD0_MMXU5_fcda3 = {"MES",false, "MMXU5$MX$Hz",-1,NULL,NULL,NULL};
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda22 ={"PROT",false,"I20PTOC1$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda23 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda23 ={"PROT",false,"I20PTOC2$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda24 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda24 ={"PROT",false,"I20PTOC3$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda25 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda25 ={"PROT",false,"I20PTOC4$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda26 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda26 ={"PROT",false,"I20PTOC5$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda27 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda27 ={"PROT",false,"I20PTOC6$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda28 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda28 ={"PROT",false,"I20PTOC7$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda29 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda29 ={"PROT",false,"I20PTOC8$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda30 };
 
-//LED12
-DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda0 = {"GGIO",false,"LED16GGIO1$ST$Ind1", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_D3_fcda1 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda1 = {"GGIO",false,"LED16GGIO1$ST$Ind2", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_D3_fcda2 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda2 = {"GGIO",false,"LED16GGIO1$ST$Ind3", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_D3_fcda3 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda3 = {"GGIO",false,"LED16GGIO1$ST$Ind4", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_D3_fcda4 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda4 = {"GGIO",false,"LED16GGIO1$ST$Ind5", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_D3_fcda5 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda5 = {"GGIO",false,"LED16GGIO1$ST$Ind6", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_D3_fcda6 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda6 = {"GGIO",false,"LED16GGIO1$ST$Ind7", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_D3_fcda7 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda7 = {"GGIO",false,"LED16GGIO1$ST$Ind8", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_D3_fcda8 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda8 = {"GGIO",false,"LED16GGIO1$ST$Ind9", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_D3_fcda9 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda9 = {"GGIO",false,"LED16GGIO1$ST$Ind10", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_D3_fcda10 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda10 = {"GGIO",false,"LED16GGIO1$ST$Ind11", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_D3_fcda11 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda11 = {"GGIO",false,"LED16GGIO1$ST$Ind12", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_D3_fcda12 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda12 = {"GGIO",false,"LED16GGIO1$ST$Ind13", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_D3_fcda13 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda13 = {"GGIO",false,"LED16GGIO1$ST$Ind14", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_D3_fcda14 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda14 = {"GGIO",false,"LED16GGIO1$ST$Ind15", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_D3_fcda15 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_D3_fcda15 = {"GGIO",false,"LED16GGIO1$ST$Ind16", -1, NULL, NULL, NULL };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda30 ={"PROT",false,"I2I1PTOC1$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda31 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda31 ={"PROT",false,"I2I1PTOC1$ST$Op", -1, NULL, NULL, NULL };
+#define 	_numDS4		32
 
-DataSetEntry iedModelds_LD0_LLN0_dataset_D4_fcda0 = {"CTRL",false,"XCBR1$ST$Pos", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_D4_fcda1 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_D4_fcda1 = {"CTRL",false,"XCBR1$ST$BlkCls", -1, NULL, NULL, NULL };
+//LLN0.DS5
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda0 = {"PROT",false,"UPTOV1$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda1 };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda1 = {"PROT",false,"UPTOV2$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda2 };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda2 = {"PROT",false,"UPTOV3$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda3 };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda3 = {"PROT",false,"UPTOV4$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda4 };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda4 = {"PROT",false,"UPTOV1$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda5 };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda5 = {"PROT",false,"UPTOV2$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda6 };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda6 = {"PROT",false,"UPTOV3$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda7 };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda7 = {"PROT",false,"UPTOV4$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda8 };
 
-DataSetEntry iedModelds_LD0_LLN0_dataset_D5_fcda0 = {"CTRL",false,"GGIO1$ST$SPCSO1$stVal", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_D5_fcda1 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_D5_fcda1 = {"CTRL",false,"GGIO1$ST$SPCSO2$stVal", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset_D5_fcda2 };
-DataSetEntry iedModelds_LD0_LLN0_dataset_D5_fcda2 = {"CTRL",false,"GGIO1$ST$SPCSO3$stVal", -1, NULL, NULL, NULL };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda8 = {"PROT",false,"UPTUV1$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda9 };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda9 = {"PROT",false,"UPTUV2$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda10 };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda10 ={"PROT",false,"UPTUV3$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda11 };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda11 ={"PROT",false,"UPTUV4$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda12 };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda12 ={"PROT",false,"UPTUV1$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda13 };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda13 ={"PROT",false,"UPTUV2$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda14 };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda14 ={"PROT",false,"UPTUV3$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda15 };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda15 ={"PROT",false,"UPTUV4$ST$Op", -1, NULL, NULL, NULL };
+#define 	_numDS5		16
+
+//LLN0.DS6
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda0 = {"PROT",false,"PTOF1$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda1 };
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda1 = {"PROT",false,"PTOF2$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda2 };
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda2 = {"PROT",false,"PTOF3$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda3 };
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda3 = {"PROT",false,"PTOF4$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda4 };
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda4 = {"PROT",false,"PTOF1$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda5 };
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda5 = {"PROT",false,"PTOF2$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda6 };
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda6 = {"PROT",false,"PTOF3$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda7 };
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda7 = {"PROT",false,"PTOF4$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda8 };
+
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda8 = {"PROT",false,"PTUF1$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda9 };
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda9 = {"PROT",false,"PTUF2$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda10 };
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda10 ={"PROT",false,"PTUF3$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda11 };
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda11 ={"PROT",false,"PTUF4$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda12 };
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda12 ={"PROT",false,"PTUF1$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda13 };
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda13 ={"PROT",false,"PTUF2$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda14 };
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda14 ={"PROT",false,"PTUF3$ST$Op", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda15 };
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda15 ={"PROT",false,"PTUF4$ST$Op", -1, NULL, NULL, NULL };
+#define 	_numDS6		16
+
+//LLN0.DS7
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda0 = {"PROT",false,"VZGGIO1$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda1 };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda1 = {"PROT",false,"VZGGIO2$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda2 };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda2 = {"PROT",false,"VZGGIO3$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda3 };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda3 = {"PROT",false,"VZGGIO4$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda4 };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda4 = {"PROT",false,"VZGGIO5$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda5 };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda5 = {"PROT",false,"VZGGIO6$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda6 };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda6 = {"PROT",false,"VZGGIO7$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda7 };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda7 = {"PROT",false,"VZGGIO8$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda8 };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda8 = {"PROT",false,"VZGGIO9$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda9 };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda9 = {"PROT",false,"VZGGIO10$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda10 };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda10 = {"PROT",false,"VZGGIO11$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda11 };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda11 = {"PROT",false,"VZGGIO12$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda12 };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda12 = {"PROT",false,"VZGGIO13$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda13 };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda13 = {"PROT",false,"VZGGIO14$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda14 };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda14 = {"PROT",false,"VZGGIO15$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda15 };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda15 = {"PROT",false,"VZGGIO16$ST$Alm", -1, NULL, NULL, NULL };
+#define 	_numDS7		16
+
+//LLN0.DS8
+DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda0 = {"PROT",false,"BLKPTTR1$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset8_fcda1 };
+DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda1 = {"PROT",false,"BLKPTTR1$MX$TmpRI", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset8_fcda2 };
+DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda2 = {"PROT",false,"QPTTR1$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset8_fcda3 };
+DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda3 = {"PROT",false,"QPTTR1$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset8_fcda4 };
+DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda4 = {"PROT",false,"QPTTR1$MX$TmpRI", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset8_fcda5 };
+DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda5 = {"PROT",false,"QPTTR2$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset8_fcda6 };
+DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda6 = {"PROT",false,"QPTTR2$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset8_fcda7 };
+DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda7 = {"PROT",false,"QPTTR2$MX$TmpRI", 		-1, NULL, NULL, NULL };
+#define 	_numDS8		8
+
+//LLN0.DS9
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda0 = {"PROT",false,"PDIS1$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda1 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda1 = {"PROT",false,"PDIS2$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda2 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda2 = {"PROT",false,"PDIS3$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda3 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda3 = {"PROT",false,"PDIS4$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda4 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda4 = {"PROT",false,"PDIS5$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda5 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda5 = {"PROT",false,"PDIS6$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda6 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda6 = {"PROT",false,"PDIS7$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda7 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda7 = {"PROT",false,"PDIS8$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda8 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda8 = {"PROT",false,"PDIS9$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda9 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda9 = {"PROT",false,"PDIS10$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda10 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda10 = {"PROT",false,"PDIS1$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda11 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda11 = {"PROT",false,"PDIS2$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda12 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda12 = {"PROT",false,"PDIS3$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda13 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda13 = {"PROT",false,"PDIS4$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda14 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda14 = {"PROT",false,"PDIS5$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda15 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda15 = {"PROT",false,"PDIS6$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda16 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda16 = {"PROT",false,"PDIS7$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda17 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda17 = {"PROT",false,"PDIS8$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda18 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda18 = {"PROT",false,"PDIS9$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda19 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda19 = {"PROT",false,"PDIS10$ST$Op", 		-1, NULL, NULL, NULL};
+#define 	_numDS9		20
+
+//LLN0.DS10
+DataSetEntry iedModelds_LD0_LLN0_dataset10_fcda0 = {"PROT",false," ", 		-1, NULL, NULL, NULL };
+#define 	_numDS10		0
+
+//LLN0.DS11
+DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda0 = {"PROT",false,"RREC1$ST$AutoRecSt", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda1 };
+DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda1 = {"PROT",false,"RREC1$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda2 };
+DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda2 = {"PROT",false,"RSYN1$ST$Rel", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda3 };
+DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda3 = {"PROT",false,"RSYN1$MX$DifVCIc", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda4 };
+DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda4 = {"PROT",false,"RSYN1$MX$DifHzCIc", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda5 };
+DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda5 = {"PROT",false,"RSYN1$MX$DifAngCIc", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda6 };
+DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda6 = {"PROT",false,"RBRF1$ST$OpEx", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda7 };
+DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda7 = {"PROT",false,"RBRF1$ST$OpIn", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda8 };
+DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda8 = {"PROT",false,"RPSB1$ST$BlkZn1", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda9 };
+DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda9 = {"PROT",false,"RPSB1$ST$BlkZn2", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda10 };
+DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda10 ={"PROT",false,"RPSB1$ST$BlkZn3", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda11 };
+DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda11 ={"PROT",false,"RPSB1$ST$BlkZn4", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda12 };
+DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda12 ={"PROT",false,"RPSB1$ST$BlkZn5", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda13 };
+DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda13 ={"PROT",false,"RPSB1$ST$BlkZn6", 	-1, NULL, NULL, NULL };
+#define 	_numDS11		14
+
+//LLN0.DS12
+DataSetEntry iedModelds_LD0_LLN0_dataset12_fcda0 = {"MES",false, "MMXU1$MX$A$phsA",		-1,NULL,NULL,	&iedModelds_LD0_LLN0_dataset12_fcda1};
+DataSetEntry iedModelds_LD0_LLN0_dataset12_fcda1 = {"MES",false, "MMXU1$MX$A$phsB",		-1,NULL,NULL,	&iedModelds_LD0_LLN0_dataset12_fcda2};
+DataSetEntry iedModelds_LD0_LLN0_dataset12_fcda2 = {"MES",false, "MMXU1$MX$A$phsC",		-1,NULL,NULL,	&iedModelds_LD0_LLN0_dataset12_fcda3};
+DataSetEntry iedModelds_LD0_LLN0_dataset12_fcda3 = {"MES",false, "MMXU1$MX$A$neut",		-1,NULL,NULL,	&iedModelds_LD0_LLN0_dataset12_fcda4};
+DataSetEntry iedModelds_LD0_LLN0_dataset12_fcda4 = {"MES",false, "MSQI1$MX$SeqA$I1",	-1,NULL,NULL,	&iedModelds_LD0_LLN0_dataset12_fcda5};
+DataSetEntry iedModelds_LD0_LLN0_dataset12_fcda5 = {"MES",false, "MSQI1$MX$SeqA$I2",	-1,NULL,NULL,	&iedModelds_LD0_LLN0_dataset12_fcda6};
+DataSetEntry iedModelds_LD0_LLN0_dataset12_fcda6 = {"MES",false, "MSQI1$MX$SeqA$3I0",	-1,NULL,NULL,	NULL};
+#define 	_numDS12		7
+
+//LLN0.DS13
+DataSetEntry iedModelds_LD0_LLN0_dataset13_fcda0 = {"MES",false, " ",		-1,NULL,NULL,	NULL};
+#define 	_numDS13		0
+
+//LLN0.DS14
+DataSetEntry iedModelds_LD0_LLN0_dataset14_fcda0 = {"MES",false, " ",		-1,NULL,NULL,	NULL};
+#define 	_numDS14		0
+
+//LLN0.DS15
+DataSetEntry iedModelds_LD0_LLN0_dataset15_fcda0 = {"MES",false, "MMXU1$MX$PhV$phsA",	-1,NULL,NULL,	&iedModelds_LD0_LLN0_dataset15_fcda1};
+DataSetEntry iedModelds_LD0_LLN0_dataset15_fcda1 = {"MES",false, "MMXU1$MX$PhV$phsB",	-1,NULL,NULL,	&iedModelds_LD0_LLN0_dataset15_fcda2};
+DataSetEntry iedModelds_LD0_LLN0_dataset15_fcda2 = {"MES",false, "MMXU1$MX$PhV$phsC",	-1,NULL,NULL,	&iedModelds_LD0_LLN0_dataset15_fcda3};
+DataSetEntry iedModelds_LD0_LLN0_dataset15_fcda3 = {"MES",false, "MMXU1$MX$PhV$neut",	-1,NULL,NULL,	&iedModelds_LD0_LLN0_dataset15_fcda4};
+DataSetEntry iedModelds_LD0_LLN0_dataset15_fcda4 = {"MES",false, "MMXU1$MX$PhV$neut1",	-1,NULL,NULL,	&iedModelds_LD0_LLN0_dataset15_fcda5};
+DataSetEntry iedModelds_LD0_LLN0_dataset15_fcda5 = {"MES",false, "MMXU1$MX$PPV$phsAB",	-1,NULL,NULL,	&iedModelds_LD0_LLN0_dataset15_fcda6};
+DataSetEntry iedModelds_LD0_LLN0_dataset15_fcda6 = {"MES",false, "MMXU1$MX$PPV$phsBC",	-1,NULL,NULL,	&iedModelds_LD0_LLN0_dataset15_fcda7};
+DataSetEntry iedModelds_LD0_LLN0_dataset15_fcda7 = {"MES",false, "MMXU1$MX$PPV$phsCA",	-1,NULL,NULL,	&iedModelds_LD0_LLN0_dataset15_fcda8};
+DataSetEntry iedModelds_LD0_LLN0_dataset15_fcda8 = {"MES",false, "MSQI1$MX$SeqU$U1",	-1,NULL,NULL,	&iedModelds_LD0_LLN0_dataset15_fcda9};
+DataSetEntry iedModelds_LD0_LLN0_dataset15_fcda9 = {"MES",false, "MSQI1$MX$SeqU$U2",	-1,NULL,NULL, 	&iedModelds_LD0_LLN0_dataset15_fcda10};
+DataSetEntry iedModelds_LD0_LLN0_dataset15_fcda10 ={"MES",false, "MSQI1$MX$SeqU$3U0",	-1,NULL,NULL,	NULL};
+#define 	_numDS15		11
+
+//LLN0.DS16
+DataSetEntry iedModelds_LD0_LLN0_dataset16_fcda0 = {"MES",false, "MMXU1$MX$TotW",		-1,NULL,NULL,	&iedModelds_LD0_LLN0_dataset16_fcda1};
+DataSetEntry iedModelds_LD0_LLN0_dataset16_fcda1 = {"MES",false, "MMXU1$MX$TotVAr",		-1,NULL,NULL,	&iedModelds_LD0_LLN0_dataset16_fcda2};
+DataSetEntry iedModelds_LD0_LLN0_dataset16_fcda2 = {"MES",false, "MMXU1$MX$TotPF",		-1,NULL,NULL,	&iedModelds_LD0_LLN0_dataset16_fcda3};
+DataSetEntry iedModelds_LD0_LLN0_dataset16_fcda3 = {"MES",false, "MMXU1$MX$Hz",			-1,NULL,NULL,	&iedModelds_LD0_LLN0_dataset16_fcda4};
+DataSetEntry iedModelds_LD0_LLN0_dataset16_fcda4 = {"MES",false, "RFLO1$MX$Fltz",		-1,NULL,NULL,	&iedModelds_LD0_LLN0_dataset16_fcda5};
+DataSetEntry iedModelds_LD0_LLN0_dataset16_fcda5 = {"MES",false, "RFLO1$MX$FltDiskm",	-1,NULL,NULL,	NULL};
+#define 	_numDS16		6
+
+
+#define 	_numDS17		0
+#define 	_numDS18		0
+#define 	_numDS19		0
 
 /***********************************************************************
  * DataSet
  ***********************************************************************/
-DataSet iedModelds_LD0_LLN0_dataset0 = {"LD0", "LLN0$DS0", 24, &iedModelds_LD0_LLN0_dataset_fcda0, 		&iedModelds_LD0_LLN0_dataset1};		//дискреты
-DataSet iedModelds_LD0_LLN0_dataset1 = {"LD0", "LLN0$DS1", 16, &iedModelds_LD0_LLN0_dataset_D3_fcda0, 	&iedModelds_LD0_LLN0_dataset2};		//аналоги
-DataSet iedModelds_LD0_LLN0_dataset2 = {"LD0", "LLN0$DS2",  2, &iedModelds_LD0_LLN0_dataset_D4_fcda0, 	&iedModelds_LD0_LLN0_dataset3};		//аналоги
-DataSet iedModelds_LD0_LLN0_dataset3 = {"LD0", "LLN0$DS3",  3, &iedModelds_LD0_LLN0_dataset_D5_fcda0 ,	&iedModelds_LD0_LLN0_dataset4};		//индикация
-DataSet iedModelds_LD0_LLN0_dataset4 = {"LD0", "LLN0$DS4",  0, NULL ,									&iedModelds_LD0_LLN0_dataset5};		//XCBR
-DataSet iedModelds_LD0_LLN0_dataset5 = {"LD0", "LLN0$DS5",  0, NULL ,									&iedModelds_LD0_LLN0_dataset6};		//ошибки в жкрнале
-DataSet iedModelds_LD0_LLN0_dataset6 = {"LD0", "LLN0$DS6",  6, &iedModelds_LD0_MMXU1_fcda0 ,			&iedModelds_LD0_LLN0_dataset7};		// мощности
-DataSet iedModelds_LD0_LLN0_dataset7 = {"LD0", "LLN0$DS7",  6, &iedModelds_LD0_MMXU2_fcda0 ,			&iedModelds_LD0_LLN0_dataset8};
-DataSet iedModelds_LD0_LLN0_dataset8 = {"LD0", "LLN0$DS8",  6, &iedModelds_LD0_MMXU3_fcda0 ,			&iedModelds_LD0_LLN0_dataset9};
-DataSet iedModelds_LD0_LLN0_dataset9 = {"LD0", "LLN0$DS9",  9, &iedModelds_LD0_MMXU4_fcda0 ,			&iedModelds_LD0_LLN0_dataset10};
-DataSet iedModelds_LD0_LLN0_dataset10 ={"LD0", "LLN0$DS10", 6, &iedModelds_LD0_MMXU5_fcda0 ,			NULL};
+DataSet iedModelds_LD0_LLN0_dataset0 = {"LD0", "LLN0$DS0", _numDS0, 	&iedModelds_LD0_LLN0_dataset0_fcda0, 	&iedModelds_LD0_LLN0_dataset1};			// IN42GGIO
+DataSet iedModelds_LD0_LLN0_dataset1 = {"LD0", "LLN0$DS1", _numDS1, 	&iedModelds_LD0_LLN0_dataset1_fcda0, 	&iedModelds_LD0_LLN0_dataset2};			// LED16
+DataSet iedModelds_LD0_LLN0_dataset2 = {"LD0", "LLN0$DS2", _numDS2, 	&iedModelds_LD0_LLN0_dataset2_fcda0, 	&iedModelds_LD0_LLN0_dataset3};			// XCBR1
+DataSet iedModelds_LD0_LLN0_dataset3 = {"LD0", "LLN0$DS3", _numDS3, 	&iedModelds_LD0_LLN0_dataset3_fcda0,	&iedModelds_LD0_LLN0_dataset4};			// SPCSO
+DataSet iedModelds_LD0_LLN0_dataset4 = {"LD0", "LLN0$DS4", _numDS4, 	&iedModelds_LD0_LLN0_dataset4_fcda0,	&iedModelds_LD0_LLN0_dataset5};			// IPTOC IPTUC
+DataSet iedModelds_LD0_LLN0_dataset5 = {"LD0", "LLN0$DS5", _numDS5, 	&iedModelds_LD0_LLN0_dataset5_fcda0,	&iedModelds_LD0_LLN0_dataset6};			// UPTOV UPTUV
+DataSet iedModelds_LD0_LLN0_dataset6 = {"LD0", "LLN0$DS6", _numDS6, 	&iedModelds_LD0_LLN0_dataset6_fcda0,	&iedModelds_LD0_LLN0_dataset7};			//
+DataSet iedModelds_LD0_LLN0_dataset7 = {"LD0", "LLN0$DS7", _numDS7, 	&iedModelds_LD0_LLN0_dataset7_fcda0,	&iedModelds_LD0_LLN0_dataset8};			//
+DataSet iedModelds_LD0_LLN0_dataset8 = {"LD0", "LLN0$DS8", _numDS8, 	&iedModelds_LD0_LLN0_dataset8_fcda0,	&iedModelds_LD0_LLN0_dataset9};			//
+DataSet iedModelds_LD0_LLN0_dataset9 = {"LD0", "LLN0$DS9", _numDS9,		&iedModelds_LD0_LLN0_dataset9_fcda0,	&iedModelds_LD0_LLN0_dataset10};		//
+DataSet iedModelds_LD0_LLN0_dataset10 ={"LD0", "LLN0$DS10",_numDS10, 	&iedModelds_LD0_LLN0_dataset10_fcda0,	&iedModelds_LD0_LLN0_dataset11};		//
+DataSet iedModelds_LD0_LLN0_dataset11 ={"LD0", "LLN0$DS11",_numDS11, 	&iedModelds_LD0_LLN0_dataset11_fcda0 ,	&iedModelds_LD0_LLN0_dataset12};		//
+DataSet iedModelds_LD0_LLN0_dataset12 ={"LD0", "LLN0$DS12",_numDS12, 	&iedModelds_LD0_LLN0_dataset12_fcda0 ,	&iedModelds_LD0_LLN0_dataset13};
+DataSet iedModelds_LD0_LLN0_dataset13 ={"LD0", "LLN0$DS13",_numDS13, 	&iedModelds_LD0_LLN0_dataset13_fcda0 ,	&iedModelds_LD0_LLN0_dataset14};
+DataSet iedModelds_LD0_LLN0_dataset14 ={"LD0", "LLN0$DS14",_numDS14, 	&iedModelds_LD0_LLN0_dataset14_fcda0 ,	&iedModelds_LD0_LLN0_dataset15};
+DataSet iedModelds_LD0_LLN0_dataset15 ={"LD0", "LLN0$DS15",_numDS15, 	&iedModelds_LD0_LLN0_dataset15_fcda0 ,	&iedModelds_LD0_LLN0_dataset16};
+DataSet iedModelds_LD0_LLN0_dataset16 ={"LD0", "LLN0$DS16",_numDS16, 	&iedModelds_LD0_LLN0_dataset16_fcda0 ,	&iedModelds_LD0_LLN0_dataset17};
+DataSet iedModelds_LD0_LLN0_dataset17 ={"LD0", "LLN0$DS17",_numDS17, 	NULL ,									&iedModelds_LD0_LLN0_dataset18};
+DataSet iedModelds_LD0_LLN0_dataset18 ={"LD0", "LLN0$DS18",_numDS18, 	NULL ,									&iedModelds_LD0_LLN0_dataset19};
+DataSet iedModelds_LD0_LLN0_dataset19 ={"LD0", "LLN0$DS19",_numDS19, 	NULL ,									NULL};
 
 
 ReportControlBlock iedModel_LD0_LLN0_report0 = {
@@ -8706,17 +9229,28 @@ ReportControlBlock iedModel_LD0_LLN0_report0 = {
 	&iedModel_LD0_LLN0_report1
 };
 
-ReportControlBlock iedModel_LD0_LLN0_report1 = { &iedModel_LD0_LLN0, 	"URCB_201", "LLN0$BR$URCB_102",	false,"DS1", 0, TRG_OPT_INTEGRITY, 111, 100, 5000,	&iedModel_LD0_LLN0_report2};
+ReportControlBlock iedModel_LD0_LLN0_report1 = {&iedModel_LD0_LLN0,	"URCB_201",		"LLN0$BR$URCB_201",	false,"DS11",0,	TRG_OPT_INTEGRITY,	111,	100,	5000,	&iedModel_LD0_LLN0_report2};
+ReportControlBlock iedModel_LD0_LLN0_report2 = {&iedModel_LD0_LLN0,	"URCB_301",		"LLN0$BR$URCB_301",	false,"DS12",0,	TRG_OPT_INTEGRITY,	111,	100,	5000,	&iedModel_LD0_LLN0_report3};
+ReportControlBlock iedModel_LD0_LLN0_report3 = {&iedModel_LD0_LLN0,	"URCB_401",		"LLN0$BR$URCB_401",	false,"DS13",0,	TRG_OPT_INTEGRITY,	111,	100,	5000,	&iedModel_LD0_LLN0_report4};
+ReportControlBlock iedModel_LD0_LLN0_report4 = {&iedModel_LD0_LLN0,	"URCB_501",		"LLN0$BR$URCB_501",	false,"DS14",0,	TRG_OPT_INTEGRITY,	111,	100,	5000,	&iedModel_LD0_LLN0_report5};
+ReportControlBlock iedModel_LD0_LLN0_report5 = {&iedModel_LD0_LLN0,	"URCB_601",		"LLN0$BR$URCB_601",	false,"DS15",0,	TRG_OPT_INTEGRITY,	111,	100,	5000,	&iedModel_LD0_LLN0_report6};
+ReportControlBlock iedModel_LD0_LLN0_report6 = {&iedModel_LD0_LLN0,	"URCB_701",		"LLN0$BR$URCB_701",	false,"DS16",0,	TRG_OPT_INTEGRITY,	111,	100,	5000,	&iedModel_LD0_LLN0_report7};
+ReportControlBlock iedModel_LD0_LLN0_report7 = {&iedModel_LD0_LLN0,	"URCB_801",		"LLN0$BR$URCB_801",	false,"DS17",0,	TRG_OPT_INTEGRITY,	111,	100,	5000,	&iedModel_LD0_LLN0_report8};
+ReportControlBlock iedModel_LD0_LLN0_report8 = {&iedModel_LD0_LLN0,	"URCB_901",		"LLN0$BR$URCB_901",	false,"DS18",0,	TRG_OPT_INTEGRITY,	111,	100,	5000,	&iedModel_LD0_LLN0_report9};
+ReportControlBlock iedModel_LD0_LLN0_report9 = {&iedModel_LD0_LLN0,	"URCB_1001",	"LLN0$BR$URCB_1001",false,"DS19",0,	TRG_OPT_INTEGRITY,	111,	100,	5000,	&iedModel_LD0_LLN0_report10};
+ReportControlBlock iedModel_LD0_LLN0_report10 = {&iedModel_LD0_LLN0,"URCB_1101",	"LLN0$BR$URCB_1101",false,"DS20",0,	TRG_OPT_INTEGRITY,	111,	100,	5000,	&iedModel_LD0_LLN0_report11};
 
-ReportControlBlock iedModel_LD0_LLN0_report2 = { &iedModel_LD0_LLN0, 	"BRCB_101", "LLN0$BR$BRCB_101", true, "DS0", 0, TRG_OPT_INTEGRITY, 111,	3000, 5000,	&iedModel_LD0_LLN0_report3};
-ReportControlBlock iedModel_LD0_LLN0_report3 = { &iedModel_LD0_LLN0, 	"BRCB_201", "LLN0$BR$BRCB_201", true, "DS1", 0, TRG_OPT_NO, 111, 3000, 5000, &iedModel_LD0_LLN0_report4};
-ReportControlBlock iedModel_LD0_LLN0_report4 = { &iedModel_LD0_LLN0, 	"BRCB_301", "LLN0$BR$BRCB_301", true, "DS2", 0, TRG_OPT_NO, 111, 3000, 5000, &iedModel_LD0_LLN0_report5};
-ReportControlBlock iedModel_LD0_LLN0_report5 = { &iedModel_LD0_LLN0, 	"BRCB_401", "LLN0$BR$BRCB_401", true, "DS3", 0, TRG_OPT_NO, 111, 3000, 5000, &iedModel_LD0_LLN0_report6};
-ReportControlBlock iedModel_LD0_LLN0_report6 = { &iedModel_LD0_LLN0, 	"BRCB_501", "LLN0$BR$BRCB_501", true, "DS4", 0, TRG_OPT_NO, 111, 3000, 5000, &iedModel_LD0_LLN0_report7};
-ReportControlBlock iedModel_LD0_LLN0_report7 = { &iedModel_LD0_LLN0, 	"BRCB_601", "LLN0$BR$BRCB_601", true, "DS5", 0, TRG_OPT_NO, 111, 3000, 5000, &iedModel_LD0_LLN0_report8};
-ReportControlBlock iedModel_LD0_LLN0_report8 = { &iedModel_LD0_LLN0, 	"BRCB_701", "LLN0$BR$BRCB_701", true, "DS6", 0, TRG_OPT_NO, 111, 3000, 5000, &iedModel_LD0_LLN0_report9};
-ReportControlBlock iedModel_LD0_LLN0_report9 = { &iedModel_LD0_LLN0, 	"BRCB_771", "LLN0$BR$BRCB_801", true, "DS7", 0, TRG_OPT_NO, 111, 3000, 5000, &iedModel_LD0_LLN0_report10};
-ReportControlBlock iedModel_LD0_LLN0_report10 = { &iedModel_LD0_LLN0, 	"BRCB_901", "LLN0$BR$BRCB_901", true, "DS8", 0, TRG_OPT_NO, 111, 3000, 5000, NULL};
+ReportControlBlock iedModel_LD0_LLN0_report11 = { &iedModel_LD0_LLN0, "BRCB_101", 	"LLN0$BR$BRCB_101", true, "DS0", 0, TRG_OPT_NO, 		111,	3000, 	5000,	&iedModel_LD0_LLN0_report12};
+ReportControlBlock iedModel_LD0_LLN0_report12 = { &iedModel_LD0_LLN0, "BRCB_201", 	"LLN0$BR$BRCB_201", true, "DS1", 0, TRG_OPT_NO, 		111, 	3000, 	5000,	&iedModel_LD0_LLN0_report13};
+ReportControlBlock iedModel_LD0_LLN0_report13 = { &iedModel_LD0_LLN0, "BRCB_301", 	"LLN0$BR$BRCB_301", true, "DS2", 0, TRG_OPT_NO, 		111, 	3000, 	5000, 	&iedModel_LD0_LLN0_report14};
+ReportControlBlock iedModel_LD0_LLN0_report14 = { &iedModel_LD0_LLN0, "BRCB_401", 	"LLN0$BR$BRCB_401", true, "DS3", 0, TRG_OPT_NO, 		111, 	3000, 	5000, 	&iedModel_LD0_LLN0_report15};
+ReportControlBlock iedModel_LD0_LLN0_report15 = { &iedModel_LD0_LLN0, "BRCB_501", 	"LLN0$BR$BRCB_501", true, "DS4", 0, TRG_OPT_NO, 		111, 	3000, 	5000, 	&iedModel_LD0_LLN0_report16};
+ReportControlBlock iedModel_LD0_LLN0_report16 = { &iedModel_LD0_LLN0, "BRCB_601", 	"LLN0$BR$BRCB_601", true, "DS5", 0, TRG_OPT_NO, 		111, 	3000, 	5000, 	&iedModel_LD0_LLN0_report17};
+ReportControlBlock iedModel_LD0_LLN0_report17 = { &iedModel_LD0_LLN0, "BRCB_701", 	"LLN0$BR$BRCB_701", true, "DS6", 0, TRG_OPT_NO, 		111, 	3000, 	5000, 	&iedModel_LD0_LLN0_report18};
+ReportControlBlock iedModel_LD0_LLN0_report18 = { &iedModel_LD0_LLN0, "BRCB_801", 	"LLN0$BR$BRCB_801", true, "DS7", 0, TRG_OPT_NO, 		111, 	3000, 	5000, 	&iedModel_LD0_LLN0_report19};
+ReportControlBlock iedModel_LD0_LLN0_report19 = { &iedModel_LD0_LLN0, "BRCB_901", 	"LLN0$BR$BRCB_901", true, "DS8", 0, TRG_OPT_NO, 		111, 	3000, 	5000, 	&iedModel_LD0_LLN0_report20};
+ReportControlBlock iedModel_LD0_LLN0_report20 = { &iedModel_LD0_LLN0, "BRCB_1001", 	"LLN0$BR$BRCB_1001",true, "DS9", 0, TRG_OPT_NO, 		111, 	3000, 	5000, 	NULL};
+
 
 
 static PhyComAddress iedModel_LD0_LLN0_gse0_address = {  4,  1,  4096,  {0x1, 0xc, 0xcd, 0x1, 0x0, 0x1} };
@@ -8769,7 +9303,8 @@ SettingGroupControlBlock iedModel_LD0_LLN0_sgcb0 = {
  *
  *************************************************************************/
 //__attribute__((__section__(".eb0rodata"))) const  uint8_t NamPlt_vendor[] = "BEMN_qwertyuiopasdfghjkl;zxcvbnm,./";
-#define Dir_not		3
+#define Dir_not		STVALCODEDENUM_UNKNOWN
+#define Dir_unknow	3
 
 static void		initializeValues()
 {
@@ -8816,7 +9351,7 @@ iedModel_PROT_LLN0_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 
 iedModel_PROT_LLN0_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
 iedModel_PROT_LLN0_Health_q.mmsValue = MmsValue_newBitString(0);
-iedModel_PROT_LLN0_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_LLN0_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 
 iedModel_PROT_LLN0_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
 iedModel_PROT_LLN0_NamPlt_ldNs.mmsValue = MmsValue_newVisibleString(_LDNS);
@@ -8856,6 +9391,25 @@ iedModel_PROT_IPTOC7_Health_q.mmsValue = MmsValue_newBitString(0);
 iedModel_PROT_IPTOC8_Mod_q.mmsValue = MmsValue_newBitString(0);
 iedModel_PROT_IPTOC8_Beh_q.mmsValue = MmsValue_newBitString(0);
 iedModel_PROT_IPTOC8_Health_q.mmsValue = MmsValue_newBitString(0);
+
+iedModel_PROT_IPTOC1_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_IPTOC1_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_IPTOC2_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_IPTOC2_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_IPTOC3_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_IPTOC3_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_IPTOC4_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_IPTOC4_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_IPTOC5_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_IPTOC5_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_IPTOC6_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_IPTOC6_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_IPTOC7_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_IPTOC7_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_IPTOC8_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_IPTOC8_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+
 iedModel_PROT_IPTOC1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
 iedModel_PROT_IPTOC1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
 iedModel_PROT_IPTOC2_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
@@ -8868,7 +9422,32 @@ iedModel_PROT_IPTOC5_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor)
 iedModel_PROT_IPTOC5_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
 iedModel_PROT_IPTOC6_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
 iedModel_PROT_IPTOC6_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+
+// IPTUС1
+iedModel_PROT_IPTUC1_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_IPTUC1_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_IPTUC1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
+iedModel_PROT_IPTUC1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+iedModel_PROT_IPTUC1_Str_dirGeneral.mmsValue = MmsValue_newIntegerFromInt16(Dir_not);
+
 // I20PTOC1...6
+iedModel_PROT_I20PTOC1_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_I20PTOC1_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_I20PTOC2_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_I20PTOC2_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_I20PTOC3_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_I20PTOC3_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_I20PTOC4_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_I20PTOC4_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_I20PTOC5_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_I20PTOC5_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_I20PTOC6_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_I20PTOC6_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_I20PTOC7_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_I20PTOC7_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_I20PTOC8_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_I20PTOC8_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
 iedModel_PROT_I20PTOC1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
 iedModel_PROT_I20PTOC1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
 iedModel_PROT_I20PTOC2_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
@@ -8885,6 +9464,15 @@ iedModel_PROT_I20PTOC7_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendo
 iedModel_PROT_I20PTOC7_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
 iedModel_PROT_I20PTOC8_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
 iedModel_PROT_I20PTOC8_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+
+// II1PTOC1
+iedModel_PROT_I2I1PTOC1_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_I2I1PTOC1_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+iedModel_PROT_I2I1PTOC1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
+iedModel_PROT_I2I1PTOC1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+
+
 // UPTOV1...4
 iedModel_PROT_UPTOV1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
 iedModel_PROT_UPTOV1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
@@ -8894,6 +9482,16 @@ iedModel_PROT_UPTOV3_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor)
 iedModel_PROT_UPTOV3_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
 iedModel_PROT_UPTOV4_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
 iedModel_PROT_UPTOV4_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+
+iedModel_PROT_UPTOV1_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_UPTOV1_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_UPTOV2_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_UPTOV2_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_UPTOV3_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_UPTOV3_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_UPTOV4_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_UPTOV4_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
 
 iedModel_PROT_UPTOV1_Str_dirGeneral.mmsValue = MmsValue_newIntegerFromInt16(Dir_not);
 iedModel_PROT_UPTOV2_Str_dirGeneral.mmsValue = MmsValue_newIntegerFromInt16(Dir_not);
@@ -8910,6 +9508,16 @@ iedModel_PROT_UPTUV3_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
 iedModel_PROT_UPTUV4_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
 iedModel_PROT_UPTUV4_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
 
+iedModel_PROT_UPTUV1_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_UPTUV1_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_UPTUV2_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_UPTUV2_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_UPTUV3_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_UPTUV3_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_UPTUV4_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_UPTUV4_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+
 iedModel_PROT_UPTUV1_Str_dirGeneral.mmsValue = MmsValue_newIntegerFromInt16(Dir_not);
 iedModel_PROT_UPTUV2_Str_dirGeneral.mmsValue = MmsValue_newIntegerFromInt16(Dir_not);
 iedModel_PROT_UPTUV3_Str_dirGeneral.mmsValue = MmsValue_newIntegerFromInt16(Dir_not);
@@ -8925,6 +9533,16 @@ iedModel_PROT_PTOF3_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
 iedModel_PROT_PTOF4_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
 iedModel_PROT_PTOF4_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
 
+iedModel_PROT_PTOF1_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PTOF1_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PTOF2_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PTOF2_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PTOF3_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PTOF3_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PTOF4_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PTOF4_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+
 iedModel_PROT_PTOF1_Str_dirGeneral.mmsValue = MmsValue_newIntegerFromInt16(Dir_not);
 iedModel_PROT_PTOF2_Str_dirGeneral.mmsValue = MmsValue_newIntegerFromInt16(Dir_not);
 iedModel_PROT_PTOF3_Str_dirGeneral.mmsValue = MmsValue_newIntegerFromInt16(Dir_not);
@@ -8939,6 +9557,16 @@ iedModel_PROT_PTUF3_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
 iedModel_PROT_PTUF3_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
 iedModel_PROT_PTUF4_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
 iedModel_PROT_PTUF4_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+
+iedModel_PROT_PTUF1_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PTUF1_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PTUF2_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PTUF2_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PTUF3_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PTUF3_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PTUF4_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PTUF4_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
 
 iedModel_PROT_PTUF1_Str_dirGeneral.mmsValue = MmsValue_newIntegerFromInt16(Dir_not);
 iedModel_PROT_PTUF2_Str_dirGeneral.mmsValue = MmsValue_newIntegerFromInt16(Dir_not);
@@ -8979,6 +9607,24 @@ iedModel_PROT_VZGGIO15_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV)
 iedModel_PROT_VZGGIO16_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
 iedModel_PROT_VZGGIO16_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
 
+iedModel_PROT_VZGGIO1_Alm_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_VZGGIO2_Alm_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_VZGGIO3_Alm_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_VZGGIO4_Alm_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_VZGGIO5_Alm_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_VZGGIO6_Alm_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_VZGGIO7_Alm_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_VZGGIO8_Alm_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_VZGGIO9_Alm_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_VZGGIO10_Alm_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_VZGGIO11_Alm_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_VZGGIO12_Alm_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_VZGGIO13_Alm_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_VZGGIO14_Alm_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_VZGGIO15_Alm_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_VZGGIO16_Alm_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+
 iedModel_PROT_VZGGIO1_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 iedModel_PROT_VZGGIO2_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 iedModel_PROT_VZGGIO3_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
@@ -9012,7 +9658,156 @@ iedModel_PROT_VZGGIO14_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVA
 iedModel_PROT_VZGGIO15_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
 iedModel_PROT_VZGGIO16_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
 
+
+//PDIS1
+iedModel_PROT_PDIS1_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_PROT_PDIS1_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PDIS1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
+iedModel_PROT_PDIS1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+iedModel_PROT_PDIS1_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PDIS1_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+
+//PDIS2
+iedModel_PROT_PDIS2_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_PROT_PDIS2_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PDIS2_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
+iedModel_PROT_PDIS2_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+iedModel_PROT_PDIS2_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PDIS2_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+//PDIS3
+iedModel_PROT_PDIS3_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_PROT_PDIS3_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PDIS3_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
+iedModel_PROT_PDIS3_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+iedModel_PROT_PDIS3_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PDIS3_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+//PDIS4
+iedModel_PROT_PDIS4_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_PROT_PDIS4_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PDIS4_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
+iedModel_PROT_PDIS4_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+iedModel_PROT_PDIS4_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PDIS4_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+//PDIS5
+iedModel_PROT_PDIS5_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_PROT_PDIS5_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PDIS5_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
+iedModel_PROT_PDIS5_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+iedModel_PROT_PDIS5_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PDIS5_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+//PDIS6
+iedModel_PROT_PDIS6_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_PROT_PDIS6_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PDIS6_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
+iedModel_PROT_PDIS6_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+iedModel_PROT_PDIS6_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PDIS6_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+//PDIS7
+iedModel_PROT_PDIS7_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_PROT_PDIS7_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PDIS7_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
+iedModel_PROT_PDIS7_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+iedModel_PROT_PDIS7_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PDIS7_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+//PDIS8
+iedModel_PROT_PDIS8_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_PROT_PDIS8_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PDIS8_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
+iedModel_PROT_PDIS8_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+iedModel_PROT_PDIS8_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PDIS8_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+//PDIS9
+iedModel_PROT_PDIS9_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_PROT_PDIS9_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PDIS9_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
+iedModel_PROT_PDIS9_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+iedModel_PROT_PDIS9_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PDIS9_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+//PDIS10
+iedModel_PROT_PDIS10_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_PROT_PDIS10_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PDIS10_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
+iedModel_PROT_PDIS10_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+iedModel_PROT_PDIS10_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_PDIS10_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+//BLKPTTR1
+iedModel_PROT_BLKPTTR1_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_BLKPTTR1_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_BLKPTTR1_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_BLKPTTR1_TmpRI_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_BLKPTTR1_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_PROT_BLKPTTR1_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_BLKPTTR1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
+iedModel_PROT_BLKPTTR1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+
+//QPTTR1
+iedModel_PROT_QPTTR1_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_QPTTR1_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_QPTTR1_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_QPTTR1_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_QPTTR1_TmpRI_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_QPTTR1_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_PROT_QPTTR1_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_QPTTR1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
+iedModel_PROT_QPTTR1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+
+//QPTTR2
+iedModel_PROT_QPTTR2_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_QPTTR2_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_QPTTR2_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_QPTTR2_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_QPTTR2_TmpRI_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_QPTTR2_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_PROT_QPTTR2_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_QPTTR2_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
+iedModel_PROT_QPTTR2_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+
+
+//RPSB1
+iedModel_PROT_RPSB1_Mod_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_ON);
+iedModel_PROT_RPSB1_Mod_q.mmsValue = MmsValue_newBitString(0);
+iedModel_PROT_RPSB1_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+iedModel_PROT_RPSB1_Beh_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_ON);
+iedModel_PROT_RPSB1_Beh_q.mmsValue = MmsValue_newBitString(0);
+iedModel_PROT_RPSB1_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+iedModel_PROT_RPSB1_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_PROT_RPSB1_Health_q.mmsValue = MmsValue_newBitString(0);
+iedModel_PROT_RPSB1_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+iedModel_PROT_RPSB1_Str_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_RPSB1_BlkZn1_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_RPSB1_BlkZn2_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_RPSB1_BlkZn3_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_RPSB1_BlkZn4_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_RPSB1_BlkZn5_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_RPSB1_BlkZn6_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_RPSB1_BlkZn7_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_RPSB1_BlkZn8_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_RPSB1_BlkZn9_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_RPSB1_BlkZn10_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+
+iedModel_PROT_RPSB1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
+iedModel_PROT_RPSB1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+
 //RREC1
+iedModel_PROT_RREC1_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_RREC1_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_RREC1_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_RREC1_AutoRecSt_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
 iedModel_PROT_RREC1_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
 iedModel_PROT_RREC1_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 iedModel_PROT_RREC1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
@@ -9025,22 +9820,26 @@ iedModel_PROT_RBRF1_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 iedModel_PROT_RBRF1_Beh_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_ON);
 iedModel_PROT_RBRF1_Beh_q.mmsValue = MmsValue_newBitString(0);
 iedModel_PROT_RBRF1_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-/*
-//RBRF2
-iedModel_PROT_RBRF2_Mod_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_ON);
-iedModel_PROT_RBRF2_Mod_q.mmsValue = MmsValue_newBitString(0);
-iedModel_PROT_RBRF2_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-iedModel_PROT_RBRF2_Beh_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_ON);
-iedModel_PROT_RBRF2_Beh_q.mmsValue = MmsValue_newBitString(0);
-iedModel_PROT_RBRF2_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-//BLKRBRF
-iedModel_PROT_BLKRBRF_Mod_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_ON);
-iedModel_PROT_BLKRBRF_Mod_q.mmsValue = MmsValue_newBitString(0);
-iedModel_PROT_BLKRBRF_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-iedModel_PROT_BLKRBRF_Beh_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_ON);
-iedModel_PROT_BLKRBRF_Beh_q.mmsValue = MmsValue_newBitString(0);
-iedModel_PROT_BLKRBRF_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-*/
+iedModel_PROT_RBRF1_OpEx_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_RBRF1_OpIn_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+iedModel_PROT_RBRF1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
+iedModel_PROT_RBRF1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+
+//RSYN1
+iedModel_PROT_RSYN1_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_RSYN1_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_RSYN1_Rel_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_RSYN1_DifVCIc_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_RSYN1_DifHzCIc_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_RSYN1_DifAngCIc_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+iedModel_PROT_RSYN1_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_PROT_RSYN1_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_PROT_RSYN1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
+iedModel_PROT_RSYN1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+
+
 //USART_TRACE("PROT\n");
 /******************************************************************************
  * CTRL
@@ -9096,6 +9895,7 @@ iedModel_CTRL_PTRC_Mod_q.mmsValue = MmsValue_newBitString(0);
 iedModel_CTRL_PTRC_Beh_q.mmsValue = MmsValue_newBitString(0);
 iedModel_CTRL_PTRC_Health_q.mmsValue = MmsValue_newBitString(0);
 
+iedModel_CTRL_PTRC_Op_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 iedModel_CTRL_PTRC_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 iedModel_CTRL_PTRC_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 iedModel_CTRL_PTRC_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
@@ -9130,6 +9930,8 @@ iedModel_CTRL_XCBR1_BlkOpn_stVal.mmsValue = MmsValue_newIntegerFromInt16(0);
 iedModel_CTRL_XCBR1_BlkOpn_q.mmsValue = MmsValue_newBitString(0);
 iedModel_CTRL_XCBR1_BlkOpn_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 
+iedModel_CTRL_XCBR1_OpCnt_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_CTRL_XCBR1_OpCnt_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
 
 iedModel_CTRL_XCBR1_BlkCls_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(CTLMODELEDENUM_statusOnly);
 iedModel_CTRL_XCBR1_BlkCls_q.mmsValue = MmsValue_newBitString(0);
@@ -9144,12 +9946,37 @@ iedModel_CTRL_XCBR1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
 iedModel_CTRL_XCBR1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
 
 //GGIO1 --------------------------------------------------------------------------------
+iedModel_CTRL_GGIO1_Mod_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(CTLMODELEDENUM_DirectWithNormalSecurity);
+iedModel_CTRL_GGIO1_Mod_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_CTRL_GGIO1_Mod_q.mmsValue = MmsValue_newBitString(0);
+iedModel_CTRL_GGIO1_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+iedModel_CTRL_GGIO1_Beh_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_CTRL_GGIO1_Beh_q.mmsValue = MmsValue_newBitString(0);
+iedModel_CTRL_GGIO1_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+iedModel_CTRL_GGIO1_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_ON);
+iedModel_CTRL_GGIO1_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+iedModel_CTRL_GGIO1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
+iedModel_CTRL_GGIO1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+
+
 iedModel_CTRL_GGIO1_SPCSO1_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(CTLMODELEDENUM_DirectWithNormalSecurity);
 iedModel_CTRL_GGIO1_SPCSO2_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(CTLMODELEDENUM_DirectWithNormalSecurity);
 iedModel_CTRL_GGIO1_SPCSO3_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(CTLMODELEDENUM_DirectWithNormalSecurity);
+iedModel_CTRL_GGIO1_SPCSO4_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(CTLMODELEDENUM_DirectWithNormalSecurity);
+
 iedModel_CTRL_GGIO1_SPCSO1_d.mmsValue = MmsValue_newVisibleString("Reset the new fault flag");//Сброс флага новой неисправности
 iedModel_CTRL_GGIO1_SPCSO2_d.mmsValue = MmsValue_newVisibleString("Reset the flag of the new record in the system log");//Сброс флага новой записи в журнале системы
 iedModel_CTRL_GGIO1_SPCSO3_d.mmsValue = MmsValue_newVisibleString("Reset the flag of the new record in the alarm log");//Сброс флага новой записи в журнале аварий
+iedModel_CTRL_GGIO1_SPCSO4_d.mmsValue = MmsValue_newVisibleString("Reset the LEDs and Relays");//Сброс индикации
+
+iedModel_CTRL_GGIO1_SPCSO1_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_CTRL_GGIO1_SPCSO2_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_CTRL_GGIO1_SPCSO3_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_CTRL_GGIO1_SPCSO4_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
 
 //USART_TRACE("CTRL_GGIO1\n");
 /******************************************************************************
@@ -9178,47 +10005,231 @@ iedModel_GGIO_LPHD1_PhyHealth_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTi
 iedModel_GGIO_INGGIO1_Mod_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
 iedModel_GGIO_INGGIO1_Beh_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
 iedModel_GGIO_INGGIO1_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
-
+iedModel_GGIO_INGGIO1_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 iedModel_GGIO_INGGIO1_Mod_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(CTLMODELEDENUM_statusOnly);
 iedModel_GGIO_INGGIO1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
 iedModel_GGIO_INGGIO1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+
+iedModel_GGIO_INGGIO1_Ind1_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind2_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind3_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind4_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind5_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind6_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind7_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind8_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind9_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind10_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind11_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind12_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind13_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind14_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind15_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind16_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind17_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind18_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind19_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind20_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind21_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind22_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind23_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind24_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind25_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind26_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind27_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind28_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind29_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind30_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind31_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind32_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind33_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind34_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind35_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind36_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind37_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind38_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind39_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind40_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind41_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_INGGIO1_Ind42_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 
 //OUTGGIO1
 iedModel_GGIO_OUTGGIO1_Mod_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
 iedModel_GGIO_OUTGGIO1_Beh_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
 iedModel_GGIO_OUTGGIO1_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
-
+iedModel_GGIO_OUTGGIO1_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 iedModel_GGIO_OUTGGIO1_Mod_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(CTLMODELEDENUM_statusOnly);
 iedModel_GGIO_OUTGGIO1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
 iedModel_GGIO_OUTGGIO1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
 
+iedModel_GGIO_OUTGGIO1_SPCSO1_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO2_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO3_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO4_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO5_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO6_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO7_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO8_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO9_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO10_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO11_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO12_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO13_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO14_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO15_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO16_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO17_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO18_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO19_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO20_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO21_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO22_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO23_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO24_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO25_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO26_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO27_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO28_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO29_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO30_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO31_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO32_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO33_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_OUTGGIO1_SPCSO34_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
 //LEDGGIO1
-iedModel_GGIO_LEDGGIO1_SPCSO1_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(CTLMODELEDENUM_DirectWithNormalSecurity);
-
-iedModel_GGIO_LEDGGIO1_SPCSO1_d.mmsValue = MmsValue_newVisibleString("Resetting the LEDs");//Сброс индикации
-
 iedModel_GGIO_LEDGGIO1_Mod_stVal.mmsValue = MmsValue_newIntegerFromInt32(STVALINT32_OK);
 iedModel_GGIO_LEDGGIO1_Beh_stVal.mmsValue = MmsValue_newIntegerFromInt32(STVALINT32_OK);
 iedModel_GGIO_LEDGGIO1_Health_stVal.mmsValue = MmsValue_newIntegerFromInt32(STVALINT32_OK);
-
-iedModel_GGIO_LEDGGIO1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
-iedModel_GGIO_LEDGGIO1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
 iedModel_GGIO_LEDGGIO1_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 iedModel_GGIO_LEDGGIO1_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 iedModel_GGIO_LEDGGIO1_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+iedModel_GGIO_LEDGGIO1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
+iedModel_GGIO_LEDGGIO1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
 IedServer_updateQuality(iedServer,&iedModel_GGIO_LEDGGIO1_Mod_q,0);
 IedServer_updateQuality(iedServer,&iedModel_GGIO_LEDGGIO1_Beh_q,0);
 IedServer_updateQuality(iedServer,&iedModel_GGIO_LEDGGIO1_Health_q,0);
 
+iedModel_GGIO_LEDGGIO1_Ind1_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LEDGGIO1_Ind2_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LEDGGIO1_Ind3_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LEDGGIO1_Ind4_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LEDGGIO1_Ind5_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LEDGGIO1_Ind6_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LEDGGIO1_Ind7_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LEDGGIO1_Ind8_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LEDGGIO1_Ind9_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LEDGGIO1_Ind10_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LEDGGIO1_Ind11_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LEDGGIO1_Ind12_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LEDGGIO1_Ind13_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LEDGGIO1_Ind14_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LEDGGIO1_Ind15_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LEDGGIO1_Ind16_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
 //SSL
+iedModel_GGIO_SSLGGIO1_Mod_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_GGIO_SSLGGIO1_Beh_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_GGIO_SSLGGIO1_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_GGIO_SSLGGIO1_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Mod_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(CTLMODELEDENUM_statusOnly);
 iedModel_GGIO_SSLGGIO1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
 iedModel_GGIO_SSLGGIO1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+
+iedModel_GGIO_SSLGGIO1_Ind1_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind2_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind3_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind4_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind5_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind6_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind7_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind8_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind9_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind10_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind11_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind12_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind13_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind14_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind15_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind16_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind17_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind18_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind19_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind20_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind21_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind22_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind23_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind24_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind25_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind26_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind27_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind28_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind29_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind30_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind31_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind32_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 //VLS
+iedModel_GGIO_VLSGGIO1_Mod_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_GGIO_VLSGGIO1_Beh_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_GGIO_VLSGGIO1_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_GGIO_VLSGGIO1_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_VLSGGIO1_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_VLSGGIO1_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_VLSGGIO1_Mod_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(CTLMODELEDENUM_statusOnly);
 iedModel_GGIO_VLSGGIO1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
 iedModel_GGIO_VLSGGIO1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+
+iedModel_GGIO_VLSGGIO1_Ind1_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_VLSGGIO1_Ind2_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_VLSGGIO1_Ind3_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_VLSGGIO1_Ind4_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_VLSGGIO1_Ind5_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_VLSGGIO1_Ind6_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_VLSGGIO1_Ind7_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_VLSGGIO1_Ind8_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_VLSGGIO1_Ind9_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_VLSGGIO1_Ind10_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_VLSGGIO1_Ind11_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_VLSGGIO1_Ind12_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_VLSGGIO1_Ind13_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_VLSGGIO1_Ind14_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_VLSGGIO1_Ind15_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_VLSGGIO1_Ind16_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
 //LS
+iedModel_GGIO_LSGGIO1_Mod_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_GGIO_LSGGIO1_Beh_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_GGIO_LSGGIO1_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
+iedModel_GGIO_LSGGIO1_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LSGGIO1_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LSGGIO1_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LSGGIO1_Mod_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(CTLMODELEDENUM_statusOnly);
 iedModel_GGIO_LSGGIO1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
 iedModel_GGIO_LSGGIO1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+
+iedModel_GGIO_LSGGIO1_Ind1_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LSGGIO1_Ind2_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LSGGIO1_Ind3_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LSGGIO1_Ind4_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LSGGIO1_Ind5_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LSGGIO1_Ind6_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LSGGIO1_Ind7_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LSGGIO1_Ind8_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LSGGIO1_Ind9_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LSGGIO1_Ind10_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LSGGIO1_Ind11_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LSGGIO1_Ind12_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LSGGIO1_Ind13_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LSGGIO1_Ind14_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LSGGIO1_Ind15_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_LSGGIO1_Ind16_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 
 /******************************************************************************
  * MES
@@ -9239,7 +10250,7 @@ iedModel_MES_LPHD1_Proxy_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT3
 iedModel_MES_LPHD1_Proxy_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 iedModel_MES_LPHD1_PhyHealth_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_ON);
 iedModel_MES_LPHD1_PhyHealth_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-
+iedModel_MES_LPHD1_PhyNam_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
 
 //MMXU1
 iedModel_MES_MMXU1_Mod_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(CTLMODELEDENUM_DirectWithNormalSecurity);
@@ -9254,49 +10265,51 @@ iedModel_MES_MMXU1_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 iedModel_MES_MMXU1_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 iedModel_MES_MMXU1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
 iedModel_MES_MMXU1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
-/*
-//MMXU2
-iedModel_MES_MMXU2_Mod_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(CTLMODELEDENUM_DirectWithNormalSecurity);
-iedModel_MES_MMXU2_Mod_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
-iedModel_MES_MMXU2_Beh_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
-iedModel_MES_MMXU2_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
-IedServer_updateQuality(iedServer,&iedModel_MES_MMXU2_Mod_q,0);
-IedServer_updateQuality(iedServer,&iedModel_MES_MMXU2_Beh_q,0);
-IedServer_updateQuality(iedServer,&iedModel_MES_MMXU2_Health_q,0);
-iedModel_MES_MMXU2_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-iedModel_MES_MMXU2_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-iedModel_MES_MMXU2_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-iedModel_MES_MMXU2_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
-iedModel_MES_MMXU2_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
 
-//MMXU3
-iedModel_MES_MMXU3_Mod_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(CTLMODELEDENUM_DirectWithNormalSecurity);
-iedModel_MES_MMXU3_Mod_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
-iedModel_MES_MMXU3_Beh_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
-iedModel_MES_MMXU3_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
-IedServer_updateQuality(iedServer,&iedModel_MES_MMXU3_Mod_q,0);
-IedServer_updateQuality(iedServer,&iedModel_MES_MMXU3_Beh_q,0);
-IedServer_updateQuality(iedServer,&iedModel_MES_MMXU3_Health_q,0);
-iedModel_MES_MMXU3_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-iedModel_MES_MMXU3_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-iedModel_MES_MMXU3_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-iedModel_MES_MMXU3_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
-iedModel_MES_MMXU3_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+//MMXU1 A
+iedModel_MES_MMXU1_A_phsA_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_MMXU1_A_phsB_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_MMXU1_A_phsC_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_MMXU1_A_phsA_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
+iedModel_MES_MMXU1_A_phsB_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
+iedModel_MES_MMXU1_A_phsC_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
+iedModel_MES_MMXU1_A_neut_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_MMXU1_A_neut_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
 
-//MMXU4
-iedModel_MES_MMXU4_Mod_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(CTLMODELEDENUM_DirectWithNormalSecurity);
-iedModel_MES_MMXU4_Mod_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
-iedModel_MES_MMXU4_Beh_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
-iedModel_MES_MMXU4_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
-IedServer_updateQuality(iedServer,&iedModel_MES_MMXU4_Mod_q,0);
-IedServer_updateQuality(iedServer,&iedModel_MES_MMXU4_Beh_q,0);
-IedServer_updateQuality(iedServer,&iedModel_MES_MMXU4_Health_q,0);
-iedModel_MES_MMXU4_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-iedModel_MES_MMXU4_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-iedModel_MES_MMXU4_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-iedModel_MES_MMXU4_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
-iedModel_MES_MMXU4_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
-*/
+//MMXU1 phV
+iedModel_MES_MMXU1_phV_phsA_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_MMXU1_phV_phsB_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_MMXU1_phV_phsC_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_MMXU1_phV_phsA_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
+iedModel_MES_MMXU1_phV_phsB_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
+iedModel_MES_MMXU1_phV_phsC_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
+iedModel_MES_MMXU1_phV_neut_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_MMXU1_phV_neut_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
+iedModel_MES_MMXU1_phV_neut1_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_MMXU1_phV_neut1_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
+
+//MMXU1 PPV
+iedModel_MES_MMXU1_PPV_phsA_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_MMXU1_PPV_phsB_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_MMXU1_PPV_phsC_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_MMXU1_PPV_phsA_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
+iedModel_MES_MMXU1_PPV_phsB_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
+iedModel_MES_MMXU1_PPV_phsC_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
+
+//MMXU1 TotVAr
+iedModel_MES_MMXU1_totVAr_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_MMXU1_totVAr_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
+//MMXU1 TotW
+iedModel_MES_MMXU1_totW_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_MMXU1_totW_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
+//MMXU1 TotPF
+iedModel_MES_MMXU1_totPF_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_MMXU1_totPF_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
+
+//MMXU1 Hz
+iedModel_MES_MMXU1_Hz_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_MMXU1_Hz_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
+
 //MSQI1
 iedModel_MES_MSQI1_Mod_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(CTLMODELEDENUM_DirectWithNormalSecurity);
 iedModel_MES_MSQI1_Mod_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
@@ -9310,49 +10323,34 @@ iedModel_MES_MSQI1_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 iedModel_MES_MSQI1_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 iedModel_MES_MSQI1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
 iedModel_MES_MSQI1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
-/*
-//MSQI2
-iedModel_MES_MSQI2_Mod_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(CTLMODELEDENUM_DirectWithNormalSecurity);
-iedModel_MES_MSQI2_Mod_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
-iedModel_MES_MSQI2_Beh_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
-iedModel_MES_MSQI2_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
-IedServer_updateQuality(iedServer,&iedModel_MES_MSQI2_Mod_q,0);
-IedServer_updateQuality(iedServer,&iedModel_MES_MSQI2_Beh_q,0);
-IedServer_updateQuality(iedServer,&iedModel_MES_MSQI2_Health_q,0);
-iedModel_MES_MSQI2_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-iedModel_MES_MSQI2_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-iedModel_MES_MSQI2_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-iedModel_MES_MSQI2_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
-iedModel_MES_MSQI2_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
 
-//MSQI3
-iedModel_MES_MSQI3_Mod_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(CTLMODELEDENUM_DirectWithNormalSecurity);
-iedModel_MES_MSQI3_Mod_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
-iedModel_MES_MSQI3_Beh_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
-iedModel_MES_MSQI3_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
-IedServer_updateQuality(iedServer,&iedModel_MES_MSQI3_Mod_q,0);
-IedServer_updateQuality(iedServer,&iedModel_MES_MSQI3_Beh_q,0);
-IedServer_updateQuality(iedServer,&iedModel_MES_MSQI3_Health_q,0);
-iedModel_MES_MSQI3_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-iedModel_MES_MSQI3_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-iedModel_MES_MSQI3_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-iedModel_MES_MSQI3_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
-iedModel_MES_MSQI3_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
+iedModel_MES_MSQI1_SeqU_U1_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_MSQI1_SeqU_U1_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
+iedModel_MES_MSQI1_SeqU_U2_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_MSQI1_SeqU_U2_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
+iedModel_MES_MSQI1_SeqU_U3U0_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_MSQI1_SeqU_U3U0_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
 
-//MSQI4
-iedModel_MES_MSQI4_Mod_ctlModel.mmsValue = MmsValue_newIntegerFromInt32(CTLMODELEDENUM_DirectWithNormalSecurity);
-iedModel_MES_MSQI4_Mod_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
-iedModel_MES_MSQI4_Beh_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
-iedModel_MES_MSQI4_Health_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
-IedServer_updateQuality(iedServer,&iedModel_MES_MSQI4_Mod_q,0);
-IedServer_updateQuality(iedServer,&iedModel_MES_MSQI4_Beh_q,0);
-IedServer_updateQuality(iedServer,&iedModel_MES_MSQI4_Health_q,0);
-iedModel_MES_MSQI4_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-iedModel_MES_MSQI4_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-iedModel_MES_MSQI4_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
-iedModel_MES_MSQI4_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
-iedModel_MES_MSQI4_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
-*/
+iedModel_MES_MSQI1_SeqA_I1_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_MSQI1_SeqA_I1_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
+iedModel_MES_MSQI1_SeqA_I2_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_MSQI1_SeqA_I2_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
+iedModel_MES_MSQI1_SeqA_3I0_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_MSQI1_SeqA_3I0_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
+
+//RFLO1
+iedModel_MES_RFLO1_Fltz_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_RFLO1_Fltz_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
+
+iedModel_MES_RFLO1_FltDiskm_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_RFLO1_FltDiskm_q.mmsValue = MmsValue_newBitString(QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA);
+
+iedModel_MES_RFLO1_Mod_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_RFLO1_Beh_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_MES_RFLO1_Health_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+iedModel_MES_RFLO1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
+iedModel_MES_RFLO1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
 
 USART_TRACE("------------------------------------------------------------\n");
 }

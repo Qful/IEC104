@@ -179,7 +179,22 @@ DWORD get_fatdate (void)
 	 sectmp |= (DWORD)(sDate.Year)<<9;
 
 	return	sectmp;
+}
 
+FRESULT set_timestampFile (
+    char *obj,     /* ”казатель на им€ файла */
+    int year,
+    int month,
+    int mday,
+    int hour,
+    int min,
+    int sec
+)
+{
+    FILINFO fno;
+    fno.fdate = (WORD)((year * 512U) | month * 32U | (mday+1));
+    fno.ftime = (WORD)(hour * 2048U | min * 32U | sec / 2U);
+    return f_utime(obj, &fno);
 }
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 

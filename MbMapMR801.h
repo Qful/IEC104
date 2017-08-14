@@ -924,7 +924,7 @@
 
 // ----------------------------------------------------------------------------------------------
 #define MB_StartRevNaddr   		0x0500		// версия 17 слов
-#define MB_NumbWordRev	   		17
+#define MB_NumbWordRev	   		16			// 16
 
 #define MB_addr_SysNote_OFF		0x0D01
 #define MB_addr_ErrorNote_OFF	0x0D02
@@ -950,6 +950,13 @@
 //#define MB_StartConfigNaddr   	0x05C0			// временно читаем только IP адрес учтройства. 0x05C0 - 2 слова
 //#define MB_NumbConfigNaddr 		2
 
+
+// ресурс выключателя ------------------------------------------------------------------------------
+#define MB_Sw_CNT				0x0410
+#define MB_NumbSw_CNT	   		8
+
+#define MB_offset_Oper_cnt		0		// число оперативных переключений
+#define MB_offset_Error_cnt		1		// число аварийных отключений
 
 
 

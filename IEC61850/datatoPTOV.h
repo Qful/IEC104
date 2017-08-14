@@ -11,4 +11,8 @@
 void	Set_UPTOV	(uint8_t num, uint64_t currentTime );
 void	Set_UPTUV	(uint8_t num, uint64_t currentTime );
 
+void	Set_U0PTOV	(uint8_t num, uint64_t currentTime );
+void	Set_U1PTUV	(uint8_t num, uint64_t currentTime );
+void	Set_U2PTOV	(uint8_t num, uint64_t currentTime );
+
 #endif /* DATATOPTOV_H_ */

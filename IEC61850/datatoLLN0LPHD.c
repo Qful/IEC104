@@ -17,6 +17,9 @@
 #if defined (MR801)
 #include "static_model_MR801.h"
 #endif
+#if defined (MR851)
+#include "static_model_MR851.h"
+#endif
 #if defined (MR901) || defined (MR902)
 #include "static_model_MR901_902.h"
 #endif
@@ -27,6 +30,7 @@
 #include "static_model_MR76x.h"
 #endif
 
+#if defined (MR761) || defined (MR762) || defined (MR763) || defined (MR771) || defined (MR801) || defined (MR901) || defined (MR902)
 extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
 
 /*******************************************************
@@ -35,12 +39,27 @@ extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
 void	Set_LLN0	(uint8_t num, uint64_t currentTime ){
 
 		uint32_t	LLN0_Health = STVALINT32_OK;
-
 // PROT
 		if ((ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule4) || (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule5)) {LLN0_Health = STVALINT32_Warning;}
 		if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_LLN0_Health_stVal, LLN0_Health))
 			IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_LLN0_Health_t, currentTime);
-
-
 }
+#endif
+
+#if defined (MR851)
+extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+
+/*******************************************************
+ * Set_LLN0 наполняем оперативными данными
+ *******************************************************/
+void	Set_LLN0	(uint8_t num, uint64_t currentTime ){
+
+		uint32_t	LLN0_Health = STVALINT32_OK;
+// PROT
+		if (ucMDiscInBuf[MB_offsetError_M1] & MB_bOffsetErrModule1) {LLN0_Health = STVALINT32_Warning;}
+		if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_RPN_LLN0_Health_stVal, LLN0_Health))
+			IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_RPN_LLN0_Health_t, currentTime);
+}
+#endif
+
 

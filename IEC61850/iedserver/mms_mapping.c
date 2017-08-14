@@ -614,11 +614,14 @@ MmsMapping_configureSettingGroups(MmsMapping* self)
 
             MmsValue* numOfSg = MmsValue_getElement(values, 0);
             MmsValue* actSg = MmsValue_getElement(values, 1);
+            MmsValue* lActTm = MmsValue_getElement(values, 4);
             MmsValue* resvTms = MmsValue_getElement(values, 5);
 
             MmsValue_setUint8(numOfSg, settingGroup->sgcb->numOfSGs);
             MmsValue_setUint8(actSg, settingGroup->sgcb->actSG);
             MmsValue_setUint16(resvTms, 0U);
+
+            MmsValue_setUtcTimeMs(lActTm, Hal_getTimeInMs());
 
             settingGroup->sgcbMmsValues = values;
 
@@ -2753,8 +2756,7 @@ MmsMapping_triggerReportObservers(MmsMapping* self, MmsValue* value, ReportInclu
                     continue;
                 break;
             case REPORT_CONTROL_VALUE_CHANGED:
-                if (((rc->triggerOps & TRG_OPT_DATA_CHANGED) == 0) &&
-                        ((rc->triggerOps & TRG_OPT_DATA_UPDATE) == 0))
+                if (((rc->triggerOps & TRG_OPT_DATA_CHANGED) == 0) && ((rc->triggerOps & TRG_OPT_DATA_UPDATE) == 0))
                     continue;
                 break;
             case REPORT_CONTROL_QUALITY_CHANGED:

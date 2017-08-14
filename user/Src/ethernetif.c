@@ -307,7 +307,7 @@ static void low_level_init(struct netif *netif)
   heth.Init.MACAddr = &MAC_ADDR[0];
   heth.Init.RxMode = ETH_RXINTERRUPT_MODE;
   heth.Init.ChecksumMode = ETH_CHECKSUM_BY_HARDWARE;
-  heth.Init.MediaInterface = ETH_MEDIA_INTERFACE_MII;
+  heth.Init.MediaInterface = ETH_MEDIA_INTERFACE_MII;//ETH_MEDIA_INTERFACE_MII;
 
   hal_eth_init_status = HAL_ETH_Init(&heth);
 

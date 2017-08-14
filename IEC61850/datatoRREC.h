@@ -10,5 +10,7 @@
 
 void	Set_RREC	(uint8_t num, uint64_t currentTime );
 void	Set_RBRF	(uint8_t num, uint64_t currentTime );
+void	Set_RSYN	(uint8_t num, uint64_t currentTime );
+void	Set_RPSB	(uint8_t num, uint64_t currentTime );
 
 #endif /* DATATORREC_H_ */

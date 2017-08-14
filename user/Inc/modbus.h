@@ -124,11 +124,16 @@ BOOL	xModbus_Get_SizeAnswer( uint8_t * Size );
 
 BOOL	Hal_setTimeFromMB_Date( uint16_t *MDateBuf );		// функция установки часов из буфера модбас
 int8_t	Hal_setIPFromMB_Date( uint16_t * MDateBuf );		// функция установки IP адреса из буфера модбас
+int8_t	Hal_Verify_Rev( uint8_t * MDateBuf );				// функция сравнения версии прибора и прошивки
+
 BOOL	Hal_setConfSWFromMB_Date ( uint16_t * MDateBuf );	// функция установки конфига выключателя в нужных узлах из буфера модбас
 
 void     vMBMODBUSPortRxDisable( void );
 
 void Modbus_SendCmd(uint8_t MB_SlaveAddr, uint8_t MB_Funct, uint16_t addr, uint16_t numb, uint16_t *Data, uint16_t len);
+
+void	ATCC_TapChg_Pos_Oper_Set(uint16_t newState, uint64_t timeStamp); // управление приводом 851
+void	ATCC_ParOp_Pos_Oper(bool newState, uint64_t timeStamp);
 
 void	CSWI_Pos_Oper_Set(bool newState, uint64_t timeStamp);
 void	GGIO_LEDGGIO1_SPCSO1_Oper(bool newState, uint64_t timeStamp);

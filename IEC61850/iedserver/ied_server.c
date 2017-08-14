@@ -270,12 +270,15 @@ installDefaultValuesForDataAttribute(IedServer self, DataAttribute* dataAttribut
 
     dataAttribute->mmsValue = cacheValue;
 
-    if (value != NULL) {
+    if (value != NULL) {						// удаляем еслм
 
         if (cacheValue != NULL)
             MmsValue_update(cacheValue, value);
+        if (cacheValue == NULL) {
+        	USART_TRACE_RED("IED_SERVER: exception: invalid initializer for %s\n", mmsVariableName);
+        }
 
-        #if (DEBUG_IED_SERVER == 1)
+        #if (DEBUG_ISO_SERVER_MY == 1)
             if (cacheValue == NULL) {
                 printf("IED_SERVER: exception: invalid initializer for %s\n", mmsVariableName);
                 exit(-1);
@@ -445,7 +448,7 @@ IedServer_create(IedModel* iedModel)
     iedModel->initializer();
 	USART_TRACE("iedModel->initializer.. ok\n");
 
-    installDefaultValuesInCache(self); /* This will also connect cached MmsValues to DataAttributes */
+    installDefaultValuesInCache(self); 						// This will also connect cached MmsValues to DataAttributes
 	USART_TRACE("installDefaultValuesInCache.. ok\n");
 
     updateDataSetsWithCachedValues(self);
@@ -455,7 +458,7 @@ IedServer_create(IedModel* iedModel)
 	USART_TRACE("clientConnections create.. ok\n");
 
     /* default write access policy allows access to SP, SE and SV FCDAs but denies access to DC and CF FCDAs */
-    self->writeAccessPolicies = ALLOW_WRITE_ACCESS_SP | ALLOW_WRITE_ACCESS_SV | ALLOW_WRITE_ACCESS_SE;
+    self->writeAccessPolicies = ALLOW_WRITE_ACCESS_SP | ALLOW_WRITE_ACCESS_SV | ALLOW_WRITE_ACCESS_SE | ALLOW_WRITE_ACCESS_CF;  // попробуем разрешить CF
 
 #if (CONFIG_IEC61850_REPORT_SERVICE == 1)
     Reporting_activateBufferedReports(self->mmsMapping);
@@ -917,9 +920,11 @@ checkForChangedTriggers(IedServer self, DataAttribute* dataAttribute)
 
 }
 
-void
+//void
+int
 IedServer_updateAttributeValue(IedServer self, DataAttribute* dataAttribute, MmsValue* value)
 {
+	int	ret = 0;
     assert(self != NULL);
     assert(dataAttribute != NULL);
     assert(MmsValue_getType(dataAttribute->mmsValue) == MmsValue_getType(value));
@@ -928,9 +933,10 @@ IedServer_updateAttributeValue(IedServer self, DataAttribute* dataAttribute, Mms
         checkForUpdateTrigger(self, dataAttribute);
     else {
         MmsValue_update(dataAttribute->mmsValue, value);
-
         checkForChangedTriggers(self, dataAttribute);
+        ret = true;
     }
+    return	ret;
 }
 
 //void
@@ -949,7 +955,9 @@ IedServer_updateFloatAttributeValue(IedServer self, DataAttribute* dataAttribute
     }
     else {
         MmsValue_setFloat(dataAttribute->mmsValue, value);
+
         checkForChangedTriggers(self, dataAttribute);
+
         ret = true;
     }
     return	ret;
@@ -1003,10 +1011,13 @@ IedServer_updateInt64AttributeValue(IedServer self, DataAttribute* dataAttribute
     return	ret;
 }
 
-void
+//void
+int
 IedServer_updateUnsignedAttributeValue(IedServer self, DataAttribute* dataAttribute, uint32_t value)
 {
-    assert(MmsValue_getType(dataAttribute->mmsValue) == MMS_UNSIGNED);
+	int	ret = 0;
+
+	assert(MmsValue_getType(dataAttribute->mmsValue) == MMS_UNSIGNED);
     assert(dataAttribute != NULL);
     assert(self != NULL);
 
@@ -1017,9 +1028,10 @@ IedServer_updateUnsignedAttributeValue(IedServer self, DataAttribute* dataAttrib
     }
     else {
         MmsValue_setUint32(dataAttribute->mmsValue, value);
-
         checkForChangedTriggers(self, dataAttribute);
+    	ret = true;
     }
+    return	ret;
 }
 
 //void
@@ -1089,6 +1101,27 @@ IedServer_updateVisibleStringAttributeValue(IedServer self, DataAttribute* dataA
         checkForChangedTriggers(self, dataAttribute);
     }
 }
+
+void
+IedServer_updateMMSStringAttributeValue(IedServer self, DataAttribute* dataAttribute, char *value)
+{
+    assert(MmsValue_getType(dataAttribute->mmsValue) == MMS_STRING);
+    assert(dataAttribute != NULL);
+    assert(self != NULL);
+
+    const char *currentValue = MmsValue_toString(dataAttribute->mmsValue);
+
+    if (!strcmp(currentValue ,value)) {
+//        checkForUpdateTrigger(self, dataAttribute);
+    }
+    else {
+    	MmsValue_setMmsString(dataAttribute->mmsValue, value);
+
+//        checkForChangedTriggers(self, dataAttribute);
+    }
+}
+
+
 
 void
 IedServer_updateUTCTimeAttributeValue(IedServer self, DataAttribute* dataAttribute, uint64_t value)

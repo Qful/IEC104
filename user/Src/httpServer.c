@@ -34,8 +34,8 @@
 //#include "http/uploadboot.c"
 //#include "http/fwupdate.c"
 
-extern IedServer iedServer;
-
+extern IedServer 	iedServer;
+extern	errMB_data	cntErrorMD;
 HAL_StatusTypeDef BOOTFLASH_Erase(FLASH_EraseInitTypeDef *pEraseInit, uint32_t *SectorError);
 
 static const char Favicon[1150] = {
@@ -301,14 +301,17 @@ void indexPage(struct netconn *conn)
 #define	httpsize	2048
 void infoPage(struct netconn *conn)
 {
+	extern RTC_TimeTypeDef StartsTime;
+	extern RTC_DateTypeDef StartsDate;
+
 		extern int16_t		ppm;
 		  portCHAR PAGE_BODY[httpsize];
 		  portCHAR pagehits[100];
 		  RTC_TimeTypeDef sTime;
 		  RTC_DateTypeDef sDate;
 
-		  HAL_RTC_GetTime((RTC_HandleTypeDef *)&hrtc, &sTime, FORMAT_BIN);			// Р§РёС‚Р°РµРј РІСЂРµРјСЏ
-		  HAL_RTC_GetDate((RTC_HandleTypeDef *)&hrtc, &sDate, FORMAT_BIN);			// С‡РёС‚Р°РµРј РґР°С‚Сѓ
+		  HAL_RTC_GetTime((RTC_HandleTypeDef *)&hrtc, &sTime, FORMAT_BIN);
+		  HAL_RTC_GetDate((RTC_HandleTypeDef *)&hrtc, &sDate, FORMAT_BIN);
 
 
 		  memset(PAGE_BODY, 0,httpsize);
@@ -343,10 +346,17 @@ void infoPage(struct netconn *conn)
 		  //<div>
 		  sprintf(pagehits,"<div>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<label>Изделие: %s</label><br>",(char *)ucMRevBuf);strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<label>связной модуль: %s</label><br>",(char *)_swREV);strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<label>Версия прошивки связного модуля: '%s'</label><br>",_SWRevision);strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<label>IP адрес устройства:%d.%d.%d.%d</label><br>", IP_ADDR[0], IP_ADDR[1], IP_ADDR[2], IP_ADDR[3]);strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<label>Время включения: %02d.%02d.%04d - %02d:%02d:%02d.%03u</label><br>",StartsDate.Date,StartsDate.Month,2000+StartsDate.Year,StartsTime.Hours,StartsTime.Minutes,StartsTime.Seconds,(uint16_t)(3999-StartsTime.SubSeconds/2));strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
+
+		  sprintf(pagehits,"<label>БД D:%u A:%u</label><br>",(unsigned int)cntErrorMD.errDiscreet,(unsigned int)cntErrorMD.errAnalog);strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
+
 		  sprintf(pagehits,"<label>Время 61850: %02d.%02d.%04d - %02d:%02d:%02d.%03u</label><br>",sDate.Date,sDate.Month,2000+sDate.Year,sTime.Hours,sTime.Minutes,sTime.Seconds,(uint16_t)(3999-sTime.SubSeconds/2));strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<label>Часовой пояс: %i</label><br>",TimeZone_my);strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<label>NTP IP адрес сервера:%d.%d.%d.%d</label><br>",SNTP_IP_ADDR[0],SNTP_IP_ADDR[1],SNTP_IP_ADDR[2],SNTP_IP_ADDR[3]);strcat(PAGE_BODY, pagehits);
@@ -580,6 +590,74 @@ void fwUpdatePage(struct netconn *conn)
 		  sprintf(pagehits,"</html>");strcat(PAGE_BODY, pagehits);
 
 		  write(conn, PAGE_BODY, strlen(PAGE_BODY));
+
+}
+/*************************************************************************
+ *
+ *************************************************************************/
+void SSH_Transmit(Socket self, uint8_t *pData, uint16_t Size){
+
+	  int conn = GetSocket_num(self);
+
+	  write(conn, pData, Size);
+}
+/*************************************************************************
+ *
+ *************************************************************************/
+void SSH_server_serve(Socket self)
+{
+  struct fs_file file = {0, 0};
+  struct http_state *hs;
+  int32_t i,len=0;
+  uint32_t DataOffset, FilenameOffset;
+  //char *data;
+  char *ptr, filename[13], login[LOGIN_SIZE];
+
+  HandleSet handles;
+
+  int conn = GetSocket_num(self);
+
+  handles = Handleset_new();
+  Handleset_addSocket(handles, self);
+
+  int result;
+  result = Handleset_waitReady(handles, 20);			// проверка состояния сокетов ждем таймаут
+  Handleset_destroy(handles);
+
+  if (result < 1){
+	  USART_TRACE_RED("Соединение без данных. Закрываем.\n");
+
+	  Socket_destroy(self);
+      return;
+  }
+
+  int buflen = 1500;
+  int ret;
+//  struct fs_file * file;
+  unsigned char recv_buffer[1500];
+
+nextbuf:
+
+  // читаем из сокета запрос от клиента
+  ret = read(conn, recv_buffer, buflen);
+
+  len = ret;//buflen;
+
+  if(ret == 0) {
+	  USART_TRACE_RED("Разорвали соединение со стороны клиента. Закрываем.\n");
+	  Socket_destroy(self);
+	  return;
+  }else
+  if(ret < 0) {
+	  USART_TRACE_RED("Из буфера ничего не прочитали. Закрываем. %i\n",ret);
+	  Socket_destroy(self);
+	  return;
+  }
+  //===================================
+
+  //===================================
+//  USART_TRACE_GREEN("закрываем соединение на 23 порт. 0x%x\n",self);
+//  Socket_destroy(self);
 
 }
 /*************************************************************************

@@ -47,21 +47,24 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 
-typedef enum 
-{
-  LED1 = 0,
-  LED2 = 1,
-  LED3 = 2,
-  LED4 = 3,
-  RS485_1_DEn = 4,
-  RS485_2_DEn = 5,
-  MODBUS_DEn = 6,
-}Port_TypeDef;
+ typedef enum
+ {
+   LED1 = 0,
+   LED2 = 1,
+   LED3 = 2,
+   LED4 = 3,
+   RS485_1_DEn = 4,
+   RS485_2_DEn = 5,
+   MODBUS_DEn = 6,
+   LED_out_RED = 7,
+   LED_out_GREEN = 8,
+ }Port_TypeDef;
+
 
 // ----------------------------------------------------------------------------------------------------
 //#define 	KSZ8873
 // ----------------------------------------------------------------------------------------------------
-#define PORTn                             7
+#define PORTn                             9
 
 #ifdef STM32F407xx
 
@@ -108,6 +111,16 @@ typedef enum
 #define LED4_GPIO_CLK_DISABLE()          __GPIOE_CLK_DISABLE()
 
 #endif
+
+#define LED_OUT_RED_PIN                 GPIO_PIN_14					// RED
+#define LED_OUT_RED_PORT                GPIOE						//
+#define LED_OUT_RED_CLK_ENABLE()        __GPIOE_CLK_ENABLE()		//
+#define LED_OUT_RED_CLK_DISABLE()       __GPIOE_CLK_DISABLE()
+
+#define LED_OUT_GREEN_PIN               GPIO_PIN_15					// GREEN
+#define LED_OUT_GREEN_PORT              GPIOE
+#define LED_OUT_GREEN_CLK_ENABLE()      __GPIOE_CLK_ENABLE()
+#define LED_OUT_GREEN_CLK_DISABLE()     __GPIOE_CLK_DISABLE()
 
 #define PHY_PWRDN                        GPIO_PIN_8
 #define PHY_PWRDN_GPIO_PORT              GPIOA
