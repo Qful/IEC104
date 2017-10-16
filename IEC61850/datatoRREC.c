@@ -391,11 +391,15 @@ void	Set_RBRF	(uint8_t num, uint64_t currentTime )
 
 #endif
 /*******************************************************
- * MR5_700
+ * MR5_700, MR5_500
  *******************************************************/
+#if defined (MR5_700) || defined (MR5_500)
 #if defined (MR5_700)
 #include "static_model_MR5_700.h"
-
+#endif
+#if defined (MR5_500)
+#include "static_model_MR5_500.h"
+#endif
 
 extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
 extern uint16_t   ucAutomatBuf[MB_NumbAutomat];
@@ -428,6 +432,36 @@ void	Set_RREC	(uint8_t num, uint64_t currentTime )
 				}
 
 }
+#if defined (MR5_500)
+/*******************************************************
+ * Set_FRREC1 наполняем оперативными данными
+ *******************************************************/
+void	Set_FRREC	(uint8_t num, uint64_t currentTime )
+{
+	/*
+	//  Mod Beh
+				uint32_t	Mod;
+				if (ucAutomatBuf[MB_offset_ConfAPW] & MB_bOffset_APW_Config_Stat) {Mod = STVALINT32_ON;} else {Mod = STVALINT32_OFF;}
+				if ( IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_FRREC_Mod_stVal, Mod))
+					IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_FRREC_Mod_t, currentTime);
+				if ( IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_FRREC_Beh_stVal, Mod))
+					IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_FRREC_Beh_t, currentTime);
+
+	//  Quality (Mod Beh)
+				int	Qual = QUALITY_VALIDITY_GOOD;
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) {Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+
+				IedServer_updateQuality(iedServer,&iedModel_PROT_FRREC_Mod_q,Qual);
+				IedServer_updateQuality(iedServer,&iedModel_PROT_FRREC_Beh_q,Qual);
+
+	// Op_general
+				if ( IedServer_updateBooleanAttributeValue(iedServer, &iedModel_PROT_FRREC_Op_general,  ucMDiscInBuf[MB_offset_SW_ON_APW] & MB_b_SW_ON_APW)){
+					IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_FRREC_Op_t, currentTime);
+					IedServer_updateQuality(iedServer,&iedModel_PROT_FRREC_Op_q,0);
+				}
+	 */
+}
+#endif
 /*******************************************************
  * Set_RBRF наполняем оперативными данными
  *******************************************************/

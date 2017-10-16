@@ -22,7 +22,6 @@ void Clocks_Init(void)
 
     hrtc.Instance = RTC;
     hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
-
     //#define RTC_ASYNCH_PREDIV    0x7F				LSI
 	//#define RTC_SYNCH_PREDIV     0x0130
 

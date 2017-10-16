@@ -3397,9 +3397,13 @@ void	Set_LEDGGIO	(uint8_t num, uint64_t currentTime )
 /*******************************************************
  * MR5_700
  *******************************************************/
+#if defined	(MR5_700) || defined	(MR5_500)
 #if defined	(MR5_700)
 #include "static_model_MR5_700.h"
-
+#endif
+#if defined	(MR5_500)
+#include "static_model_MR5_500.h"
+#endif
 extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
 extern uint16_t   ucAutomatBuf[MB_NumbAutomat];
 extern uint16_t   ucUstavkiInBuf[MB_NumbUstavki];
@@ -3976,6 +3980,27 @@ void	Set_LSGGIO	(uint8_t num, uint64_t currentTime )
 	IedServer_updateQuality(iedServer, &iedModel_GGIO_LSGGIO1_Ind7_q,0);
 	IedServer_updateQuality(iedServer, &iedModel_GGIO_LSGGIO1_Ind8_q,0);
 }
+
+#if defined	(MR5_500)
+/*******************************************************
+ * Set_FLSGGIO наполняем оперативными данными
+ *******************************************************/
+void	Set_FLSGGIO	(uint8_t num, uint64_t currentTime )
+{
+
+	uint32_t	Mod = STVALINT32_ON;
+
+	if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_FLSGGIO1_Mod_stVal, Mod))
+	IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_FLSGGIO1_Mod_t, currentTime);
+	if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_FLSGGIO1_Beh_stVal, Mod))
+	IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_FLSGGIO1_Beh_t, currentTime);
+
+//	if ( IedServer_updateBooleanAttributeValue(iedServer, &iedModel_PROT_FLSGGIO1_IntIn_stVal,  ucMDiscInBuf[MB_offsetFLS_1] & MB_bOffset_FLS_1) > 0)
+//		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_FLSGGIO1_IntIn_t, currentTime);
+//	IedServer_updateQuality(iedServer, &iedModel_PROT_FLSGGIO1_IntIn_q,0);
+}
+#endif
+
 #endif
 /*******************************************************
  * MR5_600

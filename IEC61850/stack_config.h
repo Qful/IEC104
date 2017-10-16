@@ -16,8 +16,8 @@
 #define	DEBUG_IED_SERVER		0	//0
 #define	DEBUG_ISO_SERVER		0	//0
 #define	DEBUG_ISO_SERVER_MY		0	//0
-#define	DEBUG_SOCKET			1	//1
-#define	DEBUG_GOOSE_PUBLISHER	1	//1
+#define	DEBUG_SOCKET			0	//1
+#define	DEBUG_GOOSE_PUBLISHER	0	//1
 #define DEBUG_COTP				0	//0
 
 
@@ -84,10 +84,10 @@
 
 // поддержка GOOSE в сборке -------------------------------------------------------------------------------------------
 /* Set to 1 to include GOOSE support in the build. Otherwise set to 0 */
-#define CONFIG_INCLUDE_GOOSE_SUPPORT 				0//1
+#define CONFIG_INCLUDE_GOOSE_SUPPORT 				1//1
 
 /* Ethernet interface ID for GOOSE and SV */
-#define CONFIG_ETHERNET_INTERFACE_ID "eth0"
+#define CONFIG_ETHERNET_INTERFACE_ID 	"GooseEth0"			//"eth0"
 
 /* The GOOSE retransmission interval in ms for the stable condition - i.e. no monitored value changed */
 #define CONFIG_GOOSE_STABLE_STATE_TRANSMISSION_INTERVAL 5000
@@ -193,7 +193,7 @@
 #define MMS_DYNAMIC_DATA_SETS 				1
 #define MMS_GET_DATA_SET_ATTRIBUTES 		1
 #define MMS_STATUS_SERVICE 					0
-#define MMS_IDENTIFY_SERVICE 				0
+#define MMS_IDENTIFY_SERVICE 				1
 #define MMS_FILE_SERVICE 					1		//1
 #endif /* MMS_DEFAULT_PROFILE */
 

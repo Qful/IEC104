@@ -304,7 +304,12 @@ void infoPage(struct netconn *conn)
 	extern RTC_TimeTypeDef StartsTime;
 	extern RTC_DateTypeDef StartsDate;
 
-		extern int16_t		ppm;
+	extern	RTC_TimeTypeDef lastSynchTime;
+	extern	RTC_DateTypeDef lastSynchDate;
+
+	extern int16_t		ppm;
+	extern int16_t		lostSNTPPackets;
+
 		  portCHAR PAGE_BODY[httpsize];
 		  portCHAR pagehits[100];
 		  RTC_TimeTypeDef sTime;
@@ -361,7 +366,16 @@ void infoPage(struct netconn *conn)
 		  sprintf(pagehits,"<label>„асовой по€с: %i</label><br>",TimeZone_my);strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<label>NTP IP адрес сервера:%d.%d.%d.%d</label><br>",SNTP_IP_ADDR[0],SNTP_IP_ADDR[1],SNTP_IP_ADDR[2],SNTP_IP_ADDR[3]);strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<label>NTP период обновлени€:%u мин.</label><br>",SNTP_Period);strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<label>“екущ€€ точность:%i ppm</label><br>",ppm);strcat(PAGE_BODY, pagehits);
+		  //lastSynchTime
+		  if (lastSynchDate.Date) {
+			  sprintf(pagehits,"<label>ѕоследн€€ синхронизаци€ с сервером времени: %02d.%02d.%04d - %02d:%02d:%02d.%03u (%i ppm)</label><br>",lastSynchDate.Date,lastSynchDate.Month,2000+lastSynchDate.Year,lastSynchTime.Hours,lastSynchTime.Minutes,lastSynchTime.Seconds,(uint16_t)(3999-lastSynchTime.SubSeconds/2),ppm);strcat(PAGE_BODY, pagehits);
+//			  sprintf(pagehits,"<label>“екущ€€ точность:%i ppm</label><br>",ppm);strcat(PAGE_BODY, pagehits);
+		  }
+		  else {
+			  sprintf(pagehits,"<label>нет синхронизации с сервером времени.</label><br>");strcat(PAGE_BODY, pagehits);
+		  }
+	//	  sprintf(pagehits,"<label>ѕропусков синхронизации: %d периодов</label><br>",lostSNTPPackets);strcat(PAGE_BODY, pagehits);
+
 		  sprintf(pagehits,"</div>");strcat(PAGE_BODY, pagehits);
 		  //</div>
 

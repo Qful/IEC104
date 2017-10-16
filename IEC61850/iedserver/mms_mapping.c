@@ -2996,7 +2996,6 @@ GOOSE_processGooseEvents(MmsMapping* self, uint64_t currentTimeInMs)
         element = LinkedList_getNext(element);
     }
 }
-
 #endif /* (CONFIG_INCLUDE_GOOSE_SUPPORT == 1) */
 
 

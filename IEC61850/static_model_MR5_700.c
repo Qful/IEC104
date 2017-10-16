@@ -3019,11 +3019,11 @@ DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_Check;
 //****************************************************************************
 
 IedModel iedModel = {
-    "MR5",
+    "MR5PO70",
     &iedModel_Generic_LD0,
     &iedModelds_LD0_LLN0_dataset0,		// DataSet
     &iedModel_LD0_LLN0_report0,		// ReportControlBlock
-    NULL,//&iedModel_PROT_LLN0_gse0,			// GSEControlBlock
+    &iedModel_LD0_LLN0_gse0,			// GSEControlBlock
     NULL,									// SVControlBlock
     &iedModel_LD0_LLN0_sgcb0,			// SettingGroupControlBlock
     NULL,									// lcbs
@@ -3038,7 +3038,7 @@ IedModel iedModel = {
 
 LogicalDevice iedModel_Generic_LD0 = {
     LogicalDeviceModelType,
-    "PO70LD0",								// имя нашего логического устройства		//
+    "LD0",								// имя нашего логического устройства		//
     (ModelNode*)&iedModel,					// родитель (IedModel)
     (ModelNode*)&iedModel_Generic_PROT,		// одноранговый следующий узел				// родитель
     (ModelNode*)&iedModel_LD0_LLN0			// первый LN(логический узел)
@@ -3046,7 +3046,7 @@ LogicalDevice iedModel_Generic_LD0 = {
 
 LogicalDevice iedModel_Generic_PROT = {
     LogicalDeviceModelType,
-    "PO70PROT",								// имя нашего логического устройства		//
+    "PROT",								// имя нашего логического устройства		//
     (ModelNode*)&iedModel,					// родитель (IedModel)
     (ModelNode*)&iedModel_Generic_CTRL,		// одноранговый следующий узел				// родитель
     (ModelNode*)&iedModel_PROT_LLN0			// первый LN(логический узел)
@@ -3054,21 +3054,21 @@ LogicalDevice iedModel_Generic_PROT = {
 
 LogicalDevice iedModel_Generic_CTRL = {
     LogicalDeviceModelType,
-    "PO70CTRL",								// имя нашего логического устройства		//"simpleIOGenericIO"
+    "CTRL",								// имя нашего логического устройства		//"simpleIOGenericIO"
     (ModelNode*)&iedModel,					// родитель (IedModel)
     (ModelNode*)&iedModel_Generic_MES,		// одноранговый следующий узел				// родитель
     (ModelNode*)&iedModel_CTRL_LLN0			// первый LN(логический узел)
 };
 LogicalDevice iedModel_Generic_MES = {
     LogicalDeviceModelType,
-    "PO70MES",								// имя нашего логического устройства		//"simpleIOGenericIO"
+    "MES",								// имя нашего логического устройства		//"simpleIOGenericIO"
     (ModelNode*)&iedModel,					// родитель (IedModel)
     (ModelNode*)&iedModel_Generic_GGIO,		// одноранговый следующий узел				// родитель
     (ModelNode*)&iedModel_MES_LLN0			// первый LN(логический узел)
 };
 LogicalDevice iedModel_Generic_GGIO = {
     LogicalDeviceModelType,
-    "PO70GGIO",								// имя нашего логического устройства		//"simpleIOGenericIO"
+    "GGIO",								// имя нашего логического устройства		//"simpleIOGenericIO"
     (ModelNode*)&iedModel,					// родитель (IedModel)
     NULL,									// одноранговый следующий узел				// родитель
     (ModelNode*)&iedModel_GGIO_LLN0			// первый LN(логический узел)
@@ -5863,214 +5863,214 @@ DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_Check 		= {    DataAttributeModelT
 /***********************************************************************
  * DataSet
  ***********************************************************************/
-DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda0 = {"PO70GGIO",false,"IN16GGIO1$ST$Ind1", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda1 };
-DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda1 = {"PO70GGIO",false,"IN16GGIO1$ST$Ind2", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda2 };
-DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda2 = {"PO70GGIO",false,"IN16GGIO1$ST$Ind3", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda3 };
-DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda3 = {"PO70GGIO",false,"IN16GGIO1$ST$Ind4", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda4 };
-DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda4 = {"PO70GGIO",false,"IN16GGIO1$ST$Ind5", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda5 };
-DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda5 = {"PO70GGIO",false,"IN16GGIO1$ST$Ind6", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda6 };
-DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda6 = {"PO70GGIO",false,"IN16GGIO1$ST$Ind7", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda7 };
-DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda7 = {"PO70GGIO",false,"IN16GGIO1$ST$Ind8", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda8 };
-DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda8 = {"PO70GGIO",false,"IN16GGIO1$ST$Ind9", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda9 };
-DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda9 = {"PO70GGIO",false,"IN16GGIO1$ST$Ind10", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda10 };
-DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda10 = {"PO70GGIO",false,"IN16GGIO1$ST$Ind11", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda11 };
-DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda11 = {"PO70GGIO",false,"IN16GGIO1$ST$Ind12", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda12 };
-DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda12 = {"PO70GGIO",false,"IN16GGIO1$ST$Ind13", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda13 };
-DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda13 = {"PO70GGIO",false,"IN16GGIO1$ST$Ind14", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda14 };
-DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda14 = {"PO70GGIO",false,"IN16GGIO1$ST$Ind15", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda15 };
-DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda15 = {"PO70GGIO",false,"IN16GGIO1$ST$Ind16", -1, NULL, NULL, NULL };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda0 = {"GGIO",false,"IN16GGIO1$ST$Ind1", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda1 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda1 = {"GGIO",false,"IN16GGIO1$ST$Ind2", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda2 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda2 = {"GGIO",false,"IN16GGIO1$ST$Ind3", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda3 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda3 = {"GGIO",false,"IN16GGIO1$ST$Ind4", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda4 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda4 = {"GGIO",false,"IN16GGIO1$ST$Ind5", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda5 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda5 = {"GGIO",false,"IN16GGIO1$ST$Ind6", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda6 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda6 = {"GGIO",false,"IN16GGIO1$ST$Ind7", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda7 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda7 = {"GGIO",false,"IN16GGIO1$ST$Ind8", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda8 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda8 = {"GGIO",false,"IN16GGIO1$ST$Ind9", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda9 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda9 = {"GGIO",false,"IN16GGIO1$ST$Ind10", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda10 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda10 = {"GGIO",false,"IN16GGIO1$ST$Ind11", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda11 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda11 = {"GGIO",false,"IN16GGIO1$ST$Ind12", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda12 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda12 = {"GGIO",false,"IN16GGIO1$ST$Ind13", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda13 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda13 = {"GGIO",false,"IN16GGIO1$ST$Ind14", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda14 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda14 = {"GGIO",false,"IN16GGIO1$ST$Ind15", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda15 };
+DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda15 = {"GGIO",false,"IN16GGIO1$ST$Ind16", -1, NULL, NULL, NULL };
 
 
 //DS
-DataSetEntry iedModelds_LD0_MMXU1_fcda0 = {"PO70MES",false, "MMXU1$MX$A$phsA",-1,NULL,NULL,&iedModelds_LD0_MMXU1_fcda1};
-DataSetEntry iedModelds_LD0_MMXU1_fcda1 = {"PO70MES",false, "MMXU1$MX$A$phsB",-1,NULL,NULL,&iedModelds_LD0_MMXU1_fcda2};
-DataSetEntry iedModelds_LD0_MMXU1_fcda2 = {"PO70MES",false, "MMXU1$MX$A$phsC",-1,NULL,NULL,&iedModelds_LD0_MMXU1_fcda3};
-DataSetEntry iedModelds_LD0_MMXU1_fcda3 = {"PO70MES",false, "MMXU1$MX$A$neut",-1,NULL,NULL,NULL};
+DataSetEntry iedModelds_LD0_MMXU1_fcda0 = {"MES",false, "MMXU1$MX$A$phsA",-1,NULL,NULL,&iedModelds_LD0_MMXU1_fcda1};
+DataSetEntry iedModelds_LD0_MMXU1_fcda1 = {"MES",false, "MMXU1$MX$A$phsB",-1,NULL,NULL,&iedModelds_LD0_MMXU1_fcda2};
+DataSetEntry iedModelds_LD0_MMXU1_fcda2 = {"MES",false, "MMXU1$MX$A$phsC",-1,NULL,NULL,&iedModelds_LD0_MMXU1_fcda3};
+DataSetEntry iedModelds_LD0_MMXU1_fcda3 = {"MES",false, "MMXU1$MX$A$neut",-1,NULL,NULL,NULL};
 
 //DS
-DataSetEntry iedModelds_LD0_MMXU2_fcda0 = {"PO70MES",false, "MMXU2$MX$A$phsA",-1,NULL,NULL,&iedModelds_LD0_MMXU2_fcda1};
-DataSetEntry iedModelds_LD0_MMXU2_fcda1 = {"PO70MES",false, "MMXU2$MX$A$phsB",-1,NULL,NULL,&iedModelds_LD0_MMXU2_fcda2};
-DataSetEntry iedModelds_LD0_MMXU2_fcda2 = {"PO70MES",false, "MMXU2$MX$A$phsC",-1,NULL,NULL,&iedModelds_LD0_MMXU2_fcda3};
-DataSetEntry iedModelds_LD0_MMXU2_fcda3 = {"PO70MES",false, "MMXU2$MX$A$neut",-1,NULL,NULL,&iedModelds_LD0_MMXU2_fcda4};
-DataSetEntry iedModelds_LD0_MMXU2_fcda4 = {"PO70MES",false, "MSQI2$MX$SeqA$I1",-1,NULL,NULL,&iedModelds_LD0_MMXU2_fcda5};
-DataSetEntry iedModelds_LD0_MMXU2_fcda5 = {"PO70MES",false, "MSQI2$MX$SeqA$I2",-1,NULL,NULL,NULL};
+DataSetEntry iedModelds_LD0_MMXU2_fcda0 = {"MES",false, "MMXU2$MX$A$phsA",-1,NULL,NULL,&iedModelds_LD0_MMXU2_fcda1};
+DataSetEntry iedModelds_LD0_MMXU2_fcda1 = {"MES",false, "MMXU2$MX$A$phsB",-1,NULL,NULL,&iedModelds_LD0_MMXU2_fcda2};
+DataSetEntry iedModelds_LD0_MMXU2_fcda2 = {"MES",false, "MMXU2$MX$A$phsC",-1,NULL,NULL,&iedModelds_LD0_MMXU2_fcda3};
+DataSetEntry iedModelds_LD0_MMXU2_fcda3 = {"MES",false, "MMXU2$MX$A$neut",-1,NULL,NULL,&iedModelds_LD0_MMXU2_fcda4};
+DataSetEntry iedModelds_LD0_MMXU2_fcda4 = {"MES",false, "MSQI2$MX$SeqA$I1",-1,NULL,NULL,&iedModelds_LD0_MMXU2_fcda5};
+DataSetEntry iedModelds_LD0_MMXU2_fcda5 = {"MES",false, "MSQI2$MX$SeqA$I2",-1,NULL,NULL,NULL};
 
-DataSetEntry iedModelds_LD0_MMXU3_fcda0 = {"PO70MES",false, "MMXU3$MX$A$phsA",-1,NULL,NULL,&iedModelds_LD0_MMXU3_fcda1};
-DataSetEntry iedModelds_LD0_MMXU3_fcda1 = {"PO70MES",false, "MMXU3$MX$A$phsB",-1,NULL,NULL,&iedModelds_LD0_MMXU3_fcda2};
-DataSetEntry iedModelds_LD0_MMXU3_fcda2 = {"PO70MES",false, "MMXU3$MX$A$phsC",-1,NULL,NULL,&iedModelds_LD0_MMXU3_fcda3};
-DataSetEntry iedModelds_LD0_MMXU3_fcda3 = {"PO70MES",false, "MMXU3$MX$A$neut",-1,NULL,NULL,&iedModelds_LD0_MMXU3_fcda4};
-DataSetEntry iedModelds_LD0_MMXU3_fcda4 = {"PO70MES",false, "MSQI3$MX$SeqA$I1",-1,NULL,NULL,&iedModelds_LD0_MMXU3_fcda5};
-DataSetEntry iedModelds_LD0_MMXU3_fcda5 = {"PO70MES",false, "MSQI3$MX$SeqA$I2",-1,NULL,NULL,NULL};
+DataSetEntry iedModelds_LD0_MMXU3_fcda0 = {"MES",false, "MMXU3$MX$A$phsA",-1,NULL,NULL,&iedModelds_LD0_MMXU3_fcda1};
+DataSetEntry iedModelds_LD0_MMXU3_fcda1 = {"MES",false, "MMXU3$MX$A$phsB",-1,NULL,NULL,&iedModelds_LD0_MMXU3_fcda2};
+DataSetEntry iedModelds_LD0_MMXU3_fcda2 = {"MES",false, "MMXU3$MX$A$phsC",-1,NULL,NULL,&iedModelds_LD0_MMXU3_fcda3};
+DataSetEntry iedModelds_LD0_MMXU3_fcda3 = {"MES",false, "MMXU3$MX$A$neut",-1,NULL,NULL,&iedModelds_LD0_MMXU3_fcda4};
+DataSetEntry iedModelds_LD0_MMXU3_fcda4 = {"MES",false, "MSQI3$MX$SeqA$I1",-1,NULL,NULL,&iedModelds_LD0_MMXU3_fcda5};
+DataSetEntry iedModelds_LD0_MMXU3_fcda5 = {"MES",false, "MSQI3$MX$SeqA$I2",-1,NULL,NULL,NULL};
 
 //DS15
-DataSetEntry iedModelds_LD0_MMXU4_fcda0 = {"PO70MES",false, "MMXU1$MX$PhV$phsA",	-1,NULL,NULL,	&iedModelds_LD0_MMXU4_fcda1};
-DataSetEntry iedModelds_LD0_MMXU4_fcda1 = {"PO70MES",false, "MMXU1$MX$PhV$phsB",	-1,NULL,NULL,	&iedModelds_LD0_MMXU4_fcda2};
-DataSetEntry iedModelds_LD0_MMXU4_fcda2 = {"PO70MES",false, "MMXU1$MX$PhV$phsC",	-1,NULL,NULL,	&iedModelds_LD0_MMXU4_fcda3};
-DataSetEntry iedModelds_LD0_MMXU4_fcda3 = {"PO70MES",false, "MMXU1$MX$PhV$neut",	-1, NULL,NULL,	&iedModelds_LD0_MMXU4_fcda4};
-DataSetEntry iedModelds_LD0_MMXU4_fcda4 = {"PO70MES",false, "MMXU1$MX$PPV$phsAB",	-1,NULL,NULL,	&iedModelds_LD0_MMXU4_fcda5};
-DataSetEntry iedModelds_LD0_MMXU4_fcda5 = {"PO70MES",false, "MMXU1$MX$PPV$phsBC",	-1,NULL,NULL,	&iedModelds_LD0_MMXU4_fcda6};
-DataSetEntry iedModelds_LD0_MMXU4_fcda6 = {"PO70MES",false, "MMXU1$MX$PPV$phsCA",	-1,NULL,NULL,	NULL};
+DataSetEntry iedModelds_LD0_MMXU4_fcda0 = {"MES",false, "MMXU1$MX$PhV$phsA",	-1,NULL,NULL,	&iedModelds_LD0_MMXU4_fcda1};
+DataSetEntry iedModelds_LD0_MMXU4_fcda1 = {"MES",false, "MMXU1$MX$PhV$phsB",	-1,NULL,NULL,	&iedModelds_LD0_MMXU4_fcda2};
+DataSetEntry iedModelds_LD0_MMXU4_fcda2 = {"MES",false, "MMXU1$MX$PhV$phsC",	-1,NULL,NULL,	&iedModelds_LD0_MMXU4_fcda3};
+DataSetEntry iedModelds_LD0_MMXU4_fcda3 = {"MES",false, "MMXU1$MX$PhV$neut",	-1, NULL,NULL,	&iedModelds_LD0_MMXU4_fcda4};
+DataSetEntry iedModelds_LD0_MMXU4_fcda4 = {"MES",false, "MMXU1$MX$PPV$phsAB",	-1,NULL,NULL,	&iedModelds_LD0_MMXU4_fcda5};
+DataSetEntry iedModelds_LD0_MMXU4_fcda5 = {"MES",false, "MMXU1$MX$PPV$phsBC",	-1,NULL,NULL,	&iedModelds_LD0_MMXU4_fcda6};
+DataSetEntry iedModelds_LD0_MMXU4_fcda6 = {"MES",false, "MMXU1$MX$PPV$phsCA",	-1,NULL,NULL,	NULL};
 //DS16
-DataSetEntry iedModelds_LD0_MMXU5_fcda0 = {"PO70MES",false, "MMXU1$MX$TotW",	-1,NULL,NULL,&iedModelds_LD0_MMXU5_fcda1};
-DataSetEntry iedModelds_LD0_MMXU5_fcda1 = {"PO70MES",false, "MMXU1$MX$TotVAr",	-1,NULL,NULL,&iedModelds_LD0_MMXU5_fcda2};
-DataSetEntry iedModelds_LD0_MMXU5_fcda2 = {"PO70MES",false, "MMXU1$MX$TotPF",	-1,NULL,NULL,&iedModelds_LD0_MMXU5_fcda3};
-DataSetEntry iedModelds_LD0_MMXU5_fcda3 = {"PO70MES",false, "RFLO1$MX$Fltz",	-1,NULL,NULL,&iedModelds_LD0_MMXU5_fcda4};
-DataSetEntry iedModelds_LD0_MMXU5_fcda4 = {"PO70MES",false, "RFLO1$MX$FltDiskm",-1,NULL,NULL,NULL};
+DataSetEntry iedModelds_LD0_MMXU5_fcda0 = {"MES",false, "MMXU1$MX$TotW",	-1,NULL,NULL,&iedModelds_LD0_MMXU5_fcda1};
+DataSetEntry iedModelds_LD0_MMXU5_fcda1 = {"MES",false, "MMXU1$MX$TotVAr",	-1,NULL,NULL,&iedModelds_LD0_MMXU5_fcda2};
+DataSetEntry iedModelds_LD0_MMXU5_fcda2 = {"MES",false, "MMXU1$MX$TotPF",	-1,NULL,NULL,&iedModelds_LD0_MMXU5_fcda3};
+DataSetEntry iedModelds_LD0_MMXU5_fcda3 = {"MES",false, "RFLO1$MX$Fltz",	-1,NULL,NULL,&iedModelds_LD0_MMXU5_fcda4};
+DataSetEntry iedModelds_LD0_MMXU5_fcda4 = {"MES",false, "RFLO1$MX$FltDiskm",-1,NULL,NULL,NULL};
 
 
 
 //LED12
-DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda0 = {"PO70GGIO",false,"LED12GGIO1$ST$Ind1", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda1 };
-DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda1 = {"PO70GGIO",false,"LED12GGIO1$ST$Ind2", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda2 };
-DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda2 = {"PO70GGIO",false,"LED12GGIO1$ST$Ind3", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda3 };
-DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda3 = {"PO70GGIO",false,"LED12GGIO1$ST$Ind4", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda4 };
-DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda4 = {"PO70GGIO",false,"LED12GGIO1$ST$Ind5", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda5 };
-DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda5 = {"PO70GGIO",false,"LED12GGIO1$ST$Ind6", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda6 };
-DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda6 = {"PO70GGIO",false,"LED12GGIO1$ST$Ind7", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda7 };
-DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda7 = {"PO70GGIO",false,"LED12GGIO1$ST$Ind8", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda8 };
-DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda8 = {"PO70GGIO",false,"LED12GGIO1$ST$Ind9", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda9 };
-DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda9 = {"PO70GGIO",false,"LED12GGIO1$ST$Ind10", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda10 };
-DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda10 = {"PO70GGIO",false,"LED12GGIO1$ST$Ind11", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda11 };
-DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda11 = {"PO70GGIO",false,"LED12GGIO1$ST$Ind12", -1, NULL, NULL, NULL };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda0 = {"GGIO",false,"LED12GGIO1$ST$Ind1", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda1 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda1 = {"GGIO",false,"LED12GGIO1$ST$Ind2", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda2 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda2 = {"GGIO",false,"LED12GGIO1$ST$Ind3", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda3 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda3 = {"GGIO",false,"LED12GGIO1$ST$Ind4", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda4 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda4 = {"GGIO",false,"LED12GGIO1$ST$Ind5", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda5 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda5 = {"GGIO",false,"LED12GGIO1$ST$Ind6", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda6 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda6 = {"GGIO",false,"LED12GGIO1$ST$Ind7", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda7 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda7 = {"GGIO",false,"LED12GGIO1$ST$Ind8", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda8 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda8 = {"GGIO",false,"LED12GGIO1$ST$Ind9", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda9 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda9 = {"GGIO",false,"LED12GGIO1$ST$Ind10", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda10 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda10 = {"GGIO",false,"LED12GGIO1$ST$Ind11", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset1_fcda11 };
+DataSetEntry iedModelds_LD0_LLN0_dataset1_fcda11 = {"GGIO",false,"LED12GGIO1$ST$Ind12", -1, NULL, NULL, NULL };
 
 
-DataSetEntry iedModelds_LD0_LLN0_dataset2_fcda0 = {"PO70CTRL",false,"XCBR1$ST$Pos", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset2_fcda1 };
-DataSetEntry iedModelds_LD0_LLN0_dataset2_fcda1 = {"PO70CTRL",false,"XCBR1$ST$BlkCls", -1, NULL, NULL, NULL };
+DataSetEntry iedModelds_LD0_LLN0_dataset2_fcda0 = {"CTRL",false,"XCBR1$ST$Pos", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset2_fcda1 };
+DataSetEntry iedModelds_LD0_LLN0_dataset2_fcda1 = {"CTRL",false,"XCBR1$ST$BlkCls", -1, NULL, NULL, NULL };
 
-DataSetEntry iedModelds_LD0_LLN0_dataset3_fcda0 = {"PO70CTRL",false,"GGIO1$ST$SPCSO1$stVal", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset3_fcda1 };
-DataSetEntry iedModelds_LD0_LLN0_dataset3_fcda1 = {"PO70CTRL",false,"GGIO1$ST$SPCSO2$stVal", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset3_fcda2 };
-DataSetEntry iedModelds_LD0_LLN0_dataset3_fcda2 = {"PO70CTRL",false,"GGIO1$ST$SPCSO3$stVal", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset3_fcda3 };
-DataSetEntry iedModelds_LD0_LLN0_dataset3_fcda3 = {"PO70CTRL",false,"GGIO1$ST$SPCSO4$stVal", -1, NULL, NULL, NULL };
+DataSetEntry iedModelds_LD0_LLN0_dataset3_fcda0 = {"CTRL",false,"GGIO1$ST$SPCSO1$stVal", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset3_fcda1 };
+DataSetEntry iedModelds_LD0_LLN0_dataset3_fcda1 = {"CTRL",false,"GGIO1$ST$SPCSO2$stVal", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset3_fcda2 };
+DataSetEntry iedModelds_LD0_LLN0_dataset3_fcda2 = {"CTRL",false,"GGIO1$ST$SPCSO3$stVal", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset3_fcda3 };
+DataSetEntry iedModelds_LD0_LLN0_dataset3_fcda3 = {"CTRL",false,"GGIO1$ST$SPCSO4$stVal", -1, NULL, NULL, NULL };
 
 //LLN0.DS4
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda0 = {"PO70PROT",false,"IPTOC1$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda1 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda1 = {"PO70PROT",false,"IPTOC2$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda2 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda2 = {"PO70PROT",false,"IPTOC3$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda3 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda3 = {"PO70PROT",false,"IPTOC4$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda4 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda4 = {"PO70PROT",false,"IPTOC1$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda5 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda5 = {"PO70PROT",false,"IPTOC2$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda6 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda6 = {"PO70PROT",false,"IPTOC3$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda7 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda7 = {"PO70PROT",false,"IPTOC4$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda8 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda8  ={"PO70PROT",false,"I2PTOC1$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda9 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda9  ={"PO70PROT",false,"I2PTOC2$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda10 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda10 ={"PO70PROT",false,"I0PTOC1$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda11 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda11 ={"PO70PROT",false,"I0PTOC2$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda12 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda12 ={"PO70PROT",false,"INPTOC1$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda13 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda13 ={"PO70PROT",false,"INPTOC2$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda14 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda14 ={"PO70PROT",false,"IGPTOC1$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda15 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda15 ={"PO70PROT",false,"I2PTOC1$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda16 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda16 ={"PO70PROT",false,"I2PTOC2$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda17 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda17 ={"PO70PROT",false,"I0PTOC1$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda18 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda18 ={"PO70PROT",false,"I0PTOC2$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda19 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda19 ={"PO70PROT",false,"INPTOC1$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda20 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda20 ={"PO70PROT",false,"INPTOC2$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda21 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda21 ={"PO70PROT",false,"IGPTOC1$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda22 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda22 ={"PO70PROT",false,"I2I1PTOC1$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda23 };
-DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda23 ={"PO70PROT",false,"I2I1PTOC1$ST$Op", 	-1, NULL, NULL, NULL };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda0 = {"PROT",false,"IPTOC1$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda1 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda1 = {"PROT",false,"IPTOC2$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda2 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda2 = {"PROT",false,"IPTOC3$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda3 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda3 = {"PROT",false,"IPTOC4$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda4 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda4 = {"PROT",false,"IPTOC1$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda5 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda5 = {"PROT",false,"IPTOC2$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda6 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda6 = {"PROT",false,"IPTOC3$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda7 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda7 = {"PROT",false,"IPTOC4$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda8 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda8  ={"PROT",false,"I2PTOC1$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda9 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda9  ={"PROT",false,"I2PTOC2$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda10 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda10 ={"PROT",false,"I0PTOC1$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda11 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda11 ={"PROT",false,"I0PTOC2$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda12 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda12 ={"PROT",false,"INPTOC1$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda13 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda13 ={"PROT",false,"INPTOC2$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda14 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda14 ={"PROT",false,"IGPTOC1$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda15 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda15 ={"PROT",false,"I2PTOC1$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda16 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda16 ={"PROT",false,"I2PTOC2$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda17 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda17 ={"PROT",false,"I0PTOC1$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda18 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda18 ={"PROT",false,"I0PTOC2$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda19 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda19 ={"PROT",false,"INPTOC1$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda20 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda20 ={"PROT",false,"INPTOC2$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda21 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda21 ={"PROT",false,"IGPTOC1$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda22 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda22 ={"PROT",false,"I2I1PTOC1$ST$Str", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset4_fcda23 };
+DataSetEntry iedModelds_LD0_LLN0_dataset4_fcda23 ={"PROT",false,"I2I1PTOC1$ST$Op", 	-1, NULL, NULL, NULL };
 
 //LLN0.DS5
-DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda0 = {"PO70PROT",false,"UPTOV1$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda1 };
-DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda1 = {"PO70PROT",false,"UPTOV2$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda2 };
-DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda2 = {"PO70PROT",false,"UPTOV1$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda3 };
-DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda3 = {"PO70PROT",false,"UPTOV2$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda4 };
-DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda4 = {"PO70PROT",false,"UPTUV1$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda5 };
-DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda5 = {"PO70PROT",false,"UPTUV2$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda6 };
-DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda6  ={"PO70PROT",false,"UPTUV1$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda7 };
-DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda7  ={"PO70PROT",false,"UPTUV2$ST$Op", 	-1, NULL, NULL, NULL };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda0 = {"PROT",false,"UPTOV1$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda1 };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda1 = {"PROT",false,"UPTOV2$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda2 };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda2 = {"PROT",false,"UPTOV1$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda3 };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda3 = {"PROT",false,"UPTOV2$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda4 };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda4 = {"PROT",false,"UPTUV1$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda5 };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda5 = {"PROT",false,"UPTUV2$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda6 };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda6  ={"PROT",false,"UPTUV1$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset5_fcda7 };
+DataSetEntry iedModelds_LD0_LLN0_dataset5_fcda7  ={"PROT",false,"UPTUV2$ST$Op", 	-1, NULL, NULL, NULL };
 
 //LLN0.DS6
-DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda0 = {"PO70PROT",false,"PTOF1$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda1 };
-DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda1 = {"PO70PROT",false,"PTOF2$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda2 };
-DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda2 = {"PO70PROT",false,"PTOF1$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda3 };
-DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda3 = {"PO70PROT",false,"PTOF2$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda4 };
-DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda4 = {"PO70PROT",false,"PTUF1$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda5 };
-DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda5 = {"PO70PROT",false,"PTUF2$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda6 };
-DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda6 ={"PO70PROT",false,"PTUF1$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda7 };
-DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda7 ={"PO70PROT",false,"PTUF2$ST$Op", 		-1, NULL, NULL, NULL };
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda0 = {"PROT",false,"PTOF1$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda1 };
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda1 = {"PROT",false,"PTOF2$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda2 };
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda2 = {"PROT",false,"PTOF1$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda3 };
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda3 = {"PROT",false,"PTOF2$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda4 };
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda4 = {"PROT",false,"PTUF1$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda5 };
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda5 = {"PROT",false,"PTUF2$ST$Str", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda6 };
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda6 ={"PROT",false,"PTUF1$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset6_fcda7 };
+DataSetEntry iedModelds_LD0_LLN0_dataset6_fcda7 ={"PROT",false,"PTUF2$ST$Op", 		-1, NULL, NULL, NULL };
 
 
 //LLN0.DS7
-DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda0 = {"PO70PROT",false,"VZGGIO1$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda1 };
-DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda1 = {"PO70PROT",false,"VZGGIO2$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda2 };
-DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda2 = {"PO70PROT",false,"VZGGIO3$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda3 };
-DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda3 = {"PO70PROT",false,"VZGGIO4$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda4 };
-DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda4 = {"PO70PROT",false,"VZGGIO5$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda5 };
-DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda5 = {"PO70PROT",false,"VZGGIO6$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda6 };
-DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda6 = {"PO70PROT",false,"VZGGIO7$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda7 };
-DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda7 = {"PO70PROT",false,"VZGGIO8$ST$Alm", -1, NULL, NULL, NULL };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda0 = {"PROT",false,"VZGGIO1$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda1 };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda1 = {"PROT",false,"VZGGIO2$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda2 };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda2 = {"PROT",false,"VZGGIO3$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda3 };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda3 = {"PROT",false,"VZGGIO4$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda4 };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda4 = {"PROT",false,"VZGGIO5$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda5 };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda5 = {"PROT",false,"VZGGIO6$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda6 };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda6 = {"PROT",false,"VZGGIO7$ST$Alm", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset7_fcda7 };
+DataSetEntry iedModelds_LD0_LLN0_dataset7_fcda7 = {"PROT",false,"VZGGIO8$ST$Alm", -1, NULL, NULL, NULL };
 
 //LLN0.DS8
-DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda0 = {"PO70PROT",false,"BLKPTTR1$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset8_fcda1 };
-DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda1 = {"PO70PROT",false,"BLKPTTR1$MX$TmpRI", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset8_fcda2 };
-DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda2 = {"PO70PROT",false,"QPTTR1$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset8_fcda3 };
-DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda3 = {"PO70PROT",false,"QPTTR1$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset8_fcda4 };
-DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda4 = {"PO70PROT",false,"QPTTR1$MX$TmpRI", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset8_fcda5 };
-DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda5 = {"PO70PROT",false,"QPTTR2$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset8_fcda6 };
-DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda6 = {"PO70PROT",false,"QPTTR2$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset8_fcda7 };
-DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda7 = {"PO70PROT",false,"QPTTR2$MX$TmpRI", 		-1, NULL, NULL, NULL };
+DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda0 = {"PROT",false,"BLKPTTR1$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset8_fcda1 };
+DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda1 = {"PROT",false,"BLKPTTR1$MX$TmpRI", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset8_fcda2 };
+DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda2 = {"PROT",false,"QPTTR1$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset8_fcda3 };
+DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda3 = {"PROT",false,"QPTTR1$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset8_fcda4 };
+DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda4 = {"PROT",false,"QPTTR1$MX$TmpRI", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset8_fcda5 };
+DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda5 = {"PROT",false,"QPTTR2$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset8_fcda6 };
+DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda6 = {"PROT",false,"QPTTR2$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset8_fcda7 };
+DataSetEntry iedModelds_LD0_LLN0_dataset8_fcda7 = {"PROT",false,"QPTTR2$MX$TmpRI", 		-1, NULL, NULL, NULL };
 
 //LLN0.DS9
-DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda0 = {"PO70PROT",false," ", 		-1, NULL, NULL, NULL };
-DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda1 = {"PO70PROT",false,"PDIS2$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda2 };
-DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda2 = {"PO70PROT",false,"PDIS3$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda3 };
-DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda3 = {"PO70PROT",false,"PDIS4$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda4 };
-DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda4 = {"PO70PROT",false,"PDIS5$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda5 };
-DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda5 = {"PO70PROT",false,"PDIS6$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda6 };
-DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda6 = {"PO70PROT",false,"PDIS7$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda7 };
-DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda7 = {"PO70PROT",false,"PDIS8$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda8 };
-DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda8 = {"PO70PROT",false,"PDIS9$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda9 };
-DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda9 = {"PO70PROT",false,"PDIS10$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda10 };
-DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda10 = {"PO70PROT",false,"PDIS1$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda11 };
-DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda11 = {"PO70PROT",false,"PDIS2$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda12 };
-DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda12 = {"PO70PROT",false,"PDIS3$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda13 };
-DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda13 = {"PO70PROT",false,"PDIS4$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda14 };
-DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda14 = {"PO70PROT",false,"PDIS5$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda15 };
-DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda15 = {"PO70PROT",false,"PDIS6$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda16 };
-DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda16 = {"PO70PROT",false,"PDIS7$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda17 };
-DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda17 = {"PO70PROT",false,"PDIS8$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda18 };
-DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda18 = {"PO70PROT",false,"PDIS9$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda19 };
-DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda19 = {"PO70PROT",false,"PDIS10$ST$Op", 		-1, NULL, NULL, NULL};
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda0 = {"PROT",false," ", 		-1, NULL, NULL, NULL };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda1 = {"PROT",false,"PDIS2$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda2 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda2 = {"PROT",false,"PDIS3$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda3 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda3 = {"PROT",false,"PDIS4$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda4 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda4 = {"PROT",false,"PDIS5$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda5 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda5 = {"PROT",false,"PDIS6$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda6 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda6 = {"PROT",false,"PDIS7$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda7 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda7 = {"PROT",false,"PDIS8$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda8 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda8 = {"PROT",false,"PDIS9$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda9 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda9 = {"PROT",false,"PDIS10$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda10 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda10 = {"PROT",false,"PDIS1$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda11 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda11 = {"PROT",false,"PDIS2$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda12 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda12 = {"PROT",false,"PDIS3$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda13 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda13 = {"PROT",false,"PDIS4$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda14 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda14 = {"PROT",false,"PDIS5$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda15 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda15 = {"PROT",false,"PDIS6$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda16 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda16 = {"PROT",false,"PDIS7$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda17 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda17 = {"PROT",false,"PDIS8$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda18 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda18 = {"PROT",false,"PDIS9$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset9_fcda19 };
+DataSetEntry iedModelds_LD0_LLN0_dataset9_fcda19 = {"PROT",false,"PDIS10$ST$Op", 		-1, NULL, NULL, NULL};
 
 //LLN0.DS10
-DataSetEntry iedModelds_LD0_LLN0_dataset10_fcda0 = {"PO70PROT",false,"PDPR1$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset10_fcda1 };
-DataSetEntry iedModelds_LD0_LLN0_dataset10_fcda1 = {"PO70PROT",false,"PDPR2$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset10_fcda2 };
-DataSetEntry iedModelds_LD0_LLN0_dataset10_fcda2 = {"PO70PROT",false,"PDPR1$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset10_fcda3 };
-DataSetEntry iedModelds_LD0_LLN0_dataset10_fcda3 = {"PO70PROT",false,"PDPR2$ST$Op", 		-1, NULL, NULL, NULL};
+DataSetEntry iedModelds_LD0_LLN0_dataset10_fcda0 = {"PROT",false,"PDPR1$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset10_fcda1 };
+DataSetEntry iedModelds_LD0_LLN0_dataset10_fcda1 = {"PROT",false,"PDPR2$ST$Str", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset10_fcda2 };
+DataSetEntry iedModelds_LD0_LLN0_dataset10_fcda2 = {"PROT",false,"PDPR1$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset10_fcda3 };
+DataSetEntry iedModelds_LD0_LLN0_dataset10_fcda3 = {"PROT",false,"PDPR2$ST$Op", 		-1, NULL, NULL, NULL};
 
 //LLN0.DS11
-DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda0 = {"PO70PROT",false,"RREC1$ST$AutoRecSt", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda1 };
-DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda1 = {"PO70PROT",false,"RREC1$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda2 };
-DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda2 = {"PO70PROT",false,"RBRF1$ST$OpEx", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda3 };
-DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda3 = {"PO70PROT",false,"AVRGGIO1$ST$IntIn", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda4 };
-DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda4 = {"PO70PROT",false,"LZSHPTOC1$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda5 };
-DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda5 = {"PO70PROT",false,"LZSHPTOC1$ST$Str", 	-1, NULL, NULL, NULL };
+DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda0 = {"PROT",false,"RREC1$ST$AutoRecSt", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda1 };
+DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda1 = {"PROT",false,"RREC1$ST$Op", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda2 };
+DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda2 = {"PROT",false,"RBRF1$ST$OpEx", 		-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda3 };
+DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda3 = {"PROT",false,"AVRGGIO1$ST$IntIn", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda4 };
+DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda4 = {"PROT",false,"LZSHPTOC1$ST$Op", 	-1, NULL, NULL, &iedModelds_LD0_LLN0_dataset11_fcda5 };
+DataSetEntry iedModelds_LD0_LLN0_dataset11_fcda5 = {"PROT",false,"LZSHPTOC1$ST$Str", 	-1, NULL, NULL, NULL };
 
 
 /***********************************************************************
  * DataSet
  ***********************************************************************/
-DataSet iedModelds_LD0_LLN0_dataset0 = {"PO70LD0", "LLN0$DS0", 16, &iedModelds_LD0_LLN0_dataset0_fcda0, 	&iedModelds_LD0_LLN0_dataset1};			// IN42GGIO
-DataSet iedModelds_LD0_LLN0_dataset1 = {"PO70LD0", "LLN0$DS1", 12, &iedModelds_LD0_LLN0_dataset1_fcda0, 	&iedModelds_LD0_LLN0_dataset2};			// LED16
-DataSet iedModelds_LD0_LLN0_dataset2 = {"PO70LD0", "LLN0$DS2",  2, &iedModelds_LD0_LLN0_dataset2_fcda0, 	&iedModelds_LD0_LLN0_dataset3};			// XCBR1
-DataSet iedModelds_LD0_LLN0_dataset3 = {"PO70LD0", "LLN0$DS3",  4, &iedModelds_LD0_LLN0_dataset3_fcda0,		&iedModelds_LD0_LLN0_dataset4};			// SPCSO
-DataSet iedModelds_LD0_LLN0_dataset4 = {"PO70LD0", "LLN0$DS4", 24, &iedModelds_LD0_LLN0_dataset4_fcda0,		&iedModelds_LD0_LLN0_dataset5};			// IPTOC IPTUC
-DataSet iedModelds_LD0_LLN0_dataset5 = {"PO70LD0", "LLN0$DS5",  8, &iedModelds_LD0_LLN0_dataset5_fcda0,		&iedModelds_LD0_LLN0_dataset6};			// UPTOV UPTUV
-DataSet iedModelds_LD0_LLN0_dataset6 = {"PO70LD0", "LLN0$DS6",  8, &iedModelds_LD0_LLN0_dataset6_fcda0,		&iedModelds_LD0_LLN0_dataset7};			//
-DataSet iedModelds_LD0_LLN0_dataset7 = {"PO70LD0", "LLN0$DS7",  8, &iedModelds_LD0_LLN0_dataset7_fcda0,		&iedModelds_LD0_LLN0_dataset8};			//
-DataSet iedModelds_LD0_LLN0_dataset8 = {"PO70LD0", "LLN0$DS8",  0, &iedModelds_LD0_LLN0_dataset8_fcda0,		&iedModelds_LD0_LLN0_dataset9};			//
-DataSet iedModelds_LD0_LLN0_dataset9 = {"PO70LD0", "LLN0$DS9",  0, &iedModelds_LD0_LLN0_dataset9_fcda0,		&iedModelds_LD0_LLN0_dataset10};		//
-DataSet iedModelds_LD0_LLN0_dataset10 ={"PO70LD0", "LLN0$DS10", 0, &iedModelds_LD0_LLN0_dataset10_fcda0,	&iedModelds_LD0_LLN0_dataset11};								//
-DataSet iedModelds_LD0_LLN0_dataset11 ={"PO70LD0", "LLN0$DS11", 6, &iedModelds_LD0_LLN0_dataset11_fcda0 ,	&iedModelds_LD0_LLN0_dataset12};		//
+DataSet iedModelds_LD0_LLN0_dataset0 = {"LD0", "LLN0$DS0", 16, &iedModelds_LD0_LLN0_dataset0_fcda0, 	&iedModelds_LD0_LLN0_dataset1};			// IN42GGIO
+DataSet iedModelds_LD0_LLN0_dataset1 = {"LD0", "LLN0$DS1", 12, &iedModelds_LD0_LLN0_dataset1_fcda0, 	&iedModelds_LD0_LLN0_dataset2};			// LED16
+DataSet iedModelds_LD0_LLN0_dataset2 = {"LD0", "LLN0$DS2",  2, &iedModelds_LD0_LLN0_dataset2_fcda0, 	&iedModelds_LD0_LLN0_dataset3};			// XCBR1
+DataSet iedModelds_LD0_LLN0_dataset3 = {"LD0", "LLN0$DS3",  4, &iedModelds_LD0_LLN0_dataset3_fcda0,		&iedModelds_LD0_LLN0_dataset4};			// SPCSO
+DataSet iedModelds_LD0_LLN0_dataset4 = {"LD0", "LLN0$DS4", 24, &iedModelds_LD0_LLN0_dataset4_fcda0,		&iedModelds_LD0_LLN0_dataset5};			// IPTOC IPTUC
+DataSet iedModelds_LD0_LLN0_dataset5 = {"LD0", "LLN0$DS5",  8, &iedModelds_LD0_LLN0_dataset5_fcda0,		&iedModelds_LD0_LLN0_dataset6};			// UPTOV UPTUV
+DataSet iedModelds_LD0_LLN0_dataset6 = {"LD0", "LLN0$DS6",  8, &iedModelds_LD0_LLN0_dataset6_fcda0,		&iedModelds_LD0_LLN0_dataset7};			//
+DataSet iedModelds_LD0_LLN0_dataset7 = {"LD0", "LLN0$DS7",  8, &iedModelds_LD0_LLN0_dataset7_fcda0,		&iedModelds_LD0_LLN0_dataset8};			//
+DataSet iedModelds_LD0_LLN0_dataset8 = {"LD0", "LLN0$DS8",  0, &iedModelds_LD0_LLN0_dataset8_fcda0,		&iedModelds_LD0_LLN0_dataset9};			//
+DataSet iedModelds_LD0_LLN0_dataset9 = {"LD0", "LLN0$DS9",  0, &iedModelds_LD0_LLN0_dataset9_fcda0,		&iedModelds_LD0_LLN0_dataset10};		//
+DataSet iedModelds_LD0_LLN0_dataset10 ={"LD0", "LLN0$DS10", 0, &iedModelds_LD0_LLN0_dataset10_fcda0,	&iedModelds_LD0_LLN0_dataset11};								//
+DataSet iedModelds_LD0_LLN0_dataset11 ={"LD0", "LLN0$DS11", 6, &iedModelds_LD0_LLN0_dataset11_fcda0 ,	&iedModelds_LD0_LLN0_dataset12};		//
 
-DataSet iedModelds_LD0_LLN0_dataset12 ={"PO70LD0", "LLN0$DS12", 4, &iedModelds_LD0_MMXU1_fcda0 ,			&iedModelds_LD0_LLN0_dataset13};
-DataSet iedModelds_LD0_LLN0_dataset13 ={"PO70LD0", "LLN0$DS13", 0, &iedModelds_LD0_MMXU2_fcda0 ,			&iedModelds_LD0_LLN0_dataset14};
-DataSet iedModelds_LD0_LLN0_dataset14 ={"PO70LD0", "LLN0$DS14", 0, &iedModelds_LD0_MMXU3_fcda0 ,			&iedModelds_LD0_LLN0_dataset15};
-DataSet iedModelds_LD0_LLN0_dataset15 ={"PO70LD0", "LLN0$DS15", 7, &iedModelds_LD0_MMXU4_fcda0 ,			&iedModelds_LD0_LLN0_dataset16};
-DataSet iedModelds_LD0_LLN0_dataset16 ={"PO70LD0", "LLN0$DS16", 5, &iedModelds_LD0_MMXU5_fcda0 ,			&iedModelds_LD0_LLN0_dataset17};
-DataSet iedModelds_LD0_LLN0_dataset17 ={"PO70LD0", "LLN0$DS17", 0, NULL ,			&iedModelds_LD0_LLN0_dataset18};
-DataSet iedModelds_LD0_LLN0_dataset18 ={"PO70LD0", "LLN0$DS18", 0, NULL ,			&iedModelds_LD0_LLN0_dataset19};
-DataSet iedModelds_LD0_LLN0_dataset19 ={"PO70LD0", "LLN0$DS19", 0, NULL ,			&iedModelds_LD0_LLN0_dataset20};
-DataSet iedModelds_LD0_LLN0_dataset20 ={"PO70LD0", "LLN0$DS20", 0, NULL ,			NULL};
+DataSet iedModelds_LD0_LLN0_dataset12 ={"LD0", "LLN0$DS12", 4, &iedModelds_LD0_MMXU1_fcda0 ,			&iedModelds_LD0_LLN0_dataset13};
+DataSet iedModelds_LD0_LLN0_dataset13 ={"LD0", "LLN0$DS13", 0, &iedModelds_LD0_MMXU2_fcda0 ,			&iedModelds_LD0_LLN0_dataset14};
+DataSet iedModelds_LD0_LLN0_dataset14 ={"LD0", "LLN0$DS14", 0, &iedModelds_LD0_MMXU3_fcda0 ,			&iedModelds_LD0_LLN0_dataset15};
+DataSet iedModelds_LD0_LLN0_dataset15 ={"LD0", "LLN0$DS15", 7, &iedModelds_LD0_MMXU4_fcda0 ,			&iedModelds_LD0_LLN0_dataset16};
+DataSet iedModelds_LD0_LLN0_dataset16 ={"LD0", "LLN0$DS16", 5, &iedModelds_LD0_MMXU5_fcda0 ,			&iedModelds_LD0_LLN0_dataset17};
+DataSet iedModelds_LD0_LLN0_dataset17 ={"LD0", "LLN0$DS17", 0, NULL ,			&iedModelds_LD0_LLN0_dataset18};
+DataSet iedModelds_LD0_LLN0_dataset18 ={"LD0", "LLN0$DS18", 0, NULL ,			&iedModelds_LD0_LLN0_dataset19};
+DataSet iedModelds_LD0_LLN0_dataset19 ={"LD0", "LLN0$DS19", 0, NULL ,			&iedModelds_LD0_LLN0_dataset20};
+DataSet iedModelds_LD0_LLN0_dataset20 ={"LD0", "LLN0$DS20", 0, NULL ,			NULL};
 
 ReportControlBlock iedModel_LD0_LLN0_report0 = {&iedModel_LD0_LLN0,	"URCB_101",		"LLN0$BR$URCB_101",	false,"DS10",0,	TRG_OPT_INTEGRITY,	111,	100,	5000,	&iedModel_LD0_LLN0_report1};
 ReportControlBlock iedModel_LD0_LLN0_report1 = {&iedModel_LD0_LLN0,	"URCB_201",		"LLN0$BR$URCB_201",	false,"DS11",0,	TRG_OPT_INTEGRITY,	111,	100,	5000,	&iedModel_LD0_LLN0_report2};
@@ -6096,8 +6096,8 @@ ReportControlBlock iedModel_LD0_LLN0_report19 = { &iedModel_LD0_LLN0, "BRCB_901"
 ReportControlBlock iedModel_LD0_LLN0_report20 = { &iedModel_LD0_LLN0, "BRCB_1001", 	"LLN0$BR$BRCB_1001",true, "DS9", 0, TRG_OPT_NO, 		111, 	3000, 	5000, 	NULL};
 
 
-static PhyComAddress iedModel_LD0_LLN0_gse0_address = {  4,  1,  4096,  {0x1, 0xc, 0xcd, 0x1, 0x0, 0x1} };
-static PhyComAddress iedModel_LD0_LLN0_gse1_address = {  4,  1,  4096,  {0x1, 0xc, 0xcd, 0x1, 0x0, 0x2} };
+static PhyComAddress iedModel_LD0_LLN0_gse0_address = {  4,  1,  999,  {0x1, 0xc, 0xcd, 0x1, 0x0, 0x1} };
+static PhyComAddress iedModel_LD0_LLN0_gse1_address = {  4,  1,  999,  {0x1, 0xc, 0xcd, 0x1, 0x0, 0x2} };
 
 
 GSEControlBlock iedModel_LD0_LLN0_gse0 = {
@@ -6110,14 +6110,14 @@ GSEControlBlock iedModel_LD0_LLN0_gse0 = {
 	&iedModel_LD0_LLN0_gse0_address,
 	1000,
 	3000,
-	&iedModel_LD0_LLN0_gse1
+	NULL//&iedModel_LD0_LLN0_gse1
 };
 
 GSEControlBlock iedModel_LD0_LLN0_gse1 = {
 	&iedModel_LD0_LLN0,
 	"gcbAnalog",
 	"analog",
-	"DS1",
+	"DS15",
 	2,
 	false,
 	&iedModel_LD0_LLN0_gse1_address,

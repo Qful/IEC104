@@ -32,6 +32,7 @@
 #include "stdlib.h"
 #include "string.h"
 
+//#include "queue.h"
 /* ----------------------- Platform includes --------------------------------*/
 #include "port.h"
 #include "main.h"
@@ -282,23 +283,34 @@ eMBMasterPoll( void )
 
     if( eMBState != STATE_ENABLED )        return MB_EILLSTATE;	 	// проверим, готов ли модбас для работы
 
-    if( xMBMasterPortEventGet( &eEvent ) == TRUE )					// Проверим есть ли ккое либо событие от СТЭЙТ машины приёмника или передатчика
+
+    // будем отрабатывать все события пока не опустошим
+//    if( xMBMasterPortEventGet( &eEvent ) == TRUE )					// Проверим есть ли ккое либо событие от СТЭЙТ машины приёмника или передатчика
+    while(xMBMasterPortEventGet( &eEvent ) == TRUE)
     {
         switch ( eEvent )
         {
         case EV_MASTER_ERROR_RESPOND_TIMEOUT:
+			USART_TRACE_RED("EV_MASTER_ERROR_RESPOND_TIMEOUT\n");
         	break;
         case EV_MASTER_PROCESS_SUCESS:
+			USART_TRACE_RED("EV_MASTER_PROCESS_SUCESS\n");
             break;
         case EV_MASTER_ERROR_EXECUTE_FUNCTION:
+			USART_TRACE_RED("EV_MASTER_ERROR_EXECUTE_FUNCTION\n");
             break;
         case EV_MASTER_ERROR_RECEIVE_DATA:
+			USART_TRACE_RED("EV_MASTER_PROCESS_SUCESS\n");
         	break;
         case EV_MASTER_READY:
+			USART_TRACE_GREEN("MODBUS_EV_MASTER_READY\n");
             break;
 
         case EV_MASTER_FRAME_RECEIVED:															// Приняли фрейм, проверим на целостность и обработаем
 			eStatus = peMBMasterFrameReceiveCur( &ucRcvAddress, &ucMBFrame, &usLength );
+			Port_On(LED1);
+
+			 xMBMasterPortEventClear(EV_MASTER_FRAME_RECEIVE_WAIT);
 
 			if ( ( eStatus == MB_ERECV ) && ( ucRcvAddress == ucMBMasterGetDestAddress() ) )	// Проверим, нам ли пакет и принят без ошибок.
 			{
@@ -336,6 +348,7 @@ eMBMasterPoll( void )
 						//  выбирается в зависимости от
 						// ----------------------------------------------------------------------------------------------
 						eStatus = MB_ERECVDATA;		//говорим о готовности принимать новые данные
+//						xMBMasterPortEventClear(EV_MASTER_FRAME_RECEIVE_WAIT);
 
 						// If master request is broadcast, the master need execute function for all slave.
 						if ( xMBMasterRequestIsBroadcast() ) {
@@ -365,17 +378,22 @@ eMBMasterPoll( void )
             }
             break;
 
-        case EV_MASTER_FRAME_SENT:				// передача в порт
+        case EV_MASTER_FRAME_SENT:																						// передача в порт
         	vMBMasterGetPDUSndBuf( &ucMBFrame );																		//ucMBFrame - буфер для передачи в MODBUS
-
-			eStatus = peMBMasterFrameSendCur( ucMBMasterGetDestAddress(), ucMBFrame, usMBMasterGetPDUSndLength() );		//подготовка пакета и активация передачи.
+        	while(eStatus != MB_ESENT){
+        		eStatus = peMBMasterFrameSendCur( ucMBMasterGetDestAddress(), ucMBFrame, usMBMasterGetPDUSndLength() );		//подготовка пакета и активация передачи.
+        	}
 			if (eStatus == MB_EIO ){
-	        	USART_TRACE_RED("MODBUS ERROR_SENT_DATA I/O.\n");        	// ошибка отправки пакета. не принят или отправляется предыдущий пакет.
+	        	USART_TRACE_RED("MODBUS ERROR_SENT_DATA I/O.\n");        												// ошибка отправки пакета. не принят или отправляется предыдущий пакет.
+	        	return eStatus;
+			} else{
+			    ( void ) xMBMasterPortEventPost( EV_MASTER_FRAME_RECEIVE_WAIT );										// флаг ожидания ответа, запрет новой отправки
 			}
              break;
 
         case EV_MASTER_ERROR_PROCESS:			// колбэки по ошибкам.
-        	Port_On(LED1);
+
+//        	Port_On(LED1);
 			errorType = eMBMasterGetErrorType();
 			vMBMasterGetPDUSndBuf( &ucMBFrame );
 			switch (errorType) {
@@ -396,9 +414,13 @@ eMBMasterPoll( void )
 			vMBMasterRunResRelease();
         	break;
         }
-    } else{
+    }
+    /*
+    else{
     	return MB_NOTASK;
     }
+    */
+//    eStatus = MB_NOTASK;
     return eStatus;
 }
 
@@ -432,7 +454,6 @@ void vMBMasterSetErrorType( eMBMasterErrorEventType errorType )
 {
 	eMBMasterCurErrorType = errorType;
 }
-
 
 
 #endif

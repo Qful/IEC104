@@ -62,6 +62,8 @@ static volatile uint8_t 	Modbus_SizeRX;			// размер ожидаемого ответа от MODBUS
 
 
 extern uint16_t	xMasterOsEvent;						// хранилище событий порта MODBUS
+extern volatile uint16_t	xMasterOsEventCnt;		// счетчик пропусков из-за ожидания ответа
+
 
 static USHORT usT35TimeOut50us;
 
@@ -77,10 +79,19 @@ extern uint16_t   usMAnalogInStart;
 extern volatile uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
 #endif
 #if defined (MR5_600)
-extern uint16_t   usMDiscInStart;			// адрес
 extern volatile uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
-extern uint16_t   usMAnalogInStart;
 extern volatile uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+
+extern uint16_t   usErrorNoteStart;
+extern uint16_t   usSysNoteStart;
+extern uint16_t   usMDiscInStart;
+extern uint16_t   usMAnalogInStart;
+extern uint16_t   usConfigOutStart;			// чтение конфигурации выходных сигналов
+extern uint16_t   usConfigStartExZ;			// конфигурация внешних защит
+extern uint16_t   usConfigStartF;			// конфигурация защиты по частоте
+extern uint16_t   usConfigStartU;			// конфигурация защиты по напряжению
+
+
 #endif
 #if defined (MR5_500)
 extern uint16_t   usMDiscInStart;			// адрес
@@ -261,7 +272,9 @@ void     vMBMODBUSPortRxDisable( void )
  *************************************************************************/
 void     vMBMasterPortTimersT35Enable( void )
 {
-//	 Port_On(LED2);
+//	Port_On(LED1);
+//	xMBMasterPortEventClear(EV_MASTER_FRAME_RECEIVE_WAIT);
+
      vMBMasterSetCurTimerMode(MB_TMODE_T35);
      xMBPortTimersInit( (50 * usT35TimeOut50us) / (1000 * 1000 / RT_TICK_PER_SECOND) );
 }
@@ -270,7 +283,10 @@ void     vMBMasterPortTimersT35Enable( void )
  *************************************************************************/
 void     vMBMasterPortTimersDisable( void )
 {
+//	Port_On(LED1);
+//	xMBMasterPortEventClear(EV_MASTER_FRAME_RECEIVE_WAIT);
 	HAL_TIM_Base_Stop_IT(&TimHandle);
+	HAL_TIM_Base_Stop(&TimHandle);
 }
 /*************************************************************************
  * xMBMasterPortSerialGetBuf
@@ -330,6 +346,7 @@ void     vMBMasterPortTimersConvertDelayEnable( void )
  *************************************************************************/
 void     vMBMasterPortTimersRespondTimeoutEnable( void )
 {
+//	USART_TRACE_RED("xMBMasterRTUTimerEnable\n");
 //	Port_On(LED2);
     vMBMasterSetCurTimerMode(MB_TMODE_RESPOND_TIMEOUT);
     xMBPortTimersInit(MB_MASTER_TIMEOUT_MS_RESPOND * RT_TICK_PER_SECOND / 1000);
@@ -364,6 +381,17 @@ BOOL            xMBMasterPortEventPost( eMBMasterEventType eEvent )
     return TRUE;
 }
 /*************************************************************************
+ * xMBMasterPortEventClear
+ * Удаляем событие.
+ *************************************************************************/
+BOOL            xMBMasterPortEventClear( eMBMasterEventType eEvent )
+{
+	if (xMasterOsEvent & eEvent){
+		xMasterOsEvent ^= eEvent;
+	}
+     return TRUE;
+}
+/*************************************************************************
  * xMBMasterPortEventInit
  * инит события и включение контроля над ним.
  *************************************************************************/
@@ -387,19 +415,82 @@ void            vMBMasterOsResInit( void )
  *************************************************************************/
 BOOL            xMBMasterPortEventGet(  /*@out@ */ eMBMasterEventType * eEvent ){
 
-    uint32_t recvedEvent;
+    uint32_t recvedEvent = 0;
     BOOL	status = FALSE;
-    uint32_t set = EV_MASTER_READY | EV_MASTER_FRAME_RECEIVED | EV_MASTER_EXECUTE | EV_MASTER_FRAME_SENT | EV_MASTER_ERROR_PROCESS;
+    uint32_t set=0;// = EV_MASTER_READY | EV_MASTER_FRAME_RECEIVED | EV_MASTER_EXECUTE | EV_MASTER_FRAME_SENT | EV_MASTER_ERROR_PROCESS;
 
-    if (xMasterOsEvent & set)     status = TRUE;
+    /*
+    if (status == FALSE){
+    	if ((xMasterOsEvent & EV_MASTER_FRAME_RECEIVE_WAIT) == 0){	// если ждем ответа, то не вкоем случае не шлём новый запрос. Нету смысла
+    		xMasterOsEventCnt = _RECEIVE_WAIT_lim;
+        	set = EV_MASTER_FRAME_SENT;
+    		if (xMasterOsEvent & set){
+    			status = TRUE;
+    		}
+    	}
+    }
+*/
 
-    recvedEvent = xMasterOsEvent;
+    // многозадачная реализация:
+    // 1. если пришел ответ (EV_MASTER_FRAME_RECEIVE_WAIT == 0), и приёмник готов принимать, то отправляем новый запрос.
+    // 2. приоритетная задача, EV_MASTER_EXECUTE. сначала перекинем уже принятое в нужный буфер.
+    // 3. если больше ничего не надо EV_MASTER_FRAME_RECEIVED принятое перекинем в транзитный буфер.
+    // 4. если ошибки то нужно обработать их сперва.
+    // 5. ставим в состояние EV_MASTER_READY.
+    // 6. если ничего нет, то выходим без выполнения.
 
+    if (status == FALSE){
+    	set = EV_MASTER_EXECUTE;
+    	if (xMasterOsEvent & set)     {
+    		status = TRUE;
+    	}
+    }
+    if (status == FALSE){
+     	set = EV_MASTER_FRAME_RECEIVED;
+     	if (xMasterOsEvent & set)     {
+     		status = TRUE;
+     	}
+     }
+    if (status == FALSE){
+    	if ((xMasterOsEvent & EV_MASTER_FRAME_RECEIVE_WAIT) == 0){	// если ждем ответа, то не вкоем случае не шлём новый запрос. Нету смысла
+
+    		set = EV_MASTER_FRAME_SENT;
+    		if (xMasterOsEvent & set){
+
+#if defined (MR5_700) || defined (MR5_600) || defined (MR5_500)
+    			vTaskDelay(10);				// нужно подождать для MR5 иначе не принимает запоросы сразу, после ответа
+#endif
+
+    			status = TRUE;
+    		}
+    	}
+    }
+/*
+    if (status == FALSE){
+    	set = EV_MASTER_ERROR_PROCESS;
+    	if (xMasterOsEvent & set)     {
+    		status = TRUE;
+    	}
+    }
+    */
+    if (status == FALSE){
+    	set = EV_MASTER_READY;
+    	if (xMasterOsEvent & set)     {
+    		status = TRUE;
+    	}
+    }
+
+//    recvedEvent = xMasterOsEvent;
+    if (status == TRUE){
+     recvedEvent = set;
      xMasterOsEvent &= ~set;
+    }
 
-    /* the enum type couldn't convert to int type */
     switch (recvedEvent)
     {
+//    case EV_MASTER_FRAME_RECEIVE_WAIT:
+//        *eEvent = EV_MASTER_FRAME_RECEIVE_WAIT;
+//        break;
     case EV_MASTER_READY:
         *eEvent = EV_MASTER_READY;
         break;
@@ -463,7 +554,13 @@ void            vMBMasterRunResRelease( void )
  *************************************************************************/
 BOOL            xMBMasterRunResTake( int32_t time )
 {
+    BOOL	status = FALSE;
 
+    uint16_t set = EV_MASTER_FRAME_RECEIVE_WAIT;		// пока слать нельзя.
+
+    if ((xMasterOsEvent & set) == 0)  	status = TRUE;
+
+return	status;
 }
 /*************************************************************************
  * eMBMasterWaitRequestFinish
@@ -473,7 +570,7 @@ eMBMasterReqErrCode eMBMasterWaitRequestFinish( void )
     eMBMasterReqErrCode    eErrStatus = MB_MRE_NO_ERR;
     uint32_t recvedEvent;
     BOOL	status = FALSE;
-    uint32_t set = EV_MASTER_PROCESS_SUCESS | EV_MASTER_ERROR_RESPOND_TIMEOUT | EV_MASTER_ERROR_RECEIVE_DATA | EV_MASTER_ERROR_EXECUTE_FUNCTION;
+    uint16_t set = EV_MASTER_PROCESS_SUCESS | EV_MASTER_ERROR_RESPOND_TIMEOUT | EV_MASTER_ERROR_RECEIVE_DATA | EV_MASTER_ERROR_EXECUTE_FUNCTION;
 
     if (xMasterOsEvent & set)     status = TRUE;
 
@@ -550,7 +647,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 			xModbus_Get_SizeAnswer((uint8_t *)&size);
 			HAL_UART_Receive_DMA(huart, Modbus_DataRX, size);		// запуск приёма  в DMA, укажем размер ожидаемых данных, получим колбэк по заполнению.
 
-			pxMBMasterFrameCBTransmitterEmpty();						// скажем что закончили предачу
+			pxMBMasterFrameCBTransmitterEmpty();						// скажем что закончили предачу (xMBMasterRTUTransmitFSM)
 	} else
 	if (huart == &BOOT_UART) {
 
@@ -572,6 +669,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if (pxMBMasterPortCBTimerExpired()){			// если изменилось состояние в xMasterOsEvent (хранилище событий порта MODBUS)
 
 	}
+}
+void HAL_TIMEx_BreakCallback(TIM_HandleTypeDef* htim)
+{
+//	if (pxMBMasterPortCBTimerExpired()){			// если изменилось состояние в xMasterOsEvent (хранилище событий порта MODBUS)
+
+//	}
 }
 /*************************************************************************
   * @brief  Rx Transfer completed callback
@@ -797,18 +900,24 @@ BOOL	Hal_setTimeFromMB_Date( uint16_t * MDateBuf ){
 	RTC_TimeTypeDef sTime;
 	RTC_DateTypeDef sDate;
 
-	sTime.TimeFormat = RTC_HOURFORMAT_24;
-	sTime.Hours =  MDateBuf[3];
-	sTime.Minutes =  MDateBuf[4];
-	sTime.Seconds =  MDateBuf[5];
-	// 	 ms = (1000 - (sTime.SubSeconds * 1000 / hrtc.Init.SynchPrediv));
-	sTime.SubSeconds = (1000 - MDateBuf[6]*10) * hrtc.Init.SynchPrediv / 1000;
-	//sTime.SubSeconds =  MDateBuf[6] * 1000;
+	//sTime.TimeFormat = RTC_HOURFORMAT_24;
+	hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
+
+	sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+	sTime.StoreOperation = RTC_STOREOPERATION_RESET;
+
+	sTime.Hours =  	(uint8_t) MDateBuf[3];
+	sTime.Minutes = (uint8_t) MDateBuf[4];
+	sTime.Seconds = (uint8_t) MDateBuf[5];
+
+	//sTime.SubSeconds = (1000 - MDateBuf[6]*10) * hrtc.Init.SynchPrediv / 1000;			// это не работает, нет смысла устанавливать
+
 	HAL_RTC_SetTime(&hrtc, &sTime, FORMAT_BIN);
 
-	sDate.Year = MDateBuf[0];
-	sDate.Month =  MDateBuf[1];
-	sDate.Date =  MDateBuf[2];
+	sDate.Year = (uint8_t) MDateBuf[0];
+	sDate.Month =(uint8_t) MDateBuf[1];
+	sDate.Date = (uint8_t) MDateBuf[2];
+	sDate.WeekDay = 0;				// рандомное число тут, уносит в ебеня год
 
 	HAL_RTC_SetDate(&hrtc, &sDate, FORMAT_BIN);
 
@@ -909,3 +1018,233 @@ BOOL	Hal_setConfSWFromMB_Date ( uint16_t * MDateBuf ){
 #if defined (MR5_700)
 
 #endif
+
+
+/*******************************************************
+ * AddToQueueMB
+ * постановка задачи в очередь,
+ * если размер запроса больше максимального пакета модбас (MaxSizeBlok)
+ * то дробим запросы на куски.
+ *******************************************************/
+
+int8_t	AddToQueueMB(xQueueHandle SentQueue, uint16_t	MB_Rd_cmd, uint8_t	Slaveaddr){
+
+int8_t			num = 0,i;
+ModbusMessage 	Message;
+uint16_t		addr = 0,size = 0,end = 0;
+
+extern uint16_t   ucMDateBuf[MB_NumbDate];
+
+	switch	(MB_Rd_cmd){
+
+	case	MB_Wrt_Set_Time:
+
+		addr = MB_StartDateNaddr;
+
+		Message.MBFunct 	= MB_FUNC_WRITE_MULTIPLE_REGISTERS;
+		Message.MBSlaveAddr = Slaveaddr;
+		Message.StartAddr = MB_StartDateNaddr;
+		Message.SizeMessage = MB_NumbDate;
+
+		Hal_setTimeToMB_Date((uint16_t *)&ucMDateBuf);
+		for (i = 0; i < MB_NumbDate; i++){
+			Message.ucData[i] = ucMDateBuf[i];
+		}
+		xQueueSendToFront( SentQueue, ( void * )&Message, portMAX_DELAY);	// передача в очередь сообщения в начало
+		return	0;
+		break;
+
+	case MB_Rd_Revision:
+		addr = MB_StartRevNaddr;
+		num = (uint8_t)MB_NumbWordRev / (uint8_t)MaxSizeBlok;
+		end = MB_NumbWordRev - (num * MaxSizeBlok);
+
+		Message.MBFunct 	= MB_FUNC_READ_HOLDING_REGISTER;
+		Message.MBSlaveAddr = Slaveaddr;
+		break;
+	case MB_Rd_Discreet:
+
+		addr = usMDiscInStart;
+		num = (uint8_t)MB_NumbDiscreet / (uint8_t)MaxSizeBlok;
+		end = MB_NumbDiscreet - (num * MaxSizeBlok);
+
+		Message.MBFunct 	= MB_FUNC_READ_HOLDING_REGISTER;
+		Message.MBSlaveAddr = Slaveaddr;
+
+		break;
+	case MB_Rd_Analog:
+
+		addr = usMAnalogInStart;
+		num = (uint8_t)MB_NumbAnalog / (uint8_t)MaxSizeBlok;
+		end = MB_NumbAnalog - (num * MaxSizeBlok);
+
+		Message.MBFunct 	= MB_FUNC_READ_HOLDING_REGISTER;
+		Message.MBSlaveAddr = Slaveaddr;
+
+		break;
+	case MB_Rd_AllUstavki:
+		return -1;
+		break;
+
+	case MB_Rd_Get_Time:
+
+		addr = MB_StartDateNaddr;
+		num = MB_NumbDate / MaxSizeBlok;					// количество блоков.
+		end = MB_NumbDate - (num * MaxSizeBlok);
+
+		Message.MBFunct 	= MB_FUNC_READ_HOLDING_REGISTER;
+		Message.MBSlaveAddr = Slaveaddr;
+
+		break;
+
+	case MB_Rd_Syscfg:
+
+		addr = MB_StartSystemCfg;
+		num = MB_NumbSystemCfg / MaxSizeBlok;
+		end = MB_NumbSystemCfg - (num * MaxSizeBlok);
+
+		Message.MBFunct 	= MB_FUNC_READ_HOLDING_REGISTER;
+		Message.MBSlaveAddr = Slaveaddr;
+
+		break;
+
+	case MB_Rd_Ustavki:
+
+		addr = MB_StartConfig;
+		num = (int8_t)(MB_NumbUstavki / (uint8_t)MaxSizeBlok);
+		end = MB_NumbUstavki - (num * MaxSizeBlok);
+
+		Message.MBFunct 	= MB_FUNC_READ_HOLDING_REGISTER;
+		Message.MBSlaveAddr = Slaveaddr;
+
+		break;
+
+	case MB_Rd_ConfigSWCrash:
+		return -1;
+		break;
+
+	case MB_Rd_ConfigOut:
+
+		addr = usConfigOutStart;
+		num = (int8_t)(MB_NumbConfigOut / MaxSizeBlok);
+		end = (uint16_t)MB_NumbConfigOut - ((uint16_t)num * MaxSizeBlok);
+
+		Message.MBFunct 	= MB_FUNC_READ_HOLDING_REGISTER;
+		Message.MBSlaveAddr = Slaveaddr;
+
+		break;
+	case MB_Rd_ConfigExZ:
+
+		addr = usConfigStartExZ;
+		num = (int8_t)(MB_NumbConfigExZ / MaxSizeBlok);
+		end = (uint16_t)MB_NumbConfigExZ - ((uint16_t)num * MaxSizeBlok);
+
+		Message.MBFunct 	= MB_FUNC_READ_HOLDING_REGISTER;
+		Message.MBSlaveAddr = Slaveaddr;
+
+		break;
+	case MB_Rd_ConfigF:
+
+		addr = usConfigStartF;
+		num = (uint8_t)(MB_NumbConfigF / MaxSizeBlok);
+		end = (uint16_t)MB_NumbConfigF - ((uint16_t)num * MaxSizeBlok);
+
+		Message.MBFunct 	= MB_FUNC_READ_HOLDING_REGISTER;
+		Message.MBSlaveAddr = Slaveaddr;
+
+		break;
+	case MB_Rd_ConfigU:
+
+		addr = usConfigStartU;
+		num = (int8_t)(MB_NumbConfigU / MaxSizeBlok);
+		end = (uint16_t)MB_NumbConfigU - ((uint16_t)num * MaxSizeBlok);
+
+		Message.MBFunct 	= MB_FUNC_READ_HOLDING_REGISTER;
+		Message.MBSlaveAddr = Slaveaddr;
+
+		break;
+
+	case MB_Rd_SysNote:
+
+		addr = usSysNoteStart;//MB_StartSysNoteaddr;
+		num = (int8_t)(MB_NumbSysNote / MaxSizeBlok);
+		end = (uint16_t)MB_NumbSysNote - ((uint16_t)num * MaxSizeBlok);
+
+		Message.MBFunct 	= MB_FUNC_READ_HOLDING_REGISTER;
+		Message.MBSlaveAddr = Slaveaddr;
+
+		break;
+	case MB_Rd_ErrorNote:
+
+		addr = usErrorNoteStart;//MB_StartErrorNoteaddr;
+		num = (int8_t)(MB_NumbErrorNote / MaxSizeBlok);
+		end = (uint16_t)MB_NumbErrorNote - ((uint16_t)num * MaxSizeBlok);
+
+		Message.MBFunct 	= MB_FUNC_READ_HOLDING_REGISTER;
+		Message.MBSlaveAddr = Slaveaddr;
+
+		break;
+
+// ------- WRITES -----------------------------
+	case MB_Wrt_Reset_SysNote:
+
+		addr = MB_addr_SysNote_OFF;
+		num = 0;							// не используем число данных
+		end = 0;
+
+		Message.ucData[0] = MB_CTRL_OFF;	// сообщение полько в 0-м слове
+
+		Message.MBFunct 	= MB_FUNC_WRITE_SINGLE_COIL;
+		Message.MBSlaveAddr = Slaveaddr;
+
+		break;
+
+	}
+
+//------------------------------------------------------------------
+	if (num < uxQueueSpacesAvailable(SentQueue)) {						// если влазят в свободную область
+		for (i=0;i<=num;i++){
+			Message.StartAddr = addr + MaxSizeBlok*i;
+			if (i == num) Message.SizeMessage = end;
+			else 		  Message.SizeMessage = MaxSizeBlok;
+			xQueueSend( SentQueue, ( void * )&Message, portMAX_DELAY  );		// передача в очередь сообщения
+		}
+	}else{
+		return -1;
+	}
+return num;
+}
+
+/*******************************************************
+ * eMBMasterSendMessage
+ * передача команды из структуры ModbusMessage
+ *******************************************************/
+eMBMasterReqErrCode	eMBMasterSendMessage(ModbusMessage*	Message)
+{
+eMBMasterReqErrCode    eStatus = MB_MRE_NO_ERR;
+
+	 switch	(Message->MBFunct){
+
+//команда 3
+	 case	MB_FUNC_READ_HOLDING_REGISTER:
+		 eStatus = eMBMasterReqReadHoldingRegister(Message->MBSlaveAddr,Message->StartAddr,Message->SizeMessage,RT_WAITING_FOREVER);
+   		break;
+
+//команда 5
+	 case	MB_FUNC_WRITE_SINGLE_COIL:
+		 eStatus = eMBMasterReqWriteCoil(Message->MBSlaveAddr,Message->StartAddr,Message->ucData[0],RT_WAITING_FOREVER);
+		break;
+
+//команда 6
+	 case	MB_FUNC_WRITE_REGISTER:
+		eStatus = eMBMasterReqWriteHoldingRegister(Message->MBSlaveAddr,Message->StartAddr,Message->ucData[0],RT_WAITING_FOREVER);
+		break;
+
+//команда 16
+	 case	MB_FUNC_WRITE_MULTIPLE_REGISTERS:
+   		eStatus = eMBMasterReqWriteMultipleHoldingRegister(Message->MBSlaveAddr,Message->StartAddr,Message->SizeMessage, (USHORT *)&Message->ucData,RT_WAITING_FOREVER);
+   		break;
+	 }
+
+	return	 eStatus;
+}

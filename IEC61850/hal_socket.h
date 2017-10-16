@@ -275,6 +275,7 @@ void
 Socket_destroy(Socket self);
 
 int	GetSocket_num(Socket self);
+void Print_Sockets(void);
 
 bool		prepareServerAddress(const char* address, int port, struct sockaddr_in* sockaddr);
 /*! @} */

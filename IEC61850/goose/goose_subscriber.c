@@ -36,9 +36,12 @@
 #include "goose_receiver_internal.h"
 
 GooseSubscriber
-GooseSubscriber_create(char* goCbRef, MmsValue* dataSetValues)
+GooseSubscriber_create(char* goCbRef, MmsValue* dataSetValues,void* MAC)
 {
     GooseSubscriber self = (GooseSubscriber) GLOBAL_CALLOC(1, sizeof(struct sGooseSubscriber));
+
+ //   if (MAC != NULL)
+ //   	memcpy(self->destMAC,MAC,6);
 
     self->goCBRef = copyString(goCbRef);
     self->goCBRefLen = strlen(goCbRef);

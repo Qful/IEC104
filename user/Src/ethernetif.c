@@ -604,7 +604,7 @@ void ethernetif_input( void const * argument )
         	  printf("ethernetif input ERROR : %i \n", ret_error);
               pbuf_free(p);
           }else{
-//              printf("tcpip_input no error. pbuf: 0x%x\n",(unsigned int)p);
+//             printf("tcpip_input no error. pbuf: 0x%x\n",(unsigned int)p);
           }
         }
       } while(p!=NULL);

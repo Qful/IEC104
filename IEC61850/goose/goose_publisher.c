@@ -189,11 +189,12 @@ prepareGooseBuffer(GoosePublisher self, CommParameters* parameters, const char* 
         appId = parameters->appId;
     }
 
+ /*	// не нужен сокет, кидаем прямо в интерфейс
     if (interfaceID != NULL)
         self->ethernetSocket = Ethernet_createSocket(interfaceID, dstAddr);
     else
         self->ethernetSocket = Ethernet_createSocket(CONFIG_ETHERNET_INTERFACE_ID, dstAddr);
-
+*/
     self->buffer = (uint8_t*) GLOBAL_MALLOC(GOOSE_MAX_MESSAGE_SIZE);
 
     memcpy(self->buffer, dstAddr, 6);
@@ -374,7 +375,7 @@ GoosePublisher_publish(GoosePublisher self, LinkedList dataSet)
     self->buffer[lengthIndex + 1] = gooseLength & 0xff;
 
     if (DEBUG_GOOSE_PUBLISHER)
-        printf("GOOSE_PUBLISHER: send GOOSE message\n");
+    	USART_TRACE_CYAN("GOOSE: send GOOSE message\n");
 
     Ethernet_sendPacket(self->ethernetSocket, self->buffer, self->payloadStart + payloadLength);
 

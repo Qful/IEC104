@@ -84,6 +84,8 @@
 #endif
 //#include "MmsPdu.h"
 
+#include "iedserverdataupdate.h"
+
 #include "goose_receiver.h"
 /*Modbus includes ------------------------------------------------------------*/
 #include "mb.h"
@@ -179,12 +181,12 @@ sigint_handler(int signalId)
 }
 /*************************************************************************
  * gooseListener
+ * смотрим что там пришло
  *************************************************************************/
 void	gooseListener(GooseSubscriber subscriber, void* parameter)
 {
     printf("GOOSE event:\n");
-    printf("  stNum: %u sqNum: %u\n", GooseSubscriber_getStNum(subscriber),
-            GooseSubscriber_getSqNum(subscriber));
+    printf("  stNum: %u sqNum: %u\n", GooseSubscriber_getStNum(subscriber), GooseSubscriber_getSqNum(subscriber));
     printf("  timeToLive: %u\n", GooseSubscriber_getTimeAllowedToLive(subscriber));
     printf("  timestamp: %"PRIu64"\n", GooseSubscriber_getTimestamp(subscriber));
 
@@ -288,11 +290,6 @@ extern osThreadId IEC850TaskHandle;
 		  HAL_RTC_GetDate((RTC_HandleTypeDef *)&hrtc, &StartsDate, FORMAT_BIN);
 
 
-	    iedServer = IedServer_create(&iedModel);							// создадим IED электронное устройство
-	    USART_TRACE_GREEN("Получили IP, запускаем сервак.\n");
-
-		Port_Off(LED_out_RED);
-
 	    // проверка на валидность IP адреса
 		  if (IP_ADDR[0] == 0xFF || IP_ADDR[3] == 0xFF || IP_ADDR[0] == 0 || IP_ADDR[1] == 0 ){
 			  IP_ADDR[0] = first_IP_ADDR0;
@@ -308,6 +305,11 @@ extern osThreadId IEC850TaskHandle;
 			  SNTP_IP_ADDR[3] = NTP_IP_ADDR3;
 			  SNTP_Period = 0;
 		  }
+
+		iedServer = IedServer_create(&iedModel,(uint16_t)IP_ADDR[3]);		// создадим IED электронное устройство
+		USART_TRACE_GREEN("Получили IP, запускаем сервак.\n");
+
+		Port_Off(LED_out_RED);
 
 	    // 2. конфигурим сервер открываем порт.
 		IsoServer isoServer = IedServer_getIsoServer(iedServer);
@@ -368,7 +370,7 @@ extern osThreadId IEC850TaskHandle;
 			  	    	FIL 	Myfile;
 
 						if(f_open(&Myfile,_SystemNote, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK){
-							USART_TRACE("Создали файл Jurnal.bin\n");
+							USART_TRACE("Создали файл SystemLog.bin\n");
 							/*
 							if(f_write(&Myfile,"Журнал системы:\n", strlen("Журнал системы:\n"), NULL) == FR_OK){
 								USART_TRACE("записали в него.\n");
@@ -381,11 +383,13 @@ extern osThreadId IEC850TaskHandle;
 						//AddToFileMessageString(_SystemNote,"testAppend1\n");
 
 						if(f_open(&Myfile,_ErrorNote, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK){
-							USART_TRACE("Создали файл Error.bin\n");
+							USART_TRACE("Создали файл AlarmLog.bin\n");
+							/*
 							if(f_write(&Myfile,"Журнал аварий:\n", strlen("Журнал аварий:\n"), NULL) == FR_OK){
 								USART_TRACE("записали в него.\n");
 								f_close(&Myfile);
 							}
+							*/
 						}
 			  	    }
 			  	   // portEXIT_CRITICAL();
@@ -491,20 +495,36 @@ extern osThreadId IEC850TaskHandle;
 		    IedServer_setEditSettingGroupChangedHandler(iedServer, sgcb, editSgChangedHandler, NULL);
 		    IedServer_setEditSettingGroupConfirmationHandler(iedServer, sgcb, editSgConfirmedHandler, NULL);
 
-
+#if (CONFIG_INCLUDE_GOOSE_SUPPORT == 1)
 			//--------------- Goose -------------------------
-			IedServer_setGooseInterfaceId(iedServer, CONFIG_ETHERNET_INTERFACE_ID);
+		    // конфигурация гусов.
+			IedServer_setGooseInterfaceId(iedServer, CONFIG_ETHERNET_INTERFACE_ID);			// интерфейс через который будем слать гусы. (нам не надо, он у нас один)
 
-		//    GooseReceiver receiver = GooseReceiver_create();
-		//    GooseReceiver_setInterfaceId(receiver, "eth0");
-		//    GooseSubscriber subscriber = GooseSubscriber_create("simpleIOGenericIO/LLN0$GO$gcbAnalogValues", NULL);
-		//    GooseSubscriber_setAppId(subscriber, 1000);
-		//    GooseSubscriber_setListener(subscriber, gooseListener, NULL);
-		//    GooseReceiver_addSubscriber(receiver, subscriber);
-		//    GooseReceiver_start(receiver);
+		    GooseReceiver Goosereceiver = GooseReceiver_create();
+		    GooseReceiver_setInterfaceId(Goosereceiver, CONFIG_ETHERNET_INTERFACE_ID);		// интерфейс через который будем принимать гусы. (нам не надо, он у нас один)
+
+		    // первый гус -----
+		    GooseSubscriber subscriber = GooseSubscriber_create("MR5PO70N125LD0/LLN0$GO$gcbDiscret", NULL, NULL);		// подписываемся на гус.
+		    GooseSubscriber_setAppId(subscriber, 999);
+		    GooseSubscriber_setListener(subscriber, gooseListener, NULL);					// функция для обработки конкретного принятого гуса
+		    GooseReceiver_addSubscriber(Goosereceiver, subscriber);
+		    // ----------------
+		    // второй гус -----
+		    subscriber = GooseSubscriber_create("MR5PO70N125LD0/LLN0$GO$gcbAnalog", NULL, NULL);		// подписываемся на гус.
+		    GooseSubscriber_setAppId(subscriber, 999);
+		    GooseSubscriber_setListener(subscriber, gooseListener, NULL);					// функция для обработки конкретного принятого гуса
+		    GooseReceiver_addSubscriber(Goosereceiver, subscriber);
+		    // ----------------
+		    // третий гус -----
+		    subscriber = GooseSubscriber_create("A1LD0/LLN0$GO$gcbsignal_goose", NULL, NULL);		// подписываемся на гус.
+		    GooseSubscriber_setAppId(subscriber, 3);
+		    GooseSubscriber_setListener(subscriber, gooseListener, NULL);					// функция для обработки конкретного принятого гуса
+		    GooseReceiver_addSubscriber(Goosereceiver, subscriber);
+		    // ----------------
+
+		    GooseReceiver_start(Goosereceiver);					// стартанём приёмный таск гусов.
 			//--------------- Goose -------------------------
-
-
+#endif
 			if (!IedServer_isRunning(iedServer)) {
 				USART_TRACE_RED("Ошибка запуска сервера! Останов.\n");
 				IedServer_destroy(iedServer);
@@ -512,11 +532,12 @@ extern osThreadId IEC850TaskHandle;
 
 //			osMutexRelease(xIEC850ServerStartMutex);
 
+#if (CONFIG_INCLUDE_GOOSE_SUPPORT == 1)
 			//--------------- Goose -------------------------
-			/* Start GOOSE publishing */
+			// передающая часть гусов. Start GOOSE publishing
 			IedServer_enableGoosePublishing(iedServer);
 			//--------------- Goose -------------------------
-
+#endif
 			running = 1;
 
 
@@ -526,11 +547,16 @@ extern osThreadId IEC850TaskHandle;
 			vTaskGetRunTimeStats((char *)taskInfoBuf);
 			printf("%s\r\n", taskInfoBuf);
 
+			// сокеты -------
+			Print_Sockets();
+			// --------------
 			while (running) {
 
 				IedServer_processIncomingData(iedServer);						// Должна вызываться периодически для приёма данных и соединений
 																				// проверяем было ли соединение на сокет?
 				IedServer_performPeriodicTasks(iedServer);						// Должна вызываться периодически монитор служб 61850
+
+				IedServer_PeriodicUpdateNewData(iedServer);						// обновление данных в модели из буферов памяти
 
 			}
 

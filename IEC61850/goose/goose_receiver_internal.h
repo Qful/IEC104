@@ -30,7 +30,7 @@
 #define ETH_P_GOOSE 0x88b8
 
 #ifndef DEBUG_GOOSE_SUBSCRIBER
-#define DEBUG_GOOSE_SUBSCRIBER 0
+#define DEBUG_GOOSE_SUBSCRIBER 		0
 #endif
 
 
@@ -55,6 +55,8 @@ struct sGooseSubscriber {
 
     GooseListener listener;
     void* listenerParameter;
+
+//    uint8_t destMAC[6];
 };
 
 

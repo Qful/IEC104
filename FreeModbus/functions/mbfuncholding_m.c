@@ -49,6 +49,10 @@
 
 #include "modbus.h"
 /* ----------------------- external ------------------------------------------*/
+extern	xQueueHandle 	Rd_SysNoteQueue;		// очередь для запросов журналу системы
+extern	xQueueHandle 	Rd_ErrorNoteQueue;		// очередь для запросов журналу аварий
+
+
 extern IedServer iedServer;
 extern osThreadId IEC850TaskHandle;
 
@@ -189,22 +193,48 @@ extern uint16_t   usConfigStartU;			// конфигурация защиты по напряжению
 #endif
 #if defined (MR5_500)
 
-extern uint16_t   usMDateStart;
-extern uint16_t   ucMDateBuf[MB_NumbDate];
-extern uint16_t   usMRevStart;
-extern uint16_t   ucMRevBuf[MB_NumbWordRev];
-extern uint16_t   usMDiscInStart;
-extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
-extern uint16_t   usMAnalogInStart;
-extern uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
-extern uint16_t   usMConfigStart;
-extern uint16_t   ucMConfigBuf[MB_NumbConfig];
-extern uint16_t   usMConfigStartall;
-extern uint16_t   ucMConfigBufall[MB_NumbConfigall];
-extern uint16_t   usMConfigStartSWCrash;
-extern uint16_t   ucMSWCrash[MB_NumbSWCrash];
+extern uint16_t   ucSysNoteBufPre[MB_NumbSysNote];				// последняя запись
+extern uint16_t   ucSysNoteBufNext[MB_NumbSysNote];
+extern uint16_t   ucSysNoteBuf[MB_NumbSysNote];				// буфер для хранения
 
-extern uint16_t	    Ktt,Ktn;
+extern uint16_t   ucErrorNoteBufPre[MB_NumbSysNote];				// последняя запись
+extern uint16_t   ucErrorNoteBufNext[MB_NumbSysNote];
+extern uint16_t   ucErrorNoteBuf[MB_NumbSysNote];				// буфер для хранения
+
+
+extern uint16_t   ucMDateBuf[MB_NumbDate];
+extern uint16_t   ucMRevBuf[MB_NumbWordRev];
+extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+extern uint16_t   ucSWCrash[MB_NumbSWCrash];
+extern uint16_t   ucConfigBufSW[MB_NumbConfigSW];
+extern uint16_t   ucUstavkiInBuf[MB_NumbUstavki];
+extern uint16_t   ucAutomatBuf[MB_NumbAutomat];
+extern uint16_t   ucOutSignalBuf[MB_NumbConfigOut];
+extern uint16_t   ucSystemCfgBuf[MB_NumbSystemCfg];
+extern uint16_t   ucConfigBufExZ[MB_NumbConfigExZ];
+extern uint16_t   ucConfigBufMTZ[MB_NumbConfigMTZ];
+extern uint16_t   ucConfigBufI2I1I0[MB_NumbConfigI2I1I0];
+
+extern uint16_t   usSysNoteStart;
+extern uint16_t   usErrorNoteStart;
+
+extern uint16_t   usMDateStart;
+extern uint16_t   usMRevStart;
+extern uint16_t   usMDiscInStart;
+extern uint16_t   usMAnalogInStart;
+extern uint16_t   usConfigStartSWCrash;	// ресурс выключателя
+extern uint16_t   usConfigStartSW;			// конфигурация Выключателя
+extern uint16_t   usConfigUstavkiStart;		// общие уставки
+extern uint16_t   usConfigAutomatStart;		// параметры автоматики
+extern uint16_t   usConfigOutStart;			// чтение конфигурации выходных сигналов
+extern uint16_t   usSystemCfgStart;			// параметры системы
+extern uint16_t   usConfigStartExZ;			// конфигурация внешних защит
+extern uint16_t   usConfigStartMTZ;			// конфигурация токовых защит
+extern uint16_t   usConfigStartI2I1I0;		// конфигурация Дополнительные защиты
+extern uint16_t   usConfigStartF;			// конфигурация защиты по частоте
+extern uint16_t   usConfigStartU;			// конфигурация защиты по напряжению
+
 #endif
 /*************************************************************************
  * MR801
@@ -741,9 +771,9 @@ eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
 #endif
 
 /***********************************************************************************
- * MR5_700 || MR5_600
+ * MR5_700 || MR5_600 || MR5_500
  ***********************************************************************************/
-#if defined (MR5_700) || defined (MR5_600)
+#if defined (MR5_700) || defined (MR5_600) || defined (MR5_500)
 eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
 {
 	extern uint64_t nextSynchTime;
@@ -804,7 +834,7 @@ eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
 			else if (usMDiscInStart == MemForSave){
 				eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount, ucMDiscInBuf, usMDiscInStart, MB_NumbDiscreet );		// сохраняем данные в хранилище
 				if( eRegStatus == MB_ENOERR ){
-				//	USART_TRACE_GREEN("БД дискретных.\n");
+					//USART_TRACE_GREEN("БД дискретных.\n");
 				}
 				ReadNmb++;
 			}
@@ -864,6 +894,24 @@ eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
 				}
 				ReadNmb++;
 			}
+#if !defined (MR5_600)
+// чтение ресурса выключателя
+			else if ( usConfigStartSWCrash  == MemForSave) {
+				eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,ucSWCrash, usConfigStartSWCrash, MB_NumbSWCrash);
+				if( eRegStatus == MB_ENOERR ){
+					USART_TRACE_GREEN("%d. Получили ресурс выключателя.\n",ReadNmb);
+				}
+				ReadNmb++;
+			}
+// чтение конфигурации выключателя
+			else if ( usConfigStartSW  == MemForSave) {
+				eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,ucConfigBufSW, usConfigStartSW, MB_NumbConfigSW);
+				if( eRegStatus == MB_ENOERR ){
+					USART_TRACE_GREEN("%d. Получили конфигурацию выключателя.\n",ReadNmb);
+				}
+				ReadNmb++;
+			}
+#endif
 // чтение конфигурации выходных сигналов
 			else if ( usConfigOutStart  == MemForSave) {
 				eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,ucOutSignalBuf, usConfigOutStart, MB_NumbConfigOut);
@@ -872,6 +920,16 @@ eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
 				}
 				ReadNmb++;
 			}
+#if !defined (MR5_600)
+// чтение конфигурации автоматики
+			else if ( usConfigAutomatStart  == MemForSave) {
+				eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,ucAutomatBuf, usConfigAutomatStart, MB_NumbAutomat);
+				if( eRegStatus == MB_ENOERR ){
+					USART_TRACE_GREEN("%d. Получили конфигурацию автоматики.\n",ReadNmb);
+				}
+				ReadNmb++;
+			}
+#endif
 // чтение конфигурации внешних защит
 			else if ( usConfigStartExZ  == MemForSave) {
 				eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,ucConfigBufExZ, usConfigStartExZ, MB_NumbConfigExZ);
@@ -880,6 +938,25 @@ eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
 				}
 				ReadNmb++;
 			}
+#if !defined (MR5_600)
+// чтение конфигурации токовых защит
+			else if ( usConfigStartMTZ  == MemForSave) {
+				eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,ucConfigBufMTZ, usConfigStartMTZ, MB_NumbConfigMTZ);
+				if( eRegStatus == MB_ENOERR ){
+					USART_TRACE_GREEN("%d. Получили конфигурацию токовых защит.\n",ReadNmb);
+				}
+				ReadNmb++;
+			}
+// чтение конфигурации дополнительных защит
+			else if ( usConfigStartI2I1I0  == MemForSave) {
+				eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,ucConfigBufI2I1I0, usConfigStartI2I1I0, MB_NumbConfigI2I1I0);
+				if( eRegStatus == MB_ENOERR ){
+					USART_TRACE_GREEN("%d. Получили конфигурацию дополнительных защит.\n",ReadNmb);
+				}
+				ReadNmb++;
+			}
+#endif
+#if !defined (MR5_500)
 // чтение конфигурации защиты по частоте
 			else if ( usConfigStartF  == MemForSave) {
 				eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,ucConfigBufF, usConfigStartF, MB_NumbConfigF);
@@ -888,6 +965,17 @@ eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
 				}
 				ReadNmb++;
 			}
+#if !defined (MR5_600)
+// чтение конфигурации защиты по напряжению
+			else if ( usConfigStartU  == MemForSave) {
+				eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,ucConfigBufU, usConfigStartU, MB_NumbConfigU);
+				if( eRegStatus == MB_ENOERR ){
+					USART_TRACE_GREEN("%d. Получили конфигурацию защиты по напряжению.\n",ReadNmb);
+				}
+				ReadNmb++;
+			}
+#endif
+#if defined (MR5_600)
 // чтение конфигурации защиты по напряжению
 			else if (( usConfigStartU <= MemForSave) &&(MemForSave < (usConfigStartU+MB_NumbConfigU-1))){
 
@@ -895,14 +983,16 @@ eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
 				xModbus_Get_SizeAnswer((uint8_t *)&SizeAnswer);
 				SizeAnswer -= SizeAddr+SizeFunct+1+SizeCRC;
 				SizeAnswer = SizeAnswer>>1;
-				eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,(USHORT *)&ucConfigBufU[MemForSave-usConfigStartU], MemForSave, SizeAnswer);
+	            eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,(USHORT *)&ucConfigBufU[MemForSave-usConfigStartU], MemForSave, SizeAnswer);
 
-				if( eRegStatus == MB_ENOERR ){
-					USART_TRACE_GREEN("%d. Получили конфигурацию защиты по напряжению.\n",ReadNmb);
-					NumbBlokReadMB++;
-				}
-
+                if( eRegStatus == MB_ENOERR ){
+                	USART_TRACE_GREEN("%d-%d. Получили конфигурации защиты по напряжению.(0x%X)\n",ReadNmb,NumbBlokReadMB,MemForSave);
+                	NumbBlokReadMB++;
+                }
 			}
+#endif
+
+#endif
 /*
 			else if ( usConfigStartU  == MemForSave) {
 				eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,ucConfigBufU, usConfigStartU, MB_NumbConfigU);
@@ -918,32 +1008,37 @@ eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
 				if( eRegStatus == MB_ENOERR ){
 					USART_TRACE_GREEN("%d. Получили записи журнала системы. код:%u\n",ReadNmb,ucSysNoteBuf[0]);
 				}
+
 				//сравним с моей последней записью, если нет адрес инкрементим и покатили дальше читать GlobalAddrSysNote++;
-                if ((memcmp(ucSysNoteBuf, ucSysNoteBufPre,MB_NumbSysNote*2) == 0) || (ucSysNoteBuf[0] == 0)|| (GlobalAddrSysNote >= MB_SizeSysNote-1) ){
+                if (/*(memcmp(ucSysNoteBuf, ucSysNoteBufPre,MB_NumbSysNote*2) == 0) || */(ucSysNoteBuf[0] == 0)|| (GlobalAddrSysNote >= MB_SizeSysNote-1) ){
                 	// нашли нашу запись, можно читать уставки
                 	if (getJurnals)	ReadNmb++;
                 	else 			ReadNmb = MB_Rd_AllUstavki;
                 	usSysNoteStart = MB_StartSysNoteaddr;
                 	GlobalAddrSysNote = 0;		// число новых записей
                 	memcpy(ucSysNoteBufPre, ucSysNoteBufNext,MB_NumbSysNote*2);
-                } else{
+                }
+                else{
+
                     if (GlobalAddrSysNote == 0) 	memcpy(ucSysNoteBufNext, ucSysNoteBuf,MB_NumbSysNote*2);			// запомнил последнюю запись для следующего сравнения
 
-  //                  AddToFileMessageWord(_SystemNote,(uint8_t*)ucSysNoteBuf,MB_NumbSysNote*2,FA_OPEN_APPEND | FA_WRITE);
+                    AddToFileMessageWord(_SystemNote,(uint8_t*)ucSysNoteBuf,MB_NumbSysNote*2,FA_OPEN_APPEND | FA_WRITE);
                 	// инкрементим и покатили дальше читать
                 	usSysNoteStart += MB_NumbSysNote+MB_NumbSysNoteASCII;
                 	GlobalAddrSysNote++;		// число новых записей
                 	ReadNmb = MB_Rd_SysNote;	// снова читаем
+                	AddToQueueMB(Rd_SysNoteQueue, 	MB_Rd_SysNote		,MB_Slaveaddr);
+
                 }
 			}
 // чтение записи в журнале аварий
 			else if ( usErrorNoteStart  == MemForSave) {
-				eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,ucErrorNoteBuf, usErrorNoteStart, MB_NumbSysNote);
+				eRegStatus = eMBMasterToMemDB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], usRegAddress, usRegCount,ucErrorNoteBuf, usErrorNoteStart, MB_NumbErrorNote);
 				if( eRegStatus == MB_ENOERR ){
-					USART_TRACE_GREEN("%d. Получили записи журнала системы. код:%u\n",ReadNmb,ucErrorNoteBuf[0]);
+					USART_TRACE_GREEN("%d. Получили записи журнала аварий. код:%u\n",ReadNmb,ucErrorNoteBuf[0]);
 				}
 				//сравним с моей последней записью, если нет адрес инкрементим и покатили дальше читать GlobalAddrSysNote++;
-				if ((memcmp(ucErrorNoteBuf, ucErrorNoteBufPre,MB_NumbErrorNoteTime*2) == 0) || (ucErrorNoteBuf[0] == 0)|| (GlobalAddrErrorNote >= MB_SizeErrorNote-1) ){
+				if (/*(memcmp(ucErrorNoteBuf, ucErrorNoteBufPre,MB_NumbErrorNoteTime*2) == 0) || */(ucErrorNoteBuf[0] == 0)|| (GlobalAddrErrorNote >= MB_SizeErrorNote-1) ){
 					// нашли нашу запись, можно читать дальше
                 	//if (getJurnals)	ReadNmb++;
                 	//else 			ReadNmb = MB_Rd_Discreet;;
@@ -955,11 +1050,12 @@ eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
 				} else{
 					if (GlobalAddrErrorNote == 0) 	memcpy(ucErrorNoteBufNext, ucErrorNoteBuf,MB_NumbErrorNoteTime*2);			// запомнил последнюю запись для следующего сравнения
 
-	//				AddToFileMessageWord(_ErrorNote,(uint8_t*)ucErrorNoteBuf,MB_NumbErrorNote*2,FA_OPEN_APPEND | FA_WRITE);
+					AddToFileMessageWord(_ErrorNote,(uint8_t*)ucErrorNoteBuf,MB_NumbErrorNote*2,FA_OPEN_APPEND | FA_WRITE);
 					// инкрементим и покатили дальше читать
-					usErrorNoteStart += MB_NumbErrorNote+MB_NumbErrorNoteASCII;
+					usErrorNoteStart += MB_NextErrorNote;//MB_NumbErrorNote+MB_NumbErrorNoteASCII;
 					GlobalAddrErrorNote++;		// число новых записей
 					ReadNmb = MB_Rd_ErrorNote;	// снова читаем
+					AddToQueueMB(Rd_ErrorNoteQueue, MB_Rd_ErrorNote		,MB_Slaveaddr);
 				}
 			}
 
@@ -1123,7 +1219,7 @@ eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
 /***********************************************************************************
  * MR5_500
  ***********************************************************************************/
-#if defined (MR5_500)
+#if defined (MR5_500_)
 eMBException	eMBMasterFuncReadRegisters( UCHAR * pucFrame, USHORT * usLen )
 {
 	extern uint64_t nextSynchTime;

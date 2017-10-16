@@ -266,10 +266,15 @@ void	Set_MSQI	(uint8_t num, uint64_t currentTime ){
 /*******************************************************
  * MR5_700
  *******************************************************/
+#if defined	(MR5_700) || defined	(MR5_500)
+
 #if defined	(MR5_700)
-
 #include "static_model_MR5_700.h"
+#endif
 
+#if defined	(MR5_500)
+#include "static_model_MR5_500.h"
+#endif
 
 extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
 extern uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
@@ -365,8 +370,9 @@ void	Set_MSQI	(uint8_t num, uint64_t currentTime ){
 
 		}
 
-		IedServer_updateInt32AttributeValue(iedServer,&iedModel_MES_MSQI1_SeqU_SeqT, _SeqT);
 
+#if defined	(MR5_700)
+		IedServer_updateInt32AttributeValue(iedServer,&iedModel_MES_MSQI1_SeqU_SeqT, _SeqT);
 /*************************************************************************
  * аналоговый модуль напряжений
  *************************************************************************/
@@ -393,6 +399,7 @@ void	Set_MSQI	(uint8_t num, uint64_t currentTime ){
 			if (IedServer_updateFloatAttributeValue(iedServer,&iedModel_MES_MSQI1_SeqU_c3_cVal_mag_f,mag))
 				IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_MES_MSQI1_SeqU_c3_t, currentTime);
 		}
+#endif // defined(MR5_700) аналоговый модуль напряжений
 }
 #endif
 /*******************************************************

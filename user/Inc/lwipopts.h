@@ -134,7 +134,7 @@
 #define LWIP_MULTICAST_PING             0
 
 //extern RNG_HandleTypeDef RngHandle;
-#define LWIP_IGMP                       0
+#define LWIP_IGMP                       0//0
 //#define LWIP_RAND()                    HAL_RNG_GetRandomNumber(&RngHandle)//vRndGen_GetValue()
 
 /* ---------- Statistics options ---------- */

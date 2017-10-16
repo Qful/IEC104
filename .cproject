@@ -692,6 +692,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/FatFs/drivers}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/FatFs/option}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/DebugConsole}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Program Files (x86)\CodeSourcery\arm-none-eabi\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Program Files (x86)\CodeSourcery\lib\gcc\arm-none-eabi\4.8.3\include-fixed&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Program Files (x86)\CodeSourcery\lib\gcc\arm-none-eabi\4.8.3\include&quot;"/>
 								</option>
 								<option id="org.eclipse.cdt.cross.arm.gnu.assembler.option.preprocessor.def.26827064" name="Defined symbols (-D)" superClass="org.eclipse.cdt.cross.arm.gnu.assembler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="MR5_500"/>
@@ -753,6 +756,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/FatFs/drivers}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/FatFs/option}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/DebugConsole}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Program Files (x86)\CodeSourcery\arm-none-eabi\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Program Files (x86)\CodeSourcery\lib\gcc\arm-none-eabi\4.8.3\include-fixed&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Program Files (x86)\CodeSourcery\lib\gcc\arm-none-eabi\4.8.3\include&quot;"/>
 								</option>
 								<option id="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.preprocessor.def.2051509657" name="Defined symbols (-D)" superClass="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="MR5_500"/>

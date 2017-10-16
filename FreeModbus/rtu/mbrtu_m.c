@@ -230,15 +230,15 @@ eMBMasterRTUSend( UCHAR ucSlaveAddress, const UCHAR * pucFrame, USHORT usLength 
         eSndState = STATE_M_TX_XMIT;
         xMBMasterPortSerialPutBUF(( CHAR *)pucMasterSndBufferCur,usMasterSndBufferCount);						// передадим в порт весь блок сразу
         xFrameIsBroadcast = ( ucMasterRTUSndBuf[MB_SER_PDU_ADDR_OFF] == MB_ADDRESS_BROADCAST ) ? TRUE : FALSE;	// определяем широковещательный ли ?
-
-    }
+     }
     else
     {
         eStatus = MB_EIO;					// I/O ошибка.
         // временно для проверки. нужно найти причину застревания на приеме. висит статус STATE_M_RX_RCV
-    	USART_TRACE_RED("I/O ошибка. r:%u t:%u\n",eRcvState,eSndState);
+//    	USART_TRACE_RED("I/O ошибка. r:%u t:%u\n",eRcvState,eSndState);
 
-		eRcvState = STATE_M_RX_IDLE;
+//		eRcvState = STATE_M_RX_IDLE;
+
     }
     EXIT_CRITICAL_SECTION(  );
     return eStatus;
@@ -273,12 +273,16 @@ xMBMasterRTUReceiveFSM( void )
     	vMBMasterPortTimersT35Enable( );
         break;
 
+    case STATE_M_RX_RCV:
     case STATE_M_RX_IDLE:
     	eSndState = STATE_M_TX_IDLE;
         if(usMasterRcvBufferPos < MB_SER_PDU_SIZE_MAX )	eRcvState = STATE_M_RX_RCV;			// приняли фрейм.
         else    										eRcvState = STATE_M_RX_ERROR;		// Если символов больше чем макс. возможный размер фрейма, то ошибка фрейма.
 
-        xMBMasterPortEventPost(EV_MASTER_FRAME_RECEIVED);			// всё, приняли. Не будем ждать окончания таймаута приема
+       	vMBMasterPortTimersDisable( );										// Останавливаем таймер.
+
+        xMBMasterPortEventPost(EV_MASTER_FRAME_RECEIVED);					// всё, приняли. Не будем ждать окончания таймаута приема
+
         break;
 
     }
@@ -307,6 +311,8 @@ xMBMasterRTUTransmitFSM( void )
 				vMBMasterPortTimersConvertDelayEnable( );				// Таймаут для широковещательного пакета.
 		else   	vMBMasterPortTimersRespondTimeoutEnable( );				// Таймаут для не широковещательного пакета.
 
+//		Port_Off(LED1);
+
         break;
 
 // эти состояния не могут возникнуть. Прерывания возникают только в режиме STATE_M_TX_XMIT
@@ -328,6 +334,7 @@ xMBMasterRTUTimerExpired(void)
 {
 	BOOL xNeedPoll = FALSE;
 
+
 	// Прием
 	switch (eRcvState)
 	{
@@ -338,6 +345,9 @@ xMBMasterRTUTimerExpired(void)
 		if (eSndState == STATE_M_TX_XFWR)
 			vMBMODBUSPortRxDisable();
 		eRcvState = STATE_M_RX_IDLE;
+//		Port_On(LED1);
+		xMBMasterPortEventClear(EV_MASTER_FRAME_RECEIVE_WAIT);			// ну и ладно, ждать нечего.
+
 		break;
 	case STATE_M_RX_RCV:												// Был получен фрейм и таймаут t3.5 истек. Сообщаем слушателю, что был получен новый фрейм .
 		xNeedPoll = xMBMasterPortEventPost(EV_MASTER_FRAME_RECEIVED);	// фрейм принят.
@@ -378,6 +388,8 @@ xMBMasterRTUTimerExpired(void)
 	if (eMasterCurTimerMode == MB_TMODE_CONVERT_DELAY) {
 		xNeedPoll = xMBMasterPortEventPost( EV_MASTER_EXECUTE );
 	}
+
+//	USART_TRACE_RED("xMBMasterRTUTimerExpired\n");
 
 	return xNeedPoll;
 }

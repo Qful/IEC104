@@ -97,9 +97,12 @@ volatile uint8_t	SNTP_IP_ADDR[4] = {192,168,0,122};//адрес SNTPсервера
 volatile uint16_t	SNTP_Period		= 0;
 volatile int8_t		TimeZone_my		= +3;
 
-int16_t		ppm;
+RTC_TimeTypeDef lastSynchTime;
+RTC_DateTypeDef lastSynchDate;
 
-uint8_t		NTP_IP[16];// = "192.168.000.122";
+int16_t		ppm;
+int16_t		lostSNTPPackets = 0;
+uint8_t		NTP_IP[16];				// = "192.168.000.122";
 
 /*************************************************************************
  * MR5_700
@@ -204,6 +207,7 @@ uint16_t   usMAnalogInStart = MB_StartAnalogINaddr;
 uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
 //---------------------------------------------------
 
+
 uint16_t   usConfigUstavkiStart = MB_StartConfig;			// общие уставки
 uint16_t   ucUstavkiInBuf[MB_NumbUstavki];
 
@@ -228,8 +232,23 @@ uint16_t   ucConfigBufU[MB_NumbConfigU];
  *************************************************************************/
 #if defined (MR5_500)
 
-uint16_t   usMDateStart = MB_StartDateNaddr;		// адрес
-uint16_t   ucMDateBuf[MB_NumbDate];					// буфер для хранения
+// журнал системы -----------------------
+uint16_t   usSysNoteStart = MB_StartSysNoteaddr;
+uint16_t   ucSysNoteBuf[MB_NumbSysNote];
+
+uint16_t   ucSysNoteBufPre[MB_NumbSysNote];								// последняя запись для поиска
+uint16_t   ucSysNoteBufNext[MB_NumbSysNote];							// последняя запись
+
+// журнал аварий -----------------------
+uint16_t   usErrorNoteStart = MB_StartErrorNoteaddr;
+uint16_t   ucErrorNoteBuf[MB_NumbErrorNote];
+
+uint16_t   ucErrorNoteBufPre[MB_NumbErrorNoteTime];
+uint16_t   ucErrorNoteBufNext[MB_NumbErrorNoteTime];
+
+// --------------------------------------
+uint16_t   usMDateStart = MB_StartDateNaddr;
+uint16_t   ucMDateBuf[MB_NumbDate];
 
 //Master mode: База данных Версии
 uint16_t   usMRevStart = MB_StartRevNaddr;
@@ -238,21 +257,37 @@ uint16_t   ucMRevBuf[MB_NumbWordRev];
 //Master mode: База данных дискретных сигналов
 uint16_t   usMDiscInStart = MB_StartDiscreetaddr;
 uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
-
 //Master mode: База данных аналоговых сигналов
 uint16_t   usMAnalogInStart = MB_StartAnalogINaddr;
 uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+//---------------------------------------------------
+uint16_t   usConfigStartSWCrash = MB_StartSWCrash;			// ресурс выключателя
+uint16_t   ucSWCrash[MB_NumbSWCrash];
 
-//Master mode: База уставок
-uint16_t   usMConfigStart = MB_StartConfigNaddr;
-uint16_t   ucMConfigBuf[MB_NumbConfig];
+uint16_t   usConfigStartSW = MB_StartConfigSW;				// конфигурация Выключателя
+uint16_t   ucConfigBufSW[MB_NumbConfigSW];
 
-//Master mode: База уставок
-uint16_t   usMConfigStartall = MB_StartConfig;
-uint16_t   ucMConfigBufall[MB_NumbConfigall];
+uint16_t   usConfigUstavkiStart = MB_StartConfig;			// общие уставки
+uint16_t   ucUstavkiInBuf[MB_NumbUstavki];
 
-uint16_t   usMConfigStartSWCrash = MB_StartSWCrash;
-uint16_t   ucMSWCrash[MB_NumbSWCrash];
+uint16_t   usConfigAutomatStart = MB_StartAutomat;			// параметры автоматики
+uint16_t   ucAutomatBuf[MB_NumbAutomat];
+
+uint16_t   usConfigOutStart = MB_StartConfigOut;			// чтение конфигурации выходных сигналов
+uint16_t   ucOutSignalBuf[MB_NumbConfigOut];
+
+uint16_t   usSystemCfgStart = MB_StartSystemCfg;			// параметры системы
+uint16_t   ucSystemCfgBuf[MB_NumbSystemCfg];
+
+uint16_t   usConfigStartExZ = MB_StartConfigExZ;			// конфигурация внешних защит
+uint16_t   ucConfigBufExZ[MB_NumbConfigExZ];
+
+uint16_t   usConfigStartMTZ = MB_StartConfigMTZ_SG0;		// конфигурация токовых защит
+uint16_t   ucConfigBufMTZ[MB_NumbConfigMTZ];
+
+uint16_t   usConfigStartI2I1I0 = MB_StartConfigI2I1I0_SG0;	// конфигурация Дополнительные защиты
+uint16_t   ucConfigBufI2I1I0[MB_NumbConfigI2I1I0];
+
 #endif
 /*************************************************************************
  * MR771
@@ -497,6 +532,8 @@ volatile UART_HandleTypeDef RS485_2;			//USART3
 volatile SPI_HandleTypeDef SpiHandle;			// память на шине SPI
 
 volatile uint16_t	xMasterOsEvent;				// хранилище событий порта MODBUS
+volatile uint16_t	xMasterOsEventCnt = 0;		// счетчик пропусков из-за ожидания ответа
+
 
 extern osThreadId IEC850TaskHandle;
 extern osThreadId MBUSTaskHandle;
@@ -607,6 +644,7 @@ int main(void) {
 	__set_PRIMASK(1);//отключить все прерывания
 	    NVIC_SetVectorTable(NVIC_VectTab_FLASH, 0x20000); 						//Адрес таблицы относительно начала Flash
 	__set_PRIMASK(0);//включить все прерывания
+
 
 	  HAL_Init();						// инит. Flash и Systick.
 	  SystemClock_Config();				// когфиг осциллятора.
@@ -930,7 +968,7 @@ uint32_t xGetRunTimeCounterValue( void )
 void 	printfTime (void){
 	RTC_TimeTypeDef sTime;
 	RTC_DateTypeDef sDate;
-	char WriteBuffer[24];
+	char WriteBuffer[30];	//24
 
 		HAL_RTC_GetTime((RTC_HandleTypeDef *)&hrtc, &sTime, FORMAT_BIN);			// Читаем время
 		HAL_RTC_GetDate((RTC_HandleTypeDef *)&hrtc, &sDate, FORMAT_BIN);			// читаем дату
@@ -939,7 +977,7 @@ void 	printfTime (void){
 
 		uint16_t mst = (1000 - (sTime.SubSeconds * 1000 / hrtc.Init.SynchPrediv));
 
-		sprintf( WriteBuffer, "[%02d.%02d %02d:%02d:%02d.%03u] ",sDate.Date,sDate.Month,sTime.Hours,sTime.Minutes,sTime.Seconds,(uint16_t)mst);
+		sprintf( WriteBuffer, "[%02d.%02d.%04d %02d(%02d):%02d:%02d.%03u] ",sDate.Date,sDate.Month,2000+sDate.Year,sTime.Hours,sTime.TimeFormat,sTime.Minutes,sTime.Seconds,(uint16_t)mst);
 		USART_0TRACE(WriteBuffer);
 
 //		vPortFree(WriteBuffer);

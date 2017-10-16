@@ -34,7 +34,7 @@
 #include "sntpclient.h"
 #include "lwip/sockets.h"
 
-
+#include "modbus.h"
 //int iTimeZone = 3600 * Timezone;
 
 enum EStatus {
@@ -53,7 +53,6 @@ uint64_t	TravelTimeMs;
 
 static char cRecvBuffer[ sizeof( struct SNtpPacket ) + 64 ];
 
-
 static enum EStatus xStatus = EStatusLookup;
 
 static int xUDPSocket = NULL;
@@ -63,9 +62,23 @@ void 		prvNTPPacketInit(void);
 
 BOOL		Hal_setTimeToMB_Date( uint16_t * MDateBuf );
 
+// очереди -----------------------------
+extern xQueueHandle 	ModbusSentTime;		// очередь для отправки в модбас
+extern xQueueHandle 	ModbusSentQueue;		// очередь для отправки в модбас
+
+
+extern bool			SetTimeNow;
 extern uint8_t		writeNmb;
 extern uint16_t		SNTP_Period;
 extern int8_t		TimeZone_my;
+/*  Часы ------------------------------------------------------------*/
+extern RTC_HandleTypeDef hrtc;
+/*  -----------------------------------------------------------------*/
+extern	RTC_TimeTypeDef lastSynchTime;
+extern	RTC_DateTypeDef lastSynchDate;
+
+extern	int16_t	lostSNTPPackets;
+
 /*****************************************************************************************************
  * void sntp_client_serve(Socket self)
  *
@@ -91,6 +104,7 @@ int sntp_client_serve(Socket self, const char* address, int port, int sent){
 
         prepareServerAddress(address, port, &serverAddress);
 
+        if (lostSNTPPackets < 30000)	lostSNTPPackets++;						// подсчет потеряных пакетов
         startSendTimeMs = Hal_getTimeInMs();
 //		uxSendTime = xTaskGetTickCount();		// запоминаем время отправки
 		ret = sendto( conn, ( void * )&xNTPPacket, sizeof(xNTPPacket), 0, (struct sockaddr *) &serverAddress, AddressSizeFrom );	// адрес и порт получателя дэйтаграммы.
@@ -122,7 +136,16 @@ int sntp_client_serve(Socket self, const char* address, int port, int sent){
 		}
 		else
 		{
+			// приняли сообщение от сервера времени. Нужно указать что не нужно брать время из модбаса
 			prvReadTime( ( struct SNtpPacket *)recv_buffer );		// расшифровываем время
+
+			lostSNTPPackets = 0;
+			//if (lostSNTPPackets )	lostSNTPPackets--;						// подсчет потеряных пакетов
+
+		    // получили время последней синхронизации времени.
+			  HAL_RTC_GetTime((RTC_HandleTypeDef *)&hrtc, &lastSynchTime, FORMAT_BIN);
+			  HAL_RTC_GetDate((RTC_HandleTypeDef *)&hrtc, &lastSynchDate, FORMAT_BIN);
+
 		}
 		  return 1;
 	  // --------------------------------------------------------------
@@ -186,7 +209,7 @@ void prvNTPPacketInit(void)
 
 /*****************************************************************************************************
  * static void prvReadTime( struct SNtpPacket * pxPacket )
- * нужно доделать учет времени паспространения сигнала
+ * нужно доделать учет времени распространения сигнала
  *****************************************************************************************************/
 //#define		StrobeSynchTime		11
 #define		Secunda				1000
@@ -201,7 +224,6 @@ static void prvReadTime( struct SNtpPacket * pxPacket )
 	uint16_t		DelayTimeMS;
 
 	uint16_t		StrobeSynchTime;
-
 
 	uint16_t		DelayTimeMSForWait = 0;
 
@@ -284,10 +306,16 @@ static void prvReadTime( struct SNtpPacket * pxPacket )
     // калибровка ухода часов
     Hal_setCalibrTime(SNTP_Period,(int16_t)CorrectTimeMS%1000);
 
-
-	writeNmb = 10;
-
-	USART_TRACE("время из NTP. уход:%i ms дробная:%u ms, ping:%u ms , пауза:%u ms\n",(int16_t)CorrectTimeMS,DelayTimeMS,(uint16_t)TravelTimeMs,DelayTimeMSForWait);
+    // установим часы только если ушли в сторону.
+    if (CorrectTimeMS != 0) {
+		writeNmb = MB_Wr_Set_Time;
+		SetTimeNow = true;
+		AddToQueueMB(ModbusSentTime, 	MB_Wrt_Set_Time		,MB_Slaveaddr);		// установка времени	ModbusSentTime
+		USART_TRACE_RED("время из NTP. уход:%i ms дробная:%u ms, ping:%u ms , пауза:%u ms\n",(int16_t)CorrectTimeMS,DelayTimeMS,(uint16_t)TravelTimeMs,DelayTimeMSForWait);
+		taskYIELD();// отпустим задачу. для быстрой установки времени
+    }else{
+    	USART_TRACE_GREEN("время из NTP. уход:%i ms дробная:%u ms, ping:%u ms , пауза:%u ms\n",(int16_t)CorrectTimeMS,DelayTimeMS,(uint16_t)TravelTimeMs,DelayTimeMSForWait);
+    }
 
 #else
 
@@ -369,6 +397,9 @@ BOOL	Hal_setTimeToMB_Date( uint16_t * MDateBuf ){
 //	USART_TRACE("Hal_getTimeInMs %u.%u.%u\n",sTime.Hours,sTime.Minutes,sTime.Seconds);
 
 	MDateBuf[3] = sTime.Hours;//+Timezone;
+//	if (sTime.TimeFormat == RTC_HOURFORMAT12_PM){
+//		MDateBuf[3] += 12;
+//	}
 	MDateBuf[4] = sTime.Minutes;
 	MDateBuf[5] = sTime.Seconds;
 	MDateBuf[6] = (1000 - (sTime.SubSeconds * 1000 / hrtc.Init.SynchPrediv)); //sTime.SubSeconds;

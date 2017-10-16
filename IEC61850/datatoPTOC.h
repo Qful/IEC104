@@ -34,7 +34,7 @@ void		Set_I20PTOC		(uint8_t num, uint64_t currentTime );
 void		Set_IARCPTOC	(uint8_t num, uint64_t currentTime );
 #endif
 
-#if defined	(MR5_700)
+#if defined	(MR5_700) || defined	(MR5_500)
 void		Set_IPTOC		(uint8_t num, uint64_t currentTime );
 void		Set_LZSHPTOC	(uint8_t num, uint64_t currentTime );
 void		Set_I2I1PTOC	(uint8_t num, uint64_t currentTime );

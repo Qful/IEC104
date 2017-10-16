@@ -212,6 +212,7 @@ bool	FileSystem_getFileInfo(char* filename, uint32_t* fileSize, uint64_t* lastMo
         	sDate.Date = FileInfo.fdate & 0b11111;
         	sDate.Month = FileInfo.fdate>>5 & 0b1111;
         	sDate.Year = FileInfo.fdate>>9 & 0b1111111;
+        	sDate.WeekDay = 0;
         	//sDate.Year += 10;
 
         	sTime.Seconds = (FileInfo.ftime & 0b11111)*2;

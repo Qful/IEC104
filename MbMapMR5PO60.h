@@ -56,6 +56,7 @@
 #define MB_StartErrorNoteaddr  		0x2800
 #define MB_NumbErrorNote			28			// число слов в одной аварии
 #define MB_NumbErrorNoteASCII		48			//
+#define MB_NextErrorNote			0x40		// приращение по журналу
 
 #define MB_NumbErrorNoteTime		8			// число слов времени события
 #define MB_SizeErrorNote	   		32			// число записей в журнале
@@ -640,7 +641,6 @@
 #define MB_addr_SysNote_OFF		0x1806
 #define MB_addr_ErrorNote_OFF	0x1807
 #define MB_CTRL_OFF				0xFF00
-
 
 // -----------------------------------
 #define MB_PerForSynchClock		1				// период пересинхронизации часов

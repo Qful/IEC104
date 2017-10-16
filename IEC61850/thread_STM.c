@@ -111,16 +111,17 @@ void	Semaphore_destroy(Semaphore xMutex)
 /*************************************************************************
  * Thread_create
  * ñîçäà¸ì (êîíôèãóğèì) ïîòîê
+ * ñîçäàåòñÿ òàñê äëÿ îáğàáîòêè.
  *************************************************************************/
 Thread	Thread_create(ThreadExecutionFunction function, void* parameter, bool autodestroy)
 {
 	   Thread thread = (Thread) GLOBAL_MALLOC(sizeof(struct sThread));
 
    if (thread != NULL) {
-		thread->parameter = parameter;
-		thread->function = function;
+		thread->parameter = parameter;			// ïàğàìåòğû äëÿ ôóíêöèè
+		thread->function = function;			// ôóíêöèÿ âûïîëíÿåìàÿ â (ïîòîêå)òàñêå
 		thread->state = 0;
-		thread->autodestroy = autodestroy;
+		thread->autodestroy = autodestroy;		// àâòîçàâåğøåíèå ïîòîêà.
    }
    return thread;
 }
@@ -147,17 +148,19 @@ static void	destroyAutomaticThread(void const *parameter)
  *************************************************************************/
 void	Thread_start(Thread thread)
 {
+	// ñîçäà¸ì è çàïóñêàåì òàñê îäèí ğàç, è ñğàçó æå óäàëÿåì.
 	if (thread->autodestroy == true) {
 		//pthread_create(&thread->pthread, NULL, destroyAutomaticThread, thread);
 		//pthread_detach(thread->pthread);
-		osThreadDef(USER_Thread, destroyAutomaticThread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE*8);
-		thread->pthread = osThreadCreate (osThread(USER_Thread), thread);
+		osThreadDef(GooseRe, destroyAutomaticThread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE*8);
+		thread->pthread = osThreadCreate (osThread(GooseRe), thread);
 
 	}
+	// ñîçäà¸ì è çàïóñêàåì òàñê.
 	else {
 		//pthread_create(&thread->pthread, NULL, thread->function, thread->parameter);
-		osThreadDef(USER_Thread, thread->function, osPriorityNormal, 0, configMINIMAL_STACK_SIZE*8);
-		thread->pthread = osThreadCreate (osThread(USER_Thread), thread->parameter);
+		osThreadDef(GooseRe, thread->function, osPriorityNormal, 0, configMINIMAL_STACK_SIZE*8);
+		thread->pthread = osThreadCreate (osThread(GooseRe), thread->parameter);
 	}
 
 	thread->state = 1;

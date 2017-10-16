@@ -419,10 +419,31 @@ updateDataSetsWithCachedValues(IedServer self)
         }
     }
 }
-
+/*************************************************************************
+ * IedServer_create
+ * надо иметь уникальное имя модели. будем добавлять к текущему [numb], последнее число IP адреса
+ *************************************************************************/
 IedServer
-IedServer_create(IedModel* iedModel)
+IedServer_create(IedModel* iedModel, uint16_t	numb)
 {
+	// ------------------------------------------------------------
+	// ------ добавим к имени уникальность
+	{
+		uint8_t	addIPtoName[50];
+		portCHAR pagehits[5];
+
+		memset(addIPtoName,0,50);
+		strcat((char *)addIPtoName,(const char *)iedModel->name);
+		sprintf(pagehits,"N%u",numb);
+		strcat((char *)addIPtoName, pagehits);
+
+		uint8_t	ln = strlen((const char *)addIPtoName);
+		iedModel->name = (char*)GLOBAL_MALLOC(ln);
+		memset(iedModel->name,0,ln);
+		strcat((char *)iedModel->name,(const char *)addIPtoName);
+	}
+	// ------------------------------------------------------------
+
     IedServer self = (IedServer) GLOBAL_CALLOC(1, sizeof(struct sIedServer));
 
     self->model = iedModel;

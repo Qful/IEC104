@@ -17,7 +17,25 @@
  *************************************************************************/
 #if defined (MR5_500)
 
-//Modbus  MR5-ПО70
+// константы.
+#define range_maxIphs				40		// диапазон токов по фазам
+#define range_minIphs				0
+#define range_maxI0					40
+#define range_minI0					0
+#define range_maxIn					5
+#define range_minIn					0
+
+#define range_maxU					256
+#define range_minU					0
+
+#define range_maxF					60
+#define range_minF					40
+
+#define range_maxCosF				1
+#define range_minCosF				0
+
+
+//Modbus  MR5-ПО50
 #define MB_Speed					115200
 #define MB_Slaveaddr   				1
 
@@ -58,19 +76,6 @@
 #define MB_offset_Itt			0x1001 - MB_StartConfig
 // первичный ток ТТНП -------------------------------------
 #define MB_offset_Ittnp			0x1002 - MB_StartConfig
-// коэффициент ТН -----------------------------------------
-#define MB_offset_Ktn			0x1009 - MB_StartConfig
-// коэффициент ТННП ---------------------------------------
-#define MB_offset_Ktnnp			0x100B - MB_StartConfig
-
-// конфигурация ОМП ---------------------------------------
-#define MB_StartConfig_OMP			0x100D - MB_StartConfig
-//конфигурация
-#define MB_offset_OMP_Config		0
-//Удельное индуктивное сопротивление линии
-#define MB_offset_OMP_Rline			1
-// биты
-#define MB_bOffset_OMP_Config_Stat	0b00001111
 
 // конфигурация выключателя -------------------------------------
 #define MB_StartConfigSW	   	0x1032			// конфигурация выключателя
@@ -164,51 +169,6 @@
 #define MB_offset_ConfI2I1			0x1108 - MB_StartConfigI2I1I0_SG0
 // биты
 #define MB_bOffset_I2I1_Config_Stat		0b11<<0
-
-// защиты по частоте ----------------------------------------------
-#define MB_StartConfigF_SG0  		0x1140
-#define MB_StartConfigF_SG1  		0x1160
-#define MB_NumbConfigF				MB_StartConfigF_SG1 - MB_StartConfigF_SG0 + 1
-
-// -------------------------------
-#define MB_offset_Fup				0x1140 - MB_StartConfigF_SG0
-#define MB_offset_Fup2				MB_offset_Fup+8
-// -------------------------------
-#define MB_offset_Fdn				0x1150 - MB_StartConfigF_SG0
-#define MB_offset_Fdn2				MB_offset_Fdn+8
-
-// Конфигурация
-#define MB_offset_Fup_Config		0
-#define MB_offset_Fdn_Config		0
-// биты
-#define MB_bOffset_Fup_Config_Stat	0b11
-#define MB_bOffset_Fdn_Config_Stat	0b11
-
-// защиты по напряжению -------------------------------------------
-#define MB_StartConfigU_SG0  		0x1180
-#define MB_StartConfigU_SG1  		0x11C0
-#define MB_NumbConfigU				MB_StartConfigU_SG1 - MB_StartConfigU_SG0 + 1
-
-// -------------------------------
-#define MB_offset_Uup				0x1180 - MB_StartConfigU_SG0
-#define MB_offset_Uup2				MB_offset_Uup+8
-// -------------------------------
-#define MB_offset_Udn				0x1190 - MB_StartConfigU_SG0
-#define MB_offset_Udn2				MB_offset_Udn+8
-// -------------------------------
-#define MB_offset_U2up				0x11A0 - MB_StartConfigU_SG0
-#define MB_offset_U2up2				MB_offset_U2up+8
-// -------------------------------
-#define MB_offset_U0up				0x11B0 - MB_StartConfigU_SG0
-#define MB_offset_U0up2				MB_offset_U0up+8
-
-// Конфигурация
-#define MB_offset_Uup_U_Config		0
-#define MB_offset_Udn_U_Config		0
-// биты
-#define MB_bOffset_Uup_U_Config_Stat	0b11
-#define MB_bOffset_Udn_U_Config_Stat	0b11
-
 
 // Параметры системы (они же IP адрес) ----------------------------
 #define MB_StartSystemCfg			0x1270
@@ -706,7 +666,7 @@
 
 // ------------------------------------------
 #define MB_StartAnalogINaddr   	0x1900
-#define MB_NumbAnalog   		23		//22
+#define MB_NumbAnalog   		8		//22
 
 #define MB_offset_In			0x00
 #define MB_offset_Ia			0x01
@@ -717,26 +677,7 @@
 #define MB_offset_NI1			0x05
 #define MB_offset_NI2			0x06
 
-#define MB_offset_Un			0x08
-#define MB_offset_Ua			0x09
-#define MB_offset_Ub			0x0A
-#define MB_offset_Uc			0x0B	//11
-
-#define MB_offset_Uab			12
-#define MB_offset_Ubc			13
-#define MB_offset_Uca			14
-
-#define MB_offset_NU0			15
-#define MB_offset_NU1			16
-#define MB_offset_NU2			17
-
-
-#define MB_offset_Hz			18
-#define MB_offset_TotPF			19
-#define MB_offset_TotW			20
-#define MB_offset_TotVAr		21
-#define MB_offset_OMP			22
-
+// ------------------------------------------
 #define MB_StartDateNaddr   	0x0200
 #define MB_NumbDate		   		7
 

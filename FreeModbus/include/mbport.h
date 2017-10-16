@@ -51,14 +51,16 @@ typedef enum
 typedef enum
 {
     EV_MASTER_READY                    = 1<<0,  /*!< Startup finished. */
-    EV_MASTER_FRAME_RECEIVED           = 1<<1,  /*!< Frame received. */
-    EV_MASTER_EXECUTE                  = 1<<2,  /*!< Execute function. */
+    EV_MASTER_FRAME_RECEIVED           = 1<<1,  /*!< Frame received. */			// можно выполеять после EV_MASTER_EXECUTE. т.к. данные ещё лежат в нём.
+    EV_MASTER_EXECUTE                  = 1<<2,  /*!< Execute function. */		//
     EV_MASTER_FRAME_SENT               = 1<<3,  /*!< Frame sent. */
     EV_MASTER_ERROR_PROCESS            = 1<<4,  /*!< Frame error process. */
     EV_MASTER_PROCESS_SUCESS           = 1<<5,  /*!< Request process success. */
     EV_MASTER_ERROR_RESPOND_TIMEOUT    = 1<<6,  /*!< Request respond timeout. */
     EV_MASTER_ERROR_RECEIVE_DATA       = 1<<7,  /*!< Request receive data error. */
     EV_MASTER_ERROR_EXECUTE_FUNCTION   = 1<<8,  /*!< Request execute function error. */
+    EV_MASTER_FRAME_RECEIVE_WAIT	   = 1<<9,  // ожидаем ответа от слэйва. Нельзя слать новый запрос.
+
 } eMBMasterEventType;
 
 typedef enum
@@ -92,6 +94,8 @@ BOOL            xMBPortEventGet(  /*@out@ */ eMBEventType * eEvent );
 BOOL            xMBMasterPortEventInit( void );
 
 BOOL            xMBMasterPortEventPost( eMBMasterEventType eEvent );
+
+BOOL            xMBMasterPortEventClear( eMBMasterEventType eEvent );
 
 BOOL            xMBMasterPortEventGet(  /*@out@ */ eMBMasterEventType * eEvent );
 

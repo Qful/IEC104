@@ -29,10 +29,19 @@
 #include <linux/inet.h>
 #include <unistd.h>
 
+#include <linux/bpf.h>
+#include <linux/ioctl.h>
+
+#include <fcntl.h>
+
+#include <lwip/api.h>
+
 #include <string.h>
 
 #include "libiec61850_platform_includes.h"
 #include "hal_ethernet.h"
+
+#include "hal_socket.h"
 
 #define ETH_ALEN		6		/* Octets in one ethernet addr	 */
 #define ETH_P_ALL	0x0003		/* Every packet (be careful!!!) */
@@ -52,61 +61,59 @@
 #define PF_PACKET	AF_PACKET
 
 
+int	ioctl __P((int, unsigned long, ...));
+
+//BSD
+/*
+struct sEthernetSocket {
+    int bpf;                        // BPF device handle.
+    uint8_t *bpfBuffer;             // Pointer to the BPF reception buffer.
+    int bpfBufferSize;              // Actual size of the BPF reception buffer.
+    uint8_t *bpfPositon;            // Actual read pointer on the BPF reception buffer.
+    uint8_t *bpfEnd;                // Pointer to the end of the BPF reception buffer.
+    struct bpf_program bpfProgram;  // BPF filter machine code program.
+};
+*/
 
 struct sEthernetSocket {
     int rawSocket;
     bool isBind;
-    struct sockaddr_ll socketAddress;
+    //struct sockaddr_in socketAddress;
+    struct sockaddr socketAddress;
+    //struct sockaddr_ll socketAddress;
 };
 
+/*************************************************************************
+ * getInterfaceIndex
+ *************************************************************************/
 static int
 getInterfaceIndex(int sock, const char* deviceName)
 {
-	/*
     struct ifreq ifr;
 
     strncpy(ifr.ifr_name, deviceName, IFNAMSIZ);
 
-    if (ioctl(sock, SIOCGIFINDEX, &ifr) == -1) {
-        perror("ETHERNET_LINUX: Failed to get interface index -> exit");
-        exit(1);
-    }
-
     int interfaceIndex = ifr.ifr_ifindex;
 
-    if (ioctl (sock, SIOCGIFFLAGS, &ifr) == -1)
-    {
-        perror ("ETHERNET_LINUX: Problem getting device flags -> exit");
-        exit (1);
-    }
-
-    ifr.ifr_flags |= IFF_PROMISC;
-    if (ioctl (sock, SIOCSIFFLAGS, &ifr) == -1)
-    {
-        perror ("ETHERNET_LINUX: Setting device to promiscuous mode failed -> exit");
-        exit (1);
-    }
-
     return interfaceIndex;
-    */
 }
-
-
+/*************************************************************************
+ * Ethernet_getInterfaceMACAddress
+ *************************************************************************/
 void
 Ethernet_getInterfaceMACAddress(const char* interfaceId, uint8_t* addr)
 {
-	/*
     struct ifreq buffer;
 
-    int sock = socket(PF_INET, SOCK_DGRAM, 0);
+//    int sock = socket(PF_INET, SOCK_GOOSE, 0);//SOCK_GOOSE
 
     memset(&buffer, 0x00, sizeof(buffer));
 
     strcpy(buffer.ifr_name, interfaceId);
 
-    ioctl(sock, SIOCGIFHWADDR, &buffer);
+//    ioctl(sock, SIOCGIFHWADDR, &buffer);
 
-    close(sock);
+//    close(sock);
 
     int i;
 
@@ -114,23 +121,23 @@ Ethernet_getInterfaceMACAddress(const char* interfaceId, uint8_t* addr)
     {
         addr[i] = (unsigned char)buffer.ifr_hwaddr.sa_data[i];
     }
-    */
 }
-
-
+/*************************************************************************
+ * Ethernet_createSocket
+ * тут работаем с MAC адресами.
+ *************************************************************************/
 EthernetSocket
 Ethernet_createSocket(const char* interfaceId, uint8_t* destAddress)
 {
     EthernetSocket ethernetSocket = GLOBAL_CALLOC(1, sizeof(struct sEthernetSocket));
-
-    ethernetSocket->rawSocket = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+    ethernetSocket->rawSocket = socket(AF_INET, SOCK_GOOSE, htons(ETH_P_ALL));//AF_PACKET
 
     if (ethernetSocket->rawSocket == -1) {
         printf("Error creating raw socket!\n");
         GLOBAL_FREEMEM(ethernetSocket);
         return NULL;
     }
-
+/*
     ethernetSocket->socketAddress.sll_family = PF_PACKET;
     ethernetSocket->socketAddress.sll_protocol = htons(ETH_P_IP);
 
@@ -145,25 +152,54 @@ Ethernet_createSocket(const char* interfaceId, uint8_t* destAddress)
 
     if (destAddress != NULL)
         memcpy(ethernetSocket->socketAddress.sll_addr, destAddress, 6);
+*/
+/*
+    ethernetSocket->socketAddress.sa_family = AF_INET;//PF_PACKET;
+
+    memset(ethernetSocket->socketAddress.sa_data, 0, 14);
+    ethernetSocket->socketAddress.sa_len = 6;
+
+    if (destAddress != NULL) {
+        memcpy(ethernetSocket->socketAddress.sa_data, destAddress, 6);
+        ethernetSocket->socketAddress.sa_len = 6;
+    }
+
+*/
+//    struct sockaddr_in GooseServerAddress;
+//    prepareServerAddress((const char*)destAddress,0,&GooseServerAddress);
+//    memcpy((void*)&ethernetSocket->socketAddress,(void*)&GooseServerAddress, sizeof(struct sockaddr_in));
+    ethernetSocket->socketAddress.sa_family = AF_INET;
+    memset(ethernetSocket->socketAddress.sa_data, 0, 14);
+    ethernetSocket->socketAddress.sa_len = 6;
 
     ethernetSocket->isBind = false;
 
     return ethernetSocket;
 }
 
+/*************************************************************************
+ * Ethernet_setProtocolFilter
+ *************************************************************************/
 void
 Ethernet_setProtocolFilter(EthernetSocket ethSocket, uint16_t etherType)
 {
-    ethSocket->socketAddress.sll_protocol = htons(etherType);
+
+//	ethSocket->socketAddress.sa_len = 6;
+//    ethSocket->socketAddress.sa_family = htons(etherType);
 }
 
-
-/* non-blocking receive */
-int
-Ethernet_receivePacket(EthernetSocket self, uint8_t* buffer, int bufferSize)
+/*************************************************************************
+ * Ethernet_receivePacket
+ * non-blocking receive
+ * у этого сокета нет не адреса ни порта. Принимаем широковещательные пакеты.
+ * Возможно у нас должен быть порт открыт а адрес нужно вбить мак ожидаемого пакета
+ *************************************************************************/
+int		Ethernet_receivePacket(EthernetSocket self, uint8_t* buffer, int bufferSize)
 {
+
     if (self->isBind == false) {
-        if (bind(self->rawSocket, (struct sockaddr*) &self->socketAddress, sizeof(self->socketAddress)) == 0)
+       if (bind(self->rawSocket, (struct sockaddr*) &self->socketAddress, sizeof(struct sockaddr_in)) == 0)
+
             self->isBind = true;
         else
             return 0;
@@ -171,14 +207,17 @@ Ethernet_receivePacket(EthernetSocket self, uint8_t* buffer, int bufferSize)
 
     return recvfrom(self->rawSocket, buffer, bufferSize, MSG_DONTWAIT, 0, 0);
 }
-
-void
-Ethernet_sendPacket(EthernetSocket ethSocket, uint8_t* buffer, int packetSize)
+/*************************************************************************
+ * Ethernet_sendPacket
+ * отправка сообщения прямо в netif напрямую
+ *************************************************************************/
+void	Ethernet_sendPacket(EthernetSocket ethSocket, uint8_t* buffer, int packetSize)
 {
-    sendto(ethSocket->rawSocket, buffer, packetSize,
-                0, (struct sockaddr*) &(ethSocket->socketAddress), sizeof(ethSocket->socketAddress));
+	 Goose_output(buffer, packetSize);
 }
-
+/*************************************************************************
+ * Ethernet_destroySocket
+ *************************************************************************/
 void
 Ethernet_destroySocket(EthernetSocket ethSocket)
 {

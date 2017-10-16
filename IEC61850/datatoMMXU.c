@@ -792,10 +792,15 @@ void	Set_MMXU	(uint8_t num, uint64_t currentTime )
 /*******************************************************
  * MR5_700
  *******************************************************/
+#if defined	(MR5_700) || defined	(MR5_500)
+
 #if defined	(MR5_700)
-
 #include "static_model_MR5_700.h"
+#endif
 
+#if defined	(MR5_500)
+#include "static_model_MR5_500.h"
+#endif
 
 extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
 extern uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
@@ -915,10 +920,10 @@ void	Set_MMXU	(uint8_t num, uint64_t currentTime )
 			}
 
 		}
+#if defined	(MR5_700)
 /*************************************************************************
  * аналоговый модуль напряжения
  *************************************************************************/
-
 		if (ucMDiscInBuf[MB_offsetError_M1] & MB_bOffsetErrModule1a){
 			IedServer_updateQuality(iedServer,&iedModel_MES_MMXU1_PPV_phsA_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
 			IedServer_updateQuality(iedServer,&iedModel_MES_MMXU1_PPV_phsB_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
@@ -1144,6 +1149,7 @@ void	Set_MMXU	(uint8_t num, uint64_t currentTime )
 			}
 
 		}
+#endif
 }
 #endif
 

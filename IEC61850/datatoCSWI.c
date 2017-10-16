@@ -337,9 +337,15 @@ void	Set_XCBR	(uint8_t num, uint64_t currentTime )
 /*******************************************************
  * MR5_700
  *******************************************************/
+#if defined (MR5_700) || defined (MR5_500)
+
 #if defined (MR5_700)
 #include "static_model_MR5_700.h"
+#endif
 
+#if defined (MR5_500)
+#include "static_model_MR5_500.h"
+#endif
 
 extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
 extern uint16_t   ucConfigBufSW[MB_NumbConfigSW];

@@ -149,10 +149,10 @@ osMutexDef(xIEC850StartMutex);
 osMutexId xIEC850ServerStartMutex;		// мьютекс готовности к запуску TCP/IP
 osMutexDef(xIEC850ServerStartMutex);
 
-xQueueHandle		xDebugUsartOut;			// очередь бля отправки в юсартдебаг
-
 extern IedServer 	iedServer;
 extern uint16_t		SNTP_Period;
+extern int16_t		lostSNTPPackets;
+
 
 extern uint64_t 	nextSynchTime;
 extern bool 		resynch;
@@ -163,6 +163,17 @@ extern bool		getJurnals;
 	  MBFrame	MBData;
 	  uint8_t 	Source;
 	} xData;
+
+// очереди -----------------------------
+xQueueHandle 	ModbusSentTime;		// очередь для отправки в модбас
+xQueueHandle 	ModbusSentQueue;		// очередь для отправки в модбас
+
+xQueueHandle 	Rd_SysNoteQueue;		// очередь для запросов журналу системы
+xQueueHandle 	Rd_ErrorNoteQueue;		// очередь для запросов журналу аварий
+xQueueHandle 	Rd_FileQueue;			// очередь для запросов файлов
+xQueueHandle 	Rd_UstavkiQueue;		// очередь для запросов уставок
+
+xQueueHandle	xDebugUsartOut;			// очередь для отправки в юсартдебаг
 
 
 osThreadId defaultTaskHandle;
@@ -176,6 +187,9 @@ extern 	RTC_HandleTypeDef hrtc;
 
 //  --------------------------------------------------------------------------------
 bool				IP_ready = false;
+bool				SetTimeNow = false;
+bool				Reset_SysNoteNow = false;
+
 int8_t				Nextread = 0;
 volatile  uint8_t	ReadNmb=0;
 uint16_t			NumbBlokReadMB = 0;	// куски
@@ -265,22 +279,39 @@ extern uint16_t   usConfigStartU;			// конфигурация защиты по напряжению
 #endif
 #if defined (MR5_500)
 
-extern uint16_t   usMDateStart;
+extern uint16_t   ucErrorNoteBuf[MB_NumbErrorNote];
+extern uint16_t   ucSysNoteBuf[MB_NumbSysNote];
 extern uint16_t   ucMDateBuf[MB_NumbDate];
-extern uint16_t   usMRevStart;
 extern uint16_t   ucMRevBuf[MB_NumbWordRev];
-extern uint16_t   usMDiscInStart;
 extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
-extern uint16_t   usMAnalogInStart;
 extern uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
-extern uint16_t   usMConfigStart;
-extern uint16_t   ucMConfigBuf[MB_NumbConfig];
-extern uint16_t   usMConfigStartall;
-extern uint16_t   ucMConfigBufall[MB_NumbConfigall];
-extern uint16_t   usMConfigStartSWCrash;
-extern uint16_t   ucMSWCrash[MB_NumbSWCrash];
+extern uint16_t   ucSWCrash[MB_NumbSWCrash];
+extern uint16_t   ucConfigBufSW[MB_NumbConfigSW];
+extern uint16_t   ucUstavkiInBuf[MB_NumbUstavki];
+extern uint16_t   ucAutomatBuf[MB_NumbAutomat];
+extern uint16_t   ucOutSignalBuf[MB_NumbConfigOut];
+extern uint16_t   ucSystemCfgBuf[MB_NumbSystemCfg];
+extern uint16_t   ucConfigBufExZ[MB_NumbConfigExZ];
+extern uint16_t   ucConfigBufMTZ[MB_NumbConfigMTZ];
+extern uint16_t   ucConfigBufI2I1I0[MB_NumbConfigI2I1I0];
 
-extern uint16_t	    Ktt,Ktn;
+// журнал аварий -----------------------
+extern uint16_t   usErrorNoteStart;
+extern uint16_t   usSysNoteStart;
+extern uint16_t   usMDateStart;
+extern uint16_t   usMRevStart;
+extern uint16_t   usMDiscInStart;
+extern uint16_t   usMAnalogInStart;
+extern uint16_t   usConfigStartSWCrash;	// ресурс выключателя
+extern uint16_t   usConfigStartSW;			// конфигурация Выключателя
+extern uint16_t   usConfigUstavkiStart;		// общие уставки
+extern uint16_t   usConfigAutomatStart;		// параметры автоматики
+extern uint16_t   usConfigOutStart;			// чтение конфигурации выходных сигналов
+extern uint16_t   usSystemCfgStart;			// параметры системы
+extern uint16_t   usConfigStartExZ;			// конфигурация внешних защит
+extern uint16_t   usConfigStartMTZ;			// конфигурация токовых защит
+extern uint16_t   usConfigStartI2I1I0;		// конфигурация Дополнительные защиты
+
 #endif
 
 #if defined (MR771)
@@ -412,17 +443,16 @@ size_t  outbufLen;
 
 //int16_t		GetDirGeneral(uint8_t	Currdata);
 //float		GetRealU(uint16_t	Currdata, uint16_t	ktn);
-float		GetRealP(float	Currdata, uint16_t	ktn,  uint16_t	Ittf);
-
-void StartTimersTask(void const * argument);
-void StartMODBUSTask(void const * argument);
-
 extern volatile uint8_t	MAC_ADDR[6];
 
 
-void FREERTOS_Init(void);
-
+float		GetRealP(float	Currdata, uint16_t	ktn,  uint16_t	Ittf);
+void 		StartTimersTask(void const * argument);
+void 		StartMODBUSTask(void const * argument);
+void 		FREERTOS_Init(void);
 extern void vRegisterDEBUGCommands( void );
+
+void 		FastMODBUSTask(void const * argument);
 
 /* Hook prototypes */
 
@@ -446,7 +476,7 @@ void FREERTOS_Init(void) {
 	// Создадим мьютекс для блокировки доступа к данным сервера
 	xIEC850ServerStartMutex = osMutexCreate(NULL);
 
-	osMutexWait(xIEC850StartMutex,0);						// забрали семафор
+	osMutexWait(xIEC850StartMutex,0);					// забрали семафор
 	osMutexWait(xIEC850ServerStartMutex,0);				// забрали семафор
 
   /* END RTOS_MUTEX */
@@ -465,8 +495,11 @@ void FREERTOS_Init(void) {
 	fre_pr = fre;
 	USART_TRACE("размер кучи:%u байт\n",fre);
 
-	osThreadDef(MBUS, StartMODBUSTask, MODBUSTask__PRIORITY ,0, MODBUSTask_STACK_SIZE);//256
-	MBUSTaskHandle = osThreadCreate(osThread(MBUS), NULL);
+	osThreadDef(ModBUS, FastMODBUSTask, MODBUSTask__PRIORITY ,0, MODBUSTask_STACK_SIZE);//	задача только модбаса
+	MBUSTaskHandle = osThreadCreate(osThread(ModBUS), NULL);
+
+//	osThreadDef(MBUS, StartMODBUSTask, MODBUSTask__PRIORITY ,0, MODBUSTask_STACK_SIZE);//256
+//	MBUSTaskHandle = osThreadCreate(osThread(MBUS), NULL);
 
 	osThreadDef(IEC850, StartIEC850Task,IEC850Task__PRIORITY,0, IEC850_STACK_SIZE);//1024		//1500 работало IEC850Task__PRIORITY
 	IEC850TaskHandle = osThreadCreate(osThread(IEC850), NULL);
@@ -1694,17 +1727,17 @@ void StartMODBUSTask(void const * argument)
    	   	if (writeNmb == 10) {
    	   		USART_TRACE_GREEN("1.Установка часов в приборе.\n");
    	   		Hal_setTimeToMB_Date((uint16_t *)&ucMDateBuf);
-   	   		eMBMasterReqWriteMultipleHoldingRegister(MB_Slaveaddr,usMDateStart,MB_NumbDate*2, (USHORT *)&ucMDateBuf,RT_WAITING_FOREVER);
+   	   		eMBMasterReqWriteMultipleHoldingRegister(MB_Slaveaddr,usMDateStart,MB_NumbDate, (USHORT *)&ucMDateBuf,RT_WAITING_FOREVER);
    	   	}
    	   	else
 		if (((HAL_GetTick()-TimerReadMB)>MB_PerForReadMODBUS)||(Nextread)){		// периодический опрос MODBUS с периодом MB_PerForReadMODBUS(мс)
 			Nextread = false;
 			TimerReadMB = HAL_GetTick();
 
-			if (ReadNmb>2 && ReadNmb<10)ReadNmb = 1;
+			if (ReadNmb>MB_Rd_Analog && ReadNmb<MB_Rd_AllUstavki)ReadNmb = MB_Rd_Discreet;
 
 			//--------------- синхронизация часов ------------------------------------
-			if ((ReadNmb == 1) && HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0) == 0xFFFF)	ReadNmb = 10;			// первый раз
+			if ((ReadNmb == MB_Rd_Discreet) && HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0) == 0xFFFF)	ReadNmb = MB_Rd_AllUstavki;			// первый раз
 
 			//--------------- Выключатель ------------------------------------
 	   	   	if (writeNmb == 1) {
@@ -1743,7 +1776,7 @@ void StartMODBUSTask(void const * argument)
 	   	   	if (writeNmb == 10) {
 	   	   		USART_TRACE_GREEN("2.Установка часов в приборе.\n");
 	   	   		Hal_setTimeToMB_Date((uint16_t *)&ucMDateBuf);
-	   	   		eMBMasterReqWriteMultipleHoldingRegister(MB_Slaveaddr,usMDateStart,MB_NumbDate*2, (USHORT *)&ucMDateBuf,RT_WAITING_FOREVER);
+	   	   		eMBMasterReqWriteMultipleHoldingRegister(MB_Slaveaddr,usMDateStart,MB_NumbDate, (USHORT *)&ucMDateBuf,RT_WAITING_FOREVER);
 	   	   	}
 	   		currentTime = Hal_getTimeInMs();
 
@@ -2004,6 +2037,768 @@ void StartMODBUSTask(void const * argument)
 #if defined (MR5_700)
 void StartMODBUSTask(void const * argument)
 {
+	eMBMasterReqErrCode	sentToBuff = MB_MRE_NO_ERR;
+
+	extern uint64_t nextSynchTime;
+	extern bool resynch;
+	uint32_t			TimerReadMB;
+	eMBErrorCode		errorType;
+	uint8_t				i;
+	RTC_TimeTypeDef 	Time;
+	uint8_t  			PerForSynch;
+	uint8_t				CurrSG;
+	uint8_t				LimitRead=0xFE;
+	uint64_t 			currentTime;
+	extern const uint8_t userConfig[];
+
+//	osMutexWait(xIEC850StartMutex, osWaitForever);				// забрали мьютекс для блокировки TCP пока не получим настройки IP
+//	USART_TRACE_BLUE("MODBUS забрал мьютекс IEC850Start\n");
+
+//	usMDiscInStart = MB_StartDiscreetaddr;
+
+	eMBMasterInit(MB_RTU, 4, MB_Speed,  MB_PAR_NONE);
+	eMBMasterEnable();
+
+//	vTaskDelay(1000);
+	writeNmb = MB_Wr_none;
+	ReadNmb = MB_Rd_Revision;
+
+	Port_On(LED1);
+/*
+	{
+		uint8_t 			HardFaultcnt;												// счетчик перезапусков
+		memory_read((uint8_t *)&HardFaultcnt,_IfHardFault,sizeof(HardFaultcnt));						// читаем IP из внешней флэшки
+		HardFaultcnt++;
+		memory_write_to_mem((uint8_t *)&HardFaultcnt,_IfHardFault,sizeof(HardFaultcnt));
+		USART_TRACE_GREEN("Число запусков: %u\n",HardFaultcnt);
+	}
+*/
+	TimerReadMB = HAL_GetTick();
+	for(;;)
+	{
+ //		IedServer_setControlHandler(iedServer, &iedModel_GGIO_OUTGGIO1_SPCSO1, (ControlHandler)controlListener, &iedModel_GGIO_OUTGGIO1_SPCSO1);
+
+		// попробовать при установке часов не ждать это время, а сразу отправить
+	 	if (SetTimeNow) {
+	 			writeNmb = MB_Wr_Set_Time;
+				USART_TRACE_GREEN("1.Быстрая установка часов в приборе.(%u) \n",errorType);
+				Hal_setTimeToMB_Date((uint16_t *)&ucMDateBuf);
+				sentToBuff = eMBMasterReqWriteMultipleHoldingRegister(MB_Slaveaddr,usMDateStart,MB_NumbDate*2, (USHORT *)&ucMDateBuf,RT_WAITING_FOREVER);
+				if (sentToBuff == MB_MRE_NO_ERR) SetTimeNow = false;
+		}
+	 	else
+		//if (((HAL_GetTick()-TimerReadMB)>MB_PerForReadMODBUS)||(Nextread)){		// периодический опрос MODBUS с периодом MB_PerForReadMODBUS(мс)
+			{
+			Nextread = false;
+			TimerReadMB = HAL_GetTick();
+
+			if (ReadNmb>MB_Rd_Analog && ReadNmb<MB_Rd_AllUstavki)ReadNmb = MB_Rd_Discreet;
+
+			//--------------- синхронизация часов ------------------------------------
+			if ((ReadNmb == MB_Rd_Discreet) && HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0) == 0xFFFF)	ReadNmb = MB_Rd_AllUstavki;			// первый раз
+
+			//--------------- Выключатель ------------------------------------
+	   	   	if (writeNmb == MB_Wr_SwON) {
+	   	   		USART_TRACE_GREEN("Выключатель ON\n");
+	   	   		sentToBuff = eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_SwON,MB_CTRL_OFF,RT_WAITING_FOREVER);
+	   	   	}
+	   	   	if (writeNmb == MB_Wr_SwOFF) {
+	   	   		USART_TRACE_RED("Выключатель OFF\n");
+	   	   		sentToBuff = eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_SwOFF,MB_CTRL_OFF,RT_WAITING_FOREVER);
+	   	   	}
+
+	   	   	if (writeNmb == MB_Wr_Reset_LEDS) {
+	   	   		USART_TRACE_RED("сброс индикации\n");
+	   	   		sentToBuff = eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_LEDS_OFF,MB_CTRL_OFF,RT_WAITING_FOREVER);
+	   	   	}
+	   	   	if (writeNmb == MB_Wr_Reset_Error) {
+	   	   		USART_TRACE_RED("сброс новой неисправности\n");
+	   	   		sentToBuff = eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_Error_OFF,MB_CTRL_OFF,RT_WAITING_FOREVER);
+	   	   	}
+	   	   	if (writeNmb == 5) {
+	   	   		USART_TRACE_RED("Сброс флага новой записи в журнале системы \n");
+	   	   		sentToBuff = eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_SysNote_OFF,MB_CTRL_OFF,RT_WAITING_FOREVER);
+	   	   	}
+	   	   	if (writeNmb == MB_Wr_Reset_ErrorNote) {
+	   	   		USART_TRACE_RED("Сброс флага новой записи в журнале аварий\n");
+	   	   		sentToBuff = eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_ErrorNote_OFF,MB_CTRL_OFF,RT_WAITING_FOREVER);
+	   	   	}
+	   	   	if (writeNmb == MB_Wr_SG_set_0) {
+	   	   		USART_TRACE_RED("Переключение группы уставок 0.\n");
+	   	   		sentToBuff = eMBMasterReqWriteHoldingRegister(MB_Slaveaddr,MB_addr_SG,MB_selectGroupe0,RT_WAITING_FOREVER);
+	   	   	}
+	   	   	if (writeNmb == MB_Wr_SG_set_1) {
+	   	   		USART_TRACE_RED("Переключение группы уставок 1.\n");
+	   	   		sentToBuff = eMBMasterReqWriteHoldingRegister(MB_Slaveaddr,MB_addr_SG,MB_selectGroupe1,RT_WAITING_FOREVER);
+	   	   	}
+	   	   	if ((writeNmb == MB_Wr_Reset_SysNote) || Reset_SysNoteNow) {
+	   	   		writeNmb = MB_Wr_Reset_SysNote;
+	   	   		USART_TRACE_RED("Сброс записи журнала системы. (%u)\n",errorType);
+	   	   		sentToBuff = eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_SysNote_OFF,MB_CTRL_OFF,RT_WAITING_FOREVER);
+	   	   		if (sentToBuff == MB_MRE_NO_ERR) Reset_SysNoteNow = false;
+	   	   	}
+	   	 	if (writeNmb == MB_Wr_Set_Time) {
+				USART_TRACE_GREEN("2.Установка часов в приборе.\n");
+				Hal_setTimeToMB_Date((uint16_t *)&ucMDateBuf);
+	   	   		sentToBuff = eMBMasterReqWriteMultipleHoldingRegister(MB_Slaveaddr,usMDateStart,MB_NumbDate*2, (USHORT *)&ucMDateBuf,RT_WAITING_FOREVER);
+			}
+			currentTime = Hal_getTimeInMs();
+
+			//--------------- База чтения -----------------------------------------
+	   	   	if (writeNmb == MB_Wr_none){	// запись без очереди выполним.
+				Port_Off(LED_out_GREEN);
+			//--------------- синхронизация часов только если не работает NTP -----
+			 if(SNTP_Period == 0){
+				if ((currentTime > nextSynchTime) && resynch) {					//если прошел час то делаем синхронизацию снова
+					ReadNmb = MB_Rd_EndAddr;
+					eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMDateStart,MB_NumbDate,RT_WAITING_FOREVER);
+					USART_TRACE_BLUE("Пересинхронизация часов. время:0x%X\n",(unsigned int)currentTime);
+				}
+			 }
+
+			// уставки нужно читать только той группы по которой работаем, Выделить одну область памяти
+			if (ucMDiscInBuf[MB_offset_SG] & MB_bOffsetSettingGr){
+				usConfigStartMTZ 	= MB_StartConfigMTZ_SG1;
+				usConfigStartI2I1I0	= MB_StartConfigI2I1I0_SG1;
+				usConfigStartF		= MB_StartConfigF_SG1;
+				usConfigStartU		= MB_StartConfigU_SG1;
+			}
+			 else{
+				usConfigStartMTZ 	= MB_StartConfigMTZ_SG0;
+				usConfigStartI2I1I0	= MB_StartConfigI2I1I0_SG0;
+				usConfigStartF		= MB_StartConfigF_SG0;
+				usConfigStartU		= MB_StartConfigU_SG0;
+			 }
+
+			// первое чтение, после ревизии вычитаем журналы
+	   	   	if (ReadNmb==MB_Rd_Revision){eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMRevStart,MB_NumbWordRev,RT_WAITING_FOREVER);getJurnals = true;}							// чтение ревизии устройства
+			// периодическое чтение
+	   	   	else if (ReadNmb==MB_Rd_Discreet){
+	   	   		sentToBuff = eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMDiscInStart,MB_NumbDiscreet,RT_WAITING_FOREVER);
+	   	   	}
+	   	   	else if (ReadNmb==MB_Rd_Analog)  {
+	   	   		sentToBuff = eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMAnalogInStart,MB_NumbAnalog,RT_WAITING_FOREVER);
+	   		}
+
+	   		// однократное чтение
+	   	   	else if (ReadNmb==MB_Rd_AllUstavki)	eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMDiscInStart,MB_NumbDiscreet,RT_WAITING_FOREVER);	// чтение дискретной базы
+	   	   	else if (ReadNmb==11) 	eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMDateStart,MB_NumbDate,RT_WAITING_FOREVER);						// чтение текущего времени
+	   	   	else if (ReadNmb==12) 	eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usSystemCfgStart,MB_NumbSystemCfg,RT_WAITING_FOREVER);				// чтение конфигурации системы
+	   	   	else if (ReadNmb==13) 	eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigUstavkiStart,MB_NumbUstavki,RT_WAITING_FOREVER);			// чтение уставок
+	   	   	else if (ReadNmb==14) 	eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigStartSWCrash,MB_NumbSWCrash,RT_WAITING_FOREVER);			// чтение ресурса выключателя
+	   	   	else if (ReadNmb==15) 	ReadNmb = 19;	// прыгнем к 20
+
+	   	   	else if (ReadNmb==20) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigStartSW,MB_NumbConfigSW,RT_WAITING_FOREVER);}				// чтение конфигурации выключателя
+	   	  	else if (ReadNmb==21) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigOutStart,MB_NumbConfigOut,RT_WAITING_FOREVER);}			// чтение конфигурации выходных сигналов
+	   	  	else if (ReadNmb==22) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigAutomatStart,MB_NumbAutomat,RT_WAITING_FOREVER);}			// чтение конфигурации автоматики
+	   	  	else if (ReadNmb==23) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigStartExZ,MB_NumbConfigExZ,RT_WAITING_FOREVER);}			// чтение конфигурации внешних защит
+	   	  	else if (ReadNmb==24) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigStartMTZ,MB_NumbConfigMTZ,RT_WAITING_FOREVER);}			// чтение конфигурации токовых защит
+	   	  	else if (ReadNmb==25) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigStartI2I1I0,MB_NumbConfigI2I1I0,RT_WAITING_FOREVER);}		// чтение конфигурации дополнительных защит
+	   	  	else if (ReadNmb==26) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigStartF,MB_NumbConfigF,RT_WAITING_FOREVER);}				// чтение конфигурации защиты по частоте
+	   	  	else if (ReadNmb==27) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigStartU,MB_NumbConfigU,RT_WAITING_FOREVER);}				// чтение конфигурации защиты по напряжению
+	   	   	else if (ReadNmb==28) {
+	   	   			if (getJurnals) {ReadNmb = MB_Rd_Discreet;/*MB_Rd_SysNote;*/}						//если первое включение вычитаем журналы
+	   	   			else			ReadNmb = MB_Rd_Discreet;						//иначе в цикл
+	   	   	}
+
+	   		// читаем журнал однократное чтение, с возвратом на цикл (1 чтение)
+	   	  	else if (ReadNmb==MB_Rd_SysNote) 	{ eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usSysNoteStart,MB_NumbSysNote,RT_WAITING_FOREVER);}		// читаем последние записи в журнале системы
+	   	  	else if (ReadNmb==MB_Rd_ErrorNote) 	{ eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usErrorNoteStart,MB_NumbErrorNote,RT_WAITING_FOREVER);}	// читаем последние записи в журнале аварий
+
+	   	  	else {ReadNmb++;}
+
+//			LimitRead = MB_Rd_EndAddr;
+			if (ReadNmb >= MB_Rd_EndAddr) { ReadNmb = MB_Rd_Discreet; osMutexRelease(xIEC850StartMutex);}
+			if (IP_ready) {osMutexRelease(xIEC850StartMutex);}
+
+			} else{
+				if ( sentToBuff == MB_MRE_NO_ERR){
+					if (writeNmb == MB_Wr_Reset_SysNote ) 	ReadNmb = MB_Rd_SysNote;//ReadNmb = 10;			// если была запись в журнале ситемы то были изменения уставок. Нужно все перечитать. но сначала вычитать записи в журнале
+					if (writeNmb == MB_Wr_Reset_ErrorNote) ReadNmb = MB_Rd_ErrorNote;		// вычитаем если сбросилс флаг
+					writeNmb = MB_Wr_none;
+				}
+			}
+
+/*******************************************************
+* наполняем оперативными данными структуру
+*******************************************************/
+
+if(IEC850TaskHandle && (iedServer != NULL)){
+
+            IedServer_lockDataModel(iedServer);																	// захватываем управление mmsServer'ом
+
+// PROT_IPTOC1..8 ------
+					Set_IPTOC(4,currentTime);
+// PROT_I20PTOC1 ------
+					Set_I2PTOC(2,currentTime);
+					Set_I0PTOC(2,currentTime);
+// Set_INPTOC ------
+					Set_INPTOC(2,currentTime);
+// Set_IGPTOC ------
+					Set_IGPTOC(1,currentTime);
+// Set_I2I1PTOC ------
+					Set_I2I1PTOC(1,currentTime);
+// PROT_UPTOV1 ------
+					Set_UPTOV(2,currentTime);
+// PROT_UPTUV1 ------
+					Set_UPTUV(2,currentTime);
+// PROT_U2PTOV1 ------
+					Set_U2PTOV(2,currentTime);
+// PROT_U0PTOV1 ------
+					Set_U0PTOV(2,currentTime);
+// PROT_UPTOF1 ------
+					Set_PTOF(2,currentTime);
+// PROT_UPTUF1 ------
+					Set_PTUF(2,currentTime);
+// PROT_VZGGIO1..8 ------
+					Set_VZGGIO(8,currentTime);
+
+// PROT_RREC ------
+					Set_RREC(1,currentTime);
+// PROT_AVRGGIO ------
+					Set_AVRGGIO(1,currentTime);
+// Set_LZSHPTOC ------
+					Set_LZSHPTOC(1,currentTime);
+// PROT_RBRF ------
+					Set_RBRF(1,currentTime);
+
+// CTRL_CSWI ------
+					Set_CSWI(1,currentTime);
+// CTRL_XCBR ------
+					Set_XCBR(1,currentTime);
+// CTRL_PTRC ------
+					Set_PTRC(1,currentTime);
+
+// CTRL_GGIO ------
+					Set_XCBRGGIO(1,currentTime);
+// MES_MMXU ------
+					Set_MMXU(1,currentTime);
+// MES_MSQI ------
+					Set_MSQI(1,currentTime);
+// PROT_RFLO ------
+					Set_RFLO(1,currentTime);
+
+// GGIO_IN24GGIO ------
+					Set_INGGIO(16,currentTime);
+					Set_OUTGGIO(8,currentTime);
+					Set_LEDGGIO(12,currentTime);
+					Set_SSLGGIO(24,currentTime);
+					Set_VLSGGIO(8,currentTime);
+					Set_LSGGIO(8,currentTime);
+
+// LD0 SG
+					Set_SG(0,currentTime);
+
+    IedServer_unlockDataModel(iedServer);																// отдаём управление mmsServer'ом
+}
+/*******************************************************
+ *
+ *******************************************************/
+	}
+		if ( sentToBuff == MB_MRE_NO_ERR){
+			if (writeNmb == MB_Wr_Reset_SysNote ) 	ReadNmb = MB_Rd_SysNote;	//ReadNmb = 10;			// если была запись в журнале ситемы то были изменения уставок. Нужно все перечитать. но сначала вычитать записи в журнале
+			if (writeNmb == MB_Wr_Reset_ErrorNote) 	ReadNmb = MB_Rd_ErrorNote;	// вычитаем если сбросилс флаг
+			if (writeNmb == MB_Wr_Set_Time) 		writeNmb = MB_Wr_none;
+			writeNmb = MB_Wr_none;
+		}
+
+			errorType = eMBMasterPoll();						// мониторим события от MODBUS.
+			if (errorType == MB_ETIMEDOUT){
+				USART_TRACE_RED("ReadNmb: %u\n",ReadNmb);
+				 switch (ReadNmb){
+					case 2:
+						cntErrorMD.errAnalog++;
+						break;
+					case 1:
+						cntErrorMD.errDiscreet++;
+						break;
+					default:
+						cntErrorMD.errSW++;
+						break;
+					}
+				vTaskDelay(5);									// делаем паузу, не успевает принять запрос.
+				Port_On(LED_out_RED);
+	//    		ReadNmb++;
+				GLOBAL_QUALITY =  QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA;
+				Port_Off(LED1);
+			}else
+			if (errorType == MB_ENOERR || errorType == MB_ESENT){
+				if (writeNmb == MB_Wr_Set_Time) {writeNmb = MB_Wr_none;}
+	//	   		USART_TRACE_RED("MB_ENOERR: %u\n",ReadNmb);
+			}else
+			if (errorType == MB_ERECVDATA){
+				Port_On(LED_out_GREEN);
+				Port_Off(LED_out_RED);
+				GLOBAL_QUALITY = QUALITY_VALIDITY_GOOD;
+				vTaskDelay(5);									// делаем паузу, не успевает принять запрос.
+				Nextread = true;
+			}
+
+		taskYIELD();										// отпустим задачу.
+	}
+}
+#endif
+/*******************************************************
+ * MR5_600 MODBUS
+ *******************************************************/
+#if defined (MR5_600)
+void FastMODBUSTask(void const * argument)
+{
+	eMBErrorCode		errorType = MB_ENOERR;
+	eMBMasterReqErrCode	errorSent = MB_MRE_NO_ERR;
+
+	ModbusMessage 	pxTxMessage;
+
+	volatile  uint8_t	MbNmbMessage=0;
+
+	// создали очередь из 20 элементов для отправки в модбас
+	ModbusSentQueue 	= xQueueCreate( 20, sizeof(ModbusMessage));			// основная очередь
+	ModbusSentTime		= xQueueCreate( 2, sizeof(ModbusMessage));			// первоочередная очередь, то что откладывать нельзя даже из-за дискретов
+
+	Rd_SysNoteQueue 	= xQueueCreate( 5, sizeof(ModbusMessage));			// суб. очереди, из них по одному событию перекачка в основную
+	Rd_ErrorNoteQueue 	= xQueueCreate( 10, sizeof(ModbusMessage));
+	Rd_UstavkiQueue		= xQueueCreate( 10, sizeof(ModbusMessage));
+	Rd_FileQueue 		= xQueueCreate( 20, sizeof(ModbusMessage));
+
+	eMBMasterInit(MB_RTU, 4, MB_Speed,  MB_PAR_NONE);
+	eMBMasterEnable();
+
+//	AddToQueueMB(ModbusSentTime, 	MB_Wr_Set_Time		,MB_Slaveaddr);		// установка времени
+
+
+	AddToQueueMB(ModbusSentQueue, 	MB_Rd_Revision		,MB_Slaveaddr);
+	AddToQueueMB(ModbusSentQueue, 	MB_Rd_Get_Time		,MB_Slaveaddr);
+	AddToQueueMB(ModbusSentQueue, 	MB_Rd_Syscfg		,MB_Slaveaddr);
+
+	AddToQueueMB(Rd_UstavkiQueue, 	MB_Rd_Ustavki		,MB_Slaveaddr);
+	AddToQueueMB(ModbusSentQueue, 	MB_Rd_ConfigOut		,MB_Slaveaddr);
+	AddToQueueMB(ModbusSentQueue, 	MB_Rd_ConfigExZ		,MB_Slaveaddr);
+	AddToQueueMB(ModbusSentQueue, 	MB_Rd_ConfigF		,MB_Slaveaddr);
+	AddToQueueMB(ModbusSentQueue, 	MB_Rd_ConfigU		,MB_Slaveaddr);
+
+
+//	AddToQueueMB(Rd_UstavkiQueue, 	MB_Rd_AllUstavki	,MB_Slaveaddr);
+	AddToQueueMB(Rd_SysNoteQueue, 	MB_Rd_SysNote		,MB_Slaveaddr);
+	AddToQueueMB(Rd_ErrorNoteQueue, MB_Rd_ErrorNote		,MB_Slaveaddr);
+
+	MbNmbMessage = MB_Rd_Discreet;
+
+
+	for(;;)
+	{
+		//xQueueSend( ModbusSentQueue, ( void * ) &toSend, portMAX_DELAY  );		// передача в очередь сообщения
+		//xQueueSendToFront( ModbusSentQueue, ( void * ) &toSend, portMAX_DELAY  ); // передача в начало очереди сообщения
+		//xQueueReceive( ModbusSentQueue, &( rec ), portMAX_DELAY ); 				// прием из очереди сообщения
+
+		errorType = eMBMasterPoll();						// мониторим события от MODBUS.
+
+		// только если всё отлично с состоянием, и он свободен
+		if (errorType == MB_ENOERR){
+
+// срочная очередь
+
+			if( xQueueReceive( ModbusSentTime, &(pxTxMessage),( TickType_t ) 0 ) )
+			{
+				errorSent = eMBMasterSendMessage(&pxTxMessage);
+				USART_TRACE_GREEN("шлём \n");
+				if (errorSent == MB_MRE_NO_ERR) {
+					errorType = eMBMasterPoll();	// шлём сразу.
+					MbNmbMessage = MB_Rd_Discreet;
+					USART_TRACE_GREEN("Задача срочной очереди cmd:%u addr:%.4X size:%u (err:%u)\n",pxTxMessage.MBFunct,pxTxMessage.StartAddr,pxTxMessage.SizeMessage,errorSent);
+				} else{
+					xQueueSendToFront( ModbusSentTime, ( void * )&pxTxMessage, portMAX_DELAY);	// передача в очередь сообщения в начало
+//					AddToQueueMB(ModbusSentTime, 	MB_Wrt_Set_Time		,MB_Slaveaddr);		// не получилось сразу, ставим в очередь снова.
+				}
+			}
+// аналоги,дискреты
+			else
+			// в первую очередь смотрим за часами, надо ли их засинхронизировать
+			if (MbNmbMessage==MB_Rd_Discreet){
+				eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMDiscInStart,MB_NumbDiscreet,RT_WAITING_FOREVER);
+			}
+			else
+			if (MbNmbMessage==MB_Rd_Analog)  {
+				eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMAnalogInStart,MB_NumbAnalog,RT_WAITING_FOREVER);
+			}
+
+// всё остальное, менее срочное
+			else
+			if (MbNmbMessage > MB_Rd_Analog) {
+	// общая очередь
+				if( xQueueReceive( ModbusSentQueue, &(pxTxMessage),( TickType_t ) 0 ) )		// прием из очереди сообщения
+				{
+					errorSent = eMBMasterSendMessage(&pxTxMessage);
+					if (errorSent == MB_MRE_NO_ERR) {
+						MbNmbMessage = MB_Rd_Discreet;
+						USART_TRACE_GREEN("Задача общей очереди cmd:%u addr:%.4X size:%u (err:%u)\n",pxTxMessage.MBFunct,pxTxMessage.StartAddr,pxTxMessage.SizeMessage,errorSent);
+					} else{
+						xQueueSendToFront( ModbusSentQueue, ( void * )&pxTxMessage, portMAX_DELAY);	// передача сообщения в начало
+					}
+				}else
+	// журнала систем
+				if( xQueueReceive( Rd_SysNoteQueue, &(pxTxMessage),( TickType_t ) 0 ) )
+				{
+					errorSent = eMBMasterSendMessage(&pxTxMessage);
+					if (errorSent == MB_MRE_NO_ERR) {
+						MbNmbMessage = MB_Rd_Discreet;
+						USART_TRACE_GREEN("Задача журнала системы cmd:%u addr:%.4X size:%u (err:%u)\n",pxTxMessage.MBFunct,pxTxMessage.StartAddr,pxTxMessage.SizeMessage,errorSent);
+					} else{
+						xQueueSendToFront( Rd_SysNoteQueue, ( void * )&pxTxMessage, portMAX_DELAY);	// передача сообщения в начало
+					}
+				}else
+	// журнала аварий
+				if( xQueueReceive( Rd_ErrorNoteQueue, &(pxTxMessage),( TickType_t ) 0 ) )
+				{
+					errorSent = eMBMasterSendMessage(&pxTxMessage);
+					if (errorSent == MB_MRE_NO_ERR) {
+						MbNmbMessage = MB_Rd_Discreet;
+						USART_TRACE_GREEN("Задача журнала аварий cmd:%u addr:%.4X size:%u (err:%u)\n",pxTxMessage.MBFunct,pxTxMessage.StartAddr,pxTxMessage.SizeMessage,errorSent);
+					} else{
+						xQueueSendToFront( Rd_ErrorNoteQueue, ( void * )&pxTxMessage, portMAX_DELAY);	// передача сообщения в начало
+					}
+				}
+				else{
+					MbNmbMessage = MB_Rd_Discreet;
+				}
+			}//!if (ReadNmb > MB_Rd_Analog)
+
+		}//!if (errorType == MB_ENOERR)
+		else
+		if (errorType == MB_ETIMEDOUT){
+			Port_On(LED_out_RED);
+			GLOBAL_QUALITY =  QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA;
+		}else
+		if (errorType == MB_ERECVDATA){
+			MbNmbMessage++;					// ну раз приняли то давай следующий
+			Port_On(LED_out_GREEN);
+			Port_Off(LED_out_RED);
+			GLOBAL_QUALITY = QUALITY_VALIDITY_GOOD;
+			osMutexRelease(xIEC850StartMutex);
+		}
+	taskYIELD();										// отпустим задачу.
+
+	}// !for(;;)
+}
+
+/*******************************************************
+ * MR5_600 MODBUS
+ *******************************************************/
+void StartMODBUSTask(void const * argument)
+{
+	uint16_t			NumbBlokReadMBLim=0;
+	uint16_t			SizeBlokReadMB = MaxSizeBlok;			// размер одного пакета
+	uint16_t			addrConfig;
+	eMBMasterReqErrCode sentToBuff = MB_MRE_NO_ERR;
+
+	extern uint64_t nextSynchTime;
+	extern bool resynch;
+	uint32_t			TimerReadMB;
+	eMBErrorCode		errorType;
+	uint8_t				i;
+	RTC_TimeTypeDef 	Time;
+	uint8_t  			PerForSynch;
+	uint8_t				CurrSG;
+	uint8_t				LimitRead=0xFE;
+	uint64_t 			currentTime;
+	extern const uint8_t userConfig[];
+
+//	osMutexWait(xIEC850StartMutex, osWaitForever);				// забрали мьютекс для блокировки TCP пока не получим настройки IP
+//	USART_TRACE_BLUE("MODBUS забрал мьютекс IEC850Start\n");
+
+//	usMDiscInStart = MB_StartDiscreetaddr;
+
+	eMBMasterInit(MB_RTU, 4, MB_Speed,  MB_PAR_NONE);
+	eMBMasterEnable();
+
+//	vTaskDelay(1000);
+	writeNmb = MB_Wr_none;
+	ReadNmb = MB_Rd_Revision;
+
+	Port_On(LED1);
+/*
+	{
+		uint8_t 			HardFaultcnt;												// счетчик перезапусков
+		memory_read((uint8_t *)&HardFaultcnt,_IfHardFault,sizeof(HardFaultcnt));						// читаем IP из внешней флэшки
+		HardFaultcnt++;
+		memory_write_to_mem((uint8_t *)&HardFaultcnt,_IfHardFault,sizeof(HardFaultcnt));
+		USART_TRACE_GREEN("Число запусков: %u\n",HardFaultcnt);
+	}
+*/
+	TimerReadMB = HAL_GetTick();
+	for(;;)
+	{
+ //		IedServer_setControlHandler(iedServer, &iedModel_GGIO_OUTGGIO1_SPCSO1, (ControlHandler)controlListener, &iedModel_GGIO_OUTGGIO1_SPCSO1);
+
+		// попробовать при установке часов не ждать это время, а сразу отправить
+	 	if (SetTimeNow) {
+	 			writeNmb = MB_Wr_Set_Time;
+				USART_TRACE_GREEN("1.Быстрая установка часов в приборе.(%u) \n",errorType);
+				Hal_setTimeToMB_Date((uint16_t *)&ucMDateBuf);
+				sentToBuff = eMBMasterReqWriteMultipleHoldingRegister(MB_Slaveaddr,usMDateStart,MB_NumbDate*2, (USHORT *)&ucMDateBuf,RT_WAITING_FOREVER);
+				if (sentToBuff == MB_MRE_NO_ERR) SetTimeNow = false;
+		}
+	 	else
+//		if (((HAL_GetTick()-TimerReadMB)>MB_PerForReadMODBUS)||(Nextread)){		// периодический опрос MODBUS с периодом MB_PerForReadMODBUS(мс)
+	 		if (Nextread){		// периодический опрос MODBUS с периодом MB_PerForReadMODBUS(мс)
+			Nextread = false;
+			TimerReadMB = HAL_GetTick();
+
+			if (ReadNmb>MB_Rd_Analog && ReadNmb<MB_Rd_AllUstavki)ReadNmb = MB_Rd_Discreet;
+
+			//--------------- синхронизация часов ------------------------------------
+			if ((ReadNmb == MB_Rd_Discreet) && HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0) == 0xFFFF)	ReadNmb = MB_Rd_AllUstavki;			// первый раз
+
+			//--------------- Выключатель ------------------------------------
+
+	   	   	if (writeNmb == MB_Wr_Reset_LEDS) {
+	   	   		USART_TRACE_RED("сброс индикации\n");
+	   	   		sentToBuff = eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_LEDS_OFF,MB_CTRL_OFF,RT_WAITING_FOREVER);
+	   	   	}
+	   	   	if (writeNmb == MB_Wr_Reset_Error) {
+	   	   		USART_TRACE_RED("сброс новой неисправности\n");
+	   	   		sentToBuff = eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_Error_OFF,MB_CTRL_OFF,RT_WAITING_FOREVER);
+	   	   	}
+	   	   	if (writeNmb == 5) {
+	   	   		USART_TRACE_RED("Сброс флага новой записи в журнале системы \n");
+	   	   		sentToBuff = eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_SysNote_OFF,MB_CTRL_OFF,RT_WAITING_FOREVER);
+	   	   	}
+	   	   	if (writeNmb == MB_Wr_Reset_ErrorNote) {
+	   	   		USART_TRACE_RED("Сброс флага новой записи в журнале аварий\n");
+	   	   		sentToBuff = eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_ErrorNote_OFF,MB_CTRL_OFF,RT_WAITING_FOREVER);
+	   	   	}
+	   	   	if (writeNmb == MB_Wr_SG_set_0) {
+	   	   		USART_TRACE_RED("Переключение группы уставок 0.\n");
+	   	   		sentToBuff = eMBMasterReqWriteHoldingRegister(MB_Slaveaddr,MB_addr_SG,MB_selectGroupe0,RT_WAITING_FOREVER);
+	   	   	}
+	   	   	if (writeNmb == MB_Wr_SG_set_1) {
+	   	   		USART_TRACE_RED("Переключение группы уставок 1.\n");
+	   	   		sentToBuff = eMBMasterReqWriteHoldingRegister(MB_Slaveaddr,MB_addr_SG,MB_selectGroupe1,RT_WAITING_FOREVER);
+	   	   	}
+	   	   	if ((writeNmb == MB_Wr_Reset_SysNote) || Reset_SysNoteNow) {
+	   	   		writeNmb = MB_Wr_Reset_SysNote;
+	   	   		USART_TRACE_RED("Сброс записи журнала системы. (%u)\n",errorType);
+	   	   		sentToBuff = eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_SysNote_OFF,MB_CTRL_OFF,RT_WAITING_FOREVER);
+	   	   		if (sentToBuff == MB_MRE_NO_ERR) Reset_SysNoteNow = false;
+	   	   	}
+	   	 	if (writeNmb == MB_Wr_Set_Time) {
+				USART_TRACE_GREEN("2.Установка часов в приборе по графику. (%u)\n",errorType);
+				Hal_setTimeToMB_Date((uint16_t *)&ucMDateBuf);
+				sentToBuff = eMBMasterReqWriteMultipleHoldingRegister(MB_Slaveaddr,usMDateStart,MB_NumbDate*2, (USHORT *)&ucMDateBuf,RT_WAITING_FOREVER);
+			}
+			currentTime = Hal_getTimeInMs();
+
+			//--------------- База чтения -----------------------------------------
+	   	   	if (writeNmb == MB_Wr_none){	// запись без очереди выполним.
+				Port_Off(LED_out_GREEN);
+			//--------------- синхронизация часов только если не работает NTP -----
+			 if(SNTP_Period == 0){
+				if ((currentTime > nextSynchTime) && resynch) {					//если прошел час то делаем синхронизацию снова
+					ReadNmb = MB_Rd_EndAddr;
+					eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMDateStart,MB_NumbDate,RT_WAITING_FOREVER);
+					USART_TRACE_BLUE("Пересинхронизация часов по графику. время:0x%X\n",(unsigned int)currentTime);
+				}
+			 } else
+				 if(lostSNTPPackets>_limitlostSNTPPackets){
+					ReadNmb = MB_Rd_EndAddr;
+					eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMDateStart,MB_NumbDate,RT_WAITING_FOREVER);
+					USART_TRACE_BLUE("Пересинхронизация часов после пропусков NTP. время:0x%X\n",(unsigned int)currentTime);
+					lostSNTPPackets = 0;
+			 }
+
+			// уставки нужно читать только той группы по которой работаем, Выделить одну область памяти
+			if (ucMDiscInBuf[MB_offset_SG] & MB_bOffsetSettingGr){
+				usConfigStartF		= MB_StartConfigF_SG1;
+				usConfigStartU		= MB_StartConfigU_SG1;
+				usConfigStartExZ	= MB_StartConfigExZ_SG1;
+			}
+			 else{
+				usConfigStartF		= MB_StartConfigF_SG0;
+				usConfigStartU		= MB_StartConfigU_SG0;
+				usConfigStartExZ 	= MB_StartConfigExZ_SG0;
+			 }
+
+			// первое чтение, после ревизии вычитаем журналы
+	   	   	if (ReadNmb==MB_Rd_Revision){eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMRevStart,MB_NumbWordRev,RT_WAITING_FOREVER);getJurnals = true;}							// чтение ревизии устройства
+			// периодическое чтение
+	   	   	else if (ReadNmb==MB_Rd_Discreet){
+	   	   		eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMDiscInStart,MB_NumbDiscreet,RT_WAITING_FOREVER);
+	   	   	}
+	   	   	else if (ReadNmb==MB_Rd_Analog)  {
+	   			eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMAnalogInStart,MB_NumbAnalog,RT_WAITING_FOREVER);
+	   		}
+
+	   		// однократное чтение
+	   	   	else if (ReadNmb==MB_Rd_AllUstavki)	eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMDiscInStart,MB_NumbDiscreet,RT_WAITING_FOREVER);	// чтение дискретной базы
+	   	   	else if (ReadNmb==MB_Rd_Get_Time) 	eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMDateStart,MB_NumbDate,RT_WAITING_FOREVER);			// чтение текущего времени
+	   	   	else if (ReadNmb==MB_Rd_Syscfg) 	eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usSystemCfgStart,MB_NumbSystemCfg,RT_WAITING_FOREVER);	// чтение конфигурации системы
+	   	   	else if (ReadNmb==MB_Rd_Ustavki) 	eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigUstavkiStart,MB_NumbUstavki,RT_WAITING_FOREVER);	// чтение уставок
+//	   	   	else if (ReadNmb==14) 	eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigStartSWCrash,MB_NumbSWCrash,RT_WAITING_FOREVER);			// чтение ресурса выключателя
+	   	   	else if (ReadNmb==14) 	ReadNmb = 19;	// прыгнем к 20
+
+
+	   	  	else if (ReadNmb==MB_Rd_ConfigOut) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigOutStart,MB_NumbConfigOut,RT_WAITING_FOREVER);}			// чтение конфигурации выходных сигналов
+	   	  	else if (ReadNmb==MB_Rd_ConfigExZ) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigStartExZ,MB_NumbConfigExZ,RT_WAITING_FOREVER);}			// чтение конфигурации внешних защит
+	   	  	else if (ReadNmb==MB_Rd_ConfigF) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigStartF,MB_NumbConfigF,RT_WAITING_FOREVER);}				// чтение конфигурации защиты по частоте
+//	   	  	else if (ReadNmb==MB_Rd_ConfigU) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigStartU,MB_NumbConfigU,RT_WAITING_FOREVER);}				// чтение конфигурации защиты по напряжению
+	   	  	else if (ReadNmb==MB_Rd_ConfigU) {																													// чтение основной или резервной группы уставок
+
+	   	  				if (NumbBlokReadMBLim == 0) NumbBlokReadMB = 0;
+
+	  					NumbBlokReadMBLim = (uint16_t)MB_NumbConfigU;
+	  					NumbBlokReadMBLim = NumbBlokReadMBLim/(uint16_t)MaxSizeBlok;
+
+	   	  				addrConfig = usConfigStartU + NumbBlokReadMB * MaxSizeBlok;
+
+	   	  				if (NumbBlokReadMB == NumbBlokReadMBLim){
+	   	  					SizeBlokReadMB = (uint16_t)MB_NumbConfigU;
+	   	  					SizeBlokReadMB = SizeBlokReadMB % (uint16_t)MaxSizeBlok;
+	   	  				}
+
+	   	  				if (NumbBlokReadMB > NumbBlokReadMBLim){
+	   	  					addrConfig = 0;
+							NumbBlokReadMB = 0;
+							NumbBlokReadMBLim = 0;
+							SizeBlokReadMB = MaxSizeBlok;
+							ReadNmb++;
+	   	  				} else
+					    if((SizeBlokReadMB) && addrConfig<(usConfigStartU+MB_NumbConfigU)) {
+							   USART_TRACE_BLUE("%u-%u:Запрос:0x%X\n",ReadNmb,NumbBlokReadMB,(unsigned int)addrConfig);
+							   eMBMasterReqReadHoldingRegister(MB_Slaveaddr,addrConfig,SizeBlokReadMB,RT_WAITING_FOREVER);
+						  }
+
+
+	   	  			}
+	   	  	else if (ReadNmb==24) {
+	   	   			if (getJurnals) {ReadNmb = MB_Rd_Discreet;/*MB_Rd_SysNote;*/}						//если первое включение вычитаем журналы
+	   	   			else			ReadNmb = MB_Rd_Discreet;						//иначе в цикл
+	   	   	}
+
+	   		// читаем журнал однократное чтение, с возвратом на цикл (1 чтение)
+	   	  	else if (ReadNmb==MB_Rd_SysNote) 	{ eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usSysNoteStart,MB_NumbSysNote,RT_WAITING_FOREVER);}		// читаем последние записи в журнале системы
+	   	  	else if (ReadNmb==MB_Rd_ErrorNote) 	{ eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usErrorNoteStart,MB_NumbErrorNote,RT_WAITING_FOREVER);}	// читаем последние записи в журнале аварий
+
+	   	  	else {ReadNmb++;}
+
+//			LimitRead = MB_Rd_EndAddr;
+			if (ReadNmb >= MB_Rd_EndAddr) { ReadNmb = MB_Rd_Discreet; osMutexRelease(xIEC850StartMutex);}
+			if (IP_ready) {osMutexRelease(xIEC850StartMutex);}
+
+			} else{
+				if (sentToBuff == MB_MRE_NO_ERR){
+				//	if (writeNmb == MB_Wr_Reset_SysNote ) 	ReadNmb = MB_Rd_Discreet;	//MB_Rd_SysNote;//ReadNmb = 10;			// если была запись в журнале ситемы то были изменения уставок. Нужно все перечитать. но сначала вычитать записи в журнале
+				//	if (writeNmb == MB_Wr_Reset_ErrorNote) ReadNmb = MB_Rd_ErrorNote;		// вычитаем если сбросилс флаг
+					writeNmb = MB_Wr_none;
+				}
+			}
+
+/*******************************************************
+* наполняем оперативными данными структуру
+*******************************************************/
+
+if(IEC850TaskHandle && (iedServer != NULL)){
+
+            IedServer_lockDataModel(iedServer);																	// захватываем управление mmsServer'ом
+
+//			vTaskDelay(15);
+// PROT_UPTOV ------
+					Set_UPTOV(4,currentTime);
+// PROT_UPTUV ------
+					Set_UPTUV(4,currentTime);
+// PROT_U2PTOV ------
+					Set_U2PTOV(2,currentTime);
+// PROT_U0PTOV ------
+					Set_U0PTOV(4,currentTime);
+// PROT_U1PTUV ------
+					Set_U1PTUV(2,currentTime);
+// PROT_UPTOF ------
+					Set_PTOF(4,currentTime);
+// PROT_UPTUF ------
+					Set_PTUF(4,currentTime);
+// PROT_VZGGIO1..8 ------
+					Set_VZGGIO(8,currentTime);
+
+// CTRL_PTRC ------
+					Set_PTRC(1,currentTime);
+
+// CTRL_GGIO ------
+					Set_XCBRGGIO(1,currentTime);
+// MES_MMXU ------
+					Set_MMXU(1,currentTime);
+// MES_MSQI ------
+					Set_MSQI(1,currentTime);
+
+// GGIO_IN24GGIO ------
+
+					Set_INGGIO(8,currentTime);
+					Set_OUTGGIO(16,currentTime);
+					Set_LEDGGIO(12,currentTime);
+					Set_SSLGGIO(24,currentTime);
+					Set_VLSGGIO(8,currentTime);
+					Set_LSGGIO(8,currentTime);
+
+// LD0 SG
+					Set_SG(0,currentTime);
+
+    IedServer_unlockDataModel(iedServer);																// отдаём управление mmsServer'ом
+}
+/*******************************************************
+ *
+ *******************************************************/
+	}
+		if (sentToBuff == MB_MRE_NO_ERR){
+	//		if (writeNmb == MB_Wr_Reset_SysNote ) 	ReadNmb = MB_Rd_Discreet;		//MB_Rd_SysNote;//ReadNmb = 10;			// если была запись в журнале ситемы то были изменения уставок. Нужно все перечитать. но сначала вычитать записи в журнале
+	//		if (writeNmb == MB_Wr_Reset_ErrorNote) 	ReadNmb = MB_Rd_ErrorNote;		// вычитаем если сбросилс флаг
+			if (writeNmb == MB_Wr_Set_Time) 		writeNmb = MB_Wr_none;
+			if (writeNmb == MB_Wr_Reset_SysNote)	writeNmb = MB_Wr_none;
+			writeNmb = MB_Wr_none;
+		}
+
+			errorType = eMBMasterPoll();						// мониторим события от MODBUS.
+			if (errorType == MB_ETIMEDOUT){
+				USART_TRACE_RED("ReadNmb: %u\n",ReadNmb);
+				 switch (ReadNmb){
+					case 2:
+						cntErrorMD.errAnalog++;
+						break;
+					case 1:
+						cntErrorMD.errDiscreet++;
+						break;
+					default:
+						cntErrorMD.errSW++;
+						break;
+					}
+				vTaskDelay(5);									// делаем паузу, не успевает принять запрос.
+				Port_On(LED_out_RED);
+	//    		ReadNmb++;
+				GLOBAL_QUALITY =  QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA;
+				Port_Off(LED1);
+			}else
+			if (errorType == MB_ENOERR || errorType == MB_ESENT){
+//				if (writeNmb == MB_Wr_Set_Time) {writeNmb = MB_Wr_none;}
+	//	   		USART_TRACE_RED("MB_ENOERR: %u\n",ReadNmb);
+				Nextread = true;	// приняли данные
+			}else
+			if (errorType == MB_ERECVDATA){
+				Port_On(LED_out_GREEN);
+				Port_Off(LED_out_RED);
+				GLOBAL_QUALITY = QUALITY_VALIDITY_GOOD;
+				//vTaskDelay(5);									// делаем паузу, не успевает принять запрос.
+				Nextread = true;
+			}else
+				if (errorType == MB_NOTASK){
+					Nextread = true;
+				}
+
+		taskYIELD();										// отпустим задачу.
+	}
+}
+#endif
+/*******************************************************
+ * MR5_500 MODBUS
+ *******************************************************/
+#if defined (MR5_500)
+void StartMODBUSTask(void const * argument)
+{
 	extern uint64_t nextSynchTime;
 	extern bool resynch;
 	uint32_t			TimerReadMB;
@@ -2120,14 +2915,10 @@ void StartMODBUSTask(void const * argument)
 			if (ucMDiscInBuf[MB_offset_SG] & MB_bOffsetSettingGr){
 				usConfigStartMTZ 	= MB_StartConfigMTZ_SG1;
 				usConfigStartI2I1I0	= MB_StartConfigI2I1I0_SG1;
-				usConfigStartF		= MB_StartConfigF_SG1;
-				usConfigStartU		= MB_StartConfigU_SG1;
 			}
 			 else{
 				usConfigStartMTZ 	= MB_StartConfigMTZ_SG0;
 				usConfigStartI2I1I0	= MB_StartConfigI2I1I0_SG0;
-				usConfigStartF		= MB_StartConfigF_SG0;
-				usConfigStartU		= MB_StartConfigU_SG0;
 			 }
 
 			// первое чтение, после ревизии вычитаем журналы
@@ -2154,9 +2945,9 @@ void StartMODBUSTask(void const * argument)
 	   	  	else if (ReadNmb==23) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigStartExZ,MB_NumbConfigExZ,RT_WAITING_FOREVER);}			// чтение конфигурации внешних защит
 	   	  	else if (ReadNmb==24) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigStartMTZ,MB_NumbConfigMTZ,RT_WAITING_FOREVER);}			// чтение конфигурации токовых защит
 	   	  	else if (ReadNmb==25) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigStartI2I1I0,MB_NumbConfigI2I1I0,RT_WAITING_FOREVER);}		// чтение конфигурации дополнительных защит
-	   	  	else if (ReadNmb==26) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigStartF,MB_NumbConfigF,RT_WAITING_FOREVER);}				// чтение конфигурации защиты по частоте
-	   	  	else if (ReadNmb==27) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigStartU,MB_NumbConfigU,RT_WAITING_FOREVER);}				// чтение конфигурации защиты по напряжению
-	   	   	else if (ReadNmb==28) {
+	   	  	//else if (ReadNmb==26) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigStartF,MB_NumbConfigF,RT_WAITING_FOREVER);}				// чтение конфигурации защиты по частоте
+	   	  	//else if (ReadNmb==27) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigStartU,MB_NumbConfigU,RT_WAITING_FOREVER);}				// чтение конфигурации защиты по напряжению
+	   	   	else if (ReadNmb==26) {
 	   	   			if (getJurnals) {ReadNmb = MB_Rd_Discreet;/*MB_Rd_SysNote;*/}						//если первое включение вычитаем журналы
 	   	   			else			ReadNmb = MB_Rd_Discreet;						//иначе в цикл
 	   	   	}
@@ -2196,23 +2987,17 @@ if(IEC850TaskHandle && (iedServer != NULL)){
 					Set_IGPTOC(1,currentTime);
 // Set_I2I1PTOC ------
 					Set_I2I1PTOC(1,currentTime);
-// PROT_UPTOV1 ------
-					Set_UPTOV(2,currentTime);
-// PROT_UPTUV1 ------
-					Set_UPTUV(2,currentTime);
-// PROT_U2PTOV1 ------
-					Set_U2PTOV(2,currentTime);
-// PROT_U0PTOV1 ------
-					Set_U0PTOV(2,currentTime);
-// PROT_UPTOF1 ------
-					Set_PTOF(2,currentTime);
-// PROT_UPTUF1 ------
-					Set_PTUF(2,currentTime);
 // PROT_VZGGIO1..8 ------
 					Set_VZGGIO(8,currentTime);
+// PROT_FLSGGIO
+					//Set_FLSGGIO(1,currentTime);			//??
+
 
 // PROT_RREC ------
 					Set_RREC(1,currentTime);
+// PROT_FRREC ------
+					Set_FRREC(1,currentTime);
+
 // PROT_AVRGGIO ------
 					Set_AVRGGIO(1,currentTime);
 // Set_LZSHPTOC ------
@@ -2233,8 +3018,6 @@ if(IEC850TaskHandle && (iedServer != NULL)){
 					Set_MMXU(1,currentTime);
 // MES_MSQI ------
 					Set_MSQI(1,currentTime);
-// PROT_RFLO ------
-					Set_RFLO(1,currentTime);
 
 // GGIO_IN24GGIO ------
 					Set_INGGIO(16,currentTime);
@@ -2284,858 +3067,6 @@ if(IEC850TaskHandle && (iedServer != NULL)){
 				vTaskDelay(5);									// делаем паузу, не успевает принять запрос.
 				Nextread = true;
 			}
-
-		taskYIELD();										// отпустим задачу.
-	}
-}
-#endif
-/*******************************************************
- * MR5_600 MODBUS
- *******************************************************/
-#if defined (MR5_600)
-void StartMODBUSTask(void const * argument)
-{
-	uint16_t			NumbBlokReadMBLim=0;
-	uint16_t			SizeBlokReadMB = MaxSizeBlok;			// размер одного пакета
-	uint16_t			addrConfig;
-
-	extern uint64_t nextSynchTime;
-	extern bool resynch;
-	uint32_t			TimerReadMB;
-	eMBErrorCode		errorType;
-	uint8_t				i;
-	RTC_TimeTypeDef 	Time;
-	uint8_t  			PerForSynch;
-	uint8_t				CurrSG;
-	uint8_t				LimitRead=0xFE;
-	uint64_t 			currentTime;
-	extern const uint8_t userConfig[];
-
-//	osMutexWait(xIEC850StartMutex, osWaitForever);				// забрали мьютекс для блокировки TCP пока не получим настройки IP
-//	USART_TRACE_BLUE("MODBUS забрал мьютекс IEC850Start\n");
-
-//	usMDiscInStart = MB_StartDiscreetaddr;
-
-	eMBMasterInit(MB_RTU, 4, MB_Speed,  MB_PAR_NONE);
-	eMBMasterEnable();
-
-//	vTaskDelay(1000);
-	writeNmb = MB_Wr_none;
-	ReadNmb = MB_Rd_Revision;
-
-	Port_On(LED1);
-/*
-	{
-		uint8_t 			HardFaultcnt;												// счетчик перезапусков
-		memory_read((uint8_t *)&HardFaultcnt,_IfHardFault,sizeof(HardFaultcnt));						// читаем IP из внешней флэшки
-		HardFaultcnt++;
-		memory_write_to_mem((uint8_t *)&HardFaultcnt,_IfHardFault,sizeof(HardFaultcnt));
-		USART_TRACE_GREEN("Число запусков: %u\n",HardFaultcnt);
-	}
-*/
-	TimerReadMB = HAL_GetTick();
-	for(;;)
-	{
- //		IedServer_setControlHandler(iedServer, &iedModel_GGIO_OUTGGIO1_SPCSO1, (ControlHandler)controlListener, &iedModel_GGIO_OUTGGIO1_SPCSO1);
-
-		// попробовать при установке часов не ждать это время, а сразу отправить
-	 	if (writeNmb == MB_Wr_Set_Time) {
-				USART_TRACE_GREEN("1.Установка часов в приборе.\n");
-				Hal_setTimeToMB_Date((uint16_t *)&ucMDateBuf);
-				eMBMasterReqWriteMultipleHoldingRegister(MB_Slaveaddr,usMDateStart,MB_NumbDate*2, (USHORT *)&ucMDateBuf,RT_WAITING_FOREVER);
-		   	   	}
-	 	else
-		if (((HAL_GetTick()-TimerReadMB)>MB_PerForReadMODBUS)||(Nextread)){		// периодический опрос MODBUS с периодом MB_PerForReadMODBUS(мс)
-			Nextread = false;
-			TimerReadMB = HAL_GetTick();
-
-			if (ReadNmb>MB_Rd_Analog && ReadNmb<MB_Rd_AllUstavki)ReadNmb = MB_Rd_Discreet;
-
-			//--------------- синхронизация часов ------------------------------------
-			if ((ReadNmb == MB_Rd_Discreet) && HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0) == 0xFFFF)	ReadNmb = MB_Rd_AllUstavki;			// первый раз
-
-			//--------------- Выключатель ------------------------------------
-
-	   	   	if (writeNmb == MB_Wr_Reset_LEDS) {
-	   	   		USART_TRACE_RED("сброс индикации\n");
-	   	   		eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_LEDS_OFF,MB_CTRL_OFF,RT_WAITING_FOREVER);
-	   	   	}
-	   	   	if (writeNmb == MB_Wr_Reset_Error) {
-	   	   		USART_TRACE_RED("сброс новой неисправности\n");
-	   	   		eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_Error_OFF,MB_CTRL_OFF,RT_WAITING_FOREVER);
-	   	   	}
-	   	   	if (writeNmb == 5) {
-	   	   		USART_TRACE_RED("Сброс флага новой записи в журнале системы \n");
-	   	   		eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_SysNote_OFF,MB_CTRL_OFF,RT_WAITING_FOREVER);
-	   	   	}
-	   	   	if (writeNmb == MB_Wr_Reset_ErrorNote) {
-	   	   		USART_TRACE_RED("Сброс флага новой записи в журнале аварий\n");
-	   	   		eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_ErrorNote_OFF,MB_CTRL_OFF,RT_WAITING_FOREVER);
-	   	   	}
-	   	   	if (writeNmb == MB_Wr_SG_set_0) {
-	   	   		USART_TRACE_RED("Переключение группы уставок 0.\n");
-	   	   		eMBMasterReqWriteHoldingRegister(MB_Slaveaddr,MB_addr_SG,MB_selectGroupe0,RT_WAITING_FOREVER);
-	   	   	}
-	   	   	if (writeNmb == MB_Wr_SG_set_1) {
-	   	   		USART_TRACE_RED("Переключение группы уставок 1.\n");
-	   	   		eMBMasterReqWriteHoldingRegister(MB_Slaveaddr,MB_addr_SG,MB_selectGroupe1,RT_WAITING_FOREVER);
-	   	   	}
-	   	   	if (writeNmb == MB_Wr_Reset_SysNote) {
-	   	   		USART_TRACE_RED("Сброс записи журнала системы.\n");
-	   	   		eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_SysNote_OFF,MB_CTRL_OFF,RT_WAITING_FOREVER);
-	   	   	}
-	   	 	if (writeNmb == MB_Wr_Set_Time) {
-				USART_TRACE_GREEN("2.Установка часов в приборе.\n");
-				Hal_setTimeToMB_Date((uint16_t *)&ucMDateBuf);
-				eMBMasterReqWriteMultipleHoldingRegister(MB_Slaveaddr,usMDateStart,MB_NumbDate*2, (USHORT *)&ucMDateBuf,RT_WAITING_FOREVER);
-			}
-			currentTime = Hal_getTimeInMs();
-
-			//--------------- База чтения -----------------------------------------
-	   	   	if (writeNmb == MB_Wr_none){	// запись без очереди выполним.
-				Port_Off(LED_out_GREEN);
-			//--------------- синхронизация часов только если не работает NTP -----
-			 if(SNTP_Period == 0){
-				if ((currentTime > nextSynchTime) && resynch) {					//если прошел час то делаем синхронизацию снова
-					ReadNmb = MB_Rd_EndAddr;
-					eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMDateStart,MB_NumbDate,RT_WAITING_FOREVER);
-					USART_TRACE_BLUE("Пересинхронизация часов. время:0x%X\n",(unsigned int)currentTime);
-				}
-			 }
-
-			// уставки нужно читать только той группы по которой работаем, Выделить одну область памяти
-			if (ucMDiscInBuf[MB_offset_SG] & MB_bOffsetSettingGr){
-				usConfigStartF		= MB_StartConfigF_SG1;
-				usConfigStartU		= MB_StartConfigU_SG1;
-				usConfigStartExZ	= MB_StartConfigExZ_SG1;
-			}
-			 else{
-				usConfigStartF		= MB_StartConfigF_SG0;
-				usConfigStartU		= MB_StartConfigU_SG0;
-				usConfigStartExZ 	= MB_StartConfigExZ_SG0;
-			 }
-
-			// первое чтение, после ревизии вычитаем журналы
-	   	   	if (ReadNmb==MB_Rd_Revision){eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMRevStart,MB_NumbWordRev,RT_WAITING_FOREVER);getJurnals = true;}							// чтение ревизии устройства
-			// периодическое чтение
-	   	   	else if (ReadNmb==MB_Rd_Discreet){
-	   	   		eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMDiscInStart,MB_NumbDiscreet,RT_WAITING_FOREVER);
-	   	   	}
-	   	   	else if (ReadNmb==MB_Rd_Analog)  {
-	   			eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMAnalogInStart,MB_NumbAnalog,RT_WAITING_FOREVER);
-	   		}
-
-	   		// однократное чтение
-	   	   	else if (ReadNmb==MB_Rd_AllUstavki)	eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMDiscInStart,MB_NumbDiscreet,RT_WAITING_FOREVER);	// чтение дискретной базы
-	   	   	else if (ReadNmb==11) 	eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMDateStart,MB_NumbDate,RT_WAITING_FOREVER);						// чтение текущего времени
-	   	   	else if (ReadNmb==12) 	eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usSystemCfgStart,MB_NumbSystemCfg,RT_WAITING_FOREVER);				// чтение конфигурации системы
-	   	   	else if (ReadNmb==13) 	eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigUstavkiStart,MB_NumbUstavki,RT_WAITING_FOREVER);			// чтение уставок
-//	   	   	else if (ReadNmb==14) 	eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigStartSWCrash,MB_NumbSWCrash,RT_WAITING_FOREVER);			// чтение ресурса выключателя
-	   	   	else if (ReadNmb==14) 	ReadNmb = 19;	// прыгнем к 20
-
-
-	   	  	else if (ReadNmb==20) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigOutStart,MB_NumbConfigOut,RT_WAITING_FOREVER);}			// чтение конфигурации выходных сигналов
-	   	  	else if (ReadNmb==21) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigStartExZ,MB_NumbConfigExZ,RT_WAITING_FOREVER);}			// чтение конфигурации внешних защит
-	   	  	else if (ReadNmb==22) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigStartF,MB_NumbConfigF,RT_WAITING_FOREVER);}				// чтение конфигурации защиты по частоте
-//	   	  	else if (ReadNmb==23) { eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usConfigStartU,MB_NumbConfigU,RT_WAITING_FOREVER);}				// чтение конфигурации защиты по напряжению
-	   	  	else if (ReadNmb==23) {																													// чтение основной или резервной группы уставок
-
-	   	  				if (NumbBlokReadMBLim == 0) NumbBlokReadMB = 0;
-
-	  					NumbBlokReadMBLim = (uint16_t)MB_NumbConfigU;
-	  					NumbBlokReadMBLim = NumbBlokReadMBLim/(uint16_t)MaxSizeBlok;
-
-	   	  				addrConfig = usConfigStartU + NumbBlokReadMB * MaxSizeBlok;
-
-	   	  				if (NumbBlokReadMB == NumbBlokReadMBLim){
-	   	  					SizeBlokReadMB = (uint16_t)MB_NumbConfigU;
-	   	  					SizeBlokReadMB = SizeBlokReadMB % (uint16_t)MaxSizeBlok;
-	   	  				}
-
-	   	  				if (NumbBlokReadMB > NumbBlokReadMBLim){
-	   	  					addrConfig = 0;
-							NumbBlokReadMB = 0;
-							NumbBlokReadMBLim = 0;
-							SizeBlokReadMB = MaxSizeBlok;
-							ReadNmb++;
-	   	  				} else
-					    if((SizeBlokReadMB) && addrConfig<(usConfigStartU+MB_NumbConfigU)) {
-							   USART_TRACE_BLUE("%u-%u:Запрос:0x%X\n",ReadNmb,NumbBlokReadMB,(unsigned int)addrConfig);
-							   eMBMasterReqReadHoldingRegister(MB_Slaveaddr,addrConfig,SizeBlokReadMB,RT_WAITING_FOREVER);
-						  }
-
-
-	   	  			}
-	   	  	else if (ReadNmb==24) {
-	   	   			if (getJurnals) {ReadNmb = MB_Rd_Discreet;/*MB_Rd_SysNote;*/}						//если первое включение вычитаем журналы
-	   	   			else			ReadNmb = MB_Rd_Discreet;						//иначе в цикл
-	   	   	}
-
-	   		// читаем журнал однократное чтение, с возвратом на цикл (1 чтение)
-	   	  	else if (ReadNmb==MB_Rd_SysNote) 	{ eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usSysNoteStart,MB_NumbSysNote,RT_WAITING_FOREVER);}		// читаем последние записи в журнале системы
-	   	  	else if (ReadNmb==MB_Rd_ErrorNote) 	{ eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usErrorNoteStart,MB_NumbErrorNote,RT_WAITING_FOREVER);}	// читаем последние записи в журнале аварий
-
-	   	  	else {ReadNmb++;}
-
-//			LimitRead = MB_Rd_EndAddr;
-			if (ReadNmb >= MB_Rd_EndAddr) { ReadNmb = MB_Rd_Discreet; osMutexRelease(xIEC850StartMutex);}
-			if (IP_ready) {osMutexRelease(xIEC850StartMutex);}
-
-			} else{
-				if (writeNmb == MB_Wr_Reset_SysNote ) 	ReadNmb = MB_Rd_SysNote;//ReadNmb = 10;			// если была запись в журнале ситемы то были изменения уставок. Нужно все перечитать. но сначала вычитать записи в журнале
-				if (writeNmb == MB_Wr_Reset_ErrorNote) ReadNmb = MB_Rd_ErrorNote;		// вычитаем если сбросилс флаг
-				writeNmb = MB_Wr_none;
-			}
-
-/*******************************************************
-* наполняем оперативными данными структуру
-*******************************************************/
-
-if(IEC850TaskHandle && (iedServer != NULL)){
-
-            IedServer_lockDataModel(iedServer);																	// захватываем управление mmsServer'ом
-
-			vTaskDelay(15);
-// PROT_UPTOV ------
-					Set_UPTOV(4,currentTime);
-// PROT_UPTUV ------
-					Set_UPTUV(4,currentTime);
-// PROT_U2PTOV ------
-					Set_U2PTOV(2,currentTime);
-// PROT_U0PTOV ------
-					Set_U0PTOV(4,currentTime);
-// PROT_U1PTUV ------
-					Set_U1PTUV(2,currentTime);
-// PROT_UPTOF ------
-					Set_PTOF(4,currentTime);
-// PROT_UPTUF ------
-					Set_PTUF(4,currentTime);
-// PROT_VZGGIO1..8 ------
-					Set_VZGGIO(8,currentTime);
-
-// CTRL_PTRC ------
-					Set_PTRC(1,currentTime);
-
-// CTRL_GGIO ------
-					Set_XCBRGGIO(1,currentTime);
-// MES_MMXU ------
-					Set_MMXU(1,currentTime);
-// MES_MSQI ------
-					Set_MSQI(1,currentTime);
-
-// GGIO_IN24GGIO ------
-
-					Set_INGGIO(8,currentTime);
-					Set_OUTGGIO(16,currentTime);
-					Set_LEDGGIO(12,currentTime);
-					Set_SSLGGIO(24,currentTime);
-					Set_VLSGGIO(8,currentTime);
-					Set_LSGGIO(8,currentTime);
-
-// LD0 SG
-					Set_SG(0,currentTime);
-
-    IedServer_unlockDataModel(iedServer);																// отдаём управление mmsServer'ом
-}
-/*******************************************************
- *
- *******************************************************/
-	}
-			errorType = eMBMasterPoll();						// мониторим события от MODBUS.
-			if (errorType == MB_ETIMEDOUT){
-				USART_TRACE_RED("ReadNmb: %u\n",ReadNmb);
-				 switch (ReadNmb){
-					case 2:
-						cntErrorMD.errAnalog++;
-						break;
-					case 1:
-						cntErrorMD.errDiscreet++;
-						break;
-					default:
-						cntErrorMD.errSW++;
-						break;
-					}
-				vTaskDelay(5);									// делаем паузу, не успевает принять запрос.
-				Port_On(LED_out_RED);
-	//    		ReadNmb++;
-				GLOBAL_QUALITY =  QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_OLD_DATA;
-				Port_Off(LED1);
-			}else
-			if (errorType == MB_ENOERR || errorType == MB_ESENT){
-				if (writeNmb == MB_Wr_Set_Time) {writeNmb = MB_Wr_none;}
-	//	   		USART_TRACE_RED("MB_ENOERR: %u\n",ReadNmb);
-			}else
-			if (errorType == MB_ERECVDATA){
-				Port_On(LED_out_GREEN);
-				Port_Off(LED_out_RED);
-				GLOBAL_QUALITY = QUALITY_VALIDITY_GOOD;
-				vTaskDelay(5);									// делаем паузу, не успевает принять запрос.
-				Nextread = true;
-			}
-
-		taskYIELD();										// отпустим задачу.
-	}
-}
-#endif
-/*******************************************************
- * MR5_500 MODBUS
- *******************************************************/
-#if defined (MR5_500)
-void StartMODBUSTask(void const * argument)
-{
-	extern uint64_t nextSynchTime;
-	extern bool resynch;
-	uint32_t			TimerReadMB;
-	eMBErrorCode		errorType;
-	uint8_t				i;
-	RTC_TimeTypeDef 	Time;
-	uint8_t  			PerForSynch;
-	extern const uint8_t userConfig[];
-
-//	osMutexWait(xIEC850StartMutex, osWaitForever);				// забрали мьютекс для блокировки TCP пока не получим настройки IP
-//	USART_TRACE_BLUE("MODBUS забрал мьютекс IEC850Start\n");
-
-//	usMDiscInStart = MB_StartDiscreetaddr;
-
-	eMBMasterInit(MB_RTU, 4, MB_Speed,  MB_PAR_NONE);
-	eMBMasterEnable();
-
-
-	Port_On(LED1);
-/*
-	{
-		uint8_t 			HardFaultcnt;												// счетчик перезапусков
-		memory_read((uint8_t *)&HardFaultcnt,_IfHardFault,sizeof(HardFaultcnt));						// читаем IP из внешней флэшки
-		HardFaultcnt++;
-		memory_write_to_mem((uint8_t *)&HardFaultcnt,_IfHardFault,sizeof(HardFaultcnt));
-		USART_TRACE_GREEN("Число запусков: %u\n",HardFaultcnt);
-	}
-*/
-	TimerReadMB = HAL_GetTick();
-	for(;;)
-	{
- //		IedServer_setControlHandler(iedServer, &iedModel_GGIO_OUTGGIO1_SPCSO1, (ControlHandler)controlListener, &iedModel_GGIO_OUTGGIO1_SPCSO1);
-		if (writeNmb == 10) {
-		   	   		USART_TRACE_RED("Установка часов в приборе.\n");
-		   	   		Hal_setTimeToMB_Date((uint16_t *)&ucMDateBuf);
-		   	   		eMBMasterReqWriteMultipleHoldingRegister(MB_Slaveaddr,usMDateStart,MB_NumbDate*2, (UCHAR *)&ucMDateBuf,RT_WAITING_FOREVER);
-		   	   	}
-		else
-		if ((HAL_GetTick()-TimerReadMB)>MB_PerForReadMODBUS){					// периодический опрос MODBUS с периодом MB_PerForReadMODBUS(мс)
-			TimerReadMB = HAL_GetTick();
-
-			if (ReadNmb>14) {ReadNmb = 1;}
-			if (ReadNmb>2 && ReadNmb<10) ReadNmb = 1;
-
-			//--------------- синхронизация часов ------------------------------------
-			if ((ReadNmb == 1) && HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0) == 0xFFFF)	ReadNmb = 10;			// первый раз
-
-			//--------------- Выключатель ------------------------------------
-	   	   	if (writeNmb == 1) {
-	   	   		USART_TRACE_GREEN("Выключатель ON\n");
-	   	   		eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_SwON,MB_SwON,RT_WAITING_FOREVER);
-	   	   	}
-	   	   	if (writeNmb == 2) {
-	   	   		USART_TRACE_RED("Выключатель OFF\n");
-	   	   		eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_SwOFF,MB_SwON,RT_WAITING_FOREVER);
-	   	   	}
-
-	   	   	if (writeNmb == 3) {
-	   	   		USART_TRACE_RED("сброс индикации\n");
-	   	   		eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_LEDS_OFF,MB_CTRL_OFF,RT_WAITING_FOREVER);
-	   	   	}
-	   	   	if (writeNmb == 4) {
-	   	   		USART_TRACE_RED("сброс новой неисправности\n");
-	   	   		eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_Error_OFF,MB_CTRL_OFF,RT_WAITING_FOREVER);
-	   	   	}
-	   	   	if (writeNmb == 5) {
-	   	   		USART_TRACE_RED("Сброс флага новой записи в журнале системы \n");
-	   	   		eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_SysNote_OFF,MB_CTRL_OFF,RT_WAITING_FOREVER);
-	   	   	}
-	   	   	if (writeNmb == 6) {
-	   	   		USART_TRACE_RED("Сброс флага новой записи в журнале аварий\n");
-	   	   		eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_ErrorNote_OFF,MB_CTRL_OFF,RT_WAITING_FOREVER);
-	   	   	}
-	   	   	if (writeNmb == 7) {
-	   	   		USART_TRACE_RED("Переключение группы уставок 0.\n");
-	   	   		eMBMasterReqWriteHoldingRegister(MB_Slaveaddr,MB_addr_SG,MB_selectGroupe0,RT_WAITING_FOREVER);
-	   	   	}
-	   	   	if (writeNmb == 8) {
-	   	   		USART_TRACE_RED("Переключение группы уставок 1.\n");
-	   	   		eMBMasterReqWriteHoldingRegister(MB_Slaveaddr,MB_addr_SG,MB_selectGroupe1,RT_WAITING_FOREVER);
-	   	   	}
-	   	   	if (writeNmb == 9) {
-	   	   		USART_TRACE_RED("Сброс записи журнала системы.\n");
-	   	   	eMBMasterReqWriteCoil(MB_Slaveaddr,MB_addr_SysNote_OFF,MB_CTRL_OFF,RT_WAITING_FOREVER);
-	   	   	}
-	   	   	if (writeNmb == 10) {
-	   	   		USART_TRACE_RED("Установка часов в приборе.\n");
-	   	   		Hal_setTimeToMB_Date((uint16_t *)&ucMDateBuf);
-	   	   		eMBMasterReqWriteMultipleHoldingRegister(MB_Slaveaddr,usMDateStart,MB_NumbDate*2, (UCHAR *)&ucMDateBuf,RT_WAITING_FOREVER);
-	   	   	}
-	   		uint64_t currentTime = Hal_getTimeInMs();
-
-			//--------------- База чтения ------------------------------------
-	   	   	if (writeNmb == 0){	// запись без очереди выполним.
-				Port_Off(LED_out_GREEN);
-			//--------------- синхронизация часов ------------------------------------
-		    if(SNTP_Period == 0){
-				if ((currentTime > nextSynchTime) && resynch) {					//если прошел час то делаем синхронизацию снова
-					ReadNmb = 15;
-					eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMDateStart,MB_NumbDate,RT_WAITING_FOREVER);
-					USART_TRACE_BLUE("Пересинхронизация часов. время:0x%X\n",(unsigned int)currentTime);
-				}
-		  	}
-			// периодическое чтение
-	   	   	if (ReadNmb==0)  eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMRevStart,MB_NumbWordRev,RT_WAITING_FOREVER);		// чтение ревизии устройства
-	   		if (ReadNmb==1)  eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMDiscInStart,MB_NumbDiscreet,RT_WAITING_FOREVER);
-	   		if (ReadNmb==2)  eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMAnalogInStart,MB_NumbAnalog,RT_WAITING_FOREVER);
-
-	   		// однократное чтение
-	   	   	if (ReadNmb==10) eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMDateStart,MB_NumbDate,RT_WAITING_FOREVER);				// чтение текущего времени
-	   	   	if (ReadNmb==11) eMBMasterReqReadHoldingRegister(MB_Slaveaddr,usMConfigStart,MB_NumbConfig,RT_WAITING_FOREVER);			// чтение уставок(только IP адрес)
-	   	   	if (ReadNmb==12) {eMBMasterReqReadHoldingRegister(MB_Slaveaddr,MB_StartConfig+MB_offset_Ktt,1,RT_WAITING_FOREVER);}		// чтение уставок
-	   	   	if (ReadNmb==13) eMBMasterReqReadHoldingRegister(MB_Slaveaddr,MB_StartConfig+MB_offset_Ktn,1,RT_WAITING_FOREVER);		// чтение уставок
-	   	   	if (ReadNmb==14) {
-	   	   		eMBMasterReqReadHoldingRegister(MB_Slaveaddr,MB_StartConfig,MB_NumbConfigall,RT_WAITING_FOREVER);		// чтение всех уставок
-	   	   		osMutexRelease(xIEC850StartMutex);
-	   	   	}
-	   	   	ReadNmb++;
-	   	   	} else{
-	   	   		if (writeNmb == 9 ) ReadNmb = 10;
-	   	   		writeNmb = 0;
-	   	   	}
-//+++++++++++++++++++
-/*
-	   	 		errorType = eMBMasterPoll();						// мониторим события от MODBUS.
-	   	 		if (errorType == MB_ETIMEDOUT){
-	   	    		USART_TRACE_RED("ReadNmb: %u\n",ReadNmb);
-	   	     		//if (ReadNmb) ReadNmb--;
-	   	     	Port_Off(LED1);
-	   	 		}
-*/
-//+++++++++++++++++++
-if(IEC850TaskHandle && (iedServer != NULL)){
-
-            IedServer_lockDataModel(iedServer);																	// захватываем управление mmsServer'ом
-
-if (ucMDiscInBuf[MB_offsetError] & MB_errorMSD1){
-    	    IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind1_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-    	    IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind2_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-    	    IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind3_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-    	    IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind4_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-    	    IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind5_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-    	    IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind6_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-    	    IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind7_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-    	    IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind8_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-} else
-{
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind1_q,0);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind2_q,0);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind3_q,0 | 0);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind4_q,0 | 0);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind5_q,0 | 0);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind6_q,0 | 0);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind7_q,0 | 0);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind8_q,0 | 0);
-
-            IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind1_stVal,  ucMDiscInBuf[MB_offsetDiscreet] & (1<<0));
-            IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind2_stVal,  ucMDiscInBuf[MB_offsetDiscreet] & (1<<1));
-            IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind3_stVal,  ucMDiscInBuf[MB_offsetDiscreet] & (1<<2));
-            IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind4_stVal,  ucMDiscInBuf[MB_offsetDiscreet] & (1<<3));
-            IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind5_stVal,  ucMDiscInBuf[MB_offsetDiscreet] & (1<<4));
-            IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind6_stVal,  ucMDiscInBuf[MB_offsetDiscreet] & (1<<5));
-            IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind7_stVal,  ucMDiscInBuf[MB_offsetDiscreet] & (1<<6));
-            IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind8_stVal,  ucMDiscInBuf[MB_offsetDiscreet] & (1<<7));
-}
-			IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind1_t, currentTime);
-       	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind2_t, currentTime);
-       	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind3_t, currentTime);
-       	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind4_t, currentTime);
-       	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind5_t, currentTime);
-       	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind6_t, currentTime);
-       	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind7_t, currentTime);
-       	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind8_t, currentTime);
-
-if (ucMDiscInBuf[MB_offsetError] & MB_errorMSD2){
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind9_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind10_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind11_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind12_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind13_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind14_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind15_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind16_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-} else{
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind9_q,0 | 0);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind10_q,0 | 0);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind11_q,0 | 0);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind12_q,0 | 0);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind13_q,0 | 0);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind14_q,0 | 0);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind15_q,0 | 0);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_OUTGGIO1_Ind16_q,0 | 0);
-
-            IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind9_stVal,  ucMDiscInBuf[MB_offsetDiscreet] & (1<<8));
-            IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind10_stVal,  ucMDiscInBuf[MB_offsetDiscreet] & (1<<9));
-            IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind11_stVal,  ucMDiscInBuf[MB_offsetDiscreet] & (1<<10));
-            IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind12_stVal,  ucMDiscInBuf[MB_offsetDiscreet] & (1<<11));
-            IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind13_stVal,  ucMDiscInBuf[MB_offsetDiscreet] & (1<<12));
-            IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind14_stVal,  ucMDiscInBuf[MB_offsetDiscreet] & (1<<13));
-            IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind15_stVal,  ucMDiscInBuf[MB_offsetDiscreet] & (1<<14));
-            IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind16_stVal,  ucMDiscInBuf[MB_offsetDiscreet] & (1<<15));
-
-}
-   	   	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind9_t, currentTime);
-      	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind10_t, currentTime);
-       	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind11_t, currentTime);
-       	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind12_t, currentTime);
-       	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind13_t, currentTime);
-       	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind14_t, currentTime);
-       	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind15_t, currentTime);
-       	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Ind16_t, currentTime);
-
-if (ucMDiscInBuf[MB_offsetError] & MB_errorMRV1){
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_INGGIO1_SPCSO1_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_INGGIO1_SPCSO2_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_INGGIO1_SPCSO3_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_INGGIO1_SPCSO4_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_INGGIO1_SPCSO5_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_INGGIO1_SPCSO6_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_INGGIO1_SPCSO7_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_INGGIO1_SPCSO8_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-}else{
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_INGGIO1_SPCSO1_q,0);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_INGGIO1_SPCSO2_q,0);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_INGGIO1_SPCSO3_q,0);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_INGGIO1_SPCSO4_q,0);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_INGGIO1_SPCSO5_q,0);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_INGGIO1_SPCSO6_q,0);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_INGGIO1_SPCSO7_q,0);
-			IedServer_updateQuality(iedServer,&iedModel_GGIO_INGGIO1_SPCSO8_q,0);
-
-          	IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_INGGIO1_SPCSO1_stVal,  ucMDiscInBuf[MB_offsetRelay] & (1<<0));
-       	    IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_INGGIO1_SPCSO2_stVal,  ucMDiscInBuf[MB_offsetRelay] & (1<<1));
-      	    IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_INGGIO1_SPCSO3_stVal,  ucMDiscInBuf[MB_offsetRelay] & (1<<2));
-      	    IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_INGGIO1_SPCSO4_stVal,  ucMDiscInBuf[MB_offsetRelay] & (1<<3));
-      	    IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_INGGIO1_SPCSO5_stVal,  ucMDiscInBuf[MB_offsetRelay] & (1<<4));
-      	    IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_INGGIO1_SPCSO6_stVal,  ucMDiscInBuf[MB_offsetRelay] & (1<<5));
-      	    IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_INGGIO1_SPCSO7_stVal,  ucMDiscInBuf[MB_offsetRelay] & (1<<6));
-      	    IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_INGGIO1_SPCSO8_stVal,  ucMDiscInBuf[MB_offsetRelay] & (1<<7));
-}
-			IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_INGGIO1_SPCSO1_t, currentTime);
-			IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_INGGIO1_SPCSO2_t, currentTime);
-			IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_INGGIO1_SPCSO3_t, currentTime);
-			IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_INGGIO1_SPCSO4_t, currentTime);
-    	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_INGGIO1_SPCSO5_t, currentTime);
-     	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_INGGIO1_SPCSO6_t, currentTime);
-    	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_INGGIO1_SPCSO7_t, currentTime);
-    	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_INGGIO1_SPCSO8_t, currentTime);
-
-//PTOC
-
-    IedServer_updateInt32AttributeValue(iedServer,&iedModel_PROT_PTOC1_Health_stVal,(ucMDiscInBuf[MB_offsetError] & (MB_errorMSAI | MB_errorMSAU)));
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_PTOC1_Health_t, currentTime);
-	IedServer_updateQuality(iedServer,&iedModel_PROT_PTOC1_Health_q,0);
-
-
-	IedServer_updateBooleanAttributeValue(iedServer, &iedModel_PROT_PTOC1_Str_general,  ucMDiscInBuf[MB_offset_I_IO] & (1<<0));
-
-//	int16_t		Valtmp = GetDirGeneral((ucMDiscInBuf[MB_offsetPTOC] >> 2) & 0b111111);
-	int16_t		Valtmp = ucMDiscInBuf[MB_offsetDirGeneral] & 0b11;
-	MmsValue* ValMMS = MmsValue_newIntegerFromInt16(Valtmp);
-
-	IedServer_updateAttributeValue(iedServer, &iedModel_PROT_PTOC1_Str_dirGeneral, ValMMS);
-	IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_PTOC1_Str_t, currentTime);
-
-	if (ucMDiscInBuf[MB_offsetError] & MB_errorMSAI){
-		IedServer_updateQuality(iedServer,&iedModel_PROT_PTOC1_Str_q, QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-	} else{
-		IedServer_updateQuality(iedServer,&iedModel_PROT_PTOC1_Str_q,0);
-	}
-	MmsValue_delete(ValMMS);
-
-	IedServer_updateBooleanAttributeValue(iedServer, &iedModel_PROT_PTOC1_Op_general,  ucMDiscInBuf[MB_offset_I_IO] & (1<<1));
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_PTOC1_Op_t, currentTime);
-	IedServer_updateQuality(iedServer,&iedModel_PROT_PTOC1_Op_q,0);
-
-// Аналоговые токовые данные
-	if (ucMDiscInBuf[MB_offsetError] & MB_errorMSAI){
-		// токи
-		IedServer_updateQuality(iedServer,&iedModel_MES_MMXU1_A_phsA_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-		IedServer_updateQuality(iedServer,&iedModel_MES_MMXU1_A_phsB_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-		IedServer_updateQuality(iedServer,&iedModel_MES_MMXU1_A_phsC_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-		IedServer_updateQuality(iedServer,&iedModel_MES_MMXU1_A_res_q,QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE);
-	}
-	else{
-		// токи
-		IedServer_updateQuality(iedServer,&iedModel_MES_MMXU1_A_phsA_q,0);
-		IedServer_updateQuality(iedServer,&iedModel_MES_MMXU1_A_phsB_q,0);
-		IedServer_updateQuality(iedServer,&iedModel_MES_MMXU1_A_phsC_q,0);
-		IedServer_updateQuality(iedServer,&iedModel_MES_MMXU1_A_res_q,0);
-		float CurrA;
-		CurrA = (float)(ucMAnalogInBuf[MB_offset_Ia] * 40)/65536 * Ktt;
-//		if (ucMDiscInBuf[MB_offsetPTOC] & MB_bTotVAZ) {CurrA = -CurrA;}
-		IedServer_updateFloatAttributeValue(iedServer,&iedModel_MES_MMXU1_A_phsA_cVal_mag_f,CurrA);
-
-		CurrA = (float)(ucMAnalogInBuf[MB_offset_Ib] * 40)/65536 * Ktt;
-//		if (ucMDiscInBuf[MB_offsetPTOC] & MB_bTotVAZ) {CurrA = -CurrA;}
-		IedServer_updateFloatAttributeValue(iedServer,&iedModel_MES_MMXU1_A_phsB_cVal_mag_f,CurrA);
-
-		CurrA = (float)(ucMAnalogInBuf[MB_offset_Ic] * 40)/65536 * Ktt;
-//		if (ucMDiscInBuf[MB_offsetPTOC] & MB_bTotVAZ) {CurrA = -CurrA;}
-		IedServer_updateFloatAttributeValue(iedServer,&iedModel_MES_MMXU1_A_phsC_cVal_mag_f,CurrA);
-
-		CurrA = (float)(ucMAnalogInBuf[MB_offset_In] * 5)/65536 * ucMConfigBufall[MB_offset_Kttnp];
-		IedServer_updateFloatAttributeValue(iedServer,&iedModel_MES_MMXU1_A_res_cVal_mag_f,CurrA);
-
-	}
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_MES_MMXU1_A_phsA_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_MES_MMXU1_A_phsB_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_MES_MMXU1_A_phsC_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_MES_MMXU1_A_res_t, currentTime);
-
-// !!Аналоговые токовые данные
-
-
-//CSWI
-//-------------------------------
-
-	{
-	uint8_t	res=STVALCODEDENUM_INTERMEDIATE;
-	if (ucMDiscInBuf[MB_offset_adr0] & MB_offsetSW_OFF) {res |= STVALCODEDENUM_OFF;}
-	if (ucMDiscInBuf[MB_offset_adr0] & MB_offsetSW_ON)  {res |= STVALCODEDENUM_ON;} 			//2 - STATE_ON ? 1- STATE_OFF ? 0 -  STATE_INTERMEDIATE
-
-	IedServer_updateBitStrinAttributeValue(iedServer, &iedModel_CTRL_CSWI1_Pos_stVal, res);
-	IedServer_updateQuality(iedServer,&iedModel_CTRL_CSWI1_Pos_q,0);
-	IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_CSWI1_Pos_t, currentTime);
-
-#define MB_bOffsetErrorHard		1<<0
-#define MB_bOffsetErrorLogic	1<<1
-#define MB_bOffsetErrorData		1<<2
-
-	uint32_t	res32 = STVALINT32_OK;
-	if (ucMDiscInBuf[MB_offsetDiscreet4] & MB_bOffsetErrorHard) 	{res32 |= STVALINT32_Alarm;}
-	if (ucMDiscInBuf[MB_offsetDiscreet4] & MB_bOffsetErrorLogic) 	{res32 |= STVALINT32_Alarm;}
-	if (ucMDiscInBuf[MB_offsetDiscreet4] & MB_bOffsetErrorData) 	{res32 |= STVALINT32_Alarm;}
-	if (ucMDiscInBuf[MB_offsetDiscreet4] & MB_bOffsetErrorSW) 		{res32 |= STVALINT32_Alarm;}
-	IedServer_updateInt32AttributeValue(iedServer, &iedModel_CTRL_CSWI1_Health_stVal, res32);
-	IedServer_updateQuality(iedServer,&iedModel_CTRL_CSWI1_Health_q,0);
-	IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_CSWI1_Health_t, currentTime);
-
-	}
-//XCBR
-//--------------------------------
-	{
-	//Pos
-	uint8_t	res=STVALCODEDENUM_INTERMEDIATE;
-	if (ucMDiscInBuf[MB_offset_adr0] & MB_offsetSW_OFF) {res |= STVALCODEDENUM_OFF;}
-	if (ucMDiscInBuf[MB_offset_adr0] & MB_offsetSW_ON)  {res |= STVALCODEDENUM_ON;} 			//2 - STATE_ON ? 1- STATE_OFF ? 0 -  STATE_INTERMEDIATE
-
-	IedServer_updateBitStrinAttributeValue(iedServer, &iedModel_CTRL_XCBR1_Pos_stVal, res);
-	IedServer_updateQuality(iedServer,&iedModel_CTRL_XCBR1_Pos_q,0);
-	IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_XCBR1_Pos_t, currentTime);
-
-	//Loc
-	bool XCBR1_Loc=0;
-	if (ucMConfigBufall[MB_offset_BlockSDTU]) {XCBR1_Loc = 1;}
-	IedServer_updateBooleanAttributeValue(iedServer, &iedModel_CTRL_XCBR1_Loc_stVal, XCBR1_Loc);
-	IedServer_updateQuality(iedServer,&iedModel_CTRL_XCBR1_Loc_q,0);
-	IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_XCBR1_Loc_t, currentTime);
-	}
-
-//	IedServer_updateInt32AttributeValue(iedServer, iedModel_CTRL_XCBR1_OpCnt_stVal,(ucMConfigBufall[MB_offset_BlockSDTU]);
-
-	//--------------------------------
-
-//LEDGGIO1
-//--------------------------------
- 	IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind1_stVal,  ucMDiscInBuf[MB_offsetLED] & (1<<8));
-	IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind2_stVal,  ucMDiscInBuf[MB_offsetLED] & (1<<9));
-	IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind3_stVal,  ucMDiscInBuf[MB_offsetLED] & (1<<10));
-	IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind4_stVal,  ucMDiscInBuf[MB_offsetLED] & (1<<11));
-	IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind5_stVal,  ucMDiscInBuf[MB_offsetLED] & (1<<12));
-	IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind6_stVal,  ucMDiscInBuf[MB_offsetLED] & (1<<13));
-	IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind7_stVal,  ucMDiscInBuf[MB_offsetLED] & (1<<14));
-	IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind8_stVal,  ucMDiscInBuf[MB_offsetLED] & (1<<15));
-	IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind9_stVal,  ucMDiscInBuf[MB_offsetLED] & (1<<4));
-	IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind10_stVal,  ucMDiscInBuf[MB_offsetLED] & (1<<5));
-	IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind11_stVal,  ucMDiscInBuf[MB_offsetLED] & (1<<6));
-	IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind12_stVal,  ucMDiscInBuf[MB_offsetLED] & (1<<7));
-
-	// статус сброса нидикаторов
-	if (ucMDiscInBuf[MB_offsetLED] & 0xFF00){
-		IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_SPCSO1_stVal,  1);
-	    IedServer_updateQuality(iedServer,&iedModel_GGIO_LEDGGIO1_SPCSO1_q,0);
-	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_SPCSO1_t, currentTime);
-
-	} else{
-		IedServer_updateBooleanAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_SPCSO1_stVal,  0);
-	    IedServer_updateQuality(iedServer,&iedModel_GGIO_LEDGGIO1_SPCSO1_q,0);
-	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_SPCSO1_t, currentTime);
-
-	}
-
-
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind1_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind2_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind3_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind4_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind5_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind6_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind7_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind8_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind9_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind10_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind11_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Ind12_t, currentTime);
-
-
-    IedServer_updateQuality(iedServer,&iedModel_GGIO_LEDGGIO1_Ind1_q,0);
-    IedServer_updateQuality(iedServer,&iedModel_GGIO_LEDGGIO1_Ind2_q,0);
-    IedServer_updateQuality(iedServer,&iedModel_GGIO_LEDGGIO1_Ind3_q,0);
-    IedServer_updateQuality(iedServer,&iedModel_GGIO_LEDGGIO1_Ind4_q,0);
-    IedServer_updateQuality(iedServer,&iedModel_GGIO_LEDGGIO1_Ind5_q,0);
-    IedServer_updateQuality(iedServer,&iedModel_GGIO_LEDGGIO1_Ind6_q,0);
-    IedServer_updateQuality(iedServer,&iedModel_GGIO_LEDGGIO1_Ind7_q,0);
-    IedServer_updateQuality(iedServer,&iedModel_GGIO_LEDGGIO1_Ind8_q,0);
-    IedServer_updateQuality(iedServer,&iedModel_GGIO_LEDGGIO1_Ind9_q,0);
-    IedServer_updateQuality(iedServer,&iedModel_GGIO_LEDGGIO1_Ind10_q,0);
-    IedServer_updateQuality(iedServer,&iedModel_GGIO_LEDGGIO1_Ind11_q,0);
-    IedServer_updateQuality(iedServer,&iedModel_GGIO_LEDGGIO1_Ind12_q,0);
-
-//--------------------------------
-// сброс флагов
-
-	if (ucMDiscInBuf[MB_offset_adr0] & MB_bOffsetError){
-		IedServer_updateBooleanAttributeValue(iedServer, &iedModel_CTRL_GGIO1_SPCSO1_stVal,  1);
-	    IedServer_updateQuality(iedServer,&iedModel_CTRL_GGIO1_SPCSO1_q,0);
-	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_GGIO1_SPCSO1_t, currentTime);
-
-	} else{
-		IedServer_updateBooleanAttributeValue(iedServer, &iedModel_CTRL_GGIO1_SPCSO1_stVal,  0);
-	    IedServer_updateQuality(iedServer,&iedModel_CTRL_GGIO1_SPCSO1_q,0);
-	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_GGIO1_SPCSO1_t, currentTime);
-	}
-	if (ucMDiscInBuf[MB_offset_adr0] & MB_bOffsetSysNote){
-		IedServer_updateBooleanAttributeValue(iedServer, &iedModel_CTRL_GGIO1_SPCSO2_stVal,  1);
-	    IedServer_updateQuality(iedServer,&iedModel_CTRL_GGIO1_SPCSO2_q,0);
-	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_GGIO1_SPCSO2_t, currentTime);
-
-	} else{
-		IedServer_updateBooleanAttributeValue(iedServer, &iedModel_CTRL_GGIO1_SPCSO2_stVal,  0);
-	    IedServer_updateQuality(iedServer,&iedModel_CTRL_GGIO1_SPCSO2_q,0);
-	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_GGIO1_SPCSO2_t, currentTime);
-	}
-	if (ucMDiscInBuf[MB_offset_adr0] & MB_bOffsetErrorNote){
-		IedServer_updateBooleanAttributeValue(iedServer, &iedModel_CTRL_GGIO1_SPCSO3_stVal,  1);
-	    IedServer_updateQuality(iedServer,&iedModel_CTRL_GGIO1_SPCSO3_q,0);
-	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_GGIO1_SPCSO3_t, currentTime);
-
-	} else{
-		IedServer_updateBooleanAttributeValue(iedServer, &iedModel_CTRL_GGIO1_SPCSO3_stVal,  0);
-	    IedServer_updateQuality(iedServer,&iedModel_CTRL_GGIO1_SPCSO3_q,0);
-	    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_GGIO1_SPCSO3_t, currentTime);
-	}
-
-//--------------------------------
-// MSQI1
-	int32_t MSQI_stval = 0;
-
-	if (ucMDiscInBuf[MB_offsetError] & (MB_errorMRV1|MB_errorMSAI)) {
-		MSQI_stval = 2;
-	} else		MSQI_stval = 1;
-
-	IedServer_updateInt32AttributeValue(iedServer, &iedModel_MES_MSQI1_Health_stVal,  MSQI_stval);
-    IedServer_updateQuality(iedServer,&iedModel_MES_MSQI1_Health_q,0);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_MES_MSQI1_Health_t, currentTime);
-
-// SeqA
-    float	cXtmp = (float)ucMAnalogInBuf[MB_offset_NI1] * 40 * Ktt / 65536;
-    IedServer_updateFloatAttributeValue(iedServer, &iedModel_MES_MSQI1_SeqA_c1_cVal_mag_f,  cXtmp);
-    IedServer_updateQuality(iedServer,&iedModel_MES_MSQI1_SeqA_c1_q,0);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_MES_MSQI1_SeqA_c1_t, currentTime);
-
-    cXtmp = (float)ucMAnalogInBuf[MB_offset_NI2] * 40 * Ktt / 65536;
-    IedServer_updateFloatAttributeValue(iedServer, &iedModel_MES_MSQI1_SeqA_c2_cVal_mag_f,  cXtmp);
-    IedServer_updateQuality(iedServer,&iedModel_MES_MSQI1_SeqA_c2_q,0);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_MES_MSQI1_SeqA_c2_t, currentTime);
-
-    cXtmp = (float)ucMAnalogInBuf[MB_offset_NI0] * 40 * Ktt / 65536;
-    IedServer_updateFloatAttributeValue(iedServer, &iedModel_MES_MSQI1_SeqA_c3_cVal_mag_f,  cXtmp);
-    IedServer_updateQuality(iedServer,&iedModel_MES_MSQI1_SeqA_c3_q,0);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_MES_MSQI1_SeqA_c3_t, currentTime);
-
-//--------------------------------
-    // остальные узлыузлы
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_LLN0_Health_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_LLN0_Beh_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_LLN0_Mod_t, currentTime);
-
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_LPHD1_Proxy_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_LPHD1_PhyHealth_t, currentTime);
-
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Health_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Beh_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_OUTGGIO1_Mod_t, currentTime);
-//LEDGGIO1
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Health_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Beh_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_GGIO_LEDGGIO1_Mod_t, currentTime);
-
-
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_MES_MMXU1_Health_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_MES_MMXU1_Beh_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_MES_MMXU1_Mod_t, currentTime);
-
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_PTOC1_Mod_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_PTOC1_Beh_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_PTOC1_Health_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_PTOC1_Str_t, currentTime);
-    IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_PTOC1_Op_t, currentTime);
-
-
-    // проверяем группу уставок
-    uint8_t	currSG = 1;
-    if (ucMDiscInBuf[MB_offset_adr0] & MB_bOffsetSettingGr) currSG = 2;
-
-	if (currSG != IedServer_getActiveSettingGroup(iedServer,LogicalDevice_getSettingGroupControlBlock(&iedModel_Generic_LD0))) {
-		IedServer_changeActiveSettingGroup(iedServer,LogicalDevice_getSettingGroupControlBlock(&iedModel_Generic_LD0),currSG );
-		USART_TRACE("Изменилась группа уставок. %u\n",iedModel_LD0_LLN0_sgcb0.actSG);
-	}
-
-	// -------------------- были ли изменения в уставках ---------------------------
-    if (ucMDiscInBuf[MB_offset_adr0] & MB_bOffsetSysNote) {
-    	// было изменение уставок. Нужно их перечитать.
-    	USART_TRACE("Изменились уставки.\n");
-    	writeNmb = 9;
-    	ucMDiscInBuf[MB_offset_adr0] ^= MB_bOffsetSysNote;
-    }
-
-
-    IedServer_unlockDataModel(iedServer);																// отдаём управление mmsServer'ом
-}
-//+++++++++++++++++++
-		}
-
-		// перенёс в начало
-//		errorType = eMBMasterPoll();						// мониторим события от MODBUS.
-//		if (errorType == MB_ETIMEDOUT){
-//   		USART_TRACE_RED("ReadNmb: %u\n",ReadNmb);
-//    		//if (ReadNmb) ReadNmb--;
-//    	Port_Off(LED1);
-//		}
-
-		errorType = eMBMasterPoll();						// мониторим события от MODBUS.
-		if (errorType == MB_ETIMEDOUT){
-    		USART_TRACE_RED("ReadNmb: %u\n",ReadNmb);
-    		//if (ReadNmb) ReadNmb--;
-    	Port_Off(LED1);
-		}else
-		if (errorType == MB_ENOERR){
-//			if (writeNmb == 0) ReadNmb++;
-			if (writeNmb == 10) {writeNmb = 0;}
-		}
 
 		taskYIELD();										// отпустим задачу.
 	}

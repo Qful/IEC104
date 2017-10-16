@@ -166,8 +166,9 @@ void 	Hal_setTimeInMs (uint64_t timeinms){
 
 //	sTime.SubSeconds 	= (1000-msec)*hrtc.Init.SynchPrediv/1000;		не корректирует
 	sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
-	sTime.TimeFormat = RTC_HOURFORMAT_24;
+//	sTime.TimeFormat = RTC_HOURFORMAT_24;// �� ��.
 	sTime.StoreOperation = 0;
+	hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
 	HAL_RTC_SetTime(&hrtc, &sTime, FORMAT_BIN);
 
 //	USART_TRACE("Hal_setTimeInMs %u.%u.%u\n",sTime.Hours,sTime.Minutes,sTime.Seconds);

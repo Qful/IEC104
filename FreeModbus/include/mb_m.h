@@ -69,6 +69,15 @@ PR_BEGIN_EXTERN_C
 #define MB_MASTER_TCP_PORT_USE_DEFAULT 0
 
 /* ----------------------- Type definitions ---------------------------------*/
+typedef struct
+ {
+  uint8_t 	MBSlaveAddr;				// адрес получателя
+  uint16_t 	MBFunct;					// команда модбас
+  uint16_t 	StartAddr;					// адрес сообщения
+  uint16_t 	SizeMessage;				// размер сообщения
+  uint16_t	ucData[10];					// содержание сообщения, включает адрес,число,значения. без CRC
+ }ModbusMessage;
+
 /*! \ingroup modbus
  * \brief Errorcodes used by all function in the Master request.
  */
@@ -383,7 +392,6 @@ BOOL 	xMBMasterRequestIsBroadcast( void );
 eMBMasterErrorEventType eMBMasterGetErrorType( void );
 void 	vMBMasterSetErrorType( eMBMasterErrorEventType errorType );
 eMBMasterReqErrCode eMBMasterWaitRequestFinish( void );
-
 /* ----------------------- Callback -----------------------------------------*/
 
 #ifdef __cplusplus

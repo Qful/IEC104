@@ -68,7 +68,7 @@ typedef void (*GooseListener)(GooseSubscriber subscriber, void* parameter);
  * \param dataSetValues the MmsValue object where the data set values will be written or NULL.
  */
 GooseSubscriber
-GooseSubscriber_create(char* goCbRef, MmsValue* dataSetValues);
+GooseSubscriber_create(char* goCbRef, MmsValue* dataSetValues,void* MAC);
 
 //char*
 //GooseSubscriber_getGoCbRef(GooseSubscriber self);

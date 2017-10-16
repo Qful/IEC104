@@ -63,9 +63,9 @@ GooseReceiver_create()
     if (self != NULL) {
         self->running = false;
         self->interfaceId = NULL;
-        self->buffer = (uint8_t*) GLOBAL_MALLOC(ETH_BUFFER_LENGTH);
-        self->ethSocket = NULL;
-        self->subscriberList = LinkedList_create();
+        self->buffer = (uint8_t*) GLOBAL_MALLOC(ETH_BUFFER_LENGTH);			// буфер для приёма
+        self->ethSocket = NULL;												// сокет для приёма
+        self->subscriberList = LinkedList_create();							// список MAC адресов для приёма гусов
     }
 
     return self;
@@ -685,7 +685,10 @@ parseGooseMessage(GooseReceiver self, int numbytes)
     }
 }
 
-
+/*********************************************************************
+ * gooseReceiverLoop
+ * ТАСК обрабатывающий принятые сообщения гусов
+ *********************************************************************/
 static void
 gooseReceiverLoop(void* threadParameter)
 {
@@ -694,6 +697,7 @@ gooseReceiverLoop(void* threadParameter)
     self->running = true;
     self->stopped = false;
 
+    // конфигурим приёмник VLAN сообщений, на прием гусов с нужными нам MAC фильтрами
     GooseReceiver_startThreadless(self);
 
     while (self->running) {
@@ -712,7 +716,7 @@ gooseReceiverLoop(void* threadParameter)
 void
 GooseReceiver_start(GooseReceiver self)
 {
-    Thread thread = Thread_create((ThreadExecutionFunction) gooseReceiverLoop, (void*) self, true);
+    Thread thread = Thread_create((ThreadExecutionFunction) gooseReceiverLoop, (void*) self, true);				// автоматически закрываем поток.
 
     if (thread != NULL) {
         if (DEBUG_GOOSE_SUBSCRIBER)
@@ -770,9 +774,11 @@ GooseReceiver_stopThreadless(GooseReceiver self)
     self->running = false;
 }
 
-// call after reception of ethernet frame and periodically to to house keeping tasks
-bool
-GooseReceiver_tick(GooseReceiver self)
+/***************************************
+ * GooseReceiver_tick
+ * проверяем есть ли сообщения, если есть обрабатываем их
+ ***************************************/
+bool	GooseReceiver_tick(GooseReceiver self)
 {
     int packetSize = Ethernet_receivePacket(self->ethSocket, self->buffer, ETH_BUFFER_LENGTH);
 

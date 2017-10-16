@@ -413,8 +413,7 @@ eMBErrorCode    eMBRegCoilsCB( UCHAR * pucRegBuffer, USHORT usAddress,
  *   - eMBErrorCode::MB_EIO If an unrecoverable error occurred. In this case
  *       a <b>SLAVE DEVICE FAILURE</b> exception is sent as a response.
  */
-eMBErrorCode    eMBRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress,
-                                  USHORT usNDiscrete );
+eMBErrorCode    eMBRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNDiscrete );
 
 #ifdef __cplusplus
 PR_END_EXTERN_C

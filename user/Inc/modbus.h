@@ -58,6 +58,8 @@
 #include "mbutils.h"
 
 #include "stdbool.h"
+
+#include "queue.h"
 /* ----------------------- Defines ------------------------------------------*/
 
 #define	MB_SlaveAddres							1
@@ -131,6 +133,11 @@ BOOL	Hal_setConfSWFromMB_Date ( uint16_t * MDateBuf );	// функция установки конф
 void     vMBMODBUSPortRxDisable( void );
 
 void Modbus_SendCmd(uint8_t MB_SlaveAddr, uint8_t MB_Funct, uint16_t addr, uint16_t numb, uint16_t *Data, uint16_t len);
+
+
+int8_t	AddToQueueMB(xQueueHandle SentQueue, uint16_t	MB_Rd_cmd, uint8_t	Slaveaddr);
+eMBMasterReqErrCode	eMBMasterSendMessage(ModbusMessage*	Message);
+
 
 void	ATCC_TapChg_Pos_Oper_Set(uint16_t newState, uint64_t timeStamp); // управление приводом 851
 void	ATCC_ParOp_Pos_Oper(bool newState, uint64_t timeStamp);

@@ -67,8 +67,8 @@ IedServer_getClientconections(uint8_t *pcWriteBuffer, IedServer self);
  *
  * \return the newly generated IedServer instance
  */
-IedServer
-IedServer_create(IedModel* iedModel);
+//IedServer	IedServer_create(IedModel* iedModel);
+IedServer IedServer_create(IedModel* iedModel, uint16_t	numb);
 
 /**
  * \brief Destroy an IedServer instance and release all resources (memory, TCP sockets)

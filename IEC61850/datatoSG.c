@@ -11,6 +11,10 @@
 #include "iec850.h"
 #include "iec61850_server.h"
 
+#include "modbus.h"
+
+extern 	xQueueHandle 	Rd_SysNoteQueue;		// очередь для запросов журналу системы
+
 /*******************************************************
  * MR801
  *******************************************************/
@@ -152,12 +156,20 @@ void	Set_SG	(uint8_t num, uint64_t currentTime )
 /*******************************************************
  * MR5 PO70
  *******************************************************/
+#if defined (MR5_700) || defined (MR5_500)
+
 #if defined (MR5_700)
 #include "static_model_MR5_700.h"
+#endif
+
+#if defined (MR5_500)
+#include "static_model_MR5_500.h"
+#endif
 
 extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
-extern uint8_t				writeNmb;
-extern uint8_t	  			writeNmbSG;			// номер группы уставок.
+extern uint8_t	  writeNmb;
+extern uint8_t	  writeNmbSG;			// номер группы уставок.
+extern bool		  Reset_SysNoteNow;
 
 /*******************************************************
  * Set_SG  изменяем группу уставок
@@ -177,6 +189,7 @@ void	Set_SG	(uint8_t num, uint64_t currentTime )
 	    if (ucMDiscInBuf[MB_offset_adr0] & MB_bOffsetSysNote) {
 	    	// было изменение уставок. Нужно их перечитать.
 	    	USART_TRACE("Новая запись в журнале системы.\n");
+	    	Reset_SysNoteNow = true;
 	    	writeNmb = MB_Wr_Reset_SysNote;
 	    	ucMDiscInBuf[MB_offset_adr0] ^= MB_bOffsetSysNote;
 	    }
@@ -191,8 +204,11 @@ void	Set_SG	(uint8_t num, uint64_t currentTime )
 #include "static_model_MR5_600.h"
 
 extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
-extern uint8_t				writeNmb;
-extern uint8_t	  			writeNmbSG;			// номер группы уставок.
+extern uint8_t	  writeNmb;
+extern uint8_t	  writeNmbSG;			// номер группы уставок.
+extern bool		  Reset_SysNoteNow;
+extern uint16_t			GlobalAddrSysNote;
+extern	uint16_t   usSysNoteStart;
 
 /*******************************************************
  * Set_SG  изменяем группу уставок
@@ -212,8 +228,18 @@ void	Set_SG	(uint8_t num, uint64_t currentTime )
 	    if (ucMDiscInBuf[MB_offset_adr0] & MB_bOffsetSysNote) {
 	    	// было изменение уставок. Нужно их перечитать.
 	    	USART_TRACE("Новая запись в журнале системы.\n");
+	    	Reset_SysNoteNow = true;
 	    	writeNmb = MB_Wr_Reset_SysNote;
 	    	ucMDiscInBuf[MB_offset_adr0] ^= MB_bOffsetSysNote;
+
+            AddToFileMessageWord(_SystemNote,NULL,0,FA_CREATE_ALWAYS | FA_WRITE);
+
+			AddToQueueMB(Rd_SysNoteQueue, MB_Wrt_Reset_SysNote	,MB_Slaveaddr);
+
+			usSysNoteStart = MB_StartSysNoteaddr;
+			GlobalAddrSysNote = 0;
+        	AddToQueueMB(Rd_SysNoteQueue, MB_Rd_SysNote			,MB_Slaveaddr);
+
 	    }
 
 }

@@ -33,6 +33,9 @@
 #if defined (MR5_600)
 #include "MbMapMR5PO60.h"
 #endif
+#if defined (MR5_500)
+#include "MbMapMR5PO50.h"
+#endif
 
 #include "versions/version_num.h"
 #include "versions/build_defs.h"
@@ -55,7 +58,15 @@
  * SWRevision 023 - много изменений.
  * SWRevision 023.1 - исправил ошибки состояния mod,beh в GGIO во всех приборах
  * SWRevision 023.2 - исправил ошибки состояния mod,beh в GGIO во ПО60 на МРВ1,2
+ * SWRevision 023.3 - 1. 2025год на старте. 2. синхронизация мремени из модбас при отсутствии ответа от NTP _limitlostSNTPPackets пакетов. 3. Вебинтерфейс время последней синхронизации.
+ * SWRevision 023.4 - добавил гусы
+ *
+ *
+ *
+ *
+ *
  */
+
 typedef struct					// для передачи через очереди структур.
 {
   uint32_t	errAnalog;
@@ -64,7 +75,7 @@ typedef struct					// для передачи через очереди структур.
 } errMB_data;
 
 #ifndef _SWRevision
-#define _SWRevision     "SWRev. 023.3("__DATE__"-"__TIME__")"
+#define _SWRevision     "Rev. 023.4("__DATE__"-"__TIME__")"
 #endif
 
 #ifndef _ConfigRevision
@@ -74,16 +85,8 @@ typedef struct					// для передачи через очереди структур.
 #define _Vendor		    "BEMN"
 #define _LDNS			"IEC 61850-7-4:2011"
 
-#if defined (MR5_500)
-#define _swREV			"MR5 PO50"
-#endif
-#if defined (MR5_600_)
-#define _swREV			"MR5 PO60"
-#endif
-
-
-#define _SystemNote		"0:/MMSfiles/Jurnal.bin"
-#define _ErrorNote		"0:/MMSfiles/Error.bin"
+#define _SystemNote		"0:/MMSfiles/SysLog.bin"
+#define _ErrorNote		"0:/MMSfiles/AlarmLog.bin"
 
 // константы во FLASH
 #define _Ifboot				0			// 1 байта
@@ -101,6 +104,10 @@ static const char EEPROMDEFAULT[] = {0, 192, 168, 0, 201, 0, 192, 168, 0, 122, 6
 #define _NTP_Size			7			// размер блока
 #define _startsoft			0xFF
 #define _startboot			0
+
+#define 	_limitlostSNTPPackets		10		// предел пропущеных пакетов, при котором начинаем читать время из прибора и не из NTP
+
+
 //__attribute__((__section__(".eb0rodata"))) const uint8_t userConfig[0x7FFC];// = {1,2,3,4,5,6,7,8,9,0};
 
 
@@ -177,6 +184,14 @@ print '\033[1;48mHighlighted Crimson like Chianti\033[1;m'
 							printf("\033[1;35mDBG: ") ;\
                             printf(__VA_ARGS__);\
                             printf("\033[1;m");
+
+#define  USART_TRACE_CYAN(...)   printfTime();\
+							printf("\033[1;36mDBG: ") ;\
+                            printf(__VA_ARGS__);\
+                            printf("\033[1;m");
+
+
+
 #define  USART_0TRACE(...)  printf(__VA_ARGS__);
 
 #else
@@ -286,6 +301,7 @@ print '\033[1;48mHighlighted Crimson like Chianti\033[1;m'
 #define LOGIN_SIZE   (15+ sizeof(USERID) + sizeof(PASSWORD))
 
 
+#define  _RECEIVE_WAIT_lim 		4000
 
 typedef enum
 {
@@ -323,10 +339,29 @@ typedef enum
 	MB_Rd_Analog		= 2,
 
 	MB_Rd_AllUstavki 	= 10,
+	MB_Rd_Get_Time 		= 11,
+	MB_Rd_Syscfg 		= 12,
+	MB_Rd_Ustavki 		= 13,
+	MB_Rd_ConfigSWCrash = 14,
+
+	MB_Rd_ConfigOut		= 20,
+	MB_Rd_ConfigExZ		= 21,
+	MB_Rd_ConfigF		= 22,
+	MB_Rd_ConfigU		= 23,
+
 	MB_Rd_SysNote 		= 40,
 	MB_Rd_ErrorNote 	= 41,
 	MB_Rd_EndAddr		= 42,
-	MB_Rd_none			= 0xFF,
+	MB_Rd_none			= 0xFFFF,
+
+	MB_Wrt_Reset_LEDS 		= 103,
+	MB_Wrt_Reset_Error 		= 104,
+	MB_Wrt_Reset_SysNote 	= 105,
+	MB_Wrt_Reset_ErrorNote 	= 106,
+
+	MB_Wrt_Set_Time			= 110,
+
+
 } Mb_readCMD;
 
 #if defined (MR5_600_)
