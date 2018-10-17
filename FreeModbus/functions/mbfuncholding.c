@@ -35,11 +35,81 @@
 /* ----------------------- Platform includes --------------------------------*/
 #include "port.h"
 
+#include "main.h"
+
+#include "iec850.h"
+#include "iec61850_server.h"
+#include "static_model.h"
 /* ----------------------- Modbus includes ----------------------------------*/
 #include "mb.h"
 #include "mbframe.h"
 #include "mbproto.h"
 #include "mbconfig.h"
+
+#include "modbus.h"
+
+#include "dataUpdateFromBase.h"
+
+extern IedServer iedServer;
+
+extern 	bool	NextPacketIgnor;
+extern	IedDataUpdateHandler IedDataUpdateFuncHandlers[IDU_FUNC_HANDLERS_MAX];
+/*************************************************************************
+ * MR771 MR761 MR762 MR763
+ *************************************************************************/
+#if defined (MR771) || defined (MR761) || defined (MR762) || defined (MR763) ||\
+	defined (MR801) || \
+	defined (MR901) || defined (MR902) ||\
+	defined (MR851) ||\
+	defined (MR5_500) || defined (MR5_600) || defined (MR5_700) ||\
+	defined (MR741)
+
+extern uint16_t   ucVLSOutBuf[MB_NumbConfigVLSOut];
+extern uint16_t   ucVLSInBuf[MB_NumbConfigVLSIn];
+extern uint16_t   ucMDateBuf[MB_NumbDate];
+extern uint16_t   ucMRevBuf[MB_NumbWordRev];
+extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
+extern uint16_t   ucConfigBufSW[MB_NumbConfigSW];
+extern uint16_t   ucSystemCfgBuf[MB_NumbSystemCfg];
+extern uint16_t   ucConfigTRMeasBuf[MB_NumbConfigTRMeas];
+extern uint16_t   ucMUstavkiInBuf[MB_NumbUstavki];
+extern uint16_t   ucConfigAPWBuf[MB_NumbConfigAPW];
+extern uint16_t   ucSGBuf[MB_NumbSG];
+
+extern uint16_t   ucMAutomatBuf[MB_NumbAutomat];
+extern uint16_t   ucSWCrash[MB_Size_SWCrash];
+// журнал системы -----------------------
+extern uint16_t   ucSysNoteBuf[MB_NumbSysNote];
+extern uint16_t   ucSysNoteBufPre[MB_NumbSysNote];								// последн€€ запись дл€ поиска
+extern uint16_t   ucSysNoteBufNext[MB_NumbSysNote];							// последн€€ запись
+// журнал аварий -----------------------
+extern uint16_t   ucErrorNoteBuf[MB_NumbErrorNote];
+extern uint16_t   ucErrorNoteBufPre[MB_NumbErrorNoteTime];
+extern uint16_t   ucErrorNoteBufNext[MB_NumbErrorNoteTime];
+
+
+extern uint16_t   usSysNoteStart;
+extern uint16_t   usErrorNoteStart;
+
+extern uint16_t   usMDateStart;
+extern uint16_t   usMRevStart;
+extern uint16_t   usMDiscInStart;
+extern uint16_t   usMAnalogInStart;
+extern uint16_t   usConfigStartSW;
+extern uint16_t   usConfigUstavkiStart;			// группа уставок
+extern uint16_t   usConfigAutomatStart;			// параметры автоматики
+extern uint16_t   usConfigVLSInStart;			// чтение конфигурации входных логических сигналов
+extern uint16_t   usConfigVLSOutStart;			// чтение конфигурации выходных логических сигналов
+extern uint16_t   usConfigAPWStart;				// конфигураци€ јѕ¬
+extern uint16_t   usSystemCfgStart;				// параметры системы
+extern uint16_t   usConfigTRMeasStart;			// конфигураци€ измерительного транса
+extern uint16_t   usSGStart;
+
+extern uint16_t   usConfigAutomatStart;
+extern uint16_t   usConfigStartSWCrash;			// ресурс выключател€
+
+#endif
 
 /* ----------------------- Defines ------------------------------------------*/
 #define MB_PDU_FUNC_READ_ADDR_OFF               ( MB_PDU_DATA_OFF + 0)
@@ -109,9 +179,15 @@ eMBFuncWriteHoldingRegister( UCHAR * pucFrame, USHORT * usLen )
 eMBException
 eMBFuncWriteMultipleHoldingRegister( UCHAR * pucFrame, USHORT * usLen )
 {
+	bool			DataChanged = false;
+	uint64_t 		currentTime;
+
     USHORT          usRegAddress;
     USHORT          usRegCount;
     UCHAR           ucRegByteCount;
+    uint8_t         usRegDataOffs;
+
+    uint16_t		MemForSave;
 
     eMBException    eStatus = MB_EX_NONE;
     eMBErrorCode    eRegStatus;
@@ -127,16 +203,31 @@ eMBFuncWriteMultipleHoldingRegister( UCHAR * pucFrame, USHORT * usLen )
 
         ucRegByteCount = pucFrame[MB_PDU_FUNC_WRITE_MUL_BYTECNT_OFF];
 
+   		usRegDataOffs = MB_PDU_FUNC_WRITE_MUL_VALUES_OFF;
+
         if( ( usRegCount >= 1 ) &&
             ( usRegCount <= MB_PDU_FUNC_WRITE_MUL_REGCNT_MAX ) &&
             ( ucRegByteCount == ( UCHAR ) ( 2 * usRegCount ) ) )
         {
-            /* Make callback to update the register values. */
-            eRegStatus =
-                eMBRegHoldingCB( &pucFrame[MB_PDU_FUNC_WRITE_MUL_VALUES_OFF],
-                                 usRegAddress, usRegCount, MB_REG_WRITE );
 
-            /* If an error occured convert it into a Modbus exception. */
+       	currentTime = Hal_getTimeInMs();
+
+       	MemForSave = usRegAddress-1;
+
+		// срочные дискреты 0D00
+			if (usMDiscInStart== MemForSave){
+				eRegStatus = eMBMasterToMemDB( &pucFrame[usRegDataOffs], usRegAddress, usRegCount, ucMDiscInBuf, usMDiscInStart, MB_NumbDiscreet );		// сохран€ем данные в хранилище
+				if( eRegStatus == MB_ENOERR ){
+					if (iedServer){
+//					    Port_Off(LEDtst1);
+						NextPacketIgnor = true;
+						IedServer_DataUpdateInGoosesDatasets(iedServer);
+//					    Port_On(LEDtst1);
+					}
+				}
+			}
+
+            // If an error occured convert it into a Modbus exception.
             if( eRegStatus != MB_ENOERR )
             {
                 eStatus = prveMBError2Exception( eRegStatus );

@@ -75,8 +75,13 @@ typedef struct
   uint16_t 	MBFunct;					// команда модбас
   uint16_t 	StartAddr;					// адрес сообщения
   uint16_t 	SizeMessage;				// размер сообщения
-  uint16_t	ucData[10];					// содержание сообщения, включает адрес,число,значения. без CRC
+  uint16_t	ucData[30];					// содержание сообщения, включает адрес,число,значения. без CRC
  }ModbusMessage;
+
+ typedef struct
+  {
+   uint8_t 		ucData[5];
+  }ModbusHead;
 
 /*! \ingroup modbus
  * \brief Errorcodes used by all function in the Master request.
@@ -96,8 +101,10 @@ typedef enum
  */
 typedef enum
 {
+	MB_TMODE_STOP,					// таймер остановлен
 	MB_TMODE_T35,                   /*!< Master получает фрейм T3.5 таймаут. */
 	MB_TMODE_RESPOND_TIMEOUT,       /*!< Master ждет ответа от slave. */
+	MB_TMODE_AFTERRESPOND_TIMEOUT,  /*!< Master ждет таймаут после ответа, слейв почемуто не принимает */
 	MB_TMODE_CONVERT_DELAY          /*!< Master передаёт широковещательный пакет, then delay sometime.*/
 }eMBMasterTimerMode;
 
@@ -355,6 +362,7 @@ eMBMasterReqErrCode		eMBMasterReqReadInputRegister( UCHAR ucSndAddr, USHORT usRe
 eMBMasterReqErrCode		eMBMasterReqWriteHoldingRegister( UCHAR ucSndAddr, USHORT usRegAddr, USHORT usRegData, LONG lTimeOut );
 eMBMasterReqErrCode		eMBMasterReqWriteMultipleHoldingRegister( UCHAR ucSndAddr, USHORT usRegAddr, USHORT usNRegs, USHORT * pusDataBuffer, LONG lTimeOut );
 eMBMasterReqErrCode		eMBMasterReqReadHoldingRegister( UCHAR ucSndAddr, USHORT usRegAddr, USHORT usNRegs, LONG lTimeOut );
+eMBMasterReqErrCode		eMBMasterReqReadHoldingRegisterWithAddres( UCHAR ucSndAddr, USHORT usRegAddr, USHORT usNRegs, LONG lTimeOut );
 eMBMasterReqErrCode		eMBMasterReqReadWriteMultipleHoldingRegister( UCHAR ucSndAddr, USHORT usReadRegAddr, USHORT usNReadRegs, USHORT * pusDataBuffer, USHORT usWriteRegAddr, USHORT usNWriteRegs, LONG lTimeOut );
 eMBMasterReqErrCode		eMBMasterReqReadCoils( UCHAR ucSndAddr, USHORT usCoilAddr, USHORT usNCoils, LONG lTimeOut );
 eMBMasterReqErrCode		eMBMasterReqWriteCoil( UCHAR ucSndAddr, USHORT usCoilAddr, USHORT usCoilData, LONG lTimeOut );
@@ -388,6 +396,7 @@ void 	vMBMasterSetCBRunInMasterMode( BOOL IsMasterMode );
 USHORT 	usMBMasterGetPDUSndLength( void );
 void 	vMBMasterSetPDUSndLength( USHORT SendPDULength );
 void 	vMBMasterSetCurTimerMode( eMBMasterTimerMode eMBTimerMode );
+eMBMasterTimerMode 	vMBMasterGetCurTimerMode( void );
 BOOL 	xMBMasterRequestIsBroadcast( void );
 eMBMasterErrorEventType eMBMasterGetErrorType( void );
 void 	vMBMasterSetErrorType( eMBMasterErrorEventType errorType );

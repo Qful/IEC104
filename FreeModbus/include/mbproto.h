@@ -44,6 +44,7 @@ PR_BEGIN_EXTERN_C
 #define MB_FUNC_WRITE_SINGLE_COIL             (  5 )				//+ ”становка одного дискрета.
 #define MB_FUNC_WRITE_MULTIPLE_COILS          ( 15 )				//+ ”станавливает выходы в "1" или "0"
 #define MB_FUNC_READ_HOLDING_REGISTER         (  3 )				//+ „тение последовательности выходных регистров
+#define MB_FUNC_READ_HOLDING_REGISTER_W_ADDR  ( 19 )				//+ „тение последовательности выходных регистров c указанием адреса
 #define MB_FUNC_READ_INPUT_REGISTER           (  4 )				//+ „тение последовательности входных регистров
 #define MB_FUNC_WRITE_REGISTER                (  6 )				//+ запись данных в один регистр.
 #define MB_FUNC_WRITE_MULTIPLE_REGISTERS      ( 16 )				//+ «апись данных в последовательность регистров.

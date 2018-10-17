@@ -28,6 +28,12 @@
 #include "mms_device_model.h"
 #include "control.h"
 
+
+typedef enum {
+    GOOSE_READY = 0,
+    GOOSE_PAUSE,
+} GooseMode;
+
 typedef enum {
     REPORT_CONTROL_NONE,
     REPORT_CONTROL_VALUE_UPDATE,
@@ -131,6 +137,8 @@ MmsMapping_getDomainSpecificVariableList(MmsMapping* self, const char* variableL
 
 DataSet*
 MmsMapping_getDomainSpecificDataSet(MmsMapping* self, const char* dataSetName);
+
+void	createDataSets(MmsDevice* mmsDevice, IedModel* iedModel);
 
 void
 MmsMapping_freeDynamicallyCreatedDataSet(DataSet* dataSet);

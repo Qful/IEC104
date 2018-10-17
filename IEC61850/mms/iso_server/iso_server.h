@@ -27,6 +27,8 @@
 #include "byte_buffer.h"
 #include "iso_connection_parameters.h"
 
+#include "hal_socket.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -42,6 +44,26 @@ typedef enum
     ISO_SVR_STATE_STOPPED,
     ISO_SVR_STATE_ERROR
 } IsoServerState;
+
+typedef enum
+{
+	PHY_SWITCH_DEFAULT,
+    PHY_SWITCH_OFF,
+    PHY_SWITCH_FORWARD_ALL,
+    PHY_SWITCH_FORWARD_STORM_PROTECT,
+    PHY_SWITCH_PRP,
+    PHY_SWITCH_HSR,
+    PHY_SWITCH_BLOCKING,
+    PHY_SWITCH_GOOSE_MAC_FILTERING,
+} PhyPortsMode;
+
+typedef enum
+{
+	PHY_PORT_1,
+	PHY_PORT_2,
+	PHY_PORT_1_2,
+} PhyPortsForTransmit;
+
 
 typedef struct sIsoServer* IsoServer;
 
@@ -98,6 +120,29 @@ IsoServer_create(void);
 void
 IsoServer_setTcpPort(IsoServer self, int port);
 
+void			IsoServer_SetTFTPort(IsoServer self, int	port);
+int				IsoServer_GetTFTPort(IsoServer self);
+void			IsoServer_SetTFTPServerSocket(IsoServer self, ServerSocket	Socket);
+ServerSocket	IsoServer_GetTFTPServerSocket(IsoServer self);
+
+void			IsoServer_SetFTPPort(IsoServer self, int	port);
+int				IsoServer_GetFTPPort(IsoServer self);
+void			IsoServer_SetFTPServerSocket(IsoServer self, ServerSocket	Socket);
+ServerSocket	IsoServer_GetFTPServerSocket(IsoServer self);
+
+void			IsoServer_SetHTTPServerSocket(IsoServer self, ServerSocket	Socket);
+ServerSocket	IsoServer_GetHTTPServerSocket(IsoServer self);
+void			IsoServer_SetHTTPPort(IsoServer self, int	port);
+int				IsoServer_GetHTTPPort(IsoServer self);
+
+void			IsoServer_SetSSHServerSocket(IsoServer self, ServerSocket	Socket);
+ServerSocket	IsoServer_GetSSHServerSocket(IsoServer self);
+void			IsoServer_SetSSHPort(IsoServer self, int	port);
+int				IsoServer_GetSSHPort(IsoServer self);
+void			IsoServer_SetSSHConnect(IsoServer self);
+void			IsoServer_ClrSSHConnect(IsoServer self);
+bool			IsoServer_GetSSHConnect(IsoServer self);
+
 char*
 IsoServer_getLocalIpAddress(IsoServer self);
 
@@ -121,18 +166,36 @@ IsoServer_getMaskAddress(IsoServer self);
 IsoServerState
 IsoServer_getState(IsoServer self);
 
+PhyPortsForTransmit
+IsoServer_getPHYTransmitport(IsoServer self);
+
+
+void		IsoServer_PRP_on(IsoServer self);
+void		IsoServer_PRP_off(IsoServer self);
+void		IsoServer_PRPSeqNum_increase(IsoServer self);
+void		IsoServer_PRPSeqNum_reset(IsoServer self);
+bool		IsoServer_getAppendPRP(IsoServer self);
+uint16_t	IsoServer_getprpSeqNum(IsoServer self);
+
+
+bool		IsoServer_getAppendHSR(IsoServer self);
+uint16_t	IsoServer_gethsrSeqNum(IsoServer self);
+void		IsoServer_HSR_on(IsoServer self);
+void		IsoServer_HSR_off(IsoServer self);
+void		IsoServer_HSRSeqNum_increase(IsoServer self);
+void		IsoServer_HSRSeqNum_reset(IsoServer self);
+
+void
+IsoServer_setPHYTransmitport(IsoServer self, PhyPortsForTransmit ports);
+
 void
 IsoServer_setConnectionHandler(IsoServer self, ConnectionIndicationHandler handler,
         void* parameter);
 
-void
-IsoServer_setAuthenticator(IsoServer self, AcseAuthenticator authenticator, void* authenticatorParameter);
 
-AcseAuthenticator
-IsoServer_getAuthenticator(IsoServer self);
-
-void*
-IsoServer_getAuthenticatorParameter(IsoServer self);
+void						IsoServer_setAuthenticator(IsoServer self, AcseAuthenticator authenticator, void* authenticatorParameter);
+AcseAuthenticator			IsoServer_getAuthenticator(IsoServer self);
+void*						IsoServer_getAuthenticatorParameter(IsoServer self);
 
 void
 IsoServer_startListening(IsoServer self);

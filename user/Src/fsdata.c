@@ -1,33 +1,67 @@
 /*************************************************************************
-fsdata.c generator for UIP0.9       
-Works with cc65 C compiler        
-Based on the work of Adam Dunkels <adam@dunkels.com> 
-The syntax has been left as-is, with respect to the perl version
-Supports for a maximum of 2 levels directory and 999 files in each directory
-For more information, please go to http://www.design4fpga.com
-      ALL RIGHTS RESERVED, COPYRIGHT APRIL 2006, DESIGN4FPGA
+ * файловая система
 *************************************************************************/
 
-/*************************************************************************
-REDISTRIBUTION OF THIS PIECE OF SOFTWARE IN SOURCE OR AS A BINARY FILE IS PERMITTED IF AND ONLY IF 
-THE FOLLOWING RULES ARE OBSERVED: 
+/* Includes ------------------------------------------------------------------*/
+#include "FreeRTOS.h"
+#include "task.h"
+#include "port.h"
+#include "cmsis_os.h"
+#include "queue.h"
 
-1) THE REDISTRIBUTION FILE OR ARCHIVE SHOULD INCLUDE THIS README FILE AS WELL AS THE COPYRIGHT NOTICE.
-
-BY USING THIS SOFTWARE, YOU ARE ACKNOWLEDGING THAT YOU HAVE READ AND AGREED WITH THE FOLLOWING 
-DISCLAIMER AND THE COPYRIGHT NOTICE ABOVE.
-
-DISCLAIMER: 
-
-THIS PIECE OF SOFTWARE IS SUPPLIED ''AS IS'', WE (DESIGN4FPGA) SHALL NOT BE HELD RESPONSIBLE OR LIABLE
-FOR ANY RESULTING EVENTS THAT MIGHT HAPPEN DURING THE USE OF THIS PROGRAM IN PARTICULAR:
-
-1)	THE LOSS OF INFORMATION DUE TO THE USE OR MISUSE OF FS_GENERATOR.EXE
-2)	THE LOSS OF BUSINESS, STOCKS, MONEY, PEOPLE AND LIVES OR ANY UNFORTUNATE CIRCUMSTANCE THAT MAY PREVAIL
-AS A RESULT OF A SYSTEM FAILURE, DIRECTLY OR INDIRECTLY DUE TO THE USE OF FS_GENERATOR.EXE
-*************************************************************************/
+#include "main.h"
 
 #include "fsdata.h" 
 #include "stddef.h"
 
+#include "filesystem.h"
 
+/* Variables -----------------------------------------------------------------*/
+//osMutexId xFileSystemStartMutex;		// мьютекс доступа к файлам
+//osMutexDef(xFileSystemStartMutex);
+
+xQueueHandle 	FileSystemQueue;		// очередь для файлов
+
+/*************************************************************************
+ * StartFSTask
+ *
+ * //osMutexRelease(xFileSystemStartMutex);	//разрешаем
+ *
+ * в таск будем передавать след. параметры 						_OneOscTmp,(uint8_t*)ucOscBlockBuf,0,0,FA_CREATE_ALWAYS | FA_WRITE
+ * 1. имя файла
+ * 2. указатель на буфер
+ * 3. размер буфера в байтах
+ * 4. режим доступа к файлу
+ * 5. указатель на функцию для выполнения, после работы с файлом.
+ *
+ * после работы с файлом может понадобиться выполнить какието действия,
+ * например прочитать из модбаса следующий блок данных.
+ * osFileRW(
+ *         IedServer self,
+ *         DataObject* node,
+ *         ControlHandler listener,
+ *         void* parameter)
+{
+ *************************************************************************/
+void StartFSTask(void const * argument){
+
+	FSQueueMessage 	FSMessage;
+	portBASE_TYPE 	xStatus;
+
+	FileSystemQueue	= xQueueCreate( _FileSystemQueueSize, sizeof(FSQueueMessage));
+
+
+	for(;;) {
+
+		xStatus = xQueueReceive( FileSystemQueue, &(FSMessage), 0 );
+		if( xStatus == pdPASS ){
+			AddToFileMessageWord(FSMessage.file,FSMessage.Data,FSMessage.numb,0,FSMessage.mode);
+			if (FSMessage.handler != NULL){
+				FSMessage.handler(FSMessage.parameter);
+			}
+			USART_TRACE_Yellow("Записали в файл '%s'. размер:%u\n",FSMessage.file,FSMessage.numb);
+
+		}
+	}
+
+}

@@ -34,6 +34,8 @@
 #include "control.h"
 #include "ied_server_private.h"
 
+#include "filesystem.h"
+
 #ifndef CONFIG_IEC61850_SG_RESVTMS
 #define CONFIG_IEC61850_SG_RESVTMS 100
 #endif
@@ -781,9 +783,11 @@ countLogControlBlocksForLogicalNode (MmsMapping* self, LogicalNode* logicalNode)
 
 
 #if (CONFIG_INCLUDE_GOOSE_SUPPORT == 1)
-
-static int
-countGSEControlBlocksForLogicalNode(MmsMapping* self, LogicalNode* logicalNode)
+/*******************************************************
+ * countGSEControlBlocksForLogicalNode
+ * вернет количество gseCBs в логическом узле
+ *******************************************************/
+static int		countGSEControlBlocksForLogicalNode(MmsMapping* self, LogicalNode* logicalNode)
 {
     int gseCount = 0;
 
@@ -1182,7 +1186,7 @@ createMmsDataModel(MmsMapping* self, int iedDeviceCount,
     }
 }
 
-static void
+void
 createDataSets(MmsDevice* mmsDevice, IedModel* iedModel)
 {
     DataSet* dataset = iedModel->dataSets;
@@ -1203,7 +1207,7 @@ createDataSets(MmsDevice* mmsDevice, IedModel* iedModel)
         if (dataSetDomain == NULL)
             goto exit_function; //TODO call exception handler!
 
-        MmsNamedVariableList varList = MmsNamedVariableList_create(dataSetDomain, dataset->name, false);
+        MmsNamedVariableList varList = MmsNamedVariableList_create(dataSetDomain, dataset->name, dataset->deletable);//false
 
         DataSetEntry* dataSetEntry = dataset->fcdas;
 
@@ -1227,7 +1231,8 @@ createDataSets(MmsDevice* mmsDevice, IedModel* iedModel)
 
             dataSetEntry = dataSetEntry->sibling;
         }
-
+        // varList 			- структура одной записи (датасета)
+        // dataSetDomain	- логический узел в который записывается датасет
         MmsDomain_addNamedVariableList(dataSetDomain, varList);
 
         dataset = dataset->sibling;
@@ -1246,11 +1251,18 @@ createMmsModelFromIedModel(MmsMapping* self, IedModel* iedModel)
 
         mmsDevice = MmsDevice_create(iedModel->name);
 
+        MmsDevice_CreateConfigfileName(mmsDevice,_Datasetscfg);				// имя файла
+
         int iedDeviceCount = IedModel_getLogicalDeviceCount(iedModel);
 
         createMmsDataModel(self, iedDeviceCount, mmsDevice, iedModel);
 
-        createDataSets(mmsDevice, iedModel);
+        // нужно перед createDataSets
+//        filesystem_Read_NamedVariableListRequest(mmsDevice,mmsDevice->configFileName);
+        // добавляем датасеты в модель (mmsDevice->mmsDomain->MmsNamedVariableList) из статической структуры iedModel
+//         createDataSets(mmsDevice, iedModel);
+//         USART_TRACE_BLUE("создали не удаляемые DataSets из стат. модели\n");
+
     }
 
     return mmsDevice;
@@ -1275,6 +1287,7 @@ MmsMapping_create(IedModel* model)
 #if (CONFIG_INCLUDE_GOOSE_SUPPORT == 1)
     self->gseControls = LinkedList_create();
     self->gooseInterfaceId = NULL;
+    self->goosesCurrentMode = GOOSE_READY;
 #endif
 
 #if (CONFIG_IEC61850_SAMPLED_VALUES_SUPPORT == 1)
@@ -1294,7 +1307,7 @@ MmsMapping_create(IedModel* model)
 
     self->attributeAccessHandlers = LinkedList_create();
 
-    self->mmsDevice = createMmsModelFromIedModel(self, model);
+    self->mmsDevice = createMmsModelFromIedModel(self, model);			// MMs модель из IED модели
 
     return self;
 }
@@ -1759,10 +1772,12 @@ getAccessPolicyForFC(MmsMapping* self, FunctionalConstraint fc)
 
     return ACCESS_POLICY_DENY;
 }
-
-static MmsDataAccessError
-mmsWriteHandler(void* parameter, MmsDomain* domain,
-        char* variableId, MmsValue* value, MmsServerConnection connection)
+/*******************************************************
+ * mmsWriteHandler
+ * запись переменных
+ * все те, что приходят с командой 'WRITE' из MMS
+ *******************************************************/
+static MmsDataAccessError	mmsWriteHandler(void* parameter, MmsDomain* domain, char* variableId, MmsValue* value, MmsServerConnection connection)
 {
     MmsMapping* self = (MmsMapping*) parameter;
 
@@ -1781,8 +1796,7 @@ mmsWriteHandler(void* parameter, MmsDomain* domain,
 #if (CONFIG_IEC61850_CONTROL_SERVICE == 1)
     /* Controllable objects - CO */
     if (isControllable(separator)) {
-        return Control_writeAccessControlObject(self, domain, variableId, value,
-                connection);
+        return Control_writeAccessControlObject(self, domain, variableId, value, connection);
     }
 #endif /* (CONFIG_IEC61850_CONTROL_SERVICE == 1) */
 
@@ -2085,8 +2099,31 @@ mmsWriteHandler(void* parameter, MmsDomain* domain,
 
             DataAttribute* da = IedModel_lookupDataAttributeByMmsValue(self->model, cachedValue);
 
-            if (da != NULL)
+            if (da != NULL){
+// Можно писать данные. Доступ разрешен.
                 IedServer_updateAttributeValue(self->iedServer, da, value);
+// -----------------------------------------------------------------------------
+// нужно ставить в очередь данные для записи в файл, т.к. он быстро не запишется.
+
+                IedModel* iedModel = IedServer_getDataModel(self->iedServer);
+
+        		char domainName[65];
+        		strncpy(domainName, iedModel->name, 64);
+
+				char VarName[130];
+				strncpy(VarName, domain->domainName, 64);		// из имени прибора нужно убрать тех ключ
+
+				strncpy(VarName, &VarName[strlen(domainName)], 64);		// из имени прибора нужно убрать тех ключ
+				strncat(VarName, "/", 1);
+				strncat(VarName, variableId, 64);
+
+				int ret = filesystem_Save_DataOfVariableList(VarName, value, _DataListWrites);
+
+				// если не записали то отвергнем
+				if (ret == 0 )
+					return DATA_ACCESS_ERROR_OBJECT_ACCESS_DENIED;
+// -----------------------------------------------------------------------------
+            }
             else
                 return DATA_ACCESS_ERROR_OBJECT_ACCESS_DENIED;
 
@@ -2110,6 +2147,7 @@ mmsWriteHandler(void* parameter, MmsDomain* domain,
         else
         	return DATA_ACCESS_ERROR_OBJECT_NONE_EXISTENT;
     }
+
 
     return DATA_ACCESS_ERROR_OBJECT_ACCESS_DENIED;
 }
@@ -2569,7 +2607,7 @@ void
 MmsMapping_installHandlers(MmsMapping* self)
 {
     MmsServer_installReadHandler(self->mmsServer, mmsReadHandler, (void*) self);
-    MmsServer_installWriteHandler(self->mmsServer, mmsWriteHandler, (void*) self);
+    MmsServer_installWriteHandler(self->mmsServer, mmsWriteHandler, (void*) self);							// обработчик команд записи переменных
     MmsServer_installReadAccessHandler(self->mmsServer, mmsReadAccessHandler, (void*) self);
     MmsServer_installConnectionHandler(self->mmsServer, mmsConnectionHandler, (void*) self);
     MmsServer_installVariableListChangedHandler(self->mmsServer, variableListChangedHandler, (void*) self);
@@ -2627,7 +2665,7 @@ DataSet_isMemberValue(DataSet* dataSet, MmsValue* value, int* index)
 
     while (dataSetEntry != NULL) {
 
-        MmsValue* dataSetValue = dataSetEntry->value;
+        MmsValue* dataSetValue = dataSetEntry->value;				// элементы со значениями датасета
 
         if (dataSetValue != NULL) { /* prevent invalid data set members */
             if (isMemberValueRecursive(dataSetValue, value)) {
@@ -2778,22 +2816,29 @@ MmsMapping_triggerReportObservers(MmsMapping* self, MmsValue* value, ReportInclu
 
 #if (CONFIG_INCLUDE_GOOSE_SUPPORT == 1)
 
-void
-MmsMapping_triggerGooseObservers(MmsMapping* self, MmsValue* value)
+/*******************************************************
+ * MmsMapping_triggerGooseObservers
+ * отправляем GOOSE
+ *******************************************************/
+void	MmsMapping_triggerGooseObservers(MmsMapping* self, MmsValue* value)
 {
-    LinkedList element = self->gseControls;
+	if (self->goosesCurrentMode == GOOSE_READY) {
+		LinkedList element = self->gseControls;
 
-    while ((element = LinkedList_getNext(element)) != NULL) {
-        MmsGooseControlBlock gcb = (MmsGooseControlBlock) element->data;
+		while ((element = LinkedList_getNext(element)) != NULL) {
+			MmsGooseControlBlock gcb = (MmsGooseControlBlock) element->data;
 
-        if (MmsGooseControlBlock_isEnabled(gcb)) {
-            DataSet* dataSet = MmsGooseControlBlock_getDataSet(gcb);
+			if (MmsGooseControlBlock_isEnabled(gcb)) {
+				DataSet* dataSet = MmsGooseControlBlock_getDataSet(gcb);		// берём датасет из БУ гусом
 
-            if (DataSet_isMemberValue(dataSet, value, NULL)) {
-                MmsGooseControlBlock_observedObjectChanged(gcb);
-            }
-        }
-    }
+				if (DataSet_isMemberValue(dataSet, value, NULL)) {				// если есть значение
+	//                Port_Off(LEDtst1);
+					MmsGooseControlBlock_observedObjectChanged(gcb);
+	//                Port_On(LEDtst1);
+				}
+			}
+		}
+	}
 }
 
 void
@@ -2980,15 +3025,18 @@ MmsMapping_createMmsVariableNameFromObjectReference(const char* objectReference,
 }
 
 #if (CONFIG_INCLUDE_GOOSE_SUPPORT == 1)
-
-static void
-GOOSE_processGooseEvents(MmsMapping* self, uint64_t currentTimeInMs)
+/*******************************************************
+ * GOOSE_processGooseEvents функция отправки гусов.
+ *******************************************************/
+static void		GOOSE_processGooseEvents(MmsMapping* self, uint64_t currentTimeInMs)
 {
     LinkedList element = LinkedList_getNext(self->gseControls);
 
+    // полистаем все блоки управления гусами
     while (element != NULL) {
         MmsGooseControlBlock mmsGCB = (MmsGooseControlBlock) element->data;
 
+        // если этот гус активирован, то проверим и отправим
         if (MmsGooseControlBlock_isEnabled(mmsGCB)) {
             MmsGooseControlBlock_checkAndPublish(mmsGCB, currentTimeInMs);
         }
@@ -3016,7 +3064,6 @@ processPeriodicTasks(MmsMapping* self)
 #if (CONFIG_IEC61850_REPORT_SERVICE == 1)
     Reporting_processReportEvents(self, currentTimeInMs);
 #endif
-
 #if (CONFIG_IEC61850_SETTING_GROUPS == 1)
     MmsMapping_checkForSettingGroupReservationTimeouts(self, currentTimeInMs);
 #endif
@@ -3024,6 +3071,7 @@ processPeriodicTasks(MmsMapping* self)
 #if (CONFIG_IEC61850_LOG_SERVICE == 1)
     Logging_processIntegrityLogs(self, currentTimeInMs);
 #endif
+
 }
 
 void
@@ -3032,6 +3080,20 @@ IedServer_performPeriodicTasks(IedServer self)
     processPeriodicTasks(self->mmsMapping);
 }
 
+/*******************************************************
+ * IedServer_performPeriodicGooseTasks
+ * отвылает периодические гусы, если нет изменения данных или
+ * переотправка повторов
+ *******************************************************/
+void		IedServer_performPeriodicGooseTasks(IedServer self)
+{
+    uint64_t currentTimeInMs = Hal_getTimeInMs();
+#if (CONFIG_INCLUDE_GOOSE_SUPPORT == 1)
+    if (self){
+    	GOOSE_processGooseEvents(self->mmsMapping, currentTimeInMs);
+    }
+#endif
+}
 #if (CONFIG_MMS_THREADLESS_STACK != 1)
 /* single worker thread for all enabled GOOSE and report control blocks */
 static void

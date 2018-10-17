@@ -61,6 +61,10 @@ struct ATTRIBUTE_PACKED sMmsValue {
             uint8_t buf[6];
         } binaryTime;
     } value;
+
+    uint16_t NumbFunction;			// номер функции обновления данных в списке функций
+    uint16_t ParamsFunction;		// параметры функции (аргумент)
+
 };
 
 

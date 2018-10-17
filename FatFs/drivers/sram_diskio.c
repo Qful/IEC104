@@ -37,7 +37,7 @@
 #define SRAM_ERROR      0x01
 
 //#define SRAM_DEVICE_ADDR  ((uint32_t)0x64000000)		// адрес виртуального диска
-#define SRAM_DEVICE_SIZE  256 * 512  					//размер диска 65Kбайт			128 * 512
+#define SRAM_DEVICE_SIZE  196 * 512  					//размер диска 	128 * 512		~40кЅ занимает раздел и MBR
 
 /* Block Size in Bytes */
 #define BLOCK_SIZE                512

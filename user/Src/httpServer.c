@@ -22,6 +22,9 @@
 #include "ExtSPImem.h"
 #include "inflash.h"
 
+#include "ethernetif.h"
+
+
 #include "cmsis_os.h"
 
 #include "lwip/err.h"
@@ -36,7 +39,12 @@
 
 extern IedServer 	iedServer;
 extern	errMB_data	cntErrorMD;
+
+extern uint32_t	GLOBALMemoryUsedLim;							//максимально использованной памяти
+
+
 HAL_StatusTypeDef BOOTFLASH_Erase(FLASH_EraseInitTypeDef *pEraseInit, uint32_t *SectorError);
+void	SetNTPconfig(char *inbuff);
 
 static const char Favicon[1150] = {
 	0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x10, 0x10, 0x00, 0x00, 0x01, 0x00,
@@ -193,11 +201,10 @@ extern RTC_HandleTypeDef 	hrtc;
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-#define WEBSERVER_THREAD_PRIO    ( tskIDLE_PRIORITY + 4 )
 
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-#define	httpsize	1024
+#define	httpsize	2048
 
 u32_t nPageHits = 0;
 portCHAR PAGE_BODY[httpsize];
@@ -214,28 +221,61 @@ int8_t FLASH_If_Erase(uint32_t StartSector);
 uint32_t FLASH_If_Write(__IO uint32_t* FlashAddress, uint32_t* Data ,uint16_t DataLength);
 uint32_t BootFLASH_If_Write(__IO uint32_t* FlashAddress, uint32_t* Data ,uint16_t DataLength,uint32_t TypeProgram);
 
-
+/*************************************************************************
+ * TOPBAR
+ *************************************************************************/
 void TOPBAR(portCHAR *pagehits, portCHAR *PAGE_BODY,uint8_t	pos)
 {
-//<div> TOPBAR
-		  sprintf(pagehits,"<div id=""top_bar_black"">");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<div id=""logo_header""><h2>БЭМН. Конфигуратор сервера МЭК-61850</h2></div>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<div id=""procontainer_blue"">");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<div id=""pronav_blue"">");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<ul>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<li><a href=""index.html"" title=""css menus""><span>Главная</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<li><a href=""info.html"" title=""css menus"" class=""current""><span>Инфо о защите</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<li><a href=""time.html"" title=""css menus""><span>Настройка времени</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<li><a href=""system.html"" title=""css menus""><span>Системные логи</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<li><a href=""fwupdate.html"" title=""css menus""><span>Обновление прошивки</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"</ul>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"</div></div></div>");strcat(PAGE_BODY, pagehits);
-//</div>
+	  sprintf(pagehits,"<div id=\"top_bar_black\">");strcat(PAGE_BODY, pagehits);
+	  sprintf(pagehits,"<div id=\"logo_header\"><h2>БЭМН. Конфигуратор сервера МЭК-61850</h2></div>");strcat(PAGE_BODY, pagehits);
+	  sprintf(pagehits,"<div id=\"procontainer_blue\">");strcat(PAGE_BODY, pagehits);
+	  sprintf(pagehits,"<div id=\"pronav_blue\">");strcat(PAGE_BODY, pagehits);
+	  sprintf(pagehits,"<ul>");strcat(PAGE_BODY, pagehits);
+
+	  sprintf(pagehits,"<li><a href=\"index.html\" title=\"css menus\"");strcat(PAGE_BODY, pagehits);
+	  if(pos==0)	sprintf(pagehits," class=\"current\"><span>Главная</span></a></li>");
+	  else	  		sprintf(pagehits,"><span>Главная</span></a></li>");
+	  strcat(PAGE_BODY, pagehits);
+
+	  sprintf(pagehits,"<li><a href=\"info.html\" title=\"css menus\"");strcat(PAGE_BODY, pagehits);
+	  if(pos==1)	sprintf(pagehits," class=\"current\"><span>Инфо о защите</span></a></li>");
+	  else			sprintf(pagehits,"><span>Инфо о защите</span></a></li>");
+	  strcat(PAGE_BODY, pagehits);
+
+	  sprintf(pagehits,"<li><a href=\"time.html\" title=\"css menus\"");strcat(PAGE_BODY, pagehits);
+	  if(pos==2)	sprintf(pagehits," class=\"current\"><span>Настройка времени</span></a></li>");
+	  else			sprintf(pagehits,"><span>Настройка времени</span></a></li>");
+	  strcat(PAGE_BODY, pagehits);
+
+	  sprintf(pagehits,"<li><a href=\"system.html\" title=\"css menus\"");strcat(PAGE_BODY, pagehits);
+	  if(pos==3)	sprintf(pagehits," class=\"current\"><span>Системная информация</span></a></li>");
+	  else			sprintf(pagehits,"><span>Системная информация</span></a></li>");
+	  strcat(PAGE_BODY, pagehits);
+
+	  sprintf(pagehits,"<li><a href=\"fwupdate.html\" title=\"css menus\"");strcat(PAGE_BODY, pagehits);
+	  if(pos==4)	sprintf(pagehits," class=\"current\"><span>Обновление прошивки</span></a></li>");
+	  else			sprintf(pagehits,"><span>Обновление прошивки</span></a></li>");
+	  strcat(PAGE_BODY, pagehits);
+
+	  sprintf(pagehits,"</ul>");strcat(PAGE_BODY, pagehits);
+	  sprintf(pagehits,"</div></div></div>");strcat(PAGE_BODY, pagehits);
+}
+/*************************************************************************
+ * HEAD
+ *************************************************************************/
+void HEAD(portCHAR *pagehits, portCHAR *PAGE_BODY,char *pos)
+{
+// <head>
+	  sprintf(pagehits,"<head>");strcat(PAGE_BODY, pagehits);//UTF-8
+	  sprintf(pagehits,"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=windows-1251\"/>"); strcat(PAGE_BODY, pagehits);
+	  sprintf(pagehits,"<title>%s</title>",pos); strcat(PAGE_BODY, pagehits);
+	  sprintf(pagehits,"<link href=\"styles.css\" rel=\"stylesheet\" type=\"text/css\"/>"); strcat(PAGE_BODY, pagehits);
+	  sprintf(pagehits,"</head>");strcat(PAGE_BODY, pagehits);
 }
 /*************************************************************************
  * infoPage
  *************************************************************************/
-#define	httpsize	2048
+//#define	httpsize	2048
 void indexPage(struct netconn *conn)
 {
 
@@ -247,29 +287,24 @@ void indexPage(struct netconn *conn)
 
 		  sprintf(pagehits,"<html>");strcat(PAGE_BODY, pagehits);
 
+		  HEAD(pagehits,PAGE_BODY,"БЭМН. Конфигуратор сервера МЭК-61850");
+		  /*
+// <head>
 		  sprintf(pagehits,"<head>");strcat(PAGE_BODY, pagehits);//UTF-8
 		  sprintf(pagehits,"<meta http-equiv=""Content-Type"" content=""text/html; charset=windows-1251"" />"); strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<title>БЭМН. Конфигуратор сервера МЭК-61850</title>"); strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<link href=""styles.css"" rel=""stylesheet"" type=""text/css"" />"); strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"</head>");strcat(PAGE_BODY, pagehits);
+// </head>
+ */
+  		  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
+  		  memset(PAGE_BODY, 0,httpsize);
 
 		  sprintf(pagehits,"<body>");strcat(PAGE_BODY, pagehits);
-//<div> TOPBAR
-		  sprintf(pagehits,"<div id=""top_bar_black"">");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<div id=""logo_header""><h2>БЭМН. Конфигуратор сервера МЭК-61850</h2></div>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<div id=""procontainer_blue"">");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<div id=""pronav_blue"">");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<ul>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<li><a href=""index.html"" title=""css menus"" class=""current""><span>Главная</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<li><a href=""info.html"" title=""css menus""><span>Инфо о защите</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<li><a href=""time.html"" title=""css menus""><span>Настройка времени</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<li><a href=""system.html"" title=""css menus""><span>Системные логи</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<li><a href=""fwupdate.html"" title=""css menus""><span>Обновление прошивки</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"</ul>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"</div></div></div>");strcat(PAGE_BODY, pagehits);
-//</div>
+
+		  TOPBAR(pagehits,PAGE_BODY,0);
 //<div>
-		  sprintf(pagehits,"<div id=""content_container"">");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<div id=\"content_container\">");strcat(PAGE_BODY, pagehits);
 
 		  sprintf(pagehits,"<h2>Информация об управлении в веб-интерфейсе</h2> <hr>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<br><br>");strcat(PAGE_BODY, pagehits);
@@ -277,7 +312,7 @@ void indexPage(struct netconn *conn)
 		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<p><h3>Настройка времени:</h3> <h4>настройка протокола сетевого времени NTP</h4></p>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<p><h3>Системные логи:</h3> <h4>чтение системных логов устройства</h4></p>");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<p><h3>Системная информация:</h3> <h4>чтение системной информации устройства</h4></p>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<p><h3>Обновление прошивки:</h3> <h4>обновление текущей прошивки устройства</h4></p>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
@@ -285,20 +320,21 @@ void indexPage(struct netconn *conn)
 		  sprintf(pagehits,"</div>");strcat(PAGE_BODY, pagehits);
 //</div>
 
-		  sprintf(pagehits,"<div id=""bottom_bar_black"">");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<div id=""main_container"">");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<a class=""bemn"" href=""http://www.bemn.by/"">ОАО ""БЭМН""</a>");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<div id=\"bottom_bar_black\">");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<div id=\"main_container\">");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<a class=\"bemn\" href=\"http://www.bemn.by/\">ОАО \"БЭМН\"</a>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"</div></div>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"</body>");strcat(PAGE_BODY, pagehits);
 
 		  sprintf(pagehits,"</html>");strcat(PAGE_BODY, pagehits);
 
 		  write(conn, PAGE_BODY, strlen(PAGE_BODY));
+
 }
 /*************************************************************************
  * infoPage
  *************************************************************************/
-#define	httpsize	2048
+//#define	httpsize	1024
 void infoPage(struct netconn *conn)
 {
 	extern RTC_TimeTypeDef StartsTime;
@@ -323,35 +359,35 @@ void infoPage(struct netconn *conn)
 
 		  sprintf(pagehits,"<html>");strcat(PAGE_BODY, pagehits);
 
+		  HEAD(pagehits,PAGE_BODY,"БЭМН. Конфигуратор сервера МЭК-61850");
+/*
+// <head>
 		  sprintf(pagehits,"<head>");strcat(PAGE_BODY, pagehits);//UTF-8
 		  sprintf(pagehits,"<meta http-equiv=""Content-Type"" content=""text/html; charset=windows-1251"" />"); strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<title>БЭМН. Конфигуратор сервера МЭК-61850</title>"); strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<link href=""styles.css"" rel=""stylesheet"" type=""text/css"" />"); strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"</head>");strcat(PAGE_BODY, pagehits);
+// </head>
+ */
+		  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
+		  memset(PAGE_BODY, 0,httpsize);
 
 		  sprintf(pagehits,"<body>");strcat(PAGE_BODY, pagehits);
-//<div> TOPBAR
-		  sprintf(pagehits,"<div id=""top_bar_black"">");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<div id=""logo_header""><h2>БЭМН. Конфигуратор сервера МЭК-61850</h2></div>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<div id=""procontainer_blue"">");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<div id=""pronav_blue"">");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<ul>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<li><a href=""index.html"" title=""css menus""><span>Главная</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<li><a href=""info.html"" title=""css menus"" class=""current""><span>Инфо о защите</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<li><a href=""time.html"" title=""css menus""><span>Настройка времени</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<li><a href=""system.html"" title=""css menus""><span>Системные логи</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<li><a href=""fwupdate.html"" title=""css menus""><span>Обновление прошивки</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"</ul>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"</div></div></div>");strcat(PAGE_BODY, pagehits);
-//</div>
+
+		  TOPBAR(pagehits,PAGE_BODY,1);
+
+		  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
+		  memset(PAGE_BODY, 0,httpsize);
+
 //<div>
-		  sprintf(pagehits,"<div id=""content_container"">");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<div id=\"content_container\">");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<h2>инфо о защите.</h2><hr>");strcat(PAGE_BODY, pagehits);
+
 
 		  //<div>
 		  sprintf(pagehits,"<div>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<label>Изделие: %s</label><br>",(char *)ucMRevBuf);strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<label>связной модуль: %s</label><br>",(char *)_swREV);strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<label>связной модуль: %s %s</label><br>",(char *)_swREV,(char *)_swREVverify);strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<label>Версия прошивки связного модуля: '%s'</label><br>",_SWRevision);strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<label>IP адрес устройства:%d.%d.%d.%d</label><br>", IP_ADDR[0], IP_ADDR[1], IP_ADDR[2], IP_ADDR[3]);strcat(PAGE_BODY, pagehits);
@@ -359,8 +395,8 @@ void infoPage(struct netconn *conn)
 		  sprintf(pagehits,"<label>Время включения: %02d.%02d.%04d - %02d:%02d:%02d.%03u</label><br>",StartsDate.Date,StartsDate.Month,2000+StartsDate.Year,StartsTime.Hours,StartsTime.Minutes,StartsTime.Seconds,(uint16_t)(3999-StartsTime.SubSeconds/2));strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
 
-		  sprintf(pagehits,"<label>БД D:%u A:%u</label><br>",(unsigned int)cntErrorMD.errDiscreet,(unsigned int)cntErrorMD.errAnalog);strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
+//		  sprintf(pagehits,"<label>Line D:%u A:%u CRC:%u</label><br>",(unsigned int)cntErrorMD.errDiscreet,(unsigned int)cntErrorMD.errAnalog,(unsigned int)cntErrorMD.errALLCRC);strcat(PAGE_BODY, pagehits);
+//		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
 
 		  sprintf(pagehits,"<label>Время 61850: %02d.%02d.%04d - %02d:%02d:%02d.%03u</label><br>",sDate.Date,sDate.Month,2000+sDate.Year,sTime.Hours,sTime.Minutes,sTime.Seconds,(uint16_t)(3999-sTime.SubSeconds/2));strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<label>Часовой пояс: %i</label><br>",TimeZone_my);strcat(PAGE_BODY, pagehits);
@@ -369,7 +405,6 @@ void infoPage(struct netconn *conn)
 		  //lastSynchTime
 		  if (lastSynchDate.Date) {
 			  sprintf(pagehits,"<label>Последняя синхронизация с сервером времени: %02d.%02d.%04d - %02d:%02d:%02d.%03u (%i ppm)</label><br>",lastSynchDate.Date,lastSynchDate.Month,2000+lastSynchDate.Year,lastSynchTime.Hours,lastSynchTime.Minutes,lastSynchTime.Seconds,(uint16_t)(3999-lastSynchTime.SubSeconds/2),ppm);strcat(PAGE_BODY, pagehits);
-//			  sprintf(pagehits,"<label>Текущяя точность:%i ppm</label><br>",ppm);strcat(PAGE_BODY, pagehits);
 		  }
 		  else {
 			  sprintf(pagehits,"<label>нет синхронизации с сервером времени.</label><br>");strcat(PAGE_BODY, pagehits);
@@ -381,6 +416,22 @@ void infoPage(struct netconn *conn)
 
 		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
 
+		  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
+		  memset(PAGE_BODY, 0,httpsize);
+
+		  //<div>
+		  sprintf(pagehits,"<div>");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<label>Приборы в сети:</label><hr>");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<label>");strcat(PAGE_BODY, pagehits);
+		  PHY_ReadDynamicMACTable((uint8_t *)(PAGE_BODY + strlen(PAGE_BODY)));
+		  sprintf(pagehits,"</label>");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"</div>");strcat(PAGE_BODY, pagehits);
+		  //</div>
+
+		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
+		  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
+		  memset(PAGE_BODY, 0,httpsize);
+
 		  //<div>
 		  sprintf(pagehits,"<div>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<label>Подключены клиенты:</label><hr>");strcat(PAGE_BODY, pagehits);
@@ -390,23 +441,94 @@ void infoPage(struct netconn *conn)
 		  sprintf(pagehits,"</div>");strcat(PAGE_BODY, pagehits);
 		  //</div>
 
-		  sprintf(pagehits,"</div>");strcat(PAGE_BODY, pagehits);
-//</div>
+		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
+		  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
+		  memset(PAGE_BODY, 0,httpsize);
 
-		  sprintf(pagehits,"<div id=""bottom_bar_black"">");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<div id=""main_container"">");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<a class=""bemn"" href=""http://www.bemn.by/"">ОАО ""БЭМН""</a>");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"</div>");strcat(PAGE_BODY, pagehits);
+
+
+
+
+//</div>
+		  sprintf(pagehits,"<div id=\"bottom_bar_black\">");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<div id=\"main_container\">");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<a class=\"bemn\" href=\"http://www.bemn.by/\">ОАО \"БЭМН\"</a>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"</div></div>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"</body>");strcat(PAGE_BODY, pagehits);
 
 		  sprintf(pagehits,"</html>");strcat(PAGE_BODY, pagehits);
 
-		  write(conn, PAGE_BODY, strlen(PAGE_BODY));
+		  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
+
 }
 /*************************************************************************
  * UploaddonePage
  *************************************************************************/
-#define	httpsize	1024
+void SystemPage(struct netconn *conn){
+
+  portCHAR PAGE_BODY[httpsize];
+  portCHAR pagehits[100];
+
+  memset(PAGE_BODY, 0,httpsize);
+
+  sprintf(pagehits,"<html>");strcat(PAGE_BODY, pagehits);
+  HEAD(pagehits,PAGE_BODY,"Системная информация.");
+
+  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
+  memset(PAGE_BODY, 0,httpsize);
+
+  sprintf(pagehits,"<body>");strcat(PAGE_BODY, pagehits);
+
+  TOPBAR(pagehits,PAGE_BODY,3);
+
+  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
+  memset(PAGE_BODY, 0,httpsize);
+
+//<div>
+  sprintf(pagehits,"<div id=\"content_container\">");strcat(PAGE_BODY, pagehits);
+  sprintf(pagehits,"<h2>Системная информация.</h2><hr>");strcat(PAGE_BODY, pagehits);
+
+
+  {
+	  sprintf(pagehits,"<label>Техинфо:</label><hr>");strcat(PAGE_BODY, pagehits);
+
+	  sprintf(pagehits,"<label>Line D:%u A:%u U:%u J:%u CRC:%u Timeout:%u</label><br>",
+			  (unsigned int)cntErrorMD.errDiscreet,
+			  (unsigned int)cntErrorMD.errAnalog,
+			  (unsigned int)cntErrorMD.errUstavki,
+			  (unsigned int)cntErrorMD.errJurnal,
+			  (unsigned int)cntErrorMD.errALLCRC,
+			  (unsigned int)cntErrorMD.errTimeOut);
+	  strcat(PAGE_BODY, pagehits);
+	  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
+
+	  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
+	  memset(PAGE_BODY, 0,httpsize);
+
+	  GetRunTimeStats((char *)PAGE_BODY);
+	  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
+	  memset(PAGE_BODY, 0,httpsize);
+	  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
+	  sprintf(pagehits,"<label>свободно памяти:%u </label><br>", xPortGetFreeHeapSize());strcat(PAGE_BODY, pagehits);
+	  sprintf(pagehits,"<label>предел выделения:0x%X </label><br>", GLOBALMemoryUsedLim);strcat(PAGE_BODY, pagehits);
+  }
+
+
+  sprintf(pagehits,"<div id=\"bottom_bar_black\">");strcat(PAGE_BODY, pagehits);
+  sprintf(pagehits,"<div id=\"main_container\">");strcat(PAGE_BODY, pagehits);
+  sprintf(pagehits,"<a class=\"bemn\" href=\"http://www.bemn.by/\">ОАО \"БЭМН\"</a>");strcat(PAGE_BODY, pagehits);
+  sprintf(pagehits,"</div></div>");strcat(PAGE_BODY, pagehits);
+  sprintf(pagehits,"</body>");strcat(PAGE_BODY, pagehits);
+
+  sprintf(pagehits,"</html>");strcat(PAGE_BODY, pagehits);
+
+  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
+}
+/*************************************************************************
+ * UploaddonePage
+ *************************************************************************/
+//#define	httpsize	1024
 void UploaddonePage(struct netconn *conn)
 {
 
@@ -417,36 +539,28 @@ void UploaddonePage(struct netconn *conn)
 
 		  sprintf(pagehits,"<html>");strcat(PAGE_BODY, pagehits);
 
+		  HEAD(pagehits,PAGE_BODY,"Обновление загрузчика.");
+/*
+// <head>
 		  sprintf(pagehits,"<head>");strcat(PAGE_BODY, pagehits);//UTF-8
 		  sprintf(pagehits,"<meta http-equiv=""Content-Type"" content=""text/html; charset=windows-1251"" />"); strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<title>Обновление загрузчика.</title>"); strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<link href=""styles.css"" rel=""stylesheet"" type=""text/css"" />"); strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"</head>");strcat(PAGE_BODY, pagehits);
+// </head>
+ */
+		  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
+		  memset(PAGE_BODY, 0,httpsize);
 
 		  sprintf(pagehits,"<body>");strcat(PAGE_BODY, pagehits);
-		  //sprintf(pagehits,"<div id=""top_bar_black"">");strcat(PAGE_BODY, pagehits);
-		  //sprintf(pagehits,"<div id=""logo_header""><h2>БЭМН обновление загрузчика.</h2></div>");strcat(PAGE_BODY, pagehits);
-		  //sprintf(pagehits,"</div>");strcat(PAGE_BODY, pagehits);
-		  //<div> TOPBAR
-		  		  sprintf(pagehits,"<div id=""top_bar_black"">");strcat(PAGE_BODY, pagehits);
-		  		  sprintf(pagehits,"<div id=""logo_header""><h2>БЭМН. Конфигуратор сервера МЭК-61850</h2></div>");strcat(PAGE_BODY, pagehits);
-		  		  sprintf(pagehits,"<div id=""procontainer_blue"">");strcat(PAGE_BODY, pagehits);
-		  		  sprintf(pagehits,"<div id=""pronav_blue"">");strcat(PAGE_BODY, pagehits);
-		  		  sprintf(pagehits,"<ul>");strcat(PAGE_BODY, pagehits);
-		  		  sprintf(pagehits,"<li><a href=""index.html"" title=""css menus""><span>Главная</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  		  sprintf(pagehits,"<li><a href=""info.html"" title=""css menus""><span>Инфо о защите</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  		  sprintf(pagehits,"<li><a href=""time.html"" title=""css menus""><span>Настройка времени</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  		  sprintf(pagehits,"<li><a href=""system.html"" title=""css menus""><span>Системные логи</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  		  sprintf(pagehits,"<li><a href=""fwupdate.html"" title=""css menus"" class=""current""><span>Обновление прошивки</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  		  sprintf(pagehits,"</ul>");strcat(PAGE_BODY, pagehits);
-		  		  sprintf(pagehits,"</div></div></div>");strcat(PAGE_BODY, pagehits);
-		  //</div>
 
-		  sprintf(pagehits,"<div id=""content_container"">");strcat(PAGE_BODY, pagehits);
+ 		  TOPBAR(pagehits,PAGE_BODY,4);
+
+		  sprintf(pagehits,"<div id=\"content_container\">");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<h2>Обновление загрузчика.</h2><hr>");strcat(PAGE_BODY, pagehits);
 
 		  sprintf(pagehits,"<div>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<label for=""InFile"">Прошит успешно.</label><br>");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<label for=\"InFile\">Прошит успешно.</label><br>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"</div>");strcat(PAGE_BODY, pagehits);
 
 		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
@@ -459,9 +573,9 @@ void UploaddonePage(struct netconn *conn)
 
 		  sprintf(pagehits,"</div></div></div>");strcat(PAGE_BODY, pagehits);
 
-		  sprintf(pagehits,"<div id=""bottom_bar_black"">");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<div id=""main_container"">");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<a class=""bemn"" href=""http://www.bemn.by/"">ОАО ""БЭМН""</a>");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<div id=\"bottom_bar_black\">");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<div id=\"main_container\">");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<a class=\"bemn\" href=\"http://www.bemn.by/\">ОАО \"БЭМН\"</a>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"</div></div>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"</body>");strcat(PAGE_BODY, pagehits);
 
@@ -472,7 +586,7 @@ void UploaddonePage(struct netconn *conn)
 /*************************************************************************
  * checkloginPage
  *************************************************************************/
-#define	httpsize	2048
+//#define	httpsize	2048
 void checkloginPage(struct netconn *conn)
 {
 
@@ -483,65 +597,54 @@ void checkloginPage(struct netconn *conn)
 
 	 sprintf(pagehits,"<html>");strcat(PAGE_BODY, pagehits);
 
+	  HEAD(pagehits,PAGE_BODY,"Обновление загрузчика.");
+	  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
+	  memset(PAGE_BODY, 0,httpsize);
+
+/*
 	 sprintf(pagehits,"<head>");strcat(PAGE_BODY, pagehits);//UTF-8
 	 sprintf(pagehits,"<meta http-equiv=""Content-Type"" content=""text/html; charset=windows-1251"" />"); strcat(PAGE_BODY, pagehits);
 	 sprintf(pagehits,"<title>Обновление загрузчика</title>"); strcat(PAGE_BODY, pagehits);
 	 sprintf(pagehits,"<link href=""styles.css"" rel=""stylesheet"" type=""text/css"" />"); strcat(PAGE_BODY, pagehits);
 	 sprintf(pagehits,"</head>");strcat(PAGE_BODY, pagehits);
-
+*/
 	 sprintf(pagehits,"<body>");strcat(PAGE_BODY, pagehits);
 
-	 //sprintf(pagehits,"<div id=""top_bar_black"">");strcat(PAGE_BODY, pagehits);
-	//	  sprintf(pagehits,"<div id=""logo_header""><h2>БЭМН обновление загрузчика.</h2></div>");strcat(PAGE_BODY, pagehits);
-	 //sprintf(pagehits,"</div>");strcat(PAGE_BODY, pagehits);
-	  //<div> TOPBAR
-	  		  sprintf(pagehits,"<div id=""top_bar_black"">");strcat(PAGE_BODY, pagehits);
-	  		  sprintf(pagehits,"<div id=""logo_header""><h2>БЭМН. Конфигуратор сервера МЭК-61850</h2></div>");strcat(PAGE_BODY, pagehits);
-	  		  sprintf(pagehits,"<div id=""procontainer_blue"">");strcat(PAGE_BODY, pagehits);
-	  		  sprintf(pagehits,"<div id=""pronav_blue"">");strcat(PAGE_BODY, pagehits);
-	  		  sprintf(pagehits,"<ul>");strcat(PAGE_BODY, pagehits);
-	  		  sprintf(pagehits,"<li><a href=""index.html"" title=""css menus""><span>Главная</span></a></li>");strcat(PAGE_BODY, pagehits);
-	  		  sprintf(pagehits,"<li><a href=""info.html"" title=""css menus""><span>Инфо о защите</span></a></li>");strcat(PAGE_BODY, pagehits);
-	  		  sprintf(pagehits,"<li><a href=""time.html"" title=""css menus""><span>Настройка времени</span></a></li>");strcat(PAGE_BODY, pagehits);
-	  		  sprintf(pagehits,"<li><a href=""system.html"" title=""css menus""><span>Системные логи</span></a></li>");strcat(PAGE_BODY, pagehits);
-	  		  sprintf(pagehits,"<li><a href=""fwupdate.html"" title=""css menus"" class=""current""><span>Обновление прошивки</span></a></li>");strcat(PAGE_BODY, pagehits);
-	  		  sprintf(pagehits,"</ul>");strcat(PAGE_BODY, pagehits);
-	  		  sprintf(pagehits,"</div></div></div>");strcat(PAGE_BODY, pagehits);
-	  //</div>
+     TOPBAR(pagehits,PAGE_BODY,4);
 
-	 sprintf(pagehits,"<form action =""/uploadboot.cgi"" enctype=""multipart/form-data"" method=""post"">");strcat(PAGE_BODY, pagehits);
+	 sprintf(pagehits,"<form action =\"/uploadboot.cgi\" enctype=\"multipart/form-data\" method=\"post\">");strcat(PAGE_BODY, pagehits);
 
 
-	 sprintf(pagehits,"<div id=""content_container"">");strcat(PAGE_BODY, pagehits);
+	 sprintf(pagehits,"<div id=\"content_container\">");strcat(PAGE_BODY, pagehits);
 	 sprintf(pagehits,"<h2>Обновление загрузчика.</h2><hr>");strcat(PAGE_BODY, pagehits);
 	 sprintf(pagehits,"<div>");strcat(PAGE_BODY, pagehits);
-	 sprintf(pagehits,"<label for=""InFile"">Выберите Файл прошивки загрузчика *.bin</label><br>");strcat(PAGE_BODY, pagehits);
-	 sprintf(pagehits,"<input accept ="".bin"" type=""file"" name=""datafile"" size=""40"">");strcat(PAGE_BODY, pagehits);
+	 sprintf(pagehits,"<label for=\"InFile\">Выберите Файл прошивки загрузчика *.bin</label><br>");strcat(PAGE_BODY, pagehits);
+	 sprintf(pagehits,"<input accept =\".bin\" type=\"file\" name=\"datafile\" size=\"40\">");strcat(PAGE_BODY, pagehits);
 	 sprintf(pagehits,"</div>");strcat(PAGE_BODY, pagehits);
 
 	 sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
 
 	 sprintf(pagehits,"<div><div>");strcat(PAGE_BODY, pagehits);
 
-	 sprintf(pagehits,"<button type=""submit"" value=""Upload"">Обновить</button>");strcat(PAGE_BODY, pagehits);
+	 sprintf(pagehits,"<button type=\"submit\" value=\"Upload\">Обновить</button>");strcat(PAGE_BODY, pagehits);
 	 sprintf(pagehits,"</form>");strcat(PAGE_BODY, pagehits);
 
 	 sprintf(pagehits,"</div>\n</div>\n</div>");strcat(PAGE_BODY, pagehits);
 
-	 sprintf(pagehits,"<div id=""bottom_bar_black"">");strcat(PAGE_BODY, pagehits);
-	 sprintf(pagehits,"<div id=""main_container"">\n");strcat(PAGE_BODY, pagehits);
-	 sprintf(pagehits,"<a class=""bemn"" href=""http://www.bemn.by/"">ОАО ""БЭМН""</a>");strcat(PAGE_BODY, pagehits);
+	 sprintf(pagehits,"<div id=\"bottom_bar_black\">");strcat(PAGE_BODY, pagehits);
+	 sprintf(pagehits,"<div id=\"main_container\">\n");strcat(PAGE_BODY, pagehits);
+	 sprintf(pagehits,"<a class=\"bemn\" href=\"http://www.bemn.by/\">ОАО \"БЭМН\"</a>");strcat(PAGE_BODY, pagehits);
 	 sprintf(pagehits,"</div></div>");strcat(PAGE_BODY, pagehits);
 	 sprintf(pagehits,"</body>");strcat(PAGE_BODY, pagehits);
 
 	 sprintf(pagehits,"</html>");strcat(PAGE_BODY, pagehits);
 
-	  write(conn, PAGE_BODY, strlen(PAGE_BODY));
+	 write(conn, PAGE_BODY, strlen(PAGE_BODY));
 }
 /*************************************************************************
  * fwUpdatePage
  *************************************************************************/
-#define	httpsize	2048
+//#define	httpsize	2048
 void fwUpdatePage(struct netconn *conn)
 {
 		  portCHAR PAGE_BODY[httpsize];
@@ -550,34 +653,25 @@ void fwUpdatePage(struct netconn *conn)
 		  memset(PAGE_BODY, 0,httpsize);
 		  sprintf(pagehits,"<html>");strcat(PAGE_BODY, pagehits);
 
+		  HEAD(pagehits,PAGE_BODY,"Обновление ПО модуля МЭК 61850");
+		  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
+		  memset(PAGE_BODY, 0,httpsize);
+/*
 		  sprintf(pagehits,"<head>");strcat(PAGE_BODY, pagehits);//UTF-8
 		  sprintf(pagehits,"<meta http-equiv=""Content-Type"" content=""text/html; charset=windows-1251"" />"); strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<title>Обновление ПО модуля МЭК 61850 </title>"); strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<title>Обновление ПО модуля МЭК 61850</title>"); strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<link href=""styles.css"" rel=""stylesheet"" type=""text/css"" />"); strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"</head>");strcat(PAGE_BODY, pagehits);
+*/
 
-
-		  //<div> TOPBAR
-		  		  sprintf(pagehits,"<div id=""top_bar_black"">");strcat(PAGE_BODY, pagehits);
-		  		  sprintf(pagehits,"<div id=""logo_header""><h2>БЭМН. Конфигуратор сервера МЭК-61850</h2></div>");strcat(PAGE_BODY, pagehits);
-		  		  sprintf(pagehits,"<div id=""procontainer_blue"">");strcat(PAGE_BODY, pagehits);
-		  		  sprintf(pagehits,"<div id=""pronav_blue"">");strcat(PAGE_BODY, pagehits);
-		  		  sprintf(pagehits,"<ul>");strcat(PAGE_BODY, pagehits);
-		  		  sprintf(pagehits,"<li><a href=""index.html"" title=""css menus""><span>Главная</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  		  sprintf(pagehits,"<li><a href=""info.html"" title=""css menus""><span>Инфо о защите</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  		  sprintf(pagehits,"<li><a href=""time.html"" title=""css menus""><span>Настройка времени</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  		  sprintf(pagehits,"<li><a href=""system.html"" title=""css menus""><span>Системные логи</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  		  sprintf(pagehits,"<li><a href=""fwupdate.html"" title=""css menus"" class=""current""><span>Обновление прошивки</span></a></li>");strcat(PAGE_BODY, pagehits);
-		  		  sprintf(pagehits,"</ul>");strcat(PAGE_BODY, pagehits);
-		  		  sprintf(pagehits,"</div></div></div>");strcat(PAGE_BODY, pagehits);
-		  //</div>
+		  TOPBAR(pagehits,PAGE_BODY,4);
 
 		  //sprintf(pagehits,"<body>");strcat(PAGE_BODY, pagehits);
 		  //sprintf(pagehits,"<div id=""top_bar_black"">");strcat(PAGE_BODY, pagehits);
 			//  sprintf(pagehits,"<div id=""logo_header""><h2>БЭМН загрузчик.</h2></div>");strcat(PAGE_BODY, pagehits);
 		  //sprintf(pagehits,"</div>");strcat(PAGE_BODY, pagehits);
 //форма
-		  sprintf(pagehits,"<form action =""/checklogin.cgi"" method=""post"">");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<form action =\"/checklogin.cgi\" method=\"post\">");strcat(PAGE_BODY, pagehits);
 //<div
 		  sprintf(pagehits,"<h2>Обновление ПО модуля МЭК 61850</h2><hr>");strcat(PAGE_BODY, pagehits);
 		 // -------------------
@@ -585,19 +679,19 @@ void fwUpdatePage(struct netconn *conn)
 		  sprintf(pagehits,"<div>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<h2> Введите логин и пароль </h2>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<b>Логин &#160&#160&#160</b> <input type=""text"" size=""20"" name=""username""><br><br>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<b>Пароль&#160</b>  <input type=""password"" size=""20"" name=""password"">");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<b>Логин &#160&#160&#160</b> <input type=\"text\" size=\"20\" name=\"username\"><br><br>");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<b>Пароль&#160</b> <input type=\"password\" size=\"20\" name=\"password\">");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"</div>");strcat(PAGE_BODY, pagehits);
 //!<div
-		  sprintf(pagehits,"<input type=""submit"" name=""login"" value=""Войти"">");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<input type=\"submit\" name=\"login\" value=\"Войти\">");strcat(PAGE_BODY, pagehits);
 
 		  sprintf(pagehits,"</form>");strcat(PAGE_BODY, pagehits);
 //!форма
-		  sprintf(pagehits,"<div id=""bottom_bar_black"">");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<div id=""main_container"">");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<a class=""bemn"" href=""http://www.bemn.by/"">ОАО ""БЭМН""</a>");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<div id=\"bottom_bar_black\">");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<div id=\"main_container\">");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<a class=\"bemn\" href=\"http://www.bemn.by/\">ОАО \"БЭМН\"</a>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"</div></div>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"</body>");strcat(PAGE_BODY, pagehits);
 
@@ -611,31 +705,38 @@ void fwUpdatePage(struct netconn *conn)
  *************************************************************************/
 void SSH_Transmit(Socket self, uint8_t *pData, uint16_t Size){
 
-	  int conn = GetSocket_num(self);
+	if (self == NULL) return;
 
-	  write(conn, pData, Size);
+	int conn = GetSocket_num(self);
+
+	if (conn){
+	  if (write(conn, pData, Size) == ERR_ABRT){
+//#define ERR_ABRT       -10   /* Connection aborted.      */
+//#define ERR_RST        -11   /* Connection reset.        */
+//#define ERR_CLSD       -12   /* Connection closed.       */
+//#define ERR_CONN       -13   /* Not connected.           */
+		Socket_destroy(self);
+	  }
+	}
 }
 /*************************************************************************
  *
  *************************************************************************/
 void SSH_server_serve(Socket self)
 {
-  struct fs_file file = {0, 0};
-  struct http_state *hs;
-  int32_t i,len=0;
-  uint32_t DataOffset, FilenameOffset;
-  //char *data;
-  char *ptr, filename[13], login[LOGIN_SIZE];
-
   HandleSet handles;
+
+  int buflen = 1500;
+  int ret;
+  int result;
+  unsigned char recv_buffer[1500];
 
   int conn = GetSocket_num(self);
 
   handles = Handleset_new();
   Handleset_addSocket(handles, self);
 
-  int result;
-  result = Handleset_waitReady(handles, 20);			// проверка состояния сокетов ждем таймаут
+   result = Handleset_waitReady(handles, 20);			// проверка состояния сокетов ждем таймаут
   Handleset_destroy(handles);
 
   if (result < 1){
@@ -644,18 +745,8 @@ void SSH_server_serve(Socket self)
 	  Socket_destroy(self);
       return;
   }
-
-  int buflen = 1500;
-  int ret;
-//  struct fs_file * file;
-  unsigned char recv_buffer[1500];
-
-nextbuf:
-
   // читаем из сокета запрос от клиента
   ret = read(conn, recv_buffer, buflen);
-
-  len = ret;//buflen;
 
   if(ret == 0) {
 	  USART_TRACE_RED("Разорвали соединение со стороны клиента. Закрываем.\n");
@@ -667,12 +758,6 @@ nextbuf:
 	  Socket_destroy(self);
 	  return;
   }
-  //===================================
-
-  //===================================
-//  USART_TRACE_GREEN("закрываем соединение на 23 порт. 0x%x\n",self);
-//  Socket_destroy(self);
-
 }
 /*************************************************************************
  *
@@ -688,13 +773,11 @@ void http_server_serve(Socket self)
 
   HandleSet handles;
 
-  int conn = GetSocket_num(self);
-
   handles = Handleset_new();
   Handleset_addSocket(handles, self);
 
   int result;
-  result = Handleset_waitReady(handles, 20);			// проверка состояния сокетов ждем таймаут
+  result = Handleset_waitReady(handles, 20);			// проверка состояния сокетов ждем таймаут 20мс иногда были таймауты
   Handleset_destroy(handles);
 
   if (result < 1){
@@ -706,8 +789,9 @@ void http_server_serve(Socket self)
 
   int buflen = 1500;
   int ret;
-//  struct fs_file * file;
   unsigned char recv_buffer[1500];
+
+  int conn = GetSocket_num(self);
 
 nextbuf:
 
@@ -738,7 +822,8 @@ nextbuf:
     {
       //fs_open("/index.html", &file);
 	  //write(conn, (const unsigned char*)file.data, (size_t)file.len);
-	  indexPage(conn);
+	  USART_TRACE("GET /system.html\n");
+	  SystemPage(conn);
     }
   else if(strncmp((char *)recv_buffer, "GET /favicon.ico", 16) == 0)
     {
@@ -753,61 +838,105 @@ nextbuf:
       fs_open("/styles.css", &file);
 	   write(conn, (const unsigned char*)file.data, (size_t)file.len);
     }
+
   else if(strncmp((char *)recv_buffer, "GET /restart", 12) == 0)
   {
-	  write(conn, "restart.\n", strlen("restart.\n"));
-
+	  write(conn, "restarting.\n", strlen("restarting.\n"));
 	  USART_TRACE("GET /restart\n");
+     Socket_destroy(self);
+     vTaskDelay(500);
 
-	  NVIC_SystemReset();
+	 NVIC_SystemReset();
   }
-  else if(strncmp((char *)recv_buffer, "GET /upload.html", 16) == 0)
+ /*
+  else if(strncmp((char *)recv_buffer, "GET /deleteDD", 13) == 0)
+  {
+	  write(conn, "Удалил Сохранённые переменные.\n", strlen("Удалил Сохранённые переменные.\n"));
+	  USART_TRACE("GET /deleteDD\n");
+
+	  filesystem_Delete(_DataListWrites);
+  }
+*/
+  else
+  if(strncmp((char *)recv_buffer, "GET /upload.html", 16) == 0)
   {
 	  write(conn, "upload page.\n", strlen("upload page.\n"));
-//	  USART_TRACE("GET /upload.html\n");
   }
   else if (strncmp((char *)recv_buffer, "GET /time.html",14) == 0)
-    {
-
+ {
 	  if (strncmp((char *)recv_buffer, "GET /time.html?",15) == 0){
-//		  USART_TRACE("GET /time.html?\n");
 		  SetNTPconfig((char *)recv_buffer);
-	      fs_open("/time.html", &file);
+		  fs_open("/time.html", &file);
 		  write(conn, (const unsigned char*)file.data, (size_t)file.len);
 
 	  } else{
 		  USART_TRACE("GET /time.html\n");
-	      fs_open("/time.html", &file);
+		  fs_open("/time.html", &file);
 		  write(conn, (const unsigned char*)file.data, (size_t)file.len);
 	  }
-
-     }
+ }
   else if(strncmp((char *)recv_buffer, "GET /", 5) == 0)
   {
 	  if ((strncmp((char *)recv_buffer, "GET /resetmcu.cgi", 17) ==0)&&(htmlpage == UploadDonePage))
-	         {
-          	  /* send reset.html page */
-	           htmlpage = ResetDonePage;
-	           fs_open("/reset.html", &file);
-	     	   write(conn, (const unsigned char*)file.data, (size_t)file.len);
-	           resetpage = 1;
-	         }
-	         else
-	          if(strncmp((char *)recv_buffer, "GET /fwupdate.html", 18) == 0)
-	         {
-	           htmlpage = LoginPage;
-//			   USART_TRACE("GET /fwupdate.html\n");
-			   fwUpdatePage(conn);
+		 {
+		  /* send reset.html page */
+		   htmlpage = ResetDonePage;
+		   fs_open("/reset.html", &file);
+		   write(conn, (const unsigned char*)file.data, (size_t)file.len);
+		   resetpage = 1;
+		 }
+	  else
+		 if(strncmp((char *)recv_buffer, "GET /fwupdate.html", 18) == 0)
+		  {
+		   htmlpage = LoginPage;
+		   fwUpdatePage(conn);
+		  }
+		 else
+		  if((strncmp((char *)recv_buffer, "GET / ", 6) == 0) || (strncmp((char *)recv_buffer, "GET /index.html", 15) == 0))
+		  {
+	//		    		  USART_TRACE("GET / \n");
+			  //fs_open("/index.html", &file);
+			  //write(conn, (const unsigned char*)file.data, (size_t)file.len);
+	// из памяти программы
+			  indexPage(conn);
+		  }
+		  else
+  // из 1:/http папки диска
+		  {
+			FIL 		_File;
+			FRESULT		RES;
 
-	         } else
-		          if((strncmp((char *)recv_buffer, "GET / ", 6) == 0) || (strncmp((char *)recv_buffer, "GET /index.html", 15) == 0))
-		          {
-//		    		  USART_TRACE("GET / \n");
-		    	      //fs_open("/index.html", &file);
-		    		  //write(conn, (const unsigned char*)file.data, (size_t)file.len);
-		    		  indexPage(conn);
 
-		          }
+			char* gets = strstr((char *)recv_buffer,"GET /");
+			if (gets == NULL) goto GotoOUT;
+			uint8_t pos = (uint8_t)(gets-(char *)recv_buffer) + 4;
+			strcpy(filename,_httpServer);
+
+			char* geth = strstr((char *)recv_buffer,"HTTP/");
+			uint8_t posend = (uint8_t)(geth-(char *)recv_buffer);
+
+			strncat(filename,(char *)&recv_buffer[pos],posend - pos - 1);
+
+			RES =  f_open(&_File,filename, FA_READ);
+			if(RES != FR_OK){
+				USART_TRACE_RED("ошибка файла %s код %u\n",filename, RES);
+				goto GotoOUT;
+			}
+			USART_TRACE_MAGENTA("читаем %s\n",filename);
+
+			uint8_t BuffFntRead[255];
+			while (f_eof(&_File) == 0) {			//читаем и парсим содержимое
+				//f_gets((TCHAR*)BuffFntRead,255,&_File);
+				uint16_t nm;
+				if (f_read(&_File,(TCHAR*)BuffFntRead,255,(UINT*)&nm) == FR_OK){
+					write(conn, BuffFntRead, (size_t)nm);
+				} else{
+					f_close(&_File);
+					goto GotoOUT;
+				}
+			}
+			f_close(&_File);
+		  }
   }
   else if ((strncmp((char *)recv_buffer, "POST /checklogin.cgi",20)==0)&&(htmlpage== LoginPage))
   {
@@ -1051,7 +1180,7 @@ nextbuf:
 GotoOUT:
   /* Close connection socket */
 //  close(conn);
-  USART_TRACE_GREEN("закрываем соединение на 80 порт. 0x%x\n",self);
+  USART_TRACE_GREEN("откл. от 80 порта.0x%x\n",self);
   Socket_destroy(self);
 }
 
@@ -1059,7 +1188,7 @@ GotoOUT:
  * voidSetNTPconfig
  ***********************************************************************/
 void	SetNTPconfig(char *inbuff){
-extern uint64_t nextSynchTimeNTP;
+extern uint64_t lastSynchTimeNTP;
 	uint8_t	*pos;
 	uint8_t	*end;
 	uint8_t	sizeText;
@@ -1122,7 +1251,7 @@ extern uint64_t nextSynchTimeNTP;
 				// далее период синхронизации в секундах
  				memory_write_to_mem((uint8_t *)&SNTP_Period,_IfNTP_Period,2);
 				USART_TRACE_BLUE("сохранили во flash период синхронизации:%u \n", SNTP_Period);
-				nextSynchTimeNTP = Hal_getTimeInMs() + 5000;//SNTP_Period*60*1000;
+				lastSynchTimeNTP = Hal_getTimeInMs();// + 5000;//SNTP_Period*60*1000;
 			  // сохраняем на флешку
 			}
 		}
@@ -1483,6 +1612,77 @@ uint32_t BootFLASH_If_Write(__IO uint32_t* FlashAddress, uint32_t* Data ,uint16_
 
   USART_TRACE_GREEN("BootFLASH_If_Write OK\n");
   return (0);
+}
+/***************************************************************************************
+ * GetRunTimeStats
+ *
+ ***************************************************************************************/
+void GetRunTimeStats( char *pcWriteBuffer )
+{
+UBaseType_t uxCurrentNumberOfTasks = uxTaskGetNumberOfTasks();
+
+TaskStatus_t *pxTaskStatusArray;
+volatile UBaseType_t uxArraySize, x;
+uint32_t ulTotalTime, ulStatsAsPercentage;
+uint32_t TotalTime;
+
+	// Make sure the write buffer does not contain a string.
+	*pcWriteBuffer = 0x00;
+
+	// Take a snapshot of the number of tasks in case it changes while this	function is executing.
+	uxArraySize = uxCurrentNumberOfTasks;
+
+	// Allocate an array index for each task.
+	pxTaskStatusArray = pvPortMalloc( uxCurrentNumberOfTasks * sizeof( TaskStatus_t ) );
+
+	if( pxTaskStatusArray != NULL )
+	{
+		// Generate the (binary) data.
+		uxArraySize = uxTaskGetSystemState( pxTaskStatusArray, uxArraySize, &ulTotalTime );
+
+		TotalTime = ulTotalTime;
+		// For percentage calculations.
+		ulTotalTime /= 100UL;
+
+		// Avoid divide by zero errors.
+		if( ulTotalTime > 0 )
+		{
+			// Create a human readable table from the binary data.
+			sprintf( pcWriteBuffer,"<table border=2 align=center>");
+			pcWriteBuffer += strlen( pcWriteBuffer );
+			sprintf( pcWriteBuffer,"<tr><th>задача</th><th>Свободно памяти, байт</th><th>Активность из:%u</th><th>Активность %%</th><th>Приоритет</th></tr>",(unsigned int)TotalTime);
+			pcWriteBuffer += strlen( pcWriteBuffer );
+			for( x = 0; x < uxArraySize; x++ )
+			{
+				ulStatsAsPercentage = pxTaskStatusArray[ x ].ulRunTimeCounter / ulTotalTime;
+
+				if( ulStatsAsPercentage > 0UL )
+				{
+					sprintf( pcWriteBuffer, "<tr><td>%s </td><td>%u</td><td>%u</td><td>%u%%</td><td>%u</td></tr>", pxTaskStatusArray[ x ].pcTaskName,pxTaskStatusArray[ x ].usStackHighWaterMark, ( unsigned int ) pxTaskStatusArray[ x ].ulRunTimeCounter, ( unsigned int ) ulStatsAsPercentage,( unsigned int ) pxTaskStatusArray[ x ].uxBasePriority);
+				}
+				else
+				{
+					sprintf( pcWriteBuffer, "<tr><td>%s </td><td>%u</td><td>%u</td><td><1%%</td><td>%u</td></tr>", pxTaskStatusArray[ x ].pcTaskName,pxTaskStatusArray[ x ].usStackHighWaterMark, ( unsigned int ) pxTaskStatusArray[ x ].ulRunTimeCounter, ( unsigned int ) pxTaskStatusArray[ x ].uxBasePriority );
+
+				}
+				pcWriteBuffer += strlen( pcWriteBuffer );
+
+			}
+			sprintf( pcWriteBuffer,"</table>");	pcWriteBuffer += strlen( pcWriteBuffer );
+
+		}
+		else
+		{
+			mtCOVERAGE_TEST_MARKER();
+		}
+
+		// Free the array again.
+		vPortFree( pxTaskStatusArray );
+	}
+	else
+	{
+		mtCOVERAGE_TEST_MARKER();
+	}
 }
 
 /*

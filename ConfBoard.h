@@ -53,18 +53,21 @@
    LED2 = 1,
    LED3 = 2,
    LED4 = 3,
-   RS485_1_DEn = 4,
-   RS485_2_DEn = 5,
-   MODBUS_DEn = 6,
-   LED_out_RED = 7,
-   LED_out_GREEN = 8,
+   LEDtst0 = 4,
+   LEDtst1 = 5,
+   LEDtst2 = 6,
+   RS485_1_DEn = 7,
+   RS485_2_DEn = 8,
+   MODBUS_DEn = 9,
+   LED_out_RED = 10,
+   LED_out_GREEN = 11,
  }Port_TypeDef;
 
 
 // ----------------------------------------------------------------------------------------------------
 //#define 	KSZ8873
 // ----------------------------------------------------------------------------------------------------
-#define PORTn                             9
+#define PORTn                             12
 
 #ifdef STM32F407xx
 
@@ -110,6 +113,22 @@
 #define LED4_GPIO_CLK_ENABLE()           __GPIOE_CLK_ENABLE()
 #define LED4_GPIO_CLK_DISABLE()          __GPIOE_CLK_DISABLE()
 
+#define LEDtst0_PIN                      GPIO_PIN_10
+#define LEDtst0_GPIO_PORT                GPIOG
+#define LEDtst0_GPIO_CLK_ENABLE()        __GPIOG_CLK_ENABLE()
+#define LEDtst0_GPIO_CLK_DISABLE()       __GPIOG_CLK_DISABLE()
+
+#define LEDtst1_PIN                      GPIO_PIN_11
+#define LEDtst1_GPIO_PORT                GPIOG
+#define LEDtst1_GPIO_CLK_ENABLE()        __GPIOG_CLK_ENABLE()
+#define LEDtst1_GPIO_CLK_DISABLE()       __GPIOG_CLK_DISABLE()
+
+#define LEDtst2_PIN                      GPIO_PIN_12
+#define LEDtst2_GPIO_PORT                GPIOG
+#define LEDtst2_GPIO_CLK_ENABLE()        __GPIOG_CLK_ENABLE()
+#define LEDtst2_GPIO_CLK_DISABLE()       __GPIOG_CLK_DISABLE()
+
+
 #endif
 
 #define LED_OUT_RED_PIN                 GPIO_PIN_14					// RED
@@ -151,18 +170,24 @@
                                             if((__INDEX__) == 1) LED2_GPIO_CLK_ENABLE(); else \
                                             if((__INDEX__) == 2) LED3_GPIO_CLK_ENABLE(); else \
                                             if((__INDEX__) == 3) LED4_GPIO_CLK_ENABLE(); else \
-                                            if((__INDEX__) == 4) RS485_1_DE_GPIO_CLK_ENABLE(); else \
-											if((__INDEX__) == 5) RS485_2_DE_GPIO_CLK_ENABLE(); else \
-											if((__INDEX__) == 6) MODBUS_DE_GPIO_CLK_ENABLE();\
+                                            if((__INDEX__) == 4) LEDtst0_GPIO_CLK_ENABLE(); else \
+                                            if((__INDEX__) == 5) LEDtst1_GPIO_CLK_ENABLE(); else \
+                                            if((__INDEX__) == 6) LEDtst2_GPIO_CLK_ENABLE(); else \
+                                            if((__INDEX__) == 7) RS485_1_DE_GPIO_CLK_ENABLE(); else \
+											if((__INDEX__) == 8) RS485_2_DE_GPIO_CLK_ENABLE(); else \
+											if((__INDEX__) == 9) MODBUS_DE_GPIO_CLK_ENABLE();\
                                             }while(0)
 
 #define PORTx_GPIO_CLK_DISABLE(__INDEX__) do{if((__INDEX__) == 0) LED1_GPIO_CLK_DISABLE(); else \
                                             if((__INDEX__) == 1) LED2_GPIO_CLK_DISABLE(); else \
                                             if((__INDEX__) == 2) LED3_GPIO_CLK_DISABLE(); else \
                                             if((__INDEX__) == 3) LED4_GPIO_CLK_DISABLE(); else \
-                                            if((__INDEX__) == 4) RS485_1_DE_GPIO_CLK_DISABLE(); else \
-											if((__INDEX__) == 5) RS485_2_DE_GPIO_CLK_DISABLE(); else \
-											if((__INDEX__) == 6) MODBUS_DE_GPIO_CLK_DISABLE(); \
+                                            if((__INDEX__) == 4) LEDtst0_GPIO_CLK_DISABLE(); else \
+                                            if((__INDEX__) == 5) LEDtst1_GPIO_CLK_DISABLE(); else \
+                                            if((__INDEX__) == 6) LEDtst2_GPIO_CLK_DISABLE(); else \
+                                            if((__INDEX__) == 7) RS485_1_DE_GPIO_CLK_DISABLE(); else \
+											if((__INDEX__) == 8) RS485_2_DE_GPIO_CLK_DISABLE(); else \
+											if((__INDEX__) == 9) MODBUS_DE_GPIO_CLK_DISABLE(); \
                                             }while(0)
 
 

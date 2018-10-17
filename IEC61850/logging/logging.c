@@ -791,11 +791,6 @@ createLogControlBlock(MmsMapping* self, LogControlBlock* logControlBlock,
 
     prepareLogControl(logControl);
 
-    if (logControl->enabled)
-        enableLogging(logControl);
-
-    LogControl_updateLogEna(logControl);
-
     return lcb;
 }
 
@@ -829,6 +824,11 @@ Logging_createLCBs(MmsMapping* self, MmsDomain* domain, LogicalNode* logicalNode
         if (logControlBlock->logRef != NULL)
             logControl->logInstance = getLogInstanceByLogRef(self, logControlBlock->logRef);
 
+        if (logControl->enabled)
+            enableLogging(logControl);
+
+        LogControl_updateLogEna(logControl);
+
         LinkedList_add(self->logControls, logControl);
 
         currentLcb++;
@@ -855,7 +855,7 @@ LogControl_logAllDatasetEntries(LogControl* self, const char* iedName)
 
         while (dataSetEntry != NULL) {
 
-            sprintf(dataRef, "%s%s/%s", iedName, dataSetEntry->logicalDeviceName, dataSetEntry->variableName);
+        	sprintf(dataRef, "%s%s/%s", iedName, dataSetEntry->logicalDeviceName, dataSetEntry->variableName);
 
             LogInstance_logEntryData(log, entryID, dataRef, dataSetEntry->value, TRG_OPT_INTEGRITY * 2);
 
@@ -882,8 +882,8 @@ Logging_processIntegrityLogs(MmsMapping* self, uint64_t currentTimeInMs)
 
                 if (currentTimeInMs >= logControl->nextIntegrityScan) {
 
-                    //if (DEBUG_IED_SERVER)
-                        printf("IED_SERVER: INTEGRITY SCAN for log %s\n", logControl->name);
+                    if (DEBUG_IED_SERVER)
+                	printf("IED_SERVER: INTEGRITY SCAN for log %s\n", logControl->name);
 
                     LogControl_logAllDatasetEntries(logControl, self->mmsDevice->deviceName);
 

@@ -243,6 +243,7 @@ struct sDataSet {
 	int elementCount;
 	DataSetEntry* fcdas;
 	DataSet* sibling;
+	bool	deletable;
 };
 
 struct sReportControlBlock {
@@ -252,7 +253,7 @@ struct sReportControlBlock {
 	bool buffered;
 	char* dataSetName; /* pre loaded with relative name in logical node */
 
-	uint32_t confRef;    /* ConfRef - configuration revision */
+	uint32_t confRef;    /* ConfRef - configuration revision при изменении содержимого датасета инкрементится его ревизия*/
 	uint8_t trgOps;      /* TrgOps - trigger conditions */
 	uint8_t options;     /* OptFlds */
 	uint32_t bufferTime; /* BufTm - time to buffer events until a report is generated */

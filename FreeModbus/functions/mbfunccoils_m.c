@@ -102,7 +102,7 @@ eMBMasterReqErrCode		eMBMasterReqReadDataTimeW( UCHAR ucSndAddr, USHORT usTimeAd
 		ucMBFrame[MB_PDU_REQ_READ_COILCNT_OFF]     = usNRegs >> 8;
 		ucMBFrame[MB_PDU_REQ_READ_COILCNT_OFF + 1] = usNRegs;
 		vMBMasterSetPDUSndLength( MB_PDU_SIZE_MIN + MB_PDU_REQ_READ_SIZE );
-		xModbus_Set_SizeAnswer(SizeAnswer);
+		xModbus_Set_SizeAnswer(SizeAnswer,usTimeAddr);
 		( void ) xMBMasterPortEventPost( EV_MASTER_FRAME_SENT );
 		eErrStatus = eMBMasterWaitRequestFinish( );
 
@@ -147,7 +147,7 @@ eMBMasterReqReadCoils( UCHAR ucSndAddr, USHORT usCoilAddr, USHORT usNCoils ,LONG
 		ucMBFrame[MB_PDU_REQ_READ_COILCNT_OFF ]    = usNCoils >> 8;
 		ucMBFrame[MB_PDU_REQ_READ_COILCNT_OFF + 1] = usNCoils;
 		vMBMasterSetPDUSndLength( MB_PDU_SIZE_MIN + MB_PDU_REQ_READ_SIZE );
-		xModbus_Set_SizeAnswer(SizeAnswer);
+		xModbus_Set_SizeAnswer(SizeAnswer,usCoilAddr);
 		( void ) xMBMasterPortEventPost( EV_MASTER_FRAME_SENT );
 		eErrStatus = eMBMasterWaitRequestFinish( );
 
@@ -233,6 +233,8 @@ eMBMasterFuncReadCoils( UCHAR * pucFrame, USHORT * usLen )
 eMBMasterReqErrCode
 eMBMasterReqWriteCoil( UCHAR ucSndAddr, USHORT usCoilAddr, USHORT usCoilData, LONG lTimeOut )
 {
+    uint8_t					SizeAnswer;
+
     UCHAR                 *ucMBFrame;
     eMBMasterReqErrCode    eErrStatus = MB_MRE_NO_ERR;
 
@@ -241,6 +243,9 @@ eMBMasterReqWriteCoil( UCHAR ucSndAddr, USHORT usCoilAddr, USHORT usCoilData, LO
     else if ( xMBMasterRunResTake( lTimeOut ) == FALSE ) eErrStatus = MB_MRE_MASTER_BUSY;
     else
     {
+
+    	SizeAnswer = SizeAddr+SizeFunct+2+SizeCRC+2;
+
 		vMBMasterGetPDUSndBuf(&ucMBFrame);
 		vMBMasterSetDestAddress(ucSndAddr);
 		ucMBFrame[MB_PDU_FUNC_OFF]                = MB_FUNC_WRITE_SINGLE_COIL;
@@ -249,6 +254,7 @@ eMBMasterReqWriteCoil( UCHAR ucSndAddr, USHORT usCoilAddr, USHORT usCoilData, LO
 		ucMBFrame[MB_PDU_REQ_WRITE_VALUE_OFF ]    = usCoilData >> 8;
 		ucMBFrame[MB_PDU_REQ_WRITE_VALUE_OFF + 1] = usCoilData;
 		vMBMasterSetPDUSndLength( MB_PDU_SIZE_MIN + MB_PDU_REQ_WRITE_SIZE );
+		xModbus_Set_SizeAnswer(SizeAnswer,usCoilAddr);
 		( void ) xMBMasterPortEventPost( EV_MASTER_FRAME_SENT );
 		eErrStatus = eMBMasterWaitRequestFinish( );
     }

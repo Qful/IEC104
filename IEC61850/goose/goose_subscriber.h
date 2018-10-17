@@ -39,6 +39,9 @@ extern "C" {
 
 typedef struct sGooseSubscriber* GooseSubscriber;
 
+typedef struct sGooseReceiverFile GooseReceiverFile;
+typedef struct sGooseReceiverGocbRef GooseReceiverGocbRef;
+
 /**
  * \brief user provided callback function that will be invoked when a GOOSE message is received.
  *
@@ -68,7 +71,7 @@ typedef void (*GooseListener)(GooseSubscriber subscriber, void* parameter);
  * \param dataSetValues the MmsValue object where the data set values will be written or NULL.
  */
 GooseSubscriber
-GooseSubscriber_create(char* goCbRef, MmsValue* dataSetValues,void* MAC);
+GooseSubscriber_create(GooseReceiverGocbRef* goCbRef, MmsValue* dataSetValues);
 
 //char*
 //GooseSubscriber_getGoCbRef(GooseSubscriber self);
@@ -201,6 +204,18 @@ GooseSubscriber_getTimestamp(GooseSubscriber self);
  */
 MmsValue*
 GooseSubscriber_getDataSetValues(GooseSubscriber self);
+
+char*
+GooseSubscriber_getGoCBRef(GooseSubscriber self);
+
+uint32_t
+GooseSubscriber_getNumGoose(GooseSubscriber self);
+
+bool
+GooseSubscriber_isLostGooseMessage(GooseSubscriber self);
+
+void
+GooseSubscriber_setLostGooseMessage(GooseSubscriber self, bool dat);
 
 #ifdef __cplusplus
 }

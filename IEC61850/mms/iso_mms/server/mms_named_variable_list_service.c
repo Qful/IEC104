@@ -460,7 +460,7 @@ mmsServer_handleDefineNamedVariableListRequest(MmsServerConnection connection,	u
                 MmsNamedVariableList namedVariableList = createNamedVariableList(domain, device,
                                 request, variableListName, &mmsError);
 
-                if (namedVariableList != NULL) {
+                if (namedVariableList != NULL) {	// добавляем элементы списка данных
 
                     mmsError = mmsServer_callVariableListChangedHandler(true, MMS_DOMAIN_SPECIFIC, domain, variableListName, connection);
 

@@ -1649,7 +1649,9 @@ printReportId(ReportBufferEntry* report)
 static void
 removeAllGIReportsFromReportBuffer(ReportBuffer* reportBuffer)
 {
+#if (DEBUG_IED_SERVER == 1)
     printf("removeAllGIReportsFromReportBuffer\n");
+#endif
 
     ReportBufferEntry* currentReport = reportBuffer->oldestReport;
     ReportBufferEntry* lastReport = NULL;
@@ -1682,7 +1684,9 @@ removeAllGIReportsFromReportBuffer(ReportBuffer* reportBuffer)
         }
     }
 }
-
+/*****************************************************************************************************
+ * буферизироование событий отчёра
+ *****************************************************************************************************/
 static void
 enqueueReport(ReportControl* reportControl, bool isIntegrity, bool isGI, uint64_t timeOfEntry)
 {
@@ -1706,7 +1710,7 @@ enqueueReport(ReportControl* reportControl, bool isIntegrity, bool isGI, uint64_
     inclusionFieldStatic.value.bitString.size = MmsValue_getBitStringSize(reportControl->inclusionField);
 
     MmsValue* inclusionField = &inclusionFieldStatic;
-
+// isIntegrity || isGI --------------------------------
     if (isIntegrity || isGI) {
 
         DataSetEntry* dataSetEntry = reportControl->dataSet->fcdas;
@@ -1723,6 +1727,7 @@ enqueueReport(ReportControl* reportControl, bool isIntegrity, bool isGI, uint64_
             dataSetEntry = dataSetEntry->sibling;
         }
     }
+// other trigger reason --------------------------------
     else { /* other trigger reason */
         bufferEntrySize += inclusionFieldSize;
 
@@ -2403,18 +2408,18 @@ processEventsForReport(ReportControl* rc, uint64_t currentTimeInMs)
 
 
     if ((rc->enabled) || (rc->isBuffering)) {
-
+//GI
         if (rc->triggerOps & TRG_OPT_GI) {
             if (rc->gi) {
 
                 /* send current events in event buffer before GI report */
                 if (rc->triggered) {
-                    if (rc->buffered)
+                    if (rc->buffered)// буферизированый
                         enqueueReport(rc, false, false, currentTimeInMs);
                     else{
                         sendReport(rc, false, false);
 						if (DEBUG_REPORT_SERVER) {
-							USART_TRACE_Yellow("REPORT_SERVER: отправили GI отчет: buffered:%u triggered:%u intgPd:%u gi:$u\n",rc->buffered,rc->triggered,rc->intgPd,rc->gi);
+							USART_TRACE_Yellow("REPORT_SERVER: отправили GI отчет: buffered:%u triggered:%u intgPd:%u gi:$u\n",(unsigned int)rc->buffered,(unsigned int)rc->triggered,(unsigned int)rc->intgPd,(unsigned int)rc->gi);
 						}
                     }
                     rc->triggered = false;
@@ -2425,7 +2430,7 @@ processEventsForReport(ReportControl* rc, uint64_t currentTimeInMs)
                 else{
                     sendReport(rc, false, true);
 					if (DEBUG_REPORT_SERVER) {
-						USART_TRACE_Yellow("REPORT_SERVER: отправили GI отчет: buffered:%u triggered:%u intgPd:%u gi:$u\n",rc->buffered,rc->triggered,rc->intgPd,rc->gi);
+						USART_TRACE_Yellow("REPORT_SERVER: отправили GI отчет: buffered:%u triggered:%u intgPd:%u gi:$u\n",rc->buffered,rc->triggered,(unsigned int)rc->intgPd,rc->gi);
 					}
                 }
 
@@ -2434,7 +2439,7 @@ processEventsForReport(ReportControl* rc, uint64_t currentTimeInMs)
                 rc->triggered = false;
             }
         }
-
+//TRG_OPT_INTEGRITY
         if (rc->triggerOps & TRG_OPT_INTEGRITY) {
 
             if (rc->intgPd > 0) {
@@ -2447,7 +2452,7 @@ processEventsForReport(ReportControl* rc, uint64_t currentTimeInMs)
                         else {
                             sendReport(rc, false, false);
 							if (DEBUG_REPORT_SERVER) {
-								USART_TRACE_Yellow("REPORT_SERVER: отправили INTEGRITY отчет: buffered:%u triggered:%u intgPd:%u\n",rc->buffered,rc->triggered,rc->intgPd);
+								USART_TRACE_Yellow("REPORT_SERVER: отправили INTEGRITY отчет: buffered:%u triggered:%u intgPd:%u\n",rc->buffered,rc->triggered,(unsigned int)rc->intgPd);
 							}
                         }
                         rc->triggered = false;
@@ -2460,7 +2465,7 @@ processEventsForReport(ReportControl* rc, uint64_t currentTimeInMs)
                     else{
                         sendReport(rc, true, false);
 						if (DEBUG_REPORT_SERVER) {
-							USART_TRACE_Yellow("REPORT_SERVER: отправили INTEGRITY отчет: buffered:%u triggered:%u intgPd:%u\n",rc->buffered,rc->triggered,rc->intgPd);
+							USART_TRACE_Yellow("REPORT_SERVER: отправили INTEGRITY отчет: buffered:%u triggered:%u intgPd:%u\n",rc->buffered,rc->triggered,(unsigned int)rc->intgPd);
 						}
                     }
 
@@ -2468,7 +2473,7 @@ processEventsForReport(ReportControl* rc, uint64_t currentTimeInMs)
                 }
             }
         }
-        // отчет по изменению состояния.
+// отчет по изменению состояния.
         if (rc->triggered) {
             if (currentTimeInMs >= rc->reportTime) {
 
@@ -2485,9 +2490,9 @@ processEventsForReport(ReportControl* rc, uint64_t currentTimeInMs)
                 rc->triggered = false;
             }
         }
-
+// ! отчет по изменению состояния.
         if (rc->buffered && rc->enabled) {
-            sendNextReportEntry(rc);
+            sendNextReportEntry(rc);			// отправка данных
         }
 
     }

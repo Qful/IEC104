@@ -45,6 +45,7 @@ struct sMmsMapping {
 #if (CONFIG_INCLUDE_GOOSE_SUPPORT == 1)
     LinkedList gseControls;
     const char* gooseInterfaceId;
+    GooseMode	goosesCurrentMode;
 #endif
 
 #if (CONFIG_IEC61850_SAMPLED_VALUES_SUPPORT == 1)

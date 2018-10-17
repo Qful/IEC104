@@ -24,7 +24,7 @@
 #include "libiec61850_platform_includes.h"
 
 #include "stack_config.h"
-#include "goose_subscriber.h"
+
 #include "hal_ethernet.h"
 #include "hal_thread.h"
 
@@ -34,8 +34,12 @@
 #include "mms_value_internal.h"
 #include "linked_list.h"
 
+#include "goose_subscriber.h"
 #include "goose_receiver.h"
 #include "goose_receiver_internal.h"
+#include "goose_config.h"
+
+#include "modbus.h"
 
 #ifndef DEBUG_GOOSE_SUBSCRIBER
 #define DEBUG_GOOSE_SUBSCRIBER 0
@@ -45,18 +49,315 @@
 
 #define ETH_P_GOOSE 0x88b8
 
+extern xQueueHandle 	ModbusSentTime;		// очередь для отправки в модбас
+extern uint16_t   		ucGooseBufSent[MB_NumbGoose];
+extern uint16_t   		ucGooseBufDrop[MB_NumbGoose];
+
+bool		GooseDataModify = false;
+
 struct sGooseReceiver {
-    bool running;
-    bool stopped;
-    char* interfaceId;
-    uint8_t* buffer;
-    EthernetSocket ethSocket;
-    LinkedList subscriberList;
+    bool 				running;
+    bool 				stopped;
+    char* 				interfaceId;
+    uint8_t* 			buffer;
+    EthernetSocket 		ethSocket;
+    GooseReceiverCfg*	GooseMatrix;
+    GooseReceiverMAC*	GooseMACs;
+    LinkedList 			subscriberList;
 };
+/*************************************************************************
+ * gooseListener
+ * смотрим что там пришло
+ * parameter - matrix
+ *
+ *
+ * записи в конфиге начинаются не с '0'
+ * PosBitinDB - 1
+ * i+1
+ *************************************************************************/
+void	gooseListener(GooseSubscriber subscriber, void* parameter)
+{
+	bool		res[10];
+	uint8_t		sizeRes=0;
+	uint8_t		i,j;
+	uint32_t	nEntries;
+	uint8_t		nDBword;
+	uint8_t		nDBbit;
+	uint8_t		PosBitinDB;
+
+	GooseReceiverCfg* element;
+
+    MmsValue* values = GooseSubscriber_getDataSetValues(subscriber);
+
+    nEntries = MmsValue_getArraySize(values);													// число элементов  в самом вызове
+    uint32_t	NumGocbRef = GooseSubscriber_getNumGoose(subscriber);							// отправитель гуса в самом вызове
+
+    GooseDataModify = false;
+
+    for (i=0; i < nEntries;i++)																// номер записи в датасете гуса
+    {
+    	// ищем номер бита DB по номеру записи DS гуса
+    	    PosBitinDB = 0;
+    	    element = (GooseReceiverCfg*)parameter;
+
+    	    while (element != NULL) {
+
+    	      if(element->nGocbRef == NumGocbRef)
+    	    	if (element->nDataSetGoEntries == i+1) {										// номер записи в датасете гуса
+    	    		PosBitinDB = element->nGoEntries - 1;										// номер дискрета для текущей записи
+
+    	    	   	   MmsValue* valueElemen = MmsValue_getElement(values,i);
+    	    	    	    switch (MmsValue_getType(valueElemen)) {
+    	    	    	    case MMS_BIT_STRING:
+    	    	    	    	if (MmsValue_getBitStringSize(valueElemen) == 2){
+    	    	    	    		res[0] = MmsValue_getBitStringBit(valueElemen,0);
+    	    	    	    		res[1] = MmsValue_getBitStringBit(valueElemen,1);
+    	    	    	    		sizeRes = 2;
+    	    	    	    	}else{
+	    	    	    			portENTER_CRITICAL();
+    	    	    	    		// это кволити
+    	    	    	    		res[0] = !MmsValue_getAllBitStringBits(valueElemen);				// прямое качество из гус сообщения (0-good)
+    	    	    	    		//res[0] = !MmsValue_getAllBitStringBits(valueElemen);			// перевернём
+	    	    	    			sizeRes = 1;
+	    	    	    			/*
+    	    	    	    		if (element->AddAllowedToLiveStatus) {							// если нужно подмешивать валидность, то
+    	    	    	    			res[0] |= GooseSubscriber_isLostGooseMessage(subscriber);	// нет смысла. Уже ведь принял сообщение. Это нужно делать отдельно от приёма
+    	    	    	    		}
+    	    	    	    		*/
+	    	    	    			//res[0] = !res[0];	// перевернули данные
+	    	    	    			portEXIT_CRITICAL();
+    	    	    	    	}
+    	    	    	        break;
+    	    	    	    case MMS_BOOLEAN:
+    	    	    	    		res[0] = MmsValue_getBoolean(valueElemen);
+    	    	    	    		sizeRes = 1;
+    	    	    	        break;
+    	    	    	    default:
+    	    	    	        break;
+    	    	    	    }
+
+    	    	    	    nDBword = PosBitinDB / 16;
+    	    	    		nDBbit = (PosBitinDB % 16);
+    	    				for(j=0;j<sizeRes;j++){
+    	    					// проверим, изменились ли данные, если да, то шлем в МБ
+    	    					portDISABLE_INTERRUPTS();
+    	    					if (res[j] != (bool)(ucGooseBufSent[nDBword] & (1 << (nDBbit+j)))){
 
 
-GooseReceiver
-GooseReceiver_create()
+    	    						uint32_t stnum = GooseSubscriber_getStNum(subscriber);
+    	    						uint32_t sqnum = GooseSubscriber_getSqNum(subscriber);
+    	    						USART_TRACE_RED("отправитель %u, stnum:%u sqnum:%u Изменение в %u записи. Бит MB:%u \n",NumGocbRef,stnum,sqnum,i+1,PosBitinDB+1);
+
+
+    	    						GooseDataModify = true;
+    	    					}
+    	    					if (res[j] == true )	ucGooseBufSent[nDBword] |= (1 << (nDBbit+j));		// добавим прямые данные в буфер отправки МБ
+    	    					else					ucGooseBufSent[nDBword] &= ~(1 << (nDBbit+j));
+    	    					portENABLE_INTERRUPTS();
+    	    	    		}
+
+    	    	}// !if (element->nGoEntries ==
+    	        element = element->sibling;		// следующий
+    	    }
+	}
+    //--------------------------------------------------------------------
+    // нужно передать сразу
+#if (defined (MR5_500) || defined (MR5_600) || defined (MR5_700)) || defined (MR741) || \
+	((defined	(MR761) || defined	(MR762) || defined	(MR763)) && (_REVISION_DEVICE <=302)) || (defined	(MR771) && (_REVISION_DEVICE <=106)) ||\
+	(defined	(MR801) && (_REVISION_DEVICE <=207)) ||\
+	((defined	(MR901) || defined	(MR902)) && (_REVISION_DEVICE <=206)) ||\
+	(defined	(MR851) && (_REVISION_DEVICE <=202))
+
+//			старые приборы не шлём гус
+
+
+#else
+
+// тут бывает только когда есть приём гуса.
+
+	if (GooseDataModify == true)
+    {
+		AddToQueueMB(ModbusSentTime, MB_Wrt_Set_Goose	,MB_Slaveaddr);
+
+    	eMBMasterReqErrCode		errorSent 	 = MB_MRE_ILL_ARG;
+    	ModbusMessage 			pxTxMessage;
+
+		if( xQueueReceive( ModbusSentTime, &(pxTxMessage),( TickType_t ) 0 ) )
+		{
+			errorSent = eMBMasterSendMessage(&pxTxMessage,RT_WAITING_NO);
+
+			if (errorSent == MB_MRE_NO_ERR) {
+				eMBMasterPoll();	// шлём сразу.
+			} else{
+				USART_TRACE_GREEN("Ошибка отправки гуса\n");
+				xQueueSendToFront( ModbusSentTime, ( void * )&pxTxMessage, portMAX_DELAY);	// не получилось сразу, передача в очередь сообщения в начало
+			}
+		}
+    }//!if (GooseDataModify == true)
+
+#endif
+}
+/*****************************************************************************************************
+ * GooseReceiver_getConfigFile
+ * конфигурация приёмника гусов из (структуры)файла
+ *****************************************************************************************************/
+void	GooseReceiver_addSubscriberFromConfigFile(GooseReceiver self, GooseReceiverFile* cfgFile)
+{
+	GooseSubscriber			subscriber;
+	GooseReceiverGocbRef*	gocbRefs;
+
+	if (self == NULL)		return;
+	if (cfgFile == NULL)	return;
+
+	gocbRefs = cfgFile->GocbRefs;
+
+	self->GooseMatrix = cfgFile->GooseMatrix;								// добавим матрицу для расшифровки
+	self->GooseMACs = cfgFile->GooseMACs;									// добавим список MAC адресов гусов
+
+    while (gocbRefs != NULL) {
+
+    	subscriber = GooseSubscriber_create(gocbRefs, NULL);						// подписываемся на гус.
+    	GooseSubscriber_setAppId(subscriber,gocbRefs->AppId);						//конфигурим AppId
+	    GooseSubscriber_setListener(subscriber, gooseListener,self->GooseMatrix);	// функция для обработки конкретного принятого гуса
+	    GooseReceiver_addSubscriber(self, subscriber);
+//		USART_TRACE("gooseListener:%s, AppId:%u\n",gocbRefs->gocbRef,gocbRefs->AppId);
+
+	    gocbRefs = gocbRefs->sibling;									// следующий элемент
+	}
+}
+/*****************************************************************************************************
+ *GooseReceiver_ConfigCreate
+ *****************************************************************************************************/
+GooseReceiverFile*	GooseReceiver_ConfigCreate(){
+
+	GooseReceiverFile*	self = (GooseReceiverFile*) GLOBAL_MALLOC(sizeof(struct sGooseReceiverFile));
+
+	if (self != NULL) {
+		//self->GooseMACs   = NULL;
+		//self->GocbRefs    = NULL;
+		//self->GooseMatrix = NULL;
+	        self->GooseMACs = GooseReceiverMAC_create();
+	        self->GocbRefs = GooseReceiverGocbRef_create();
+	        self->GooseMatrix = GooseReceiverCfg_create();
+	    }
+    return self;
+}
+
+/*****************************************************************************************************
+ *GooseReceiver_ConfigDestroy
+ *****************************************************************************************************/
+void	GooseReceiver_ConfigDestroy(GooseReceiverFile* self)
+{
+
+    if (self->GooseMACs)   GLOBAL_FREEMEM(self->GooseMACs);
+    if (self->GocbRefs)    GLOBAL_FREEMEM(self->GocbRefs);
+    if (self->GooseMatrix) GLOBAL_FREEMEM(self->GooseMatrix);
+    if (self) GLOBAL_FREEMEM(self);
+}
+/*****************************************************************************************************
+ * newStringwithSize
+ * GooseReceiverMAC
+ *****************************************************************************************************/
+char*	newStringwithSize(const char* string, int size)
+{
+	char* self = (char*) GLOBAL_CALLOC(1, size);
+
+    if (self == NULL) return self;
+
+    strncpy (self,string,(size_t)size);
+
+    return self;
+}
+/*****************************************************************************************************
+ * GooseReceiverMAC_create
+ * GooseReceiverMAC
+ *****************************************************************************************************/
+GooseReceiverMAC*	GooseReceiverMAC_create(void)
+{
+	GooseReceiverMAC* newElement;
+	newElement = (GooseReceiverMAC*) GLOBAL_MALLOC(sizeof(struct sGooseReceiverMAC));
+	int var;
+	for (var = 0; var < 6; ++var)
+		newElement->MAC[var]=0;
+
+	newElement->sibling = NULL;
+    return newElement;
+}
+
+/*****************************************************************************************************
+ * GooseReceiverGocbRef_add
+ * GooseReceiverGocbRef
+ *****************************************************************************************************/
+GooseReceiverMAC*	GooseReceiverMAC_add(GooseReceiverMAC* Cfg)
+{
+	GooseReceiverMAC* newElement = GooseReceiverMAC_create();
+	while (Cfg->sibling){
+		Cfg = Cfg->sibling;
+	}
+	Cfg->sibling = newElement;
+
+return 	newElement;
+}
+/*****************************************************************************************************
+ * GooseReceiverGocbRef_create
+ * GooseReceiverGocbRef
+ *****************************************************************************************************/
+GooseReceiverGocbRef*	GooseReceiverGocbRef_create()
+{
+	GooseReceiverGocbRef* newElement;
+	newElement = (GooseReceiverGocbRef*) GLOBAL_MALLOC(sizeof(struct sGooseReceiverGocbRef));
+	newElement->gocbRef = NULL;
+	newElement->numbGocbRef = 0;
+	newElement->AppId = 0;
+	newElement->sibling = NULL;
+    return newElement;
+}
+/*****************************************************************************************************
+ * GooseReceiverGocbRef_add
+ * GooseReceiverGocbRef
+ *****************************************************************************************************/
+GooseReceiverGocbRef*	GooseReceiverGocbRef_add(GooseReceiverGocbRef* Cfg)
+{
+	GooseReceiverGocbRef* newElement = GooseReceiverGocbRef_create();
+	while (Cfg->sibling){
+		Cfg = Cfg->sibling;
+	}
+	Cfg->sibling = newElement;
+return 	newElement;
+}
+/*****************************************************************************************************
+ * GooseReceiver_ParseConfigFile
+ * GooseReceiverCfg
+ *****************************************************************************************************/
+GooseReceiverCfg*	GooseReceiverCfg_create()
+{
+	GooseReceiverCfg* newElement;
+
+	newElement = (GooseReceiverCfg*) GLOBAL_MALLOC(sizeof(struct sGooseReceiverCfg));
+	newElement->AddAllowedToLiveStatus = false;
+	newElement->nDataSetGoEntries = 0;
+	newElement->nGoEntries = 0;
+	newElement->nGocbRef = 0;
+	newElement->sibling = NULL;
+    return newElement;
+}
+/*****************************************************************************************************
+ * GooseReceiver_ParseConfigFile
+ * GooseReceiverCfg
+ *****************************************************************************************************/
+GooseReceiverCfg*	GooseReceiverCfg_add(GooseReceiverCfg* Cfg)
+{
+	GooseReceiverCfg* newElement = GooseReceiverCfg_create();
+	while (Cfg->sibling){
+		Cfg = Cfg->sibling;
+	}
+	Cfg->sibling = newElement;
+return 	newElement;
+}
+/*****************************************************************************************************
+ *GooseReceiver_create
+ *****************************************************************************************************/
+GooseReceiver	GooseReceiver_create()
 {
     GooseReceiver self = (GooseReceiver) GLOBAL_MALLOC(sizeof(struct sGooseReceiver));
 
@@ -159,6 +460,8 @@ parseAllData(uint8_t* buffer, int allDataLength, MmsValue* dataSetValues)
             break;
 
         case 0x84: /* BIT STRING */
+            if (DEBUG_GOOSE_SUBSCRIBER) printf("GOOSE_SUBSCRIBER:    found bitstring\n");
+
             if (MmsValue_getType(value) == MMS_BIT_STRING) {
                 int padding = buffer[bufPos];
                 int bitStringLength = (8 * (elementLength - 1)) - padding;
@@ -434,9 +737,11 @@ exit_with_error:
     return NULL;
 }
 
-
-static int
-parseGoosePayload(GooseReceiver self, uint8_t* buffer, int apduLength)
+/***************************************
+ * parseGoosePayload
+ * парсим гусс пакет и вызываем функцию обработчик
+ ***************************************/
+static int	parseGoosePayload(GooseReceiver self, uint8_t* buffer, int apduLength)
 {
     int bufPos = 0;
     uint32_t timeAllowedToLive = 0;
@@ -485,11 +790,15 @@ parseGoosePayload(GooseReceiver self, uint8_t* buffer, int apduLength)
                         GooseSubscriber subscriber = (GooseSubscriber) LinkedList_getData(element);
 
                         if (subscriber->goCBRefLen == elementLength) {
+
+                        	//portDISABLE_INTERRUPTS();
+
                             if (memcmp(subscriber->goCBRef, buffer + bufPos, elementLength) == 0) {
-                                if (DEBUG_GOOSE_SUBSCRIBER) printf("GOOSE_SUBSCRIBER:   gocbRef is matching!\n");
-                                matchingSubscriber = subscriber;
+                               	if (DEBUG_GOOSE_SUBSCRIBER) printf("GOOSE_SUBSCRIBER:   gocbRef is matching!\n");
+                               	matchingSubscriber = subscriber;
                                 break;
                             }
+                        	//portENABLE_INTERRUPTS();
                         }
 
                         element = LinkedList_getNext(element);
@@ -582,9 +891,17 @@ parseGoosePayload(GooseReceiver self, uint8_t* buffer, int apduLength)
             bool isValid = true;
 
             if (matchingSubscriber->stNum == stNum) {
-                if (matchingSubscriber->sqNum >= sqNum) {
-                    isValid = false;
+            		// иногда приборы шлют 2 одинаковых пакета (двойной инкремент stNum. пропуск потом 2 одинаковых).
+            		//из-за этого ошибка по валидити падает. временно  >= поменяем на ==. для обнаружения дубликатов
+                //if (matchingSubscriber->sqNum >= sqNum) {
+            	if (matchingSubscriber->sqNum > sqNum) {
+               		USART_TRACE_CYAN("Goose потеря NumGo:%u sqNum:%u\n",(unsigned int)matchingSubscriber->NumGocbRef,sqNum);
+                    //isValid = false;
                 }
+            	if (matchingSubscriber->sqNum == sqNum) {
+               		USART_TRACE_CYAN("Goose Дубликат:NumGo%u sqNum:%u\n",(unsigned int)matchingSubscriber->NumGocbRef,sqNum);
+                    //isValid = false;
+            	}
             }
 
             matchingSubscriber->stateValid = isValid;
@@ -592,10 +909,27 @@ parseGoosePayload(GooseReceiver self, uint8_t* buffer, int apduLength)
             matchingSubscriber->stNum = stNum;
             matchingSubscriber->sqNum = sqNum;
 
-            matchingSubscriber->invalidityTime = Hal_getTimeInMs() + timeAllowedToLive;
+            {
+            portDISABLE_INTERRUPTS();
+//было:
+            //matchingSubscriber->invalidityTime = Hal_getTimeInMs() + (uint64_t)timeAllowedToLive;
+//стало:
+            uint64_t	nextinvalidityTime = Hal_getTimeInMs() + (uint64_t)timeAllowedToLive;
+            if (nextinvalidityTime > matchingSubscriber->invalidityTime){
+            	matchingSubscriber->invalidityTime = nextinvalidityTime;
+            }
+            else
+            if ((matchingSubscriber->invalidityTime-nextinvalidityTime)>nextinvalidityTime) {
+               	matchingSubscriber->invalidityTime = nextinvalidityTime;
+            }
+            portENABLE_INTERRUPTS();
+            }
 
-            if (matchingSubscriber->listener != NULL)
+//            USART_TRACE_Yellow("Goose update invalidityTime:%u, 0x%X\n",(unsigned int)matchingSubscriber->NumGocbRef,(unsigned int)matchingSubscriber->invalidityTime);
+
+            if (matchingSubscriber->listener != NULL){
                 matchingSubscriber->listener(matchingSubscriber, matchingSubscriber->listenerParameter);
+            }
 
             return 1;
         }
@@ -608,9 +942,11 @@ exit_with_fault:
     return -1;
 }
 
-
-static void
-parseGooseMessage(GooseReceiver self, int numbytes)
+/***************************************
+ * parseGooseMessage
+ * парсим пакет из сети
+ ***************************************/
+static void		parseGooseMessage(GooseReceiver self, int numbytes)
 {
     int bufPos;
     bool subscriberFound = false;
@@ -662,7 +998,6 @@ parseGooseMessage(GooseReceiver self, int numbytes)
         printf("GOOSE_SUBSCRIBER:   APDU length: %i\n", apduLength);
     }
 
-
     // check if there is an interested subscriber
     LinkedList element = LinkedList_getNext(self->subscriberList);
 
@@ -677,8 +1012,15 @@ parseGooseMessage(GooseReceiver self, int numbytes)
         element = LinkedList_getNext(element);
     }
 
-    if (subscriberFound)
+    if (subscriberFound){
         parseGoosePayload(self, buffer + bufPos, apduLength);
+
+//        USART_TRACE_CYAN("GOOSE_SUBSCRIBER: GOOSE message. APPID: %u, LENGTH: %u, APDU length: %i\n",appId,length,apduLength);
+
+        if (DEBUG_GOOSE_SUBSCRIBER)
+            printf("GOOSE_SUBSCRIBER: GOOSE message parse OK.\n");
+
+    }
     else {
         if (DEBUG_GOOSE_SUBSCRIBER)
             printf("GOOSE_SUBSCRIBER: GOOSE message ignored due to unknown APPID value\n");
@@ -686,24 +1028,167 @@ parseGooseMessage(GooseReceiver self, int numbytes)
 }
 
 /*********************************************************************
- * gooseReceiverLoop
- * ТАСК обрабатывающий принятые сообщения гусов
+ * gooseReceiverDropMonitor
+ * ТАСК мониторит потери гусов
+ * нужно изменять данные ucGooseBufSent только когда gooseListener не работает
+ * иначе портятся данные нафиг.
+ * gooseListener и gooseReceiverDropMonitor имеют общие данные для отправки, нужно их семафорить както.
+ * Работают они с этими данными долго по времени. делая паузы. Нужно потери связи держать отдельно, и только перед отправкой их суммировать.
+ *
  *********************************************************************/
-static void
-gooseReceiverLoop(void* threadParameter)
+static void		gooseReceiverDropMonitor(void* threadParameter)
 {
-    GooseReceiver self = (GooseReceiver) threadParameter;
+	bool		DataDropModify;
+	uint8_t 	nDBword;
+	uint8_t 	nDBbit;
+	uint8_t 	PosBitinDB;
+
+    GooseReceiver 		self 		= (GooseReceiver) threadParameter;
+
+    while (self->running) {
+
+    	UBaseType_t WaterMark = uxTaskGetStackHighWaterMark(NULL);
+    		if (WaterMark<20){
+				USART_TRACE_RED("память стека задачи осталось: %u  \n",(unsigned int)WaterMark);
+    		}
+
+		DataDropModify = false;
+		// проверим на пропажу посылок от серверов отправителей
+		LinkedList element = LinkedList_getNext(self->subscriberList);
+
+		while (element != NULL) {
+			GooseSubscriber subscriber = (GooseSubscriber) LinkedList_getData(element);
+
+			uint32_t	NumGocbRef = GooseSubscriber_getNumGoose(subscriber);	// номер гуса
+				if (GooseSubscriber_isValid(subscriber) == false){				// валидность
+																				// вот она, была потеря. Нужно выставить везде флаги.
+
+					if (GooseSubscriber_isLostGooseMessage(subscriber)!=true) 		// гус уже помечен что потеря
+					{
+					GooseSubscriber_setLostGooseMessage(subscriber,true);					// пометим что нет связи
+
+						PosBitinDB = 0;
+						GooseReceiverCfg* elementMatrix = self->GooseMatrix;
+						while (elementMatrix != NULL) {
+
+						//+++++++
+						if (elementMatrix->AddAllowedToLiveStatus == true)			// если нужно подмешивать потерю связи к этой записи
+						  if(elementMatrix->nGocbRef == NumGocbRef){				// сравним отправителя гуса
+								PosBitinDB = elementMatrix->nGoEntries-1;			// номера дискрета в конфиге начинаются с '1'
+								nDBword = PosBitinDB / 16;
+								nDBbit = (PosBitinDB % 16);
+
+								// проверим надо ли слать пакет. (если в нужной позиции "1" и потеря связи то ставим "0" и шлём)
+								// предотвращает повторную отправку
+								//if ((ucGooseBufSent[nDBword] & (1 << (nDBbit))) > 0){
+								//	DataDropModify = true;
+								//}
+								//ucGooseBufSent[nDBword] &= ~(1 << (nDBbit));			// активный 0 ставим в нужные позиции и шлём в МБ
+
+								portDISABLE_INTERRUPTS();
+								ucGooseBufDrop[nDBword] |= (1 << (nDBbit));
+								portENABLE_INTERRUPTS();
+
+								DataDropModify = true;
+
+								//if (DataDropModify)
+								USART_TRACE_RED("Потеря связи %u, бит MB:%u \n",(unsigned int)NumGocbRef,(unsigned int)PosBitinDB+1);
+
+							}
+						//+++++++
+
+							elementMatrix = elementMatrix->sibling;		// следующий
+//							Port_Off(LEDtst2);
+					      	taskYIELD();							// отпустим задачу.
+//							vTaskDelay(2);
+//							Port_On(LEDtst2);
+
+
+						}//!while (elementMatrix != NULL)
+					}//!if (GooseSubscriber_isLostGooseMessage(subscriber)!=true)
+				} else{
+					if (GooseSubscriber_isLostGooseMessage(subscriber)==true){
+					// снимаем валидность
+
+						PosBitinDB = 0;
+						GooseReceiverCfg* elementMatrix = self->GooseMatrix;
+						while (elementMatrix != NULL) {
+
+							if (elementMatrix->AddAllowedToLiveStatus == true)
+							  if(elementMatrix->nGocbRef == NumGocbRef){
+									PosBitinDB = elementMatrix->nGoEntries-1;			// номера дискрета в конфиге начинаются с '1'
+									nDBword = PosBitinDB / 16;
+									nDBbit = (PosBitinDB % 16);
+
+									portDISABLE_INTERRUPTS();
+									ucGooseBufDrop[nDBword] &= ~(1 << (nDBbit));
+									portENABLE_INTERRUPTS();
+
+									DataDropModify = true;
+
+									USART_TRACE_GREEN("Возврат связи %u, бит MB:%u \n",(unsigned int)NumGocbRef,(unsigned int)PosBitinDB+1);
+
+							  }
+
+							elementMatrix = elementMatrix->sibling;		// следующий
+					      	taskYIELD();							// отпустим задачу.
+						}
+
+					}
+					GooseSubscriber_setLostGooseMessage(subscriber,false);
+				}
+
+			element = LinkedList_getNext(element);
+		}
+		// ----------------------------------------------------------------
+#if (defined (MR5_500) || defined (MR5_600) || defined (MR5_700)) || defined (MR741) || \
+	((defined	(MR761) || defined	(MR762) || defined	(MR763)) && (_REVISION_DEVICE <=302)) || (defined	(MR771) && (_REVISION_DEVICE <=106)) ||\
+	(defined	(MR801) && (_REVISION_DEVICE <=207)) ||\
+	((defined	(MR901) || defined	(MR902)) && (_REVISION_DEVICE <=206)) ||\
+	(defined	(MR851) && (_REVISION_DEVICE <=202))
+
+//			старые приборы не шлём гус
+
+
+#else
+// тут мы бываем очень часто до 3мс
+		if (DataDropModify == true)		 AddToQueueMB(ModbusSentTime, MB_Wrt_Set_Goose	,MB_Slaveaddr);
+
+#endif
+
+    }
+}
+
+/*********************************************************************
+ * gooseReceiverLoop
+ * ТАСК мониторит приём гусов
+ * обрабатывающий принятые сообщения гусов
+ *********************************************************************/
+static void		gooseReceiverLoop(void* threadParameter)
+{
+
+     GooseReceiver 		self 		= (GooseReceiver) threadParameter;
 
     self->running = true;
     self->stopped = false;
 
     // конфигурим приёмник VLAN сообщений, на прием гусов с нужными нам MAC фильтрами
+    // нужно закинуть конфиг в свич
     GooseReceiver_startThreadless(self);
 
     while (self->running) {
 
-        if (GooseReceiver_tick(self) == false)
-            Thread_sleep(1);
+        if (GooseReceiver_tick(self) == true){
+     //   	taskYIELD();							// отпустим задачу.
+        }else{
+		UBaseType_t WaterMark = uxTaskGetStackHighWaterMark(NULL);
+			if (WaterMark<20){
+				USART_TRACE_RED("память задачи осталось: %u \n",WaterMark);
+			}
+
+        }
+      	taskYIELD();							// отпустим задачу.
+//        vTaskDelay(2);
     }
 
    GooseReceiver_stopThreadless(self);
@@ -716,17 +1201,23 @@ gooseReceiverLoop(void* threadParameter)
 void
 GooseReceiver_start(GooseReceiver self)
 {
+
     Thread thread = Thread_create((ThreadExecutionFunction) gooseReceiverLoop, (void*) self, true);				// автоматически закрываем поток.
 
     if (thread != NULL) {
-        if (DEBUG_GOOSE_SUBSCRIBER)
-            printf("GOOSE_SUBSCRIBER: GOOSE receiver started for interface %s\n", self->interfaceId);
-
-        Thread_start(thread);
+//        if (DEBUG_GOOSE_SUBSCRIBER) printf("GOOSE_SUBSCRIBER: GOOSE receiver started for interface %s\n", self->interfaceId);
+        Thread_start(thread,GooseTask__PRIORITY,GooseTask_STACK_SIZE,"gseRe");
     }
     else {
-        if (DEBUG_GOOSE_SUBSCRIBER)
-            printf("GOOSE_SUBSCRIBER: Starting GOOSE receiver failed for interface %s\n", self->interfaceId);
+        if (DEBUG_GOOSE_SUBSCRIBER)  printf("GOOSE_SUBSCRIBER: Starting GOOSE receiver failed for interface %s\n", self->interfaceId);
+    }
+// таск монитора потери связи с подписанными устройствами
+    thread = Thread_create((ThreadExecutionFunction) gooseReceiverDropMonitor, (void*) self, true);				// автоматически закрываем поток.
+    if (thread != NULL) {
+        Thread_start(thread,GooseTask__PRIORITY,GooseDropTask_STACK_SIZE,"gseMon");
+    }
+    else {
+        if (DEBUG_GOOSE_SUBSCRIBER)  printf("GOOSE_SUBSCRIBER: Starting GOOSE receiver drop Monitor failed for interface %s\n", self->interfaceId);
     }
 
 }
@@ -781,9 +1272,10 @@ GooseReceiver_stopThreadless(GooseReceiver self)
 bool	GooseReceiver_tick(GooseReceiver self)
 {
     int packetSize = Ethernet_receivePacket(self->ethSocket, self->buffer, ETH_BUFFER_LENGTH);
-
     if (packetSize > 0) {
+//    	Port_On(LEDtst1);
         parseGooseMessage(self, packetSize);
+//    	Port_Off(LEDtst1);
         return true;
     }
     else

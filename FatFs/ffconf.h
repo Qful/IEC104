@@ -99,8 +99,8 @@
 */
 
 
-#define	_USE_LFN	0//1
-#define	_MAX_LFN	255
+#define	_USE_LFN	0														//0    	изменил на 3 для FTP
+#define	_MAX_LFN	25														//255 	изменил на 25 для экономии места
 /* The _USE_LFN switches the support of long file name (LFN).
 /
 /   0: Disable support of LFN. _MAX_LFN has no effect.
@@ -147,7 +147,7 @@
 /  This option has no effect when _LFN_UNICODE == 0. */
 
 
-#define _FS_RPATH	0																							//0
+#define _FS_RPATH	2																							//0  включил 2 для FTPD не проверено
 /*
  * по умолчанию (_FS_RPATH == 0) нет такого понятия, как текущая директория, как принято в операционных системах.
  * Все объекты на томе указываются через полный путь, который начинается с корневой (root) директории.
@@ -175,7 +175,7 @@
 
 
 #define _STR_VOLUME_ID	0
-#define _VOLUME_STRS	"RAM","NAND","CF","SD","SD2","USB","USB2","USB3"
+#define _VOLUME_STRS	"RAM","SPI","NAND","CF","SD","SD2","USB","USB2","USB3"
 /* _STR_VOLUME_ID switches string support of volume ID.
 /  When _STR_VOLUME_ID is set to 1, also pre-defined strings can be used as drive
 /  number in the path name. _VOLUME_STRS defines the drive ID strings for each
@@ -252,7 +252,7 @@
 /  These options have no effect at read-only configuration (_FS_READONLY = 1). */
 
 
-#define	_FS_LOCK	0
+#define	_FS_LOCK	0// запретим одновременное открытие нескольких экземпляров   //0
 /* The option _FS_LOCK switches file lock function to control duplicated file open
 /  and illegal operation to open objects. This option must be 0 when _FS_READONLY
 /  is 1.
@@ -264,9 +264,9 @@
 /      lock control is independent of re-entrancy. */
 
 
-#define _FS_REENTRANT	0
+#define _FS_REENTRANT	1//0
 #define _FS_TIMEOUT		1000
-#define	_SYNC_t			HANDLE
+#define	_SYNC_t			QueueHandle_t//HANDLE
 /* The option _FS_REENTRANT switches the re-entrancy (thread safe) of the FatFs
 /  module itself. Note that regardless of this option, file access to different
 /  volume is always re-entrant and volume control functions, f_mount(), f_mkfs()

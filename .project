@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>MR771</name>
+	<name>MR-iec61850</name>
 	<comment></comment>
 	<projects>
 		<project>FreeRTOS</project>

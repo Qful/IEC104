@@ -21,6 +21,14 @@
  *  See COPYING file for the complete license text.
  */
 
+/* Scheduler includes. */
+#include "FreeRTOS.h"
+#include "task.h"
+#include "port.h"
+#include "cmsis_os.h"
+#include "queue.h"
+
+
 #include <string.h>
 //#include <dirent.h>
 
@@ -75,7 +83,7 @@ FileHandle		FileSystem_openFile(char* fileName, bool readWrite)
 	FRESULT	res;
     FileHandle 	Myfile;
 
-	USART_TRACE_BLUE("FileSystem_openFile: '%s'\n",fileName);
+//	USART_TRACE_BLUE("FileSystem_openFile: '%s'\n",fileName);
 
     //Myfile = GLOBAL_MALLOC(sizeof(FileHandle));
     Myfile = GLOBAL_MALLOC(sizeof(FIL));		// похоже и тут надо выделять для структуры память
@@ -90,7 +98,7 @@ FileHandle		FileSystem_openFile(char* fileName, bool readWrite)
 
     	res = f_open((FIL*)Myfile,(const TCHAR*)fileName,FA_WRITE);
     	if (res != FR_OK){
-    		USART_TRACE_RED("FileSystem_openFile ERROR\n");
+    		USART_TRACE_RED("FS openFile ERROR\n");
 
     		GLOBAL_FREEMEM(Myfile);
     		Myfile = NULL;
@@ -101,7 +109,7 @@ FileHandle		FileSystem_openFile(char* fileName, bool readWrite)
     	res = f_open((FIL*)Myfile,(const TCHAR*)fileName,FA_READ);
 
     	if (res != FR_OK){
-    		USART_TRACE_RED("FileSystem_openFile ERROR\n");
+    		USART_TRACE_RED("FS openFile ERROR\n");
 
     		GLOBAL_FREEMEM(Myfile);
     		Myfile = NULL;
@@ -115,23 +123,29 @@ FileHandle		FileSystem_openFile(char* fileName, bool readWrite)
 /***********************************************************************
  * FileSystem_readFile
  * читаем файл
+ * можно попробовать дать команду на чтение из прибора файла, и здать окончания
+ * передачи. Но вопрос как повлияет на остальные пакеты, например отчеты эта пауза.
+ * нельзя долго держать сдесь. Останавливаестя весь таск и перестаёт передавать всем
+ * клиентам.
  ***********************************************************************/
 int		FileSystem_readFile(FileHandle handle, uint8_t* buffer, int maxSize)
 {
 	FRESULT	res;
 	UINT nmb;
 
-	USART_TRACE_BLUE("FileSystem_readFile. 0x%x maxSize:\n",(unsigned int)handle,maxSize);
+//	USART_TRACE_BLUE("FileSystem_readFile. 0x%x maxSize:%u\n",(unsigned int)handle,maxSize);
 
+//	vTaskDelay(10000);
+//	USART_TRACE_BLUE("FileSystem_readFile after wait MB. 0x%x maxSize:%u\n",(unsigned int)handle,maxSize);
 
 //    return fread(buffer, maxSize, 1, (FILE*) handle);
 	res = f_read(handle, buffer, maxSize, &nmb);
     if (res == FR_OK){
-    	USART_TRACE_GREEN("FileSystem_readFile.  OK. 0x%x: %u\n",(unsigned int)buffer,nmb);
+//    	USART_TRACE_GREEN("FileSystem_readFile.  OK. 0x%x: %u\n",(unsigned int)buffer,nmb);
     	return nmb;
     }
     else{
-		USART_TRACE_RED("FileSystem_readFile ERROR\n");
+		USART_TRACE_RED("FS readFile ERROR\n");
     	return -1;
     }
 
@@ -142,12 +156,12 @@ int		FileSystem_readFile(FileHandle handle, uint8_t* buffer, int maxSize)
  ***********************************************************************/
 void	FileSystem_closeFile(FileHandle handle)
 {
-	USART_TRACE_BLUE("FileSystem_closeFile. 0x%x\n",handle);
+//	USART_TRACE_BLUE("FS closeFile 0x%x\n",handle);
 
 //    fclose((FILE*) handle);
     f_close((FIL*)handle);
 
-	USART_TRACE_BLUE("GLOBAL_FREEMEM. 0x%x\n",handle);
+//	USART_TRACE_BLUE("GLOBAL_FREEMEM. 0x%x\n",handle);
 
     GLOBAL_FREEMEM((void*)handle);
 }
@@ -196,12 +210,11 @@ bool	FileSystem_getFileInfo(char* filename, uint32_t* fileSize, uint64_t* lastMo
 {
 	RTC_TimeTypeDef sTime;
 	RTC_DateTypeDef sDate;
-	uint64_t	sectmp,den;
-	FILINFO FileInfo;
-	FRESULT res;
+	uint64_t		sectmp,den;
+	FILINFO 		FileInfo;
+	FRESULT 		res;
 
-	USART_TRACE_BLUE("FileSystem_getFileInfo.\n");
-
+//	USART_TRACE_BLUE("FileSystem_getFileInfo.\n");
 
 	res = f_stat(filename, &FileInfo);
     if (res == FR_OK){
@@ -219,8 +232,8 @@ bool	FileSystem_getFileInfo(char* filename, uint32_t* fileSize, uint64_t* lastMo
         	sTime.Minutes = FileInfo.ftime>>5 & 0b111111;
         	sTime.Hours = FileInfo.ftime>>11 & 0b11111;
 
-
-        	den 	= (30+sDate.Year) * 365 + (30+sDate.Year+2)/4 - 2;
+//        	den 	= (30+sDate.Year) * 365 + (30+sDate.Year+2)/4 - 2;
+        	den 	= (30+sDate.Year) * 365 + (30+sDate.Year+2)/4 - 1;
 
         	switch(sDate.Month) {
         	    case 2 : den +=31; break;	//31	31
@@ -236,7 +249,10 @@ bool	FileSystem_getFileInfo(char* filename, uint32_t* fileSize, uint64_t* lastMo
         	    case 12 : den +=334; break;	//334	30
         	   };
 
-        	if (!((30+sDate.Year+2)%4) && sDate.Month>2) den++;
+//        	if (!((30+sDate.Year+2)%4) && sDate.Month>2) den++;
+        	if (((30+sDate.Year+2)%4) == 0){
+        		if (sDate.Month < 3) den--;
+        	}
 
         	 den += sDate.Date;
 
@@ -255,11 +271,11 @@ bool	FileSystem_getFileInfo(char* filename, uint32_t* fileSize, uint64_t* lastMo
     	  if (fileSize != NULL)
     	        *fileSize = FileInfo.fsize;
 
-    	USART_TRACE_GREEN("FileSystem_getFileInfo return...\n");
+//    	USART_TRACE_GREEN("FileSystem_getFileInfo return...\n");
     return true;
 
     }else{
-		USART_TRACE_RED("FileSystem_getFileInfo ERROR\n");
+		USART_TRACE_RED("FS getFileInfo ERROR: %s\n",ff_str_err(res));
 		return false;
     }
 }
@@ -273,7 +289,7 @@ DirectoryHandle		FileSystem_openDirectory(char* directoryName)
 	DIR* dirHandle;
 	FRESULT res;
 	int	sz = sizeof(DIR);
-	USART_TRACE_BLUE("FileSystem_openDirectory.\n");
+//	USART_TRACE_BLUE("FileSystem_openDirectory.\n");
 
 // тут нужно выделять память не на sDirectoryHandle а на всю структуру DIR*
 //	dirHandle = GLOBAL_MALLOC(sizeof(struct sDirectoryHandle));
@@ -286,12 +302,12 @@ DirectoryHandle		FileSystem_openDirectory(char* directoryName)
 
 //TODO: тут ошибка с выделением памяти, нужно исправить
     if(res == FR_OK) {
-    	USART_TRACE_BLUE("/%s/\n",directoryName);
+//    	USART_TRACE_BLUE("/%s/\n",directoryName);
         handle = GLOBAL_MALLOC(sizeof(DirectoryHandle));
         handle->handle = dirHandle;
         return handle;
     } else{
-		USART_TRACE_RED("FileSystem_openDirectory ERROR\n");
+//		USART_TRACE_RED("FileSystem_openDirectory ERROR\n");
 
     	GLOBAL_FREEMEM(dirHandle);
     	//dirHandle = NULL;
@@ -302,6 +318,11 @@ DirectoryHandle		FileSystem_openDirectory(char* directoryName)
 /***********************************************************************
  * FileSystem_readDirectory
  * читаем директорию
+ *
+ * возвращает последовательно, друг за другом имена файлов
+ * находящиеся в директории directory->handle
+ * если в качестве параметра directory->handle указан null указатель,
+ * то позиция чтения директории отматывается на начало.
  ***********************************************************************/
 char*		FileSystem_readDirectory(DirectoryHandle directory, bool* isDirectory)
 {
@@ -311,7 +332,7 @@ char*		FileSystem_readDirectory(DirectoryHandle directory, bool* isDirectory)
     FRESULT res;
     DIR dirHandle;
 
-	USART_TRACE_BLUE("FileSystem_readDirectory.\n");
+//	USART_TRACE_BLUE("FileSystem_readDirectory.\n");
 
     res = f_readdir(directory->handle,&fno);		//Функция f_readdir последовательно, друг за другом читает элементы (файлы и папки), находящиеся в директории DirObject. Все элементы директории могут быть прочитаны повторяющимися вызовами f_readdir. Когда будут прочитаны все элементы в директории, функция вернет пустую ASCIIZ-строку в поле fname[] (т. е. fname[0]==0) без какой-либо ошибки. Когда в качестве параметра FileInfo указан null указатель, то позиция чтения директории отматывается на начало.
 //	res = f_readdir(directory,&fno);
@@ -330,7 +351,7 @@ char*		FileSystem_readDirectory(DirectoryHandle directory, bool* isDirectory)
             			 *isDirectory = false;
             	}
             	fn = fno.fname;
-            	USART_TRACE_BLUE("-> '%s'\n",fn);
+//            	USART_TRACE_BLUE("-> '%s'\n",fn);		// есть такой файл. Можно попробовать дать команду на чтение из модбас его. и както указать готовность к чтению
             	return	fn;
             }
     }
@@ -343,7 +364,7 @@ char*		FileSystem_readDirectory(DirectoryHandle directory, bool* isDirectory)
  ***********************************************************************/
 void	FileSystem_closeDirectory(DirectoryHandle directory)
 {
-	USART_TRACE_BLUE("FileSystem_closeDirectory.\n");
+//	USART_TRACE_BLUE("FileSystem_closeDirectory.\n");
 
 //	f_closedir(directory);
 //	GLOBAL_FREEMEM(directory);
@@ -354,4 +375,60 @@ void	FileSystem_closeDirectory(DirectoryHandle directory)
     GLOBAL_FREEMEM(directory);
 
 }
+/***********************************************************************
+ * выводит содержимое директории
+ * вернёт:
+ * -1 если нет директории
+ * 0  если пустая
+ * или число элементов
+ ***********************************************************************/
+int	FileSystem_CMD_Dir(char* directoryName){
+int 	ret = 0;
+int 	files = 0;
+int 	dirs = 0;
+bool 	isDirectory;
+char* 	fileName;
 
+DirectoryHandle directory = FileSystem_openDirectory(directoryName);				// открываем директорию
+
+	if (directory != NULL) {														// если открылась
+		printf("---------------------\n");
+		printf("Содержимое папки %s/\n\n",directoryName);
+
+		fileName = FileSystem_readDirectory(directory, &isDirectory);			// читаем первый элемент директории
+
+		while (fileName != NULL) {													// читаем до конца директории.
+			ret++;
+			if (isDirectory) {dirs++;printf("<DIR>	");} else {files++;printf("     	");}
+			printf("%s\n",fileName);
+			fileName = FileSystem_readDirectory(directory, &isDirectory);			// читаем очередной элемент директории
+		}
+		FileSystem_closeDirectory(directory);
+
+		printf("%3d файлов\n",files);
+		printf("%3d папок\n",dirs);
+
+		{
+			uint8_t res;
+			FATFS *fs;
+			DWORD fre_clust, fre_sect, tot_sect;
+
+			// Get volume information and free clusters of drive 1
+			res = f_getfree(directoryName, &fre_clust, &fs);//SPIFLASHDISKPath
+
+			if (res == FR_OK){
+			// Get total sectors and free sectors
+			tot_sect = (fs->n_fatent - 2) * fs->csize;
+			fre_sect = fre_clust * fs->csize;
+
+			printf("размер диска %lu байт, свободно %lu байт\n",tot_sect * 512, fre_sect * 512);
+			}
+		}
+
+		printf("---------------------\n");
+	} else{
+		ret = -1;
+	}
+return ret;
+
+}

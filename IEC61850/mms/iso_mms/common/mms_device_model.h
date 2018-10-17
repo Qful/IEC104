@@ -36,18 +36,19 @@ extern "C" {
 #endif
 
 typedef struct {
-    char* deviceName;
+    char* 						deviceName;
 
     /* MMS VMD scope variables support */
-    int namedVariablesCount;
-    MmsVariableSpecification** namedVariables;
+    int 						namedVariablesCount;
+    MmsVariableSpecification** 	namedVariables;
 
     /* MMS VMD scope named variables list support */
     LinkedList /*<MmsNamedVariableList>*/ namedVariableLists;
 
+    char*			configFileName;			// файл для сохранения датасетов во флэше
     /* MMS domain support */
-    int domainCount;
-    MmsDomain** domains;
+    int 			domainCount;
+    MmsDomain** 	domains;
 } MmsDevice;
 
 
@@ -207,6 +208,11 @@ MmsJournal_create(const char* name);
 void
 MmsJournal_destroy(MmsJournal self);
 
+char*
+MmsDevice_getconfigfileName(MmsDevice* self);
+
+char*
+MmsDevice_CreateConfigfileName(MmsDevice* self, char* configFileName);
 /**@}*/
 
 #ifdef __cplusplus

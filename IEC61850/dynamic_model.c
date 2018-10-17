@@ -163,9 +163,13 @@ IedModel_addSettingGroupControlBlock(IedModel* self, SettingGroupControlBlock* s
 }
 #endif /* (CONFIG_IEC61850_SETTING_GROUPS == 1) */
 
-
-static void
-IedModel_addGSEControlBlock(IedModel* self, GSEControlBlock* gcb)
+/*******************************************************
+ * IedModel_addGSEControlBlock
+ * добавим блок управления гусами в конец списка, если нету
+ * то он будет первым.
+ * добавляем в IedModel
+ *******************************************************/
+static void		IedModel_addGSEControlBlock(IedModel* self, GSEControlBlock* gcb)
 {
     if (self->gseCBs == NULL)
         self->gseCBs = gcb;
@@ -393,33 +397,35 @@ SettingGroupControlBlock_create(LogicalNode* parent, uint8_t actSG, uint8_t numO
     return self;
 }
 #endif /* (CONFIG_IEC61850_SETTING_GROUPS == 1) */
-
-static void
-LogicalNode_addGSEControlBlock(LogicalNode* self, GSEControlBlock* gcb)
+/*******************************************************
+ * LogicalNode_addGSEControlBlock
+ * добавим блок управления гусами в конец списка, если нету
+ * то он будет первым.
+ * добавляем в IedModel но адрес из указателей в LogicalNode
+ *******************************************************/
+static void		LogicalNode_addGSEControlBlock(LogicalNode* self, GSEControlBlock* gcb)
 {
     IedModel* model = (IedModel*) self->parent->parent;
 
     IedModel_addGSEControlBlock(model, gcb);
 }
-
-GSEControlBlock*
-GSEControlBlock_create(const char* name, LogicalNode* parent, char* appId, char* dataSet, uint32_t confRef, bool fixedOffs,
-        int minTime, int maxTime)
+/*******************************************************
+ * GSEControlBlock_create
+ * создаём и добавляем в модель GSEControlBlock если есть parent
+ * возвращает указатель на него
+ *******************************************************/
+GSEControlBlock*	GSEControlBlock_create(const char* name, LogicalNode* parent, char* appId, char* dataSet, uint32_t confRef, bool fixedOffs, int minTime, int maxTime)
 {
     GSEControlBlock* self = (GSEControlBlock*) GLOBAL_MALLOC(sizeof(GSEControlBlock));
 
     self->name = copyString(name);
     self->parent = parent;
 
-    if (appId)
-        self->appId = copyString(appId);
-    else
-        self->appId = NULL;
+    if (appId)		self->appId = copyString(appId);
+    else			self->appId = NULL;
 
-    if (dataSet)
-        self->dataSetName = copyString(dataSet);
-    else
-        self->dataSetName = NULL;
+    if (dataSet)	self->dataSetName = copyString(dataSet);
+    else	        self->dataSetName = NULL;
 
     self->confRev = confRef;
     self->fixedOffs = fixedOffs;
@@ -588,9 +594,13 @@ DataAttribute_create(const char* name, ModelNode* parent, DataAttributeType type
 
     return self;
 }
-
+/*******************************************************
+ * DataSet_create
+ * создаём датасет с именем "name" в логическом узле "parent"
+ * возвращаем указатель на датасет
+ *******************************************************/
 DataSet*
-DataSet_create(const char* name, LogicalNode* parent)
+DataSet_create(const char* name, LogicalNode* parent, bool deletable)
 {
     DataSet* self = (DataSet*) GLOBAL_MALLOC(sizeof(DataSet));
 
@@ -601,6 +611,7 @@ DataSet_create(const char* name, LogicalNode* parent)
     self->sibling = NULL;
     self->logicalDeviceName = ld->name;
     self->fcdas = NULL;
+    self->deletable = deletable;
 
     IedModel_addDataSet((IedModel*) ld->parent, self);
 
@@ -648,7 +659,7 @@ DataSet_addEntry(DataSet* self, DataSetEntry* newEntry)
 }
 
 DataSetEntry*
-DataSetEntry_create(DataSet* dataSet, const char* variable, int index, const char* component)
+DataSetEntry_create(DataSet* dataSet,const char* logicalDevice, const char* variable, int index, const char* component)
 {
     DataSetEntry* self = (DataSetEntry*) GLOBAL_MALLOC(sizeof(DataSetEntry));
 
@@ -667,7 +678,13 @@ DataSetEntry_create(DataSet* dataSet, const char* variable, int index, const cha
     }
     else {
         self->variableName = copyString(variable);
-        self->logicalDeviceName = dataSet->logicalDeviceName;
+        if (logicalDevice == NULL){
+        	self->logicalDeviceName = dataSet->logicalDeviceName;
+        }
+        else{
+            strncpy(variableName, logicalDevice, 129);
+        	self->logicalDeviceName = copyString(variableName);
+        }
         self->isLDNameDynamicallyAllocated = false;
     }
 

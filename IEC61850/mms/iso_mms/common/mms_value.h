@@ -346,6 +346,9 @@ MmsValue_getBitStringBit(const MmsValue* self, int bitPos);
 void
 MmsValue_deleteAllBitStringBits(MmsValue* self);
 
+// возврашает или всех бит
+bool	MmsValue_getAllBitStringBits(MmsValue* self);
+
 
 /**
  * \brief Get the size of a bit string in bits.
@@ -634,67 +637,29 @@ MmsValue_equalTypes(const MmsValue* self, const MmsValue* otherValue);
  * Constructors and destructors
  *************************************************************************************/
 
-
-MmsValue*
-MmsValue_newDataAccessError(MmsDataAccessError accessError);
-
-MmsValue*
-MmsValue_newIntegerFromBerInteger(Asn1PrimitiveValue* berInteger);
-
-MmsValue*
-MmsValue_newUnsignedFromBerInteger(Asn1PrimitiveValue* berInteger);
-
-MmsValue*
-MmsValue_newInteger(int size);
-
-MmsValue*
-MmsValue_newUnsigned(int size);
-
-MmsValue*
-MmsValue_newBoolean(bool boolean);
-
+MmsValue*	MmsValue_newDataAccessError(MmsDataAccessError accessError);
+MmsValue*	MmsValue_newIntegerFromBerInteger(Asn1PrimitiveValue* berInteger);
+MmsValue*	MmsValue_newUnsignedFromBerInteger(Asn1PrimitiveValue* berInteger);
+MmsValue*	MmsValue_newInteger(int size);
+MmsValue*	MmsValue_newUnsigned(int size);
+MmsValue*	MmsValue_newBoolean(bool boolean);
 /**
  * \brief Create a new MmsValue instance of type MMS_BITSTRING.
- *
  * \param bitSize the size of the bit string in bit
- *
  * \return new MmsValue instance of type MMS_BITSTRING
  */
-MmsValue*
-MmsValue_newBitString(int bitSize);
-
-MmsValue*
-MmsValue_newOctetString(int size, int maxSize);
-
-MmsValue*
-MmsValue_newStructure(const MmsVariableSpecification* typeSpec);
-
-MmsValue*
-MmsValue_createEmptyStructure(int size);
-
-MmsValue*
-MmsValue_newDefaultValue(const MmsVariableSpecification* typeSpec);
-
-MmsValue*
-MmsValue_newIntegerFromInt8(int8_t integer);
-
-MmsValue*
-MmsValue_newIntegerFromInt16(int16_t integer);
-
-MmsValue*
-MmsValue_newIntegerFromInt32(int32_t integer);
-
-MmsValue*
-MmsValue_newIntegerFromInt64(int64_t integer);
-
-MmsValue*
-MmsValue_newUnsignedFromUint32(uint32_t integer);
-
-MmsValue*
-MmsValue_newFloat(float variable);
-
-MmsValue*
-MmsValue_newDouble(double variable);
+MmsValue*	MmsValue_newBitString(int bitSize);
+MmsValue*	MmsValue_newOctetString(int size, int maxSize);
+MmsValue*	MmsValue_newStructure(const MmsVariableSpecification* typeSpec);
+MmsValue*	MmsValue_createEmptyStructure(int size);
+MmsValue*	MmsValue_newDefaultValue(const MmsVariableSpecification* typeSpec);
+MmsValue*	MmsValue_newIntegerFromInt8(int8_t integer);
+MmsValue*	MmsValue_newIntegerFromInt16(int16_t integer);
+MmsValue*	MmsValue_newIntegerFromInt32(int32_t integer);
+MmsValue*	MmsValue_newIntegerFromInt64(int64_t integer);
+MmsValue*	MmsValue_newUnsignedFromUint32(uint32_t integer);
+MmsValue*	MmsValue_newFloat(float variable);
+MmsValue*	MmsValue_newDouble(double variable);
 
 /**
  * \brief Create a (deep) copy of an MmsValue instance
@@ -706,8 +671,7 @@ MmsValue_newDouble(double variable);
  *
  * \return an MmsValue instance that is an exact copy of the given instance.
  */
-MmsValue*
-MmsValue_clone(const MmsValue* self);
+MmsValue*	MmsValue_clone(const MmsValue* self);
 
 /**
  * \brief Create a (deep) copy of an MmsValue instance in a user provided buffer
@@ -719,8 +683,7 @@ MmsValue_clone(const MmsValue* self);
  *
  * \return a pointer to the position in the buffer just after the last byte written.
  */
-uint8_t*
-MmsValue_cloneToBuffer(const MmsValue* self, uint8_t* destinationAddress);
+uint8_t*	MmsValue_cloneToBuffer(const MmsValue* self, uint8_t* destinationAddress);
 
 /**
  * \brief Determine the required amount of bytes by a clone.
@@ -771,8 +734,7 @@ MmsValue_deleteConditional(MmsValue* value);
  *
  * \param self the MmsValue instance to be deleted.
  */
-void
-MmsValue_deleteIfNotNull(MmsValue* value);
+void	MmsValue_deleteIfNotNull(MmsValue* value);
 
 /**
  * \brief Create a new MmsValue instance of type MMS_VISIBLE_STRING.
@@ -784,8 +746,7 @@ MmsValue_deleteIfNotNull(MmsValue* value);
  *
  * \return new MmsValue instance of type MMS_VISIBLE_STRING
  */
-MmsValue*
-MmsValue_newVisibleString(const char* string);
+MmsValue*	MmsValue_newVisibleString(const char* string);
 
 /**
  * \brief Create a new MmsValue instance of type MMS_VISIBLE_STRING.
@@ -798,8 +759,7 @@ MmsValue_newVisibleString(const char* string);
  *
  * \return new MmsValue instance of type MMS_VISIBLE_STRING
  */
-MmsValue*
-MmsValue_newVisibleStringWithSize(int size);
+MmsValue*	MmsValue_newVisibleStringWithSize(int size);
 
 /**
  * \brief Create a new MmsValue instance of type MMS_STRING.
@@ -812,8 +772,7 @@ MmsValue_newVisibleStringWithSize(int size);
  *
  * \return new MmsValue instance of type MMS_STRING
  */
-MmsValue*
-MmsValue_newMmsStringWithSize(int size);
+MmsValue*	MmsValue_newMmsStringWithSize(int size);
 
 /**
  * \brief Create a new MmsValue instance of type MMS_BINARYTIME.
@@ -826,8 +785,7 @@ MmsValue_newMmsStringWithSize(int size);
  *
  * \return new MmsValue instance of type MMS_BINARYTIME
  */
-MmsValue*
-MmsValue_newBinaryTime(bool timeOfDay);
+MmsValue*	MmsValue_newBinaryTime(bool timeOfDay);
 
 /**
  * \brief Create a new MmsValue instance of type MMS_VISIBLE_STRING from the specified byte array
@@ -837,8 +795,7 @@ MmsValue_newBinaryTime(bool timeOfDay);
  *
  * \return new MmsValue instance of type MMS_VISIBLE_STRING
  */
-MmsValue*
-MmsValue_newVisibleStringFromByteArray(uint8_t* byteArray, int size);
+MmsValue*	MmsValue_newVisibleStringFromByteArray(uint8_t* byteArray, int size);
 
 /**
  * \brief Create a new MmsValue instance of type MMS_STRING from the specified byte array
@@ -848,8 +805,7 @@ MmsValue_newVisibleStringFromByteArray(uint8_t* byteArray, int size);
  *
  * \return new MmsValue instance of type MMS_STRING
  */
-MmsValue*
-MmsValue_newMmsStringFromByteArray(uint8_t* byteArray, int size);
+MmsValue*	MmsValue_newMmsStringFromByteArray(uint8_t* byteArray, int size);
 
 /**
  * \brief Create a new MmsValue instance of type MMS_STRING.
@@ -858,11 +814,9 @@ MmsValue_newMmsStringFromByteArray(uint8_t* byteArray, int size);
  *
  * \return new MmsValue instance of type MMS_STRING
  */
-MmsValue*
-MmsValue_newMmsString(char* string);
+MmsValue*	MmsValue_newMmsString(char* string);
 
-void
-MmsValue_setMmsString(MmsValue* value, const char* string);
+void		MmsValue_setMmsString(MmsValue* value, const char* string);
 
 /**
  * \brief Create a new MmsValue instance of type MMS_UTCTIME.
@@ -871,8 +825,7 @@ MmsValue_setMmsString(MmsValue* value, const char* string);
  *
  * \return new MmsValue instance of type MMS_UTCTIME
  */
-MmsValue*
-MmsValue_newUtcTime(uint32_t timeval);
+MmsValue*	MmsValue_newUtcTime(uint32_t timeval);
 
 /**
  * \brief Create a new MmsValue instance of type MMS_UTCTIME.
@@ -881,8 +834,7 @@ MmsValue_newUtcTime(uint32_t timeval);
  *
  * \return new MmsValue instance of type MMS_UTCTIME
  */
-MmsValue*
-MmsValue_newUtcTimeByMsTime(uint64_t timeval);
+MmsValue*	MmsValue_newUtcTimeByMsTime(uint64_t timeval);
 
 
 void
@@ -965,6 +917,20 @@ MmsValue_decodeMmsData(uint8_t* buffer, int bufPos, int bufferLength);
 int
 MmsValue_encodeMmsData(MmsValue* self, uint8_t* buffer, int bufPos, bool encode);
 
+
+/**
+ * \brief Serialize the MmsValue instance as BER encoded MMS Data element
+ *
+ * \param self the MmsValue instance
+ *   uint16_t NumbFunction;		// номер функции обновления данных в списке функций
+    uint8_t ParamsFunction;		// параметры функции (аргумент)
+ *
+ */
+int		MmsValue_setFunctionDataUpdate(MmsValue* value, uint16_t NumbFunc, uint16_t Params);
+int		MmsValue_getFunctionDataUpdate(MmsValue* value, uint16_t* NumbFunc, uint16_t* Params);
+
+
+int	MmsValue_getDataToStr(char*	Str,int StrSize, const MmsValue* self);
 /**@}*/
 
 /**@}*/

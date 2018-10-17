@@ -27,6 +27,7 @@
 #define THREAD_HAL_H_
 
 #include <stdbool.h>
+#include "cmsis_os.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -74,7 +75,7 @@ Thread_create(ThreadExecutionFunction function, void* parameter, bool autodestro
  * \param thread the Thread instance to start
  */
 void
-Thread_start(Thread thread);
+Thread_start(Thread thread, osPriority	prior, uint16_t		STACK_SIZE, char* name);
 
 /**
  * \brief Destroy a Thread and free all related resources.

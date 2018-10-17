@@ -50,10 +50,11 @@ struct sMmsGooseControlBlock {
     MmsValue* mmsValue;
     GoosePublisher publisher;
 
-    DataSet* dataSet;
+    DataSet* dataSet;							// указатель на датасет (список указателей на структуры DataSetEntry (элементов датасета fcdas) )
+    											// тут список с описанием датасетов пример: {"LD0", "LLN0$DS0", _numDS0, 	&iedModelds_LD0_LLN0_dataset0_fcda0, 	&iedModelds_LD0_LLN0_dataset1};
     bool isDynamicDataSet;
 
-    LinkedList dataSetValues;
+    LinkedList dataSetValues;					// значения данных в датасетах
     uint64_t nextPublishTime;
     int retransmissionsLeft; /* number of retransmissions left for the last event */
 
@@ -292,9 +293,11 @@ MmsGooseControlBlock_disable(MmsGooseControlBlock self)
     }
 }
 
-
-void
-MmsGooseControlBlock_checkAndPublish(MmsGooseControlBlock self, uint64_t currentTime)
+/*******************************************************
+ * MmsGooseControlBlock_checkAndPublish
+ * функция сверки времени для отправки и непосредственной отправки гусов.
+ *******************************************************/
+void	MmsGooseControlBlock_checkAndPublish(MmsGooseControlBlock self, uint64_t currentTime)
 {
     if (currentTime >= self->nextPublishTime) {
 
@@ -302,11 +305,12 @@ MmsGooseControlBlock_checkAndPublish(MmsGooseControlBlock self, uint64_t current
         Semaphore_wait(self->publisherMutex);
 #endif
 
-        GoosePublisher_publish(self->publisher, self->dataSetValues);
+        // отправка гуса
+        GoosePublisher_publish(self->publisher, self->dataSetValues);			// self->dataSetValues значения данных в датасетах
 
+        // подсчет количества ретрансмиттов и времени жизни
         if (self->retransmissionsLeft > 0) {
             self->nextPublishTime = currentTime + self->minTime;
-
 
             if (self->retransmissionsLeft > 1)
                 GoosePublisher_setTimeAllowedToLive(self->publisher, self->minTime * 3);
@@ -317,7 +321,6 @@ MmsGooseControlBlock_checkAndPublish(MmsGooseControlBlock self, uint64_t current
         }
         else {
             GoosePublisher_setTimeAllowedToLive(self->publisher, self->maxTime * 3);
-
             self->nextPublishTime = currentTime + self->maxTime;
         }
 
@@ -352,6 +355,7 @@ MmsGooseControlBlock_observedObjectChanged(MmsGooseControlBlock self)
         GoosePublisher_setTimeAllowedToLive(self->publisher, self->maxTime * 3);
     }
 
+    // отправка гуса (весь датасет)
     GoosePublisher_publish(self->publisher, self->dataSetValues);
 
 #if (CONFIG_MMS_THREADLESS_STACK != 1)
@@ -431,7 +435,10 @@ createMmsGooseControlBlock(char* gcbName)
 
     return gcb;
 }
-
+/*******************************************************
+ * getGCBForLogicalNodeWithIndex
+ * вернет GSEControlBlock по его номеру в списке
+ *******************************************************/
 static GSEControlBlock*
 getGCBForLogicalNodeWithIndex(MmsMapping* self, LogicalNode* logicalNode, int index)
 {
@@ -464,24 +471,23 @@ createDataSetReference(char* domainName, char* lnName, char* dataSetName)
     return dataSetReference;
 }
 
-MmsVariableSpecification*
-GOOSE_createGOOSEControlBlocks(MmsMapping* self, MmsDomain* domain,
-        LogicalNode* logicalNode, int gseCount)
+/*******************************************************
+ * GOOSE_createGOOSEControlBlocks
+ * создаём GOOSEControlBlocks
+ *******************************************************/
+MmsVariableSpecification*	GOOSE_createGOOSEControlBlocks(MmsMapping* self, MmsDomain* domain, LogicalNode* logicalNode, int gseCount)
 {
-    MmsVariableSpecification* namedVariable = (MmsVariableSpecification*) GLOBAL_CALLOC(1,
-            sizeof(MmsVariableSpecification));
+    MmsVariableSpecification* namedVariable = (MmsVariableSpecification*) GLOBAL_CALLOC(1, sizeof(MmsVariableSpecification));
     namedVariable->name = copyString("GO");
     namedVariable->type = MMS_STRUCTURE;
 
     namedVariable->typeSpec.structure.elementCount = gseCount;
-    namedVariable->typeSpec.structure.elements = (MmsVariableSpecification**) GLOBAL_CALLOC(gseCount,
-            sizeof(MmsVariableSpecification*));
+    namedVariable->typeSpec.structure.elements = (MmsVariableSpecification**) GLOBAL_CALLOC(gseCount, sizeof(MmsVariableSpecification*));
 
     int currentGCB = 0;
 
     while (currentGCB < gseCount) {
-        GSEControlBlock* gooseControlBlock = getGCBForLogicalNodeWithIndex(
-                self, logicalNode, currentGCB);
+        GSEControlBlock* gooseControlBlock = getGCBForLogicalNodeWithIndex( self, logicalNode, currentGCB);
 
         MmsVariableSpecification* gseTypeSpec = createMmsGooseControlBlock(gooseControlBlock->name);
 
@@ -492,8 +498,7 @@ GOOSE_createGOOSEControlBlocks(MmsMapping* self, MmsDomain* domain,
         MmsGooseControlBlock mmsGCB = MmsGooseControlBlock_create();
 
 
-        mmsGCB->goCBRef = createString(5, MmsDomain_getName(domain), "/", logicalNode->name,
-                "$GO$", gooseControlBlock->name);
+        mmsGCB->goCBRef = createString(5, MmsDomain_getName(domain), "/", logicalNode->name, "$GO$", gooseControlBlock->name);
 
         if (gooseControlBlock->appId != NULL) {
             MmsValue* goID = MmsValue_getElement(gseValues, 1);
@@ -504,8 +509,7 @@ GOOSE_createGOOSEControlBlocks(MmsMapping* self, MmsDomain* domain,
         }
 
         if (gooseControlBlock->dataSetName != NULL)
-        	mmsGCB->dataSetRef = createDataSetReference(MmsDomain_getName(domain),
-        			logicalNode->name, gooseControlBlock->dataSetName);
+        	mmsGCB->dataSetRef = createDataSetReference(MmsDomain_getName(domain), logicalNode->name, gooseControlBlock->dataSetName);
         else
         	mmsGCB->dataSetRef = NULL;
 
@@ -581,5 +585,6 @@ GOOSE_createGOOSEControlBlocks(MmsMapping* self, MmsDomain* domain,
 
     return namedVariable;
 }
+
 
 #endif /* (CONFIG_INCLUDE_GOOSE_SUPPORT == 1) */

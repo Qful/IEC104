@@ -9,6 +9,7 @@
 #define SNTPCLIENT_H_
 
 #include <port.h>
+#include "hal_socket.h"
 
 #define CorrectTrewel	165			// корректировка времени установки часов в самом приборе после модбас передаче
 
@@ -21,7 +22,7 @@ typedef enum
 	Read = 0
 } SNTP_RW_Indication;
 
-int sntp_client_serve(Socket self, const char* address, int port, int sent);
-BOOL		Hal_setTimeToMB_Date( uint16_t * MDateBuf );
+int 	sntp_client_serve(Socket self, const char* address, int port, int sent);
+BOOL	Hal_setTimeToMB_Date( uint16_t * MDateBuf );
 
 #endif /* SNTPCLIENT_H_ */

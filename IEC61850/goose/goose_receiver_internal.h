@@ -33,20 +33,53 @@
 #define DEBUG_GOOSE_SUBSCRIBER 		0
 #endif
 
+typedef struct sGooseReceiverCfg 	GooseReceiverCfg;
+typedef struct sGooseReceiverMAC	GooseReceiverMAC;
+
+// список MAC адресов
+typedef struct sGooseReceiverMAC {
+	uint8_t MAC[6];
+	struct sGooseReceiverMAC* sibling;
+};
+
+// список ссылок гусов (устройства)
+typedef struct sGooseReceiverGocbRef {
+	uint16_t	numbGocbRef;						// номер записи
+	char*		gocbRef;							// гусс запись
+    uint16_t 	AppId;								// AppId для записи
+	struct sGooseReceiverGocbRef* sibling;			// следующая запись
+};
+
+// таблица соответствия
+struct sGooseReceiverCfg {
+	uint16_t 			nGocbRef;					// отправитель гуса
+	uint8_t 			nDataSetGoEntries;			// номер записи в датасете гуса
+	uint8_t 			nGoEntries;					// номер дискрета для текущей записи
+	bool	 			AddAllowedToLiveStatus;		// подмешивать потерю связи
+	GooseReceiverCfg* 	sibling;					// следующий элемент
+};
+
+struct sGooseReceiverFile {
+	GooseReceiverMAC*		GooseMACs;
+	GooseReceiverGocbRef*	GocbRefs;
+	GooseReceiverCfg*		GooseMatrix;
+};
 
 struct sGooseSubscriber {
-    char* goCBRef;
-    int goCBRefLen;
-    uint32_t timeAllowedToLive;
-    uint32_t stNum;
-    uint32_t sqNum;
-    uint32_t confRev;
-    MmsValue* timestamp;
-    bool simulation;
-    bool ndsCom;
+	uint16_t 	NumGocbRef;			// номер гуса в списке, для быстрого поиска
+    char* 		goCBRef;
+    int 		goCBRefLen;
+    uint32_t 	timeAllowedToLive;
+    bool		lostGooseMessage;
+    uint32_t 	stNum;
+    uint32_t 	sqNum;
+    uint32_t 	confRev;
+    MmsValue* 	timestamp;
+    bool 		simulation;
+    bool 		ndsCom;
 
-    uint64_t invalidityTime;
-    bool stateValid;
+    uint64_t 	invalidityTime;
+    bool 		stateValid;
 
     int32_t appId; /* APPID or -1 if APPID should be ignored */
 

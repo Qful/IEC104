@@ -34,6 +34,8 @@
 
 #include "mms_server.h"
 
+// файловая система. запись и чтение конфигурвции
+#include "filesystem.h"
 /**********************************************************************************************
  * MMS Common support functions
  *********************************************************************************************/
@@ -223,8 +225,8 @@ handleConfirmedRequestPdu(
             	if (DEBUG_MMS_SERVER){
             		USART_TRACE_MAGENTA("MMS_SERVER: write-request\n");
             	}
-                mmsServer_handleWriteRequest(self, buffer, bufPos, bufPos + length,
-                                invokeId, response);
+                mmsServer_handleWriteRequest(self, buffer, bufPos, bufPos + length, invokeId, response);
+
                 break;
 #endif /* (MMS_WRITE_SERVICE == 1) */
 
@@ -239,13 +241,19 @@ handleConfirmedRequestPdu(
 
 
 #if (MMS_DYNAMIC_DATA_SETS == 1)
+// создаём датасеты.
             case 0xab: /* define-named-variable-list */
             	if (DEBUG_MMS_SERVER){
             		USART_TRACE_MAGENTA("MMS_SERVER: define-named-variable-list-request\n");
             	}
-                mmsServer_handleDefineNamedVariableListRequest(self,
-                        buffer, bufPos, bufPos + length,
-                        invokeId, response);
+                mmsServer_handleDefineNamedVariableListRequest(self, buffer, bufPos, bufPos + length, invokeId, response);
+
+                // нужно сохранить динамические датасеты в файл на диске
+                {
+                	MmsDevice* device = MmsServer_getDevice(self->server);
+                	filesystem_Save_NamedVariableListRequest(device,0);
+                }
+
                 break;
 #endif /* (MMS_DYNAMIC_DATA_SETS == 1) */
 
@@ -262,13 +270,19 @@ handleConfirmedRequestPdu(
 #endif /* (MMS_GET_DATA_SET_ATTRIBUTES == 1) */
 
 #if (MMS_DYNAMIC_DATA_SETS == 1)
+// удаляем датасеты.
             case 0xad: /* delete-named-variable-list-request */
             	if (DEBUG_MMS_SERVER){
             		USART_TRACE_MAGENTA("MMS_SERVER: delete-named-variable-list-request\n");
             	}
-                mmsServer_handleDeleteNamedVariableListRequest(self,
-                        buffer, bufPos, bufPos + length,
-                        invokeId, response);
+                mmsServer_handleDeleteNamedVariableListRequest(self, buffer, bufPos, bufPos + length, invokeId, response);
+
+                // нужно сохранить динамические датасеты в файл на диске
+                {
+                	MmsDevice* device = MmsServer_getDevice(self->server);
+                	filesystem_Save_NamedVariableListRequest(device,0);
+                }
+
                 break;
 #endif /* (MMS_DYNAMIC_DATA_SETS == 1) */
 

@@ -116,13 +116,16 @@ typedef enum
     MB_EINVAL,                  /*!< illegal argument. */
     MB_EPORTERR,                /*!< porting layer error. */
     MB_ENORES,                  /*!< insufficient resources. */
-    MB_EIO,                     /*!< I/O error. */
+    MB_EIO_Tx,                  /*!< I/O error. */
+    MB_EIO_Rx,                  /*!< I/O error. */
+    MB_CRCERR_Rx,               /*!< CRC error. */
     MB_EILLSTATE,               /*!< protocol stack in illegal state. */
     MB_ETIMEDOUT,                /*!< timeout error occurred. */
     MB_ESENT,
     MB_ERECV,
     MB_ERECVDATA,				// приняли и обработали данные
     MB_ERECVDATAERROR,			// Не приняли и обработали данные
+    MB_ERECVDATAWAIT,			// ждём ответа
     MB_NOTASK
 } eMBErrorCode;
 

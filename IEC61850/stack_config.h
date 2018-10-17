@@ -30,12 +30,13 @@
 
 #define 	LIMITERRORCONNECT	0						// счетчик ошибок приема из сокета
 
+// память выделяемая для каждого клиента.
 /* Maximum MMS PDU SIZE - default is 65000 */
-#define MMS_MAXIMUM_PDU_SIZE 			16384//4096//2048						//1200//4096//8192//2048
+#define MMS_MAXIMUM_PDU_SIZE 			8192				//16384 было до 05.03.2018					//4096//2048//1200//4096//8192//2048
 
 // reserve 64k for dynamic memory allocation  this can be optimized maybe there is a good guess for the required memory size
 // sendNextReportEntry()
-#define LOCAL_STORAGE_MEMORY			16384
+#define LOCAL_STORAGE_MEMORY			16384				// память для блока отчетов
 
 #define	CONFIG_MMS_MAXIMUM_PDU_SIZE		MMS_MAXIMUM_PDU_SIZE
 
@@ -59,30 +60,26 @@
 /* number of concurrent MMS client connections the server accepts, -1 for no limit */
 #define CONFIG_MAXIMUM_TCP_CLIENT_CONNECTIONS 		3
 
-/* activate TCP keep alive mechanism. 1 -> activate */
-/*
+/* activate TCP keep alive mechanism. 1 -> activate
  * Механизм tcp_keepalive имеет двойное назначение:
  * он может использоваться как для искусственного поддержания активности соединения,
  * так и для выявления разорванных (так называемых «полуоткрытых») соединений.
  */
 #define CONFIG_ACTIVATE_TCP_KEEPALIVE 	1
-
 /* time (in s) between last message and first keepalive message */
 #define CONFIG_TCP_KEEPALIVE_IDLE 		5
-
 /* time between subsequent keepalive messages if no ack received */
 #define CONFIG_TCP_KEEPALIVE_INTERVAL 	2
-
 /* number of not missing keepalive responses until socket is considered dead */
 #define CONFIG_TCP_KEEPALIVE_CNT 		2
-
 /* maximum COTP (ISO 8073) TPDU size - valid range is 1024 - 16384 */
 #define CONFIG_COTP_MAX_TPDU_SIZE 		4096//4096//1024
 
 /* timeout while reading from TCP stream in ms */
 //#define CONFIG_TCP_READ_TIMEOUT_MS 		1000				//1000
 
-// поддержка GOOSE в сборке -------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------
+// поддержка GOOSE в сборке ----------------------------------------------------------------------------------------------
 /* Set to 1 to include GOOSE support in the build. Otherwise set to 0 */
 #define CONFIG_INCLUDE_GOOSE_SUPPORT 				1//1
 
@@ -96,6 +93,7 @@
 #define CONFIG_GOOSE_EVENT_RETRANSMISSION_INTERVAL 500
 
 /* The number of GOOSE retransmissions after an event */
+// число повторных передач порле события
 #define CONFIG_GOOSE_EVENT_RETRANSMISSION_COUNT 	2
 
 #define CONFIG_GOOSE_GOID_WRITABLE 					0
@@ -121,85 +119,91 @@
 
 //------------------------------------------------------------------------------------------------------------------------
 /* include support for IEC 61850 control services */
-#define CONFIG_IEC61850_CONTROL_SERVICE 	1
+#define CONFIG_IEC61850_CONTROL_SERVICE 						1
 
 /* The default select timeout in ms. This will apply only if no sboTimeout attribute exists for a control object. Set to 0 for no timeout. */
-#define CONFIG_CONTROL_DEFAULT_SBO_TIMEOUT 	15000
+#define CONFIG_CONTROL_DEFAULT_SBO_TIMEOUT 						15000
 
 //------------------------------------------------------------------------------------------------------------------------
 /* include support for IEC 61850 reporting services */
-#define CONFIG_IEC61850_REPORT_SERVICE 		1
+#define CONFIG_IEC61850_REPORT_SERVICE 							1
 
 /* support buffered report control blocks with ResvTms field
  * Был выключен. Для ARIS нужно включить, он использует поле RESVTMS
  * */
-#define CONFIG_IEC61850_BRCB_WITH_RESVTMS 	1								//1
+#define CONFIG_IEC61850_BRCB_WITH_RESVTMS 						1								//1
 
 /* The default buffer size of buffered RCBs in bytes */
-#define CONFIG_REPORTING_DEFAULT_REPORT_BUFFER_SIZE 	4096
+#define CONFIG_REPORTING_DEFAULT_REPORT_BUFFER_SIZE 			4096
 
 //------------------------------------------------------------------------------------------------------------------------
 /* include support for setting groups */
-#define CONFIG_IEC61850_SETTING_GROUPS 		1
+#define CONFIG_IEC61850_SETTING_GROUPS 							1
 
 /* default reservation time of a setting group control block in s */
-#define CONFIG_IEC61850_SG_RESVTMS 			300
+#define CONFIG_IEC61850_SG_RESVTMS 								300
 
 //------------------------------------------------------------------------------------------------------------------------
 /* include support for IEC 61850 log services */
-#define CONFIG_IEC61850_LOG_SERVICE 		0
+#define CONFIG_IEC61850_LOG_SERVICE 							1			// пока не поддерживаем
 
 //------------------------------------------------------------------------------------------------------------------------
 /* MMS virtual file store base path - where MMS file services are looking for files */
-#define CONFIG_VIRTUAL_FILESTORE_BASEPATH  "MMSfiles"
+#define CONFIG_VIRTUAL_FILESTORE_BASEPATH  						"0:/MMSfiles"
+
+//#define CONFIG_VIRTUAL_FILESTORE_BASEPATH  "1:/cfg"
 
 /* Maximum number of open file per MMS connection (for MMS file read service) */
 #define CONFIG_MMS_MAX_NUMBER_OF_OPEN_FILES_PER_CONNECTION 		3
 
 //------------------------------------------------------------------------------------------------------------------------
 /* Maximum number of the domain specific data sets - this also includes the static (pre-configured) and dynamic data sets */
-#define CONFIG_MMS_MAX_NUMBER_OF_DOMAIN_SPECIFIC_DATA_SETS 		10
+/*Максимальное количество наборов данных для конкретных доменов - это также включает статические (предварительно настроенные) и динамические наборы данных*/
+#define CONFIG_MMS_MAX_NUMBER_OF_DOMAIN_SPECIFIC_DATA_SETS 		30
 
 /* Maximum number of association specific data sets */
-#define CONFIG_MMS_MAX_NUMBER_OF_ASSOCIATION_SPECIFIC_DATA_SETS 10
+#define CONFIG_MMS_MAX_NUMBER_OF_ASSOCIATION_SPECIFIC_DATA_SETS 30
 
 /* Maximum number of VMD specific data sets */
 #define CONFIG_MMS_MAX_NUMBER_OF_VMD_SPECIFIC_DATA_SETS 		10
 
 /* Maximum number of the members in a data set (named variable list) */
-#define CONFIG_MMS_MAX_NUMBER_OF_DATA_SET_MEMBERS 				100
+/*Максимальное количество членов в наборе данных (список имен переменных)*/
+
+#define CONFIG_MMS_MAX_NUMBER_OF_DATA_SET_MEMBERS 				100				// ограничим число записей до
 //------------------------------------------------------------------------------------------------------------------------
 
 /* Set to 1 to compile for edition 1 server - default is 0 to compile for edition 2
  * 1 - выключим OWNER из структуры
+ * редакция протокола
  * */
-#define CONFIG_IEC61850_EDITION_1 		0
+#define CONFIG_IEC61850_EDITION_1 					0
 
 //------------------------------------------------------------------------------------------------------------------------
 
 /* Enable reporting - Note reporting also includes datasets */
-#define CONFIG_REPORTING 	1
+#define CONFIG_REPORTING 							1
 
 /* Definition of supported services */
-#define MMS_DEFAULT_PROFILE 1
+#define MMS_DEFAULT_PROFILE 						1
 
 #if MMS_DEFAULT_PROFILE
-#define MMS_READ_SERVICE 					1
-#define MMS_WRITE_SERVICE 					1
-#define MMS_GET_NAME_LIST 					1
-#define MMS_JOURNAL_SERVICE 				0
-#define MMS_GET_VARIABLE_ACCESS_ATTRIBUTES 	1
-#define MMS_DATA_SET_SERVICE 				1
-#define MMS_DYNAMIC_DATA_SETS 				1
-#define MMS_GET_DATA_SET_ATTRIBUTES 		1
-#define MMS_STATUS_SERVICE 					0
-#define MMS_IDENTIFY_SERVICE 				1
-#define MMS_FILE_SERVICE 					1		//1
+#define MMS_READ_SERVICE 							1
+#define MMS_WRITE_SERVICE 							1
+#define MMS_GET_NAME_LIST 							1
+#define MMS_JOURNAL_SERVICE 						0				//0 лог не поддерживаем пока
+#define MMS_GET_VARIABLE_ACCESS_ATTRIBUTES 			1
+#define MMS_DATA_SET_SERVICE 						1
+#define MMS_DYNAMIC_DATA_SETS 						1
+#define MMS_GET_DATA_SET_ATTRIBUTES 				1
+#define MMS_STATUS_SERVICE 							0
+#define MMS_IDENTIFY_SERVICE 						1
+#define MMS_FILE_SERVICE 							1		//1
 #endif /* MMS_DEFAULT_PROFILE */
 
 #if (MMS_WRITE_SERVICE != 1)
 #undef CONFIG_IEC61850_CONTROL_SERVICE
-#define CONFIG_IEC61850_CONTROL_SERVICE 0
+#define CONFIG_IEC61850_CONTROL_SERVICE 			0
 #endif
 
 #endif /* STACK_CONFIG_H_ */

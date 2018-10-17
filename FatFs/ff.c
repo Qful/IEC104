@@ -552,12 +552,39 @@ static const BYTE ExCvt[] = _EXCVT;	/* Upper conversion table for SBCS extended 
 
 
 
+static const char *FRESULTerr[] = {
+"FR_OK",				// (0) Succeeded
+"FR_DISK_ERR",			// (1) A hard error occurred in the low level disk I/O layer
+"FR_INT_ERR",				// (2) Assertion failed
+"FR_NOT_READY",			// (3) The physical drive cannot work
+"FR_NO_FILE",				// (4) Could not find the file
+"FR_NO_PATH",				// (5) Could not find the path
+"FR_INVALID_NAME",		// (6) The path name format is invalid
+"FR_DENIED",				// (7) Access denied due to prohibited access or directory full
+"FR_EXIST",				// (8) Access denied due to prohibited access
+"FR_INVALID_OBJECT",		// (9) The file/directory object is invalid
+"FR_WRITE_PROTECTED",		// (10) The physical drive is write protected
+"FR_INVALID_DRIVE",		// (11) The logical drive number is invalid
+"FR_NOT_ENABLED",			// (12) The volume has no work area
+"FR_NO_FILESYSTEM",		// (13) There is no valid FAT volume
+"FR_MKFS_ABORTED",		// (14) The f_mkfs() aborted due to any problem
+"FR_TIMEOUT",				// (15) Could not get a grant to access the volume within defined period
+"FR_LOCKED",				// (16) The operation is rejected according to the file sharing policy
+"FR_NOT_ENOUGH_CORE",		// (17) LFN working buffer could not be allocated
+"FR_TOO_MANY_OPEN_FILES",	// (18) Number of open files > _FS_LOCK
+"FR_INVALID_PARAMETER"	// (19) Given parameter is invalid
+};
+
 /*--------------------------------------------------------------------------
 
    Module Private Functions
 
 ---------------------------------------------------------------------------*/
+const char *ff_str_err(FRESULT err)
+{
+  return FRESULTerr[err];
 
+}
 
 /*-----------------------------------------------------------------------*/
 /* Load/Store multi-byte word in the FAT structure                       */
@@ -3813,7 +3840,7 @@ FRESULT f_chdir (
 	LEAVE_FF(fs, res);
 }
 
-
+// позволяет запросить текущую директорию.
 #if _FS_RPATH >= 2
 FRESULT f_getcwd (
 	TCHAR* buff,	/* Pointer to the directory path */
@@ -5195,7 +5222,7 @@ FRESULT f_forward (
 FRESULT f_mkfs (
 	const TCHAR* path,	/* Logical drive number */
 	BYTE opt,			/* Format option */
-	DWORD au,			/* Size of allocation unit [byte] */  // резмер кластера в байтаж
+	DWORD au,			/* Size of allocation unit [byte] */  // резмер кластера в байтах
 	void* work,			/* Pointer to working buffer */
 	UINT len			/* Size of working buffer */
 )
@@ -5716,9 +5743,13 @@ FRESULT f_fdisk (
 
 
 #if _USE_STRFUNC
-/*-----------------------------------------------------------------------*/
-/* Get a string from the file                                            */
-/*-----------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------
+ * Get a string from the file
+ * Операция чтения будет продолжаться до конца файла до тех пор, пока не будет сохранен символ '\n',
+ * либо до момента, когда буфер чтения не заполнится на Size - 1 символов. Прочитанная строка завершается нулем '\0'
+ * Когда нет символов для чтения, или во время операции чтения произошла любая ошибка, функция f_gets() вернет нулевой указатель (null).
+ * Когда функция выполнилась успешно, то будет возвращена Str.
+ *-----------------------------------------------------------------------*/
 
 TCHAR* f_gets (
 	TCHAR* buff,	/* Pointer to the string buffer to read */

@@ -94,7 +94,7 @@ eMBMasterReqReadDiscreteInputs( UCHAR ucSndAddr, USHORT usDiscreteAddr, USHORT u
 		ucMBFrame[MB_PDU_REQ_READ_DISCCNT_OFF ]    = usNDiscreteIn >> 8;
 		ucMBFrame[MB_PDU_REQ_READ_DISCCNT_OFF + 1] = usNDiscreteIn;
 		vMBMasterSetPDUSndLength( MB_PDU_SIZE_MIN + MB_PDU_REQ_READ_SIZE );
-		xModbus_Set_SizeAnswer(SizeAnswer);
+		xModbus_Set_SizeAnswer(SizeAnswer,usDiscreteAddr);
 		( void ) xMBMasterPortEventPost( EV_MASTER_FRAME_SENT );				// передаём событие "FRAME_SENT" в менеджер событий
 		eErrStatus = eMBMasterWaitRequestFinish( );								// ожидаем ответ от менеджера событий об окончании с возвратом статуса
     }

@@ -55,19 +55,20 @@ typedef enum
     EV_MASTER_EXECUTE                  = 1<<2,  /*!< Execute function. */		//
     EV_MASTER_FRAME_SENT               = 1<<3,  /*!< Frame sent. */
     EV_MASTER_ERROR_PROCESS            = 1<<4,  /*!< Frame error process. */
-    EV_MASTER_PROCESS_SUCESS           = 1<<5,  /*!< Request process success. */
-    EV_MASTER_ERROR_RESPOND_TIMEOUT    = 1<<6,  /*!< Request respond timeout. */
-    EV_MASTER_ERROR_RECEIVE_DATA       = 1<<7,  /*!< Request receive data error. */
-    EV_MASTER_ERROR_EXECUTE_FUNCTION   = 1<<8,  /*!< Request execute function error. */
-    EV_MASTER_FRAME_RECEIVE_WAIT	   = 1<<9,  // ожидаем ответа от слэйва. Нельзя слать новый запрос.
-
+//    EV_MASTER_PROCESS_SUCESS           = 1<<5,  /*!< Request process success. */
+//    EV_MASTER_FRAME_SENT_WAIT	   	   = 1<<5, // ожидаем окончания отправки пакета. Нельзя слать новый запрос.
+    EV_MASTER_FRAME_RECEIVE_WAIT	   = 1<<6, // ожидаем ответа от слэйва. Нельзя слать новый запрос.
+// функции работы в режиме слейва. с другим адресом
+//    EV_SLAVE_FRAME_RECEIVED           = 1<<7,
+//    EV_SLAVE_EXECUTE                  = 1<<8,
 } eMBMasterEventType;
 
 typedef enum
 {
-    EV_ERROR_RESPOND_TIMEOUT,         /*!< Slave respond timeout. */
-    EV_ERROR_RECEIVE_DATA,            /*!< Receive frame data error. */
-    EV_ERROR_EXECUTE_FUNCTION,        /*!< Execute function error. */
+    EV_ERROR_RESPOND_TIMEOUT,       // Slave respond timeout.
+    EV_ERROR_RECEIVE_DATA,          // Receive frame data error.
+    EV_ERROR_EXECUTE_FUNCTION,      // Execute function error.
+    EV_ERROR_SENT_DATA,				// ошибка отправки сообщения. Нужно переинитить весь передатчик
 } eMBMasterErrorEventType;
 
 /*! \ingroup modbus
@@ -138,35 +139,28 @@ BOOL     xMBMasterPortSerialPutBUF( CHAR * putBuf, USHORT leng );
 BOOL     xMBMasterPortSerialGetBuf(UCHAR pos, CHAR * pucByte );
 
 /* ----------------------- Timers functions ---------------------------------*/
-BOOL            xMBPortTimersInit( USHORT usTimeOut50us );
-
+BOOL            xMBPortTimersInit( uint32_t usTimeOut_ns);
 void            xMBPortTimersClose( void );
 
 void     vMBPortTimersEnable( void );
-
 void     vMBPortTimersDisable( void );
 
-BOOL            xMBMasterPortTimersInit( USHORT usTimeOut50us );
-
-void            xMBMasterPortTimersClose( void );
-
-void     vMBMasterPortTimersT35Enable( void );
-
-void     vMBMasterPortTimersConvertDelayEnable( void );
+BOOL     	xMBMasterPortTimersInit( USHORT usTimeOut50us );
+void     	xMBMasterPortTimersClose( void );
 
 void     vMBMasterPortTimersRespondTimeoutEnable( void );
+void     vMBMasterPortTimersAfterRespondTimeoutEnable( void );
 
 void     vMBMasterPortTimersDisable( void );
 
 /* ----------------- Callback for the master error process ------------------*/
-void            vMBMasterErrorCBRespondTimeout( UCHAR ucDestAddress, const UCHAR* pucPDUData,
-                                                USHORT ucPDULength );
+void            vMBMasterErrorCBRespondTimeout( UCHAR ucDestAddress, const UCHAR* pucPDUData, USHORT ucPDULength );
+void            vMBMasterErrorCBReceiveData( UCHAR ucDestAddress, const UCHAR* pucPDUData, USHORT ucPDULength );
+void            vMBMasterErrorCBSendData( UCHAR ucDestAddress, const UCHAR* pucPDUData, USHORT ucPDULength );
+void            vMBMasterErrorCBExecuteFunction( UCHAR ucDestAddress, const UCHAR* pucPDUData, USHORT ucPDULength );
 
-void            vMBMasterErrorCBReceiveData( UCHAR ucDestAddress, const UCHAR* pucPDUData,
-                                             USHORT ucPDULength );
+void			vMBMasterErrorCBIncCntErr( UCHAR ucDestAddress, const UCHAR* pucPDUData, USHORT ucPDULength );
 
-void            vMBMasterErrorCBExecuteFunction( UCHAR ucDestAddress, const UCHAR* pucPDUData,
-                                                 USHORT ucPDULength );
 
 void            vMBMasterCBRequestScuuess( void );
 
@@ -195,6 +189,9 @@ extern          BOOL( *pxMBMasterFrameCBByteReceived ) ( void );
 extern          BOOL( *pxMBMasterFrameCBTransmitterEmpty ) ( void );
 
 extern          BOOL( *pxMBMasterPortCBTimerExpired ) ( void );
+
+extern			BOOL( *pxMBMasterPortCBStartIdle ) ( void );
+
 
 /* ----------------------- TCP port functions -------------------------------*/
 BOOL            xMBTCPPortInit( USHORT usTCPPort );

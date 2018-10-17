@@ -21,6 +21,11 @@
  *  See COPYING file for the complete license text.
  */
 
+#include "main.h"
+
+#include "iec61850_server.h"
+#
+
 #include "libiec61850_platform_includes.h"
 #include "stack_config.h"
 #include "goose_publisher.h"
@@ -35,8 +40,11 @@
 
 #define GOOSE_MAX_MESSAGE_SIZE 1518
 
+extern IedServer iedServer;
+
+
 static void
-prepareGooseBuffer(GoosePublisher self, CommParameters* parameters, const char* interfaceID);
+prepareGooseBuffer(GoosePublisher self, CommParameters* parameters,/*HSRParameters* HSRparam,*/ const char* interfaceID);
 
 struct sGoosePublisher {
     uint8_t* buffer;
@@ -59,8 +67,14 @@ struct sGoosePublisher {
     uint32_t timeAllowedToLive;
     bool needsCommission;
     bool simulation;
+/*
+    bool 		AppendPRP;			// добавлять резервирование PRP
+    uint16_t 	prpSeqNum;			//
 
-    MmsValue* timestamp; /* time when stNum is increased */
+    bool 		AppendHSR;			// добавлять резервирование HSR
+    uint16_t 	hsrSeqNum;
+*/
+    MmsValue* 	timestamp; /* time when stNum is increased */
 };
 
 
@@ -160,7 +174,7 @@ GoosePublisher_setTimeAllowedToLive(GoosePublisher self, uint32_t timeAllowedToL
 }
 
 static void
-prepareGooseBuffer(GoosePublisher self, CommParameters* parameters, const char* interfaceID)
+prepareGooseBuffer(GoosePublisher self, CommParameters* parameters,/*HSRParameters* HSRparam,*/ const char* interfaceID)
 {
     uint8_t srcAddr[6];
 
@@ -202,6 +216,34 @@ prepareGooseBuffer(GoosePublisher self, CommParameters* parameters, const char* 
 
     int bufPos = 12;
 
+// -------------------------------------------------------
+// Если будем использовать HSR
+// -------------------------------------------------------
+#if defined (UseHSR)
+    HSRParameters 	HSRparam;
+
+    HSRparam.hsrHead = HSRsuffix;
+    HSRparam.hsrIdNet = 0;
+    HSRparam.hsrSize = 0;
+    HSRparam.hsrSeqNum = 0;
+
+    self->buffer[bufPos++] = HSRparam.hsrHead / 256;
+    self->buffer[bufPos++] = HSRparam.hsrHead % 256;
+
+    uint16_t Netid = HSRparam.hsrIdNet<<12;
+    Netid += HSRparam.hsrSize & 0xb111111111111;
+
+    self->buffer[bufPos++] = Netid / 256;
+    self->buffer[bufPos++] = Netid % 256;
+
+
+    self->buffer[bufPos++] = HSRparam.hsrSeqNum / 256;
+    self->buffer[bufPos++] = HSRparam.hsrSeqNum % 256;
+
+#endif
+// -------------------------------------------------------
+// Если будем использовать VLAN
+// -------------------------------------------------------
 #if 1
     /* Priority tag - IEEE 802.1Q */
     self->buffer[bufPos++] = 0x81;
@@ -241,14 +283,22 @@ prepareGooseBuffer(GoosePublisher self, CommParameters* parameters, const char* 
     self->payloadStart = bufPos;
 }
 
-static int32_t
-createGoosePayload(GoosePublisher self, LinkedList dataSetValues, uint8_t* buffer, size_t maxPayloadSize) {
+/*******************************************************
+ * createGoosePayload
+ * подготовка пакета GOOSE на основании датасета
+ *
+ * dataSetValues - содержимое датасета
+ * buffer - буфер для сообщения
+ * maxPayloadSize - максимальный размер сообщения
+ *
+ * return - размер заполненного буфера сообщения
+ *******************************************************/
+static int32_t		createGoosePayload(GoosePublisher self, LinkedList dataSetValues, uint8_t* buffer, size_t maxPayloadSize) {
 
     /* Step 1 - calculate length fields */
     uint32_t goosePduLength = 0;
 
     goosePduLength += BerEncoder_determineEncodedStringSize(self->goCBRef);
-
     goosePduLength += BerEncoder_determineEncodedStringSize(self->dataSetRef);
 
     if (self->goID != NULL)
@@ -259,30 +309,24 @@ createGoosePayload(GoosePublisher self, LinkedList dataSetValues, uint8_t* buffe
     uint32_t timeAllowedToLive = self->timeAllowedToLive;
 
     goosePduLength += 2 + BerEncoder_UInt32determineEncodedSize(timeAllowedToLive);
-
     goosePduLength += 2 + 8; /* for T (UTCTIME) */
-
     goosePduLength += 2 + BerEncoder_UInt32determineEncodedSize(self->sqNum);
-
     goosePduLength += 2 + BerEncoder_UInt32determineEncodedSize(self->stNum);
-
     goosePduLength += 2 + BerEncoder_UInt32determineEncodedSize(self->confRev);
-
     goosePduLength += 6; /* for ndsCom and simulation */
 
+    // подсчет числа записей в датасете для указания размера (0x61, goosePduLength)
     uint32_t numberOfDataSetEntries = LinkedList_size(dataSetValues);
+    // можно же взять из структуры датасета число его записей DataSet.elementCount
+    //uint32_t numberOfDataSetEntries = IedModel_lookupDataSet(iedModel,self->dataSetRef)->elementCount;
 
     goosePduLength += 2 + BerEncoder_UInt32determineEncodedSize(numberOfDataSetEntries);
 
     uint32_t dataSetSize = 0;
-
     LinkedList element = LinkedList_getNext(dataSetValues);
-
     while (element != NULL) {
         MmsValue* dataSetEntry = (MmsValue*) element->data;
-
         dataSetSize += MmsValue_encodeMmsData(dataSetEntry, NULL, 0, false);
-
         element = LinkedList_getNext(element);
     }
 
@@ -290,8 +334,8 @@ createGoosePayload(GoosePublisher self, LinkedList dataSetValues, uint8_t* buffe
 
     goosePduLength += allDataSize;
 
-    if (goosePduLength > maxPayloadSize)
-        return -1;
+    // если получилось больше чем максимальный разрешенный то всё плохо
+    if (goosePduLength > maxPayloadSize)       return -1;
 
     /* Step 2 - encode to buffer */
 
@@ -299,13 +343,10 @@ createGoosePayload(GoosePublisher self, LinkedList dataSetValues, uint8_t* buffe
 
     /* Encode GOOSE PDU */
     bufPos = BerEncoder_encodeTL(0x61, goosePduLength, buffer, bufPos);
-
     /* Encode gocbRef */
     bufPos = BerEncoder_encodeStringWithTag(0x80, self->goCBRef, buffer, bufPos);
-
     /* Encode timeAllowedToLive */
     bufPos = BerEncoder_encodeUInt32WithTL(0x81, timeAllowedToLive, buffer, bufPos);
-
     /* Encode datSet reference */
     bufPos = BerEncoder_encodeStringWithTag(0x82, self->dataSetRef, buffer, bufPos);
 
@@ -317,67 +358,134 @@ createGoosePayload(GoosePublisher self, LinkedList dataSetValues, uint8_t* buffe
 
     /* Encode t */
     bufPos = BerEncoder_encodeOctetString(0x84, self->timestamp->value.utcTime, 8, buffer, bufPos);
-
     /* Encode stNum */
     bufPos = BerEncoder_encodeUInt32WithTL(0x85, self->stNum, buffer, bufPos);
-
     /* Encode sqNum */
     bufPos = BerEncoder_encodeUInt32WithTL(0x86, self->sqNum, buffer, bufPos);
-
     /* Encode simulation */
     bufPos = BerEncoder_encodeBoolean(0x87, self->simulation, buffer, bufPos);
-
     /* Encode confRef */
     bufPos = BerEncoder_encodeUInt32WithTL(0x88, self->confRev, buffer, bufPos);
-
     /* Encode ndsCom */
     bufPos = BerEncoder_encodeBoolean(0x89, self->needsCommission, buffer, bufPos);
-
     /* Encode numDatSetEntries */
     bufPos = BerEncoder_encodeUInt32WithTL(0x8a, numberOfDataSetEntries, buffer, bufPos);
-
     /* Encode all data */
     bufPos = BerEncoder_encodeTL(0xab, dataSetSize, buffer, bufPos);
 
     /* Encode data set entries */
+    // расшифровка данных из датасета
     element = LinkedList_getNext(dataSetValues);
-
     while (element != NULL) {
         MmsValue* dataSetEntry = (MmsValue*) element->data;
-
+    	if (dataSetEntry == NULL) break;
         bufPos = MmsValue_encodeMmsData(dataSetEntry, buffer, bufPos, true);
-
         element = LinkedList_getNext(element);
     }
 
     return bufPos;
 }
 
-int
-GoosePublisher_publish(GoosePublisher self, LinkedList dataSet)
+/*******************************************************
+ * GoosePublisher_publish
+ * подготовка пакета на основании датасета и отправка
+ * в физический интерфейс
+ *
+ * dataSet - значения данных в датасетах т.е. MmsValue*
+ *******************************************************/
+int		GoosePublisher_publish(GoosePublisher self, LinkedList dataSet)
 {
-    uint8_t* buffer = self->buffer + self->payloadStart;
+	int32_t payloadLength;
+#if defined (UseHSR) || defined (UsePRP)
+	int bufPos;
+#endif
 
+    uint8_t* buffer = self->buffer + self->payloadStart;
     size_t maxPayloadSize = GOOSE_MAX_MESSAGE_SIZE - self->payloadStart;
 
-    int32_t payloadLength = createGoosePayload(self, dataSet, buffer, maxPayloadSize);
+    // нужно заголовок пакета готовить каждый раз, т.к.  есть резервирование
+    // или править нужные ячейки если включено резервирование
+
+#if defined (UseHSR)
+	IsoServer IsoServ = IedServer_getIsoServer(iedServer);
+
+    if (IsoServer_getAppendHSR(IsoServ) == true){
+
+		int bufPos = _Addr_hsrSeqNum;				// минуем заголовок
+
+		// -------------------------------------------------------
+		// Если будем использовать HSR
+		// -------------------------------------------------------
+    	IsoServer_HSRSeqNum_increase(IsoServ);
+    	uint16_t	hsrSeqNum =  IsoServer_gethsrSeqNum(IsoServ);
+
+		self->buffer[bufPos++] = hsrSeqNum / 256;
+		self->buffer[bufPos++] = hsrSeqNum % 256;
+
+    }
+#endif
+
+
+    // подготовка пакета на основании датасета
+    payloadLength = createGoosePayload(self, dataSet, buffer, maxPayloadSize);				// вернул число добавленных байт.
 
     self->sqNum++;
 
-    if (payloadLength == -1)
-        return -1;
+    if (payloadLength == -1)    return -1;
 
     int lengthIndex = self->lengthField;
-
     size_t gooseLength = payloadLength + 8;
-
     self->buffer[lengthIndex] = gooseLength / 256;
     self->buffer[lengthIndex + 1] = gooseLength & 0xff;
 
-    if (DEBUG_GOOSE_PUBLISHER)
-    	USART_TRACE_CYAN("GOOSE: send GOOSE message\n");
+#if defined (UsePRP)
 
-    Ethernet_sendPacket(self->ethernetSocket, self->buffer, self->payloadStart + payloadLength);
+	IsoServer IsoServ = IedServer_getIsoServer(iedServer);
+
+    if (IsoServer_getAppendPRP(IsoServ) == true){
+
+    	size_t prpSize	=	payloadLength + 8 + 6;//+ 2
+
+    	bufPos = payloadLength + self->payloadStart;//+ 2
+
+    	IsoServer_PRPSeqNum_increase(IsoServ);
+    	uint16_t	prpSeqNum =  IsoServer_getprpSeqNum(IsoServ);
+		self->buffer[bufPos++] = prpSeqNum / 256;
+		self->buffer[bufPos++] = prpSeqNum % 256;
+
+		uint16_t Netid = (uint16_t)LAN_Addr_0 << 8;
+		Netid += prpSize & 0xfff;
+
+		self->buffer[bufPos++] = Netid / 256;
+		self->buffer[bufPos++] = Netid % 256;
+
+		self->buffer[bufPos++] = PRPsuffix / 256;
+		self->buffer[bufPos++] = PRPsuffix % 256;
+
+		payloadLength = bufPos - self->payloadStart;
+    }
+#endif
+
+#if defined (UseHSR)
+
+    // размер пакета
+    if (IsoServer_getAppendHSR(IsoServ) == true){
+    	size_t hsrLength	=	self->payloadStart + gooseLength - 22;
+    	self->buffer[_Addr_hsrSize] 	= (hsrLength / 256) & 0xFFF;
+    	self->buffer[_Addr_hsrSize+1] 	= hsrLength & 0xff;
+    }
+#endif
+
+
+//    Ethernet_sendPacket(self->ethernetSocket, self->buffer, self->payloadStart + payloadLength);
+      Ethernet_sendPacket(self->ethernetSocket, self, self->payloadStart + payloadLength);
 
     return 0;
 }
+//----------------------------------------------------
+uint8_t*	Goose_getbufferAddr(GoosePublisher self){
+
+	uint8_t*	ret = self->buffer;
+
+ return	ret;
+ }

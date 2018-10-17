@@ -335,11 +335,11 @@ eMBDisable( void )
 
 eMBErrorCode eMBPoll( void )
 {
-    static UCHAR   *ucMBFrame;
-    static UCHAR    ucRcvAddress;
-    static UCHAR    ucFunctionCode;
-    static USHORT   usLength;
-    static eMBException eException;
+     UCHAR   *ucMBFrame;
+     UCHAR    ucRcvAddress;
+     UCHAR    ucFunctionCode;
+     USHORT   usLength;
+     eMBException eException;
 
     int             i;
     eMBErrorCode    eStatus = MB_ENOERR;

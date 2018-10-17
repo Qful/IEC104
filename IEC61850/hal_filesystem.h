@@ -178,6 +178,8 @@ FileSystem_closeDirectory(DirectoryHandle directory);
 void
 FileSystem_setBasePath(char* basePath);
 
+// команда DIR
+int	FileSystem_CMD_Dir(char* directoryName);
 /*! @} */
 
 /*! @} */

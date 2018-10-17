@@ -94,7 +94,7 @@ eMBMasterReqReadInputRegister( UCHAR ucSndAddr, USHORT usRegAddr, USHORT usNRegs
 		ucMBFrame[MB_PDU_REQ_READ_REGCNT_OFF]     = usNRegs >> 8;
 		ucMBFrame[MB_PDU_REQ_READ_REGCNT_OFF + 1] = usNRegs;
 		vMBMasterSetPDUSndLength( MB_PDU_SIZE_MIN + MB_PDU_REQ_READ_SIZE );
-		xModbus_Set_SizeAnswer(SizeAnswer);
+		xModbus_Set_SizeAnswer(SizeAnswer,usRegAddr);
 		( void ) xMBMasterPortEventPost( EV_MASTER_FRAME_SENT );
 		eErrStatus = eMBMasterWaitRequestFinish( );
     }

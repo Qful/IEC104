@@ -31,6 +31,8 @@
 #include "byte_buffer.h"
 #include "buffer_chain.h"
 
+#include "PrpHsr_value.h"
+
 #define TPKT_RFC1006_HEADER_SIZE 4
 
 #define COTP_DATA_HEADER_SIZE 3
@@ -171,8 +173,13 @@ sendBuffer(CotpConnection* self)
     int sentBytes;
 
     do {
+#if defined (UseHSR) || defined (UsePRP)
         sentBytes = Socket_write(self->socket, ByteBuffer_getBuffer(self->writeBuffer), writeBufferPosition);
 
+//        sentBytes = Socket_write_PRPHSR(self->socket, ByteBuffer_getBuffer(self->writeBuffer), writeBufferPosition);
+#else
+        sentBytes = Socket_write(self->socket, ByteBuffer_getBuffer(self->writeBuffer), writeBufferPosition);
+#endif
         if (sentBytes == -1)
             goto exit_function;
 

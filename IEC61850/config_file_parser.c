@@ -75,8 +75,7 @@ readLine(FileHandle fileHandle, uint8_t* buffer, int maxSize)
     return bytesRead;
 }
 
-static void
-terminateString(char* string, char ch)
+void	terminateString(char* string, char ch)
 {
     int index = 0;
 
@@ -186,7 +185,7 @@ ConfigFileParser_createModelFromConfigFile(FileHandle fileHandle)
                         sscanf((char*) lineBuffer, "DS(%s)", nameString);
                         terminateString(nameString, ')');
 
-                        currentDataSet = DataSet_create(nameString, currentLN);
+                        currentDataSet = DataSet_create(nameString, currentLN, false);		// статические датасеты
                     }
                     else if (StringUtils_startsWith((char*) lineBuffer, "RC")) {
                         int isBuffered;
@@ -212,7 +211,7 @@ ConfigFileParser_createModelFromConfigFile(FileHandle fileHandle)
                         if (strcmp(nameString3, "-") != 0)
                             dataSetName = nameString3;
 
-                        ReportControlBlock_create(nameString, currentLN, rptId,
+                        ReportControlBlock_create(nameString, currentLN, rptId,									// блоки управления отчётами.
                                 (bool) isBuffered, dataSetName, confRef, trgOps, options, bufTm, intgPd);
                     }
                     else if (StringUtils_startsWith((char*) lineBuffer, "LC")) {
@@ -409,7 +408,7 @@ ConfigFileParser_createModelFromConfigFile(FileHandle fileHandle)
                         sscanf((char*) lineBuffer, "DE(%s)", nameString);
                         terminateString(nameString, ')');
 
-                        DataSetEntry_create(currentDataSet, nameString, -1, NULL);
+                        DataSetEntry_create(currentDataSet,NULL, nameString, -1, NULL);
                     }
                     else if (StringUtils_startsWith((char*) lineBuffer, "PA")) {
                         uint32_t vlanPrio;
@@ -429,8 +428,7 @@ ConfigFileParser_createModelFromConfigFile(FileHandle fileHandle)
 
 
                         PhyComAddress* dstAddress =
-                                PhyComAddress_create((uint8_t) vlanPrio, (uint16_t) vlanId, (uint16_t) appId,
-                                        (uint8_t*) nameString2);
+                                PhyComAddress_create((uint8_t) vlanPrio, (uint16_t) vlanId, (uint16_t) appId, (uint8_t*) nameString2);
 
                         GSEControlBlock_addPhyComAddress(currentGoCB, dstAddress);
 

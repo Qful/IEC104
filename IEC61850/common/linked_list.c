@@ -89,8 +89,11 @@ LinkedList_destroyStatic(LinkedList list)
     while (nextElement != NULL);
 }
 
-int
-LinkedList_size(LinkedList list)
+/*******************************************************
+ * LinkedList_size
+ * число записей в датасете
+ *******************************************************/
+int		LinkedList_size(LinkedList list)
 {
     LinkedList nextElement = list;
     int size = 0;
@@ -99,7 +102,6 @@ LinkedList_size(LinkedList list)
         nextElement = nextElement->next;
         size++;
     }
-
     return size;
 }
 

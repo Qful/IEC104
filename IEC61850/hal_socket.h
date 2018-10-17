@@ -74,6 +74,8 @@ struct __kernel_sockaddr_storage {
 
 const char * inet_ntop(int af, const void *addr, char *buf, socklen_t len);
 
+char*	Socket_getPeerAddressStatic(Socket self, char* peerAddressString);
+
 /**
  * \brief Create a new connection handle set (HandleSet)
  *
@@ -81,6 +83,8 @@ const char * inet_ntop(int af, const void *addr, char *buf, socklen_t len);
  */
 HandleSet
 Handleset_new(void);
+
+void	Handleset_reset(HandleSet self);
 
 /**
  * \brief add a soecket to an existing handle set
@@ -130,6 +134,9 @@ TcpServerSocket_create(const char* address, int port);
 
 ServerSocket
 UDPClientSocket_create(const char* address, int port);
+
+ServerSocket
+UDPServerSocket_create(const char* address, int port);
 
 void
 ServerSocket_listen(ServerSocket self);
@@ -244,8 +251,9 @@ Socket_read(Socket self, uint8_t* buf, int size);
  *
  * \return number of bytes transmitted of -1 in case of an error
  */
-int
-Socket_write(Socket self, uint8_t* buf, int size);
+int	Socket_write(Socket self, uint8_t* buf, int size);
+
+int	Socket_write_PRPHSR(Socket self, uint8_t* buf, int size);
 
 /**
  * \brief Get the address of the peer application (IP address and port number)

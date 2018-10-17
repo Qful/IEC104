@@ -33,7 +33,7 @@
  * critical regions during buffer allocation, deallocation and memory
  * allocation and deallocation.
  */
-#define SYS_LIGHTWEIGHT_PROT    1//0     включил защиту доступа к памяти
+#define SYS_LIGHTWEIGHT_PROT    1	//0     включил защиту доступа к памяти
 
 #define ETHARP_TRUST_IP_MAC     0
 #define IP_REASSEMBLY           0
@@ -51,58 +51,86 @@
 /* MEM_ALIGNMENT: should be set to the alignment of the CPU for which
    lwIP is compiled. 4 byte alignment -> define MEM_ALIGNMENT to 4, 2
    byte alignment -> define MEM_ALIGNMENT to 2. */
+
 #define MEM_ALIGNMENT           4
 // пробую от завичсания
 //#define MEM_LIBC_MALLOC			1
 
-/* MEM_SIZE: the size of the heap memory. If the application will send a lot of data that needs to be copied, this should be set high. */
-#define MEM_SIZE                (10 *1024)
+/* MEM_SIZE: the size of the heap memory. If the application will send a lot of data that needs to be copied, this should be set high.
+ * размер кучи
+ *
+ * */
+#define MEM_SIZE                		(15 * 1024)//(10 * 1024)
+
+//MEMP_NUM_NETBUF: the number of struct netbufs.
+#define MEMP_NUM_NETBUF                 4
 
 /* MEMP_NUM_PBUF: the number of memp struct pbufs. If the application sends a lot of data out of ROM (or other static memory), this   should be set high. */
-#define MEMP_NUM_PBUF           50
+#define MEMP_NUM_PBUF           		50
+
 /* MEMP_NUM_UDP_PCB: the number of UDP protocol control blocks. One per active UDP "connection". */
-#define MEMP_NUM_UDP_PCB        6
+// количество блоков управления протоколом UDP. Один за активное соединение UDP
+// 1. DNS
+// 2. NTP
+// берём 4 с запасом
+#define MEMP_NUM_UDP_PCB        		4
+
 /* MEMP_NUM_TCP_PCB: the number of simulatenously active TCP  connections. */
-#define MEMP_NUM_TCP_PCB        10
-/* MEMP_NUM_TCP_PCB_LISTEN: the number of listening TCP
-   connections. */
-#define MEMP_NUM_TCP_PCB_LISTEN 6
+// количество одновременно активных TCP-соединений.
+// 1. MMS сокеты 1слушатель + 4соединения 			= 5
+// 2. FTP  1 (21порт) слушатель + 2 порта передачи. = 3
+// 3. HTTP 1 (80порт) 								= 1
+// 4. DEBUG 1(23порт) 								= 1
+// = 15 c запасом
+#define MEMP_NUM_TCP_PCB        		16//16 - memp_malloc: out of memory in pool TCP_PCB
+
+/* MEMP_NUM_TCP_PCB_LISTEN: the number of listening TCP connections. */
+// количество прослушивающих TCP-соединений.
+// 1. 102 порт
+// 2. 80  порт
+// 3. 21  порт
+// 4. 32  порт
+#define MEMP_NUM_TCP_PCB_LISTEN 		6
+
+#define MEMP_NUM_TCPIP_MSG_INPKT		10			// 8 по умолчанию
 /* MEMP_NUM_TCP_SEG: the number of simultaneously queued TCP  segments. */
-#define MEMP_NUM_TCP_SEG        12
-/* MEMP_NUM_SYS_TIMEOUT: the number of simulateously active
-   timeouts. */
-#define MEMP_NUM_SYS_TIMEOUT    10
+// количество одновременно поставленных сегментов TCP.
+#define MEMP_NUM_TCP_SEG        		12
+
+/* MEMP_NUM_SYS_TIMEOUT: the number of simulateously active timeouts. */
+// количество симулированных активных тайм-аутов.
+#define MEMP_NUM_SYS_TIMEOUT    		10
 
 
 /* ---------- Pbuf options ---------- */
 /* PBUF_POOL_SIZE: the number of buffers in the pbuf pool. */
-#define PBUF_POOL_SIZE          10
+#define PBUF_POOL_SIZE          		12//10
 
 /* PBUF_POOL_BUFSIZE: the size of each pbuf in the pbuf pool. */
-#define PBUF_POOL_BUFSIZE       1524
+#define PBUF_POOL_BUFSIZE       		1524
 
 
 /* ---------- TCP options ---------- */
-#define LWIP_TCP                1
-#define TCP_TTL                 255
+#define LWIP_TCP               	 		1
+#define TCP_TTL                 		255
 
 /* Controls if TCP should queue segments that arrive out of
    order. Define to 0 if your device is low on memory. */
-#define TCP_QUEUE_OOSEQ         0
+#define TCP_QUEUE_OOSEQ         		0
 
 /* TCP Maximum segment size. */
-#define TCP_MSS                 (1500 - 40)	  /* TCP_MSS = (Ethernet MTU - IP header size - TCP header size) */
+#define TCP_MSS                 		(1500 - 40)	  /* TCP_MSS = (Ethernet MTU - IP header size - TCP header size) */
 
 /* TCP sender buffer space (bytes). */
-#define TCP_SND_BUF             (4*TCP_MSS)
+#define TCP_SND_BUF             		(4*TCP_MSS)
 
 /*  TCP_SND_QUEUELEN: TCP sender buffer space (pbufs). This must be at least
   as much as (2 * TCP_SND_BUF/TCP_MSS) for things to work. */
 
-#define TCP_SND_QUEUELEN        (2* TCP_SND_BUF/TCP_MSS)
+#define TCP_SND_QUEUELEN        		(2* TCP_SND_BUF/TCP_MSS)
 
 /* TCP receive window. */
-#define TCP_WND                 (2*TCP_MSS)
+#define TCP_WND                 		(2*TCP_MSS)
 
 
 /* ---------- ICMP options ---------- */
@@ -119,6 +147,13 @@
 /* ---------- UDP options ---------- */
 #define LWIP_UDP                1
 #define UDP_TTL                 255
+
+
+/* ---------- HSR options ---------- */
+
+//#define ETH_SUPPORT_HSR			1					// поддержка HSR
+//#define ETH_HSR_SIZE				6					// размер HSR блока
+
 
 /*
    ----------------------------------
@@ -140,13 +175,14 @@
 /* ---------- Statistics options ---------- */
 // статистика стека, ошибки и всё остальное.
 #define LWIP_STATS 						1 //0
-#define LWIP_PROVIDE_ERRNO 1
+#define LWIP_PROVIDE_ERRNO 				1
 
 /* ---------- link callback options ---------- */
 /* LWIP_NETIF_LINK_CALLBACK==1: Support a callback function from an interface
  * whenever the link changes (i.e., link down)
+ * Использовать колбэк функции монитора LINK по прерыванию от PHY модуля
  */
-#define LWIP_NETIF_LINK_CALLBACK        1
+#define LWIP_NETIF_LINK_CALLBACK        0
 
 /*
    --------------------------------------
@@ -215,13 +251,15 @@ The STM32F4x7 allows computing and verifying the IP, UDP, TCP and ICMP checksums
  */
 #define LWIP_SOCKET                     1
 
+// Обнаружение разорванных TCP-соединений
+#define LWIP_TCP_KEEPALIVE     			1
 /*
    -----------------------------------
    ---------- DEBUG options ----------
    -----------------------------------
 */
 
-#define LWIP_DEBUG                      1
+#define LWIP_DEBUG                      0//1
 
 
 /*
@@ -230,17 +268,21 @@ The STM32F4x7 allows computing and verifying the IP, UDP, TCP and ICMP checksums
    ---------------------------------
 */
 
+// стек задачи "LwIP"
+
 #define TCPIP_THREAD_NAME              "TCP/IP"
-#define TCPIP_THREAD_STACKSIZE          1000
-#define TCPIP_MBOX_SIZE                 5
-#define DEFAULT_UDP_RECVMBOX_SIZE       2000
-#define DEFAULT_TCP_RECVMBOX_SIZE       2000//2000
-#define DEFAULT_ACCEPTMBOX_SIZE         2000
-#define DEFAULT_THREAD_STACKSIZE        500
-#define TCPIP_THREAD_PRIO               (configMAX_PRIORITIES - 2)
-#define LWIP_COMPAT_MUTEX               1
+#define TCPIP_THREAD_STACKSIZE          1024//1000					// размер памяти для задачи
+#define TCPIP_MBOX_SIZE                 15							// число в sys_mbox_new(&mbox, TCPIP_MBOX_SIZE)
+#define TCPIP_THREAD_PRIO               (configMAX_PRIORITIES - 2)	// приоритет
 
+#define DEFAULT_ACCEPTMBOX_SIZE         15//2000					// sys_mbox_new(&msg->conn->acceptmbox, DEFAULT_ACCEPTMBOX_SIZE); в функции lwip_listen() функция do_listen
+#define DEFAULT_UDP_RECVMBOX_SIZE       5//2000						// sys_mbox_new(&msg->conn->acceptmbox, DEFAULT_UDP_RECVMBOX_SIZE);
+#define DEFAULT_TCP_RECVMBOX_SIZE       10//2000					// sys_mbox_new(&msg->conn->acceptmbox, DEFAULT_TCP_RECVMBOX_SIZE);
+#define DEFAULT_RAW_RECVMBOX_SIZE		5
+#define DEFAULT_GOOSE_RECVMBOX_SIZE		5
+#define LWIP_COMPAT_MUTEX               1							// LWIP_COMPAT_MUTEX = 1, если порт не имеет мьютексов, и вместо него следует использовать двоичные семафоры
 
+#define LWIP_COMPAT_MUTEX_ALLOWED		1							// хз ЗАЧЕМ
 
 #endif /* __LWIPOPTS_H__ */
 

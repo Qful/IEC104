@@ -36,16 +36,17 @@
 #include "goose_receiver_internal.h"
 
 GooseSubscriber
-GooseSubscriber_create(char* goCbRef, MmsValue* dataSetValues,void* MAC)
+GooseSubscriber_create(GooseReceiverGocbRef* goCbRef, MmsValue* dataSetValues)
 {
     GooseSubscriber self = (GooseSubscriber) GLOBAL_CALLOC(1, sizeof(struct sGooseSubscriber));
 
  //   if (MAC != NULL)
  //   	memcpy(self->destMAC,MAC,6);
 
-    self->goCBRef = copyString(goCbRef);
-    self->goCBRefLen = strlen(goCbRef);
-    self->timestamp = MmsValue_newUtcTime(0);
+    self->NumGocbRef 	= goCbRef->numbGocbRef;
+    self->goCBRef 		= copyString(goCbRef->gocbRef);
+    self->goCBRefLen 	= strlen(goCbRef->gocbRef);
+    self->timestamp 	= MmsValue_newUtcTime(0);
     self->dataSetValues = dataSetValues;
 
     if (dataSetValues != NULL)
@@ -55,17 +56,21 @@ GooseSubscriber_create(char* goCbRef, MmsValue* dataSetValues,void* MAC)
 
     return self;
 }
-
-bool
-GooseSubscriber_isValid(GooseSubscriber self)
+/*************************************************************************
+ * GooseSubscriber_isValid
+ * проверка на провалы в обменах(пропуск 3-х кратного максимального времени)
+ *************************************************************************/
+bool	GooseSubscriber_isValid(GooseSubscriber self)
 {
-    if (self->stateValid == false)
-        return false;
+	bool ret = true;
+	uint64_t	tim=Hal_getTimeInMs();
+	uint64_t    itim = self->invalidityTime;
 
-    if (Hal_getTimeInMs() > self->invalidityTime)
-        return false;
+    if (tim > itim)   ret = false;
+//    if ((ret == false)&&(itim>0)) USART_TRACE_RED("stateValid false:%u 0x%X > 0x%X\n",self->NumGocbRef,(unsigned int)tim,(unsigned int)itim);
+    if (self->stateValid == false)    ret = false;
 
-    return true;
+    return ret;
 }
 
 void
@@ -142,7 +147,29 @@ GooseSubscriber_getDataSetValues(GooseSubscriber self)
     return self->dataSetValues;
 }
 
+char*
+GooseSubscriber_getGoCBRef(GooseSubscriber self)
+{
+    return self->goCBRef;
+}
 
+uint32_t
+GooseSubscriber_getNumGoose(GooseSubscriber self)
+{
+    return self->NumGocbRef;
+}
+
+bool
+GooseSubscriber_isLostGooseMessage(GooseSubscriber self)
+{
+    return self->lostGooseMessage;
+}
+
+void
+GooseSubscriber_setLostGooseMessage(GooseSubscriber self, bool dat)
+{
+    self->lostGooseMessage = dat;
+}
 
 
 

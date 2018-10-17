@@ -23,6 +23,10 @@
 
 #include "libiec61850_platform_includes.h"
 
+uint32_t	GLOBALMemoryUsedLim = 0;							//максимально использованной памяти
+uint32_t	GLOBALMemoryUsedCurr = 0;							//текущее выделение
+
+
 static MemoryExceptionHandler exceptionHandler = NULL;
 static void* exceptionHandlerParameter = NULL;
 
@@ -50,8 +54,12 @@ Memory_malloc(size_t size)
     portEXIT_CRITICAL();
 //    printf("Memory_malloc 0x%x:%u\n", memory,size);
 
-    if (memory == NULL)
+    if (memory == NULL){
         noMemoryAvailableHandler();
+    } else{
+    	uint32_t	tmp = (uint32_t)memory + (uint32_t)size;
+    	if (GLOBALMemoryUsedLim<tmp) GLOBALMemoryUsedLim = tmp;
+    }
 
     return memory;
 }
@@ -68,8 +76,12 @@ Memory_calloc(size_t nmemb, size_t size)
 
 //    printf("Memory_calloc 0x%x:%u\n", memory,size);
 
-    if (memory == NULL)
+    if (memory == NULL){
         noMemoryAvailableHandler();
+    }else{
+    	GLOBALMemoryUsedCurr = (uint32_t)memory + (uint32_t)size*(uint32_t)nmemb;
+    	if (GLOBALMemoryUsedLim<GLOBALMemoryUsedCurr) GLOBALMemoryUsedLim = GLOBALMemoryUsedCurr;
+    }
 
     return memory;
 }
@@ -86,8 +98,12 @@ Memory_realloc(void *ptr, size_t size)
     portEXIT_CRITICAL();
 //    printf("Memory_realloc 0x%x:%u\n", memory,size);
 
-    if (memory == NULL)
+    if (memory == NULL){
         noMemoryAvailableHandler();
+    }else{
+    	GLOBALMemoryUsedCurr = (uint32_t)memory + (uint32_t)size;
+    	if (GLOBALMemoryUsedLim<GLOBALMemoryUsedCurr) GLOBALMemoryUsedLim = GLOBALMemoryUsedCurr;
+    }
 
     return memory;
 }

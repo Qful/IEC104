@@ -239,30 +239,8 @@ typedef enum {
 	FR_TOO_MANY_OPEN_FILES,	/* (18) Number of open files > _FS_LOCK */
 	FR_INVALID_PARAMETER	/* (19) Given parameter is invalid */
 } FRESULT;
-/*
-static uint16_t* FRESULT_txt[20] = {
-"FR_OK",				// (0) Succeeded
-"FR_DISK_ERR",			// (1) A hard error occurred in the low level disk I/O layer
-"FR_INT_ERR",				// (2) Assertion failed
-"FR_NOT_READY",			// (3) The physical drive cannot work
-"FR_NO_FILE",				// (4) Could not find the file
-"FR_NO_PATH",				// (5) Could not find the path
-"FR_INVALID_NAME",		// (6) The path name format is invalid
-"FR_DENIED",				// (7) Access denied due to prohibited access or directory full
-"FR_EXIST",				// (8) Access denied due to prohibited access
-"FR_INVALID_OBJECT",		// (9) The file/directory object is invalid
-"FR_WRITE_PROTECTED",		// (10) The physical drive is write protected
-"FR_INVALID_DRIVE",		// (11) The logical drive number is invalid
-"FR_NOT_ENABLED",			// (12) The volume has no work area
-"FR_NO_FILESYSTEM",		// (13) There is no valid FAT volume
-"FR_MKFS_ABORTED",		// (14) The f_mkfs() aborted due to any problem
-"FR_TIMEOUT",				// (15) Could not get a grant to access the volume within defined period
-"FR_LOCKED",				// (16) The operation is rejected according to the file sharing policy
-"FR_NOT_ENOUGH_CORE",		// (17) LFN working buffer could not be allocated
-"FR_TOO_MANY_OPEN_FILES",	// (18) Number of open files > _FS_LOCK
-"FR_INVALID_PARAMETER"	// (19) Given parameter is invalid
-};
-*/
+
+extern const char *ff_str_err(FRESULT err);
 
 /*--------------------------------------------------------------*/
 /* FatFs module application interface                           */
@@ -272,9 +250,9 @@ FRESULT f_close (FIL* fp);											/* Close an open file object */
 FRESULT f_read (FIL* fp, void* buff, UINT btr, UINT* br);			/* Read data from the file */
 FRESULT f_write (FIL* fp, const void* buff, UINT btw, UINT* bw);	/* Write data to the file */
 FRESULT f_lseek (FIL* fp, FSIZE_t ofs);								/* перемещение по файлу позиции чтени€/записи, увеличение размера файла (Expand file size)*/
-FRESULT f_truncate (FIL* fp);										/* обрезка файла (Truncate file size)*/
-FRESULT f_sync (FIL* fp);											/* Flush cached data of the writing file */
-FRESULT f_opendir (DIR* dp, const TCHAR* path);						/* Open a directory */
+FRESULT f_truncate (FIL* fp);										// уменьшение размера файла;
+FRESULT f_sync (FIL* fp);											// перезапись кешированных данных на диск;
+FRESULT f_opendir (DIR* dp, const TCHAR* path);						// Open a directory */
 FRESULT f_closedir (DIR* dp);										/* Close an open directory */
 FRESULT f_readdir (DIR* dp, FILINFO* fno);							/* Read a directory item */
 FRESULT f_findfirst (DIR* dp, FILINFO* fno, const TCHAR* path, const TCHAR* pattern);	/* Find first file */
@@ -314,7 +292,10 @@ TCHAR* f_gets (TCHAR* buff, int len, FIL* fp);						/* Get a string from the fil
     f_printf(&fil, "%c", 'a');             // "a"
     f_printf(&fil, "%f", 10.0);            // f_printf не поддерживает числа с плавающей зап€той
  */
+
+//¬озвращает ненулевое значение, если позици€ чтени€/записи дошла до конца файла, иначе возвращает 0.
 #define f_eof(fp) ((int)((fp)->fptr == (fp)->obj.objsize))
+
 #define f_error(fp) ((fp)->err)
 #define f_tell(fp) ((fp)->fptr)
 #define f_size(fp) ((fp)->obj.objsize)

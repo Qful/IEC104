@@ -128,6 +128,30 @@ MmsDevice_getNamedVariableLists(MmsDevice* self)
     return self->namedVariableLists;
 }
 
+char*
+MmsDevice_getconfigfileName(MmsDevice* self)
+{
+    return self->configFileName;
+}
+
+char*
+MmsDevice_CreateConfigfileName(MmsDevice* self, char* configFileName){
+
+	char* configFile;
+
+	if (self->configFileName == NULL)
+		configFile = (char*) GLOBAL_MALLOC(strlen(configFileName));
+	else
+		configFile = (char*) GLOBAL_REALLOC(self->configFileName,strlen(configFileName));
+
+		strcpy(configFile,configFileName);
+
+		self->configFileName = configFile;
+
+    return self->configFileName;
+}
+
+
 MmsNamedVariableList
 MmsDevice_getNamedVariableListWithName(MmsDevice* self, const char* variableListName)
 {

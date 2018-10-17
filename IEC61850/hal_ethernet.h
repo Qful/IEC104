@@ -48,6 +48,8 @@ extern "C" {
  */
 typedef struct sEthernetSocket* EthernetSocket;
 
+typedef struct sGoosePublisher* GoosePublisher;
+
 /**
  * \brief Return the MAC address of an Ethernet interface.
  *
@@ -78,7 +80,7 @@ void
 Ethernet_destroySocket(EthernetSocket ethSocket);
 
 void
-Ethernet_sendPacket(EthernetSocket ethSocket, uint8_t* buffer, int packetSize);
+Ethernet_sendPacket(EthernetSocket ethSocket, GoosePublisher buffer, int packetSize);
 
 /*
  * \brief set a protocol filter for the specified etherType

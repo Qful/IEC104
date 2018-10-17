@@ -38,7 +38,7 @@
 /* ----------------------- Modbus includes ----------------------------------*/
 #include "mb.h"
 #include "mbproto.h"
-
+#include "mbutils.h"
 /* ----------------------- Defines ------------------------------------------*/
 #define BITS_UCHAR      8U
 
@@ -138,4 +138,35 @@ prveMBError2Exception( eMBErrorCode eErrorCode )
     }
 
     return eStatus;
+}
+
+static const char *MB_strerr[] = {
+           "MB_ENOERR",
+           "MB_ENOREG",
+           "MB_EINVAL",
+           "MB_EPORTERR",
+           "MB_ENORES",
+           "MB_EIO_Tx",
+           "MB_EIO_Rx",
+           "MB_CRCERR_Rx",
+           "MB_EILLSTATE",
+           "MB_ETIMEDOUT",
+           "MB_ESENT",
+           "MB_ERECV",
+           "MB_ERECVDATA",
+           "MB_ERECVDATAERROR",
+           "MB_ERECVDATAWAIT",
+           "MB_NOTASK",
+};
+
+/**
+ * Convert an lwip internal error to a string representation.
+ *
+ * @param err an lwip internal err_t
+ * @return a string representation for err
+ */
+const char *
+eMB_strerr(eMBErrorCode err)
+{
+  return MB_strerr[err];
 }

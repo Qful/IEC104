@@ -206,6 +206,8 @@
 
 #define PHY_BCR                         ((uint16_t)0x00)    /*!< Transceiver Basic Control Register   */
 #define PHY_BSR                         ((uint16_t)0x01)    /*!< Transceiver Basic Status Register    */
+#define PHY_IDh                         ((uint16_t)0x02)
+#define PHY_IDl                         ((uint16_t)0x03)
  
 #define PHY_RESET                       ((uint16_t)0x8000)  /*!< PHY Reset */
 #define PHY_LOOPBACK                    ((uint16_t)0x4000)  /*!< Select loop-back mode */
@@ -240,10 +242,15 @@
 
 #else
  /* ################## Ethernet KSZ8873 configuration ##################### */
-#define  	PHY_RESET 			0
-#define 	PHY_SR 				0
-#define 	PHY_DUPLEX_STATUS	0
-#define 	PHY_SPEED_STATUS	0
+#define  	PHY_RESET 						0
+#define 	PHY_SR 							0
+#define 	PHY_DUPLEX_STATUS				0
+#define 	PHY_SPEED_STATUS				0
+
+#define  	PHY_AN_ENABLE		 			((uint16_t)0x1000)
+#define  	PHY_DISABLE_TRANSMIT 			((uint16_t)0x0002)
+#define  	PHY_ENABLE_TRANSMIT 			((uint16_t)0x0000)
+
 
 #define Partner_FULLDUPLEX_100M             ((uint16_t)0x0100)  /*!< Set the full-duplex mode at 100 Mb/s */
 #define Partner_HALFDUPLEX_100M             ((uint16_t)0x0080)  /*!< Set the half-duplex mode at 100 Mb/s */
@@ -273,6 +280,8 @@
 
 #define PHY_BCR                         ((uint16_t)0x00)    /*!< Transceiver Basic Control Register   */
 #define PHY_BSR                         ((uint16_t)0x01)    /*!< Transceiver Basic Status Register    */
+#define PHY_IDh                         ((uint16_t)0x02)
+#define PHY_IDl                         ((uint16_t)0x03)
 #define PHY_ANLPA                       ((uint16_t)0x05)
 
 

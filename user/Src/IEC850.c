@@ -31,6 +31,7 @@
 
 // Файловая система
 #include "ff.h"
+#include "filesystem.h"
 
 /* часы --*/
 #include "clocks.h"
@@ -58,6 +59,7 @@
 
 #include "mms_server_connection.h"
 
+
 #if defined (MR5_700)
 #include "static_model_MR5_700.h"
 #endif
@@ -82,11 +84,12 @@
 #if defined (MR761) || defined (MR762) || defined (MR763)
 #include "static_model_MR76x.h"
 #endif
-//#include "MmsPdu.h"
-
+#if defined	(MR741)
+#include "static_model_MR741.h"
+#endif
 #include "iedserverdataupdate.h"
-
 #include "goose_receiver.h"
+
 /*Modbus includes ------------------------------------------------------------*/
 #include "mb.h"
 #include "mb_m.h"
@@ -94,21 +97,25 @@
 #include "modbus.h"
 
 
-
-#define WEBSERVER_THREAD_PRIO    ( tskIDLE_PRIORITY + 4 )
 /* Variables -----------------------------------------------------------------*/
+IedServer iedServer = NULL;
+
+/* password "database" */
+static char* password1 = "user";
+static char* password2 = "admin";
+
+static int running = 0;
+
+uint64_t 	nextSynchTime = 0;
+//uint32_t 	nextSynchTime = 0;
+bool 		resynch = false;
+
+osThreadId defaultTaskHandle;
+
+/* extern Variables ----------------------------------------------------------*/
+
 extern RTC_TimeTypeDef StartsTime;
 extern RTC_DateTypeDef StartsDate;
-
-
-// виртуальный диск
-FATFS RAMDISKFatFs;  /* File system object for RAM disk logical drive */
-char RAMDISKPath[4]; /* RAM disk logical drive path */
-uint8_t	buffer[100];
-
-BYTE Buff[4096] __attribute__ ((aligned (4))) ;	/* Working buffer */
-
-
 
 // сеть
 extern volatile uint8_t	MAC_ADDR[6];
@@ -117,27 +124,14 @@ extern uint8_t		NETMASK_ADDR[4];
 extern uint8_t		GW_ADDR[4];
 extern uint8_t		SNTP_IP_ADDR[4];
 extern uint16_t		SNTP_Period;
-extern int8_t		TimeZone_my;
 
-extern uint8_t		writeNmb;
 extern	uint8_t	  writeNmbSG;			// номер группы уставок.
 
-
-//extern IedServer iedServer;
-IedServer iedServer = NULL;
-
-static int running = 0;
-
-uint64_t 	nextSynchTime = 0;
-bool 		resynch = false;
-bool		getJurnals = false;
-
-extern struct netconn *newconn850;
 extern struct netif 	gnetif;
 
 
 extern osMutexId xIEC850StartMutex;
-extern osMutexId xIEC850ServerStartMutex;
+extern osMutexId xFTPStartMutex;				// мьютекс готовности к запуску FTP
 
 
 extern osSemaphoreId Netif_LinkSemaphore;
@@ -146,22 +140,23 @@ extern struct link_str link_arg;
 extern RTC_HandleTypeDef hrtc;
 /*  -----------------------------------------------------------------*/
 
-osThreadId defaultTaskHandle;
+/*  очередь ---------------------------------------------------------*/
+extern	xQueueHandle 	ModbusSentQueue;	// очередь для отправки в модбас
+extern xQueueHandle 	ModbusSentTime;		// очередь для отправки в модбас
 
 /*  -----------------------------------------------------------------*/
-
-void			observerCallback(DataAttribute* dataAttribute);
+static bool		clientAuthenticator(void* parameter, AcseAuthenticationParameter authParameter, void** securityToken);
 void			controlHandlerForBinaryOutput(void* parameter, MmsValue* value, bool test);
 
 void 			sigint_handler(int signalId);
 
 static void 	Netif_Config(char* ipAddress,char* Mask, char* Gateway);
+void 			Network_Start(void);
 
 
-
-static bool	activeSgChangedHandler (void* parameter, SettingGroupControlBlock* sgcb,	 uint8_t newActSg, ClientConnection connection);
-static bool	editSgChangedHandler (void* parameter, SettingGroupControlBlock* sgcb,  uint8_t newEditSg, ClientConnection connection);
-static void	editSgConfirmedHandler(void* parameter, SettingGroupControlBlock* sgcb,	uint8_t editSg);
+static bool		activeSgChangedHandler (void* parameter, SettingGroupControlBlock* sgcb,	 uint8_t newActSg, ClientConnection connection);
+static bool		editSgChangedHandler (void* parameter, SettingGroupControlBlock* sgcb,  uint8_t newEditSg, ClientConnection connection);
+static void		editSgConfirmedHandler(void* parameter, SettingGroupControlBlock* sgcb,	uint8_t editSg);
 static void		loadActiveSgValues (int actSG);
 static void		loadEditSgValues (int editSG);
 
@@ -180,51 +175,6 @@ sigint_handler(int signalId)
     running = 0;
 }
 /*************************************************************************
- * gooseListener
- * смотрим что там пришло
- *************************************************************************/
-void	gooseListener(GooseSubscriber subscriber, void* parameter)
-{
-    printf("GOOSE event:\n");
-    printf("  stNum: %u sqNum: %u\n", GooseSubscriber_getStNum(subscriber), GooseSubscriber_getSqNum(subscriber));
-    printf("  timeToLive: %u\n", GooseSubscriber_getTimeAllowedToLive(subscriber));
-    printf("  timestamp: %"PRIu64"\n", GooseSubscriber_getTimestamp(subscriber));
-
-    MmsValue* values = GooseSubscriber_getDataSetValues(subscriber);
-
-    char buffer[1024];
-
-    MmsValue_printToBuffer(values, buffer, 1024);
-
-    printf("%s\n", buffer);
-}
-/*************************************************************************
- * CheckHandlerResult
- *************************************************************************/
-/*
-static CheckHandlerResult	checkHandler(void* parameter, MmsValue* ctlVal, bool test, bool interlockCheck, ClientConnection connection)
-{
-    printf("check handler called!\n");
-
-    if (interlockCheck)
-        printf("  with interlock check bit set!\n");
-
-    if (parameter == &iedModel_GGIO_INGGIO1_SPCSO1)
-        return CONTROL_ACCEPTED;
-
-    if (parameter == &iedModel_GGIO_INGGIO1_SPCSO2)
-        return CONTROL_ACCEPTED;
-
-    if (parameter == &iedModel_GGIO_INGGIO1_SPCSO3)
-        return CONTROL_ACCEPTED;
-
-    if (parameter == &iedModel_GGIO_INGGIO1_SPCSO4)
-        return CONTROL_ACCEPTED;
-
-    return CONTROL_OBJECT_UNDEFINED;
-}
-*/
-/*************************************************************************
  * connectionHandler
  *************************************************************************/
 static void	connectionHandler (IedServer self, ClientConnection connection, bool connected, void* parameter)
@@ -237,228 +187,55 @@ static void	connectionHandler (IedServer self, ClientConnection connection, bool
     }
 }
 /*************************************************************************
- * writeAccessHandler
- *************************************************************************/
-static MmsDataAccessError	writeAccessHandler (DataAttribute* dataAttribute, MmsValue* value, ClientConnection connection, void* parameter)
-{
-	/*
-    if (dataAttribute == IED&iedModel_erter_ZINV1_OutVarSet_setMag_f) { //&iedModel_GenericIO_GGIO1_NamPlt_vendor
-
-        float newValue = MmsValue_toFloat(value);
-
-        printf("New value for OutVarSet_setMag_f = %f\n", newValue);
-
-        // Check if value is inside of valid range
-        if ((newValue >= 0.f) && (newValue <= 1000.1f))
-            return DATA_ACCESS_ERROR_SUCCESS;
-        else
-            return DATA_ACCESS_ERROR_OBJECT_VALUE_INVALID;
-
-    }
-*/
-    return DATA_ACCESS_ERROR_OBJECT_ACCESS_DENIED;
-}
-
-/*************************************************************************
  * StartIEC850Task
  *************************************************************************/
 void StartIEC850Task(void const * argument){
 
-long p3;
-extern osThreadId IEC850TaskHandle;
-
-
-/*
-	IP_ADDR[0] = 192;
-	IP_ADDR[1] = 168;
-	IP_ADDR[2] = 0;
-	IP_ADDR[3] = 252;
-*/
-//	iedServer = IedServer_create(&iedModel);	// создадим IED электронное устройство
-
-	osMutexRelease(xIEC850ServerStartMutex);
-
 // 1. ждем семафора готовности настроек IP
-	    osStatus status = osMutexWait(xIEC850StartMutex,osWaitForever);		// блокируемся
+	    osStatus status = osMutexWait(xIEC850StartMutex,TIMEOUT_startServer);		// блокируемся	TIMEOUT_startServer
 	    if (status != osOK) {
 	    	// не запустился, всё нам конец.
-			USART_TRACE_RED("не запустился, всё нам конец.\n");
+			USART_TRACE_RED("не получили IP. Нет связи MB.\n");
+	    }else{
+	    	USART_TRACE_GREEN("Получили IP, запускаем сервак.\n");
 	    }
+		Port_Off(LED_out_RED);
+
+	    Network_Start();
 
 	    // получили время включеня модуля.
-		  HAL_RTC_GetTime((RTC_HandleTypeDef *)&hrtc, &StartsTime, FORMAT_BIN);
-		  HAL_RTC_GetDate((RTC_HandleTypeDef *)&hrtc, &StartsDate, FORMAT_BIN);
+		HAL_RTC_GetTime((RTC_HandleTypeDef *)&hrtc, &StartsTime, FORMAT_BIN);
+		HAL_RTC_GetDate((RTC_HandleTypeDef *)&hrtc, &StartsDate, FORMAT_BIN);
 
-
-	    // проверка на валидность IP адреса
-		  if (IP_ADDR[0] == 0xFF || IP_ADDR[3] == 0xFF || IP_ADDR[0] == 0 || IP_ADDR[1] == 0 ){
-			  IP_ADDR[0] = first_IP_ADDR0;
-			  IP_ADDR[1] = first_IP_ADDR1;
-			  IP_ADDR[2] = first_IP_ADDR2;
-			  IP_ADDR[3] = first_IP_ADDR3;
-		  }
-		// проверка на валидность IP NTP адреса
-		  if (SNTP_IP_ADDR[0] == 0xFF || SNTP_IP_ADDR[3] == 0xFF || SNTP_IP_ADDR[0] == 0 || SNTP_IP_ADDR[1] == 0 ){
-			  SNTP_IP_ADDR[0] = NTP_IP_ADDR0;
-			  SNTP_IP_ADDR[1] = NTP_IP_ADDR1;
-			  SNTP_IP_ADDR[2] = NTP_IP_ADDR2;
-			  SNTP_IP_ADDR[3] = NTP_IP_ADDR3;
-			  SNTP_Period = 0;
-		  }
-
-		iedServer = IedServer_create(&iedModel,(uint16_t)IP_ADDR[3]);		// создадим IED электронное устройство
-		USART_TRACE_GREEN("Получили IP, запускаем сервак.\n");
-
-		Port_Off(LED_out_RED);
+		iedServer = IedServer_create(&iedModel,(uint16_t)IP_ADDR[3]);			// создадим IED электронное устройство
+		//IedServer_setAuthenticator(iedServer, clientAuthenticator, NULL); 	// вкл. парольный доступ
 
 	    // 2. конфигурим сервер открываем порт.
 		IsoServer isoServer = IedServer_getIsoServer(iedServer);
 		IsoServer_setEthernetParam(isoServer,(char*)IP_ADDR,(char*)NETMASK_ADDR,(char*)GW_ADDR);
 
-		MAC_ADDR[0]	= MAC_ADDR0;
-		MAC_ADDR[1]	= MAC_ADDR1;
-		MAC_ADDR[2]	= MAC_ADDR2;
-		MAC_ADDR[3]	= IP_ADDR[1];//MAC_ADDR3;
-		MAC_ADDR[4]	= IP_ADDR[2];//MAC_ADDR4;
-		MAC_ADDR[5]	= IP_ADDR[3];//IP_ADDR[2];//MAC_ADDR5;
+    	// разрешаем запуск тасков зависящих от старта текущего таска
+		osMutexRelease(xFTPStartMutex);
 
-		GW_ADDR[0] = IP_ADDR[0];
-		GW_ADDR[1] = IP_ADDR[1];
-		GW_ADDR[2] = IP_ADDR[2];
-		GW_ADDR[3] = 1;
+	    // режим работы свича ----------------------------------------
+		PHY_setSwitchMode(isoServer);
 
-	    tcpip_init( NULL, NULL );									// создаем tcp_ip stack, таск TCP/IP
-	    // добавить функцию получения IP
-    	Netif_Config((char*)IP_ADDR,(char*)NETMASK_ADDR,(char*)GW_ADDR);		// Initialize the LwIP stack
-
-// 3. Информируем таск модбаса о готовности структуры для ввода данных
-	    USART_TRACE_GREEN("Разрешаем доступ к данным сервера 61850\n");
-// 4. запускаем стейтмашину 61850
-	    USART_TRACE_GREEN("запускаем стейтмашину 61850\n");
-
-// -----------------------------------------------------------------------------
-
-	    if(FATFS_LinkDriver(&SRAMDISK_Driver, RAMDISKPath) == 0)				  // Link the RAM disk I/O driver SPIDISK_Driver   SRAMDISK_Driver
-	    {
-	      if(f_mount(&RAMDISKFatFs, (TCHAR const*)RAMDISKPath, 0) != FR_OK)	      // Монтируем диск
-	      {
-	  	    USART_TRACE_RED("Ошибка монтирования диска\n");
-	      }
-	      else
-	      {
-	       // if(f_mkfs((TCHAR const*)RAMDISKPath, 0, 0) != FR_OK)
-	    	  if(f_mkfs((const TCHAR*)RAMDISKPath, FM_FAT, 0, Buff, sizeof Buff)!= FR_OK)	// форматируем диск
-	        {
-		  	    USART_TRACE_RED("Ошибка форматирования диска\n");
-	        }
-	        else
-	        {
-		  	    USART_TRACE_GREEN("Диск создан успешно\n");
-		  	  if (f_mkdir("MMSfiles") != FR_OK){
-			  	    USART_TRACE_RED("Ошибка создания каталога MMSfiles\n");
-		  	  } else
-		  	  {
-			  	    USART_TRACE_GREEN("каталог MMSfiles/ создан успешно\n");
-
-			 // 	   DIR dirHandle;
-			 // 	  if(f_opendir(&dirHandle, (TCHAR const*)"MMSfiles") == FR_OK){				// Open directory
-			 // 		USART_TRACE("сменили каталог 0:/MMSfiles>\n");
-			 // 	  }
-
-			  		//portENTER_CRITICAL();
-			  	    {
-			  	    	FIL 	Myfile;
-
-						if(f_open(&Myfile,_SystemNote, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK){
-							USART_TRACE("Создали файл SystemLog.bin\n");
-							/*
-							if(f_write(&Myfile,"Журнал системы:\n", strlen("Журнал системы:\n"), NULL) == FR_OK){
-								USART_TRACE("записали в него.\n");
-								f_close(&Myfile);
-							}
-							*/
-						}
-
-						//AddToFileMessageString(_SystemNote,"testAppend\n");
-						//AddToFileMessageString(_SystemNote,"testAppend1\n");
-
-						if(f_open(&Myfile,_ErrorNote, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK){
-							USART_TRACE("Создали файл AlarmLog.bin\n");
-							/*
-							if(f_write(&Myfile,"Журнал аварий:\n", strlen("Журнал аварий:\n"), NULL) == FR_OK){
-								USART_TRACE("записали в него.\n");
-								f_close(&Myfile);
-							}
-							*/
-						}
-			  	    }
-			  	   // portEXIT_CRITICAL();
-
-
-			  		uint8_t res;
-			  	    FATFS *fs;
-			  	    DWORD fre_clust, fre_sect, tot_sect;
-
-
-			  	    /* Get volume information and free clusters of drive 1 */
-			  	    res = f_getfree(RAMDISKPath, &fre_clust, &fs);
-
-			  	    /* Get total sectors and free sectors */
-			  	    tot_sect = (fs->n_fatent - 2) * fs->csize;
-			  	    fre_sect = fre_clust * fs->csize;
-
-			  	    /* Print the free space (assuming 512 bytes/sector) */
-			  	    printf("Размер диска %lu KB. Свободно %lu KB \n", tot_sect / 2, fre_sect / 2);
-		  	  }
-	        }
-	      }
-	    }
-// -----------------------------------------------------------------------------
 	    Port_Off(LED1);
+		Port_Off(LED_out_GREEN);
 
 	for(;;) {
-
-		// -------------------------------------------------------------------------------------------------------------------
-		// -------------------------------------------------------------------------------------------------------------------
-		//iedServer = IedServer_create(&iedModel);								// создадим IED электронное устройство
-		// включаем парольный доступ
-		AcseAuthenticationParameter auth = GLOBAL_MALLOC(sizeof(AcseAuthenticationParameter));
-
-		char* password = "testpw";
-	    auth->mechanism = ACSE_AUTH_PASSWORD;
-	    auth->value.password.octetString = (uint8_t*) password;
-	    auth->value.password.passwordLength = strlen(password);
-	    //пароль
-//		IsoServer_setAuthenticationParameter(isoServer, auth);
 
 		// -------------------------------------------------------------------------------------------------------------------
 		// Функции контроля над объектами, при управлении от клиента
 		// -------------------------------------------------------------------------------------------------------------------
 
-		// контроль за объектом &iedModel_GenericIO_GGIO1_Ind1. Указываем на функцию-обработчик controlHandlerForBinaryOutput и параметр (&iedModel_GenericIO_GGIO1_Ind1) если функция обрабатывает несколько объектов.
-		// управление выключателем
-
-#if defined (MR761) || defined (MR762) || defined (MR763)
+	    // управление выключателем
+#if defined (MR771) || defined (MR761) || defined (MR762) || defined (MR763) || defined (MR801) ||\
+	defined (MR5_500) || defined (MR5_700) || defined (MR741)
 	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_CSWI1_Pos, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_CSWI1_Pos_Oper);
 	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_XCBR1_Mod,(ControlHandler) controlHandlerForBinaryOutput, &iedModel_CTRL_XCBR1_Mod_Oper);
 #endif
-#if defined (MR771)
-	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_CSWI1_Pos, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_CSWI1_Pos_Oper);
-	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_XCBR1_Mod,(ControlHandler) controlHandlerForBinaryOutput, &iedModel_CTRL_XCBR1_Mod_Oper);
-#endif
-#if defined (MR801)
-	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_CSWI1_Pos, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_CSWI1_Pos_Oper);
-	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_XCBR1_Mod,(ControlHandler) controlHandlerForBinaryOutput, &iedModel_CTRL_XCBR1_Mod_Oper);
-#endif
-#if defined (MR5_700)
-	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_CSWI1_Pos, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_CSWI1_Pos_Oper);
-	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_XCBR1_Mod,(ControlHandler) controlHandlerForBinaryOutput, &iedModel_CTRL_XCBR1_Mod_Oper);
-#endif
-#if defined (MR5_500)
-	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_CSWI1_Pos, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_CSWI1_Pos_Oper);
-	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_XCBR1_Mod,(ControlHandler) controlHandlerForBinaryOutput, &iedModel_CTRL_XCBR1_Mod_Oper);
-#endif
-
+	    // управление приводом
 #if defined (MR851)
 	    IedServer_setControlHandler(iedServer, &iedModel_RPN_ATCC1_TapChg, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_RPN_ATCC1_TapChg_Oper);
 	    IedServer_setControlHandler(iedServer, &iedModel_RPN_ATCC1_ParOp, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_RPN_ATCC1_ParOp_Oper);
@@ -470,9 +247,8 @@ extern osThreadId IEC850TaskHandle;
 		IedServer_setControlHandler(iedServer, &iedModel_CTRL_GGIO1_SPCSO3, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_GGIO1_SPCSO3_Oper);
 		IedServer_setControlHandler(iedServer, &iedModel_CTRL_GGIO1_SPCSO4, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_GGIO1_SPCSO4_Oper);
 
-
-	    /* this is optional - performs operative checks */
-	 //   IedServer_setPerformCheckHandler(iedServer, &iedModel_GGIO_INGGIO1_SPCSO1, checkHandler, &iedModel_GGIO_INGGIO1_SPCSO1);
+	    // this is optional - performs operative checks
+		// IedServer_setPerformCheckHandler(iedServer, &iedModel_GGIO_INGGIO1_SPCSO1, checkHandler, &iedModel_GGIO_INGGIO1_SPCSO1);
 /*****************************************************************************************************
  *
  * многоклиентский доступ
@@ -495,68 +271,56 @@ extern osThreadId IEC850TaskHandle;
 		    IedServer_setEditSettingGroupChangedHandler(iedServer, sgcb, editSgChangedHandler, NULL);
 		    IedServer_setEditSettingGroupConfirmationHandler(iedServer, sgcb, editSgConfirmedHandler, NULL);
 
-#if (CONFIG_INCLUDE_GOOSE_SUPPORT == 1)
+#if (CONFIG_INCLUDE_GOOSE_SUPPORT == 1) && (1)
 			//--------------- Goose -------------------------
-		    // конфигурация гусов.
-			IedServer_setGooseInterfaceId(iedServer, CONFIG_ETHERNET_INTERFACE_ID);			// интерфейс через который будем слать гусы. (нам не надо, он у нас один)
-
-		    GooseReceiver Goosereceiver = GooseReceiver_create();
-		    GooseReceiver_setInterfaceId(Goosereceiver, CONFIG_ETHERNET_INTERFACE_ID);		// интерфейс через который будем принимать гусы. (нам не надо, он у нас один)
-
-		    // первый гус -----
-		    GooseSubscriber subscriber = GooseSubscriber_create("MR5PO70N125LD0/LLN0$GO$gcbDiscret", NULL, NULL);		// подписываемся на гус.
-		    GooseSubscriber_setAppId(subscriber, 999);
-		    GooseSubscriber_setListener(subscriber, gooseListener, NULL);					// функция для обработки конкретного принятого гуса
-		    GooseReceiver_addSubscriber(Goosereceiver, subscriber);
-		    // ----------------
-		    // второй гус -----
-		    subscriber = GooseSubscriber_create("MR5PO70N125LD0/LLN0$GO$gcbAnalog", NULL, NULL);		// подписываемся на гус.
-		    GooseSubscriber_setAppId(subscriber, 999);
-		    GooseSubscriber_setListener(subscriber, gooseListener, NULL);					// функция для обработки конкретного принятого гуса
-		    GooseReceiver_addSubscriber(Goosereceiver, subscriber);
-		    // ----------------
-		    // третий гус -----
-		    subscriber = GooseSubscriber_create("A1LD0/LLN0$GO$gcbsignal_goose", NULL, NULL);		// подписываемся на гус.
-		    GooseSubscriber_setAppId(subscriber, 3);
-		    GooseSubscriber_setListener(subscriber, gooseListener, NULL);					// функция для обработки конкретного принятого гуса
-		    GooseReceiver_addSubscriber(Goosereceiver, subscriber);
-		    // ----------------
-
-		    GooseReceiver_start(Goosereceiver);					// стартанём приёмный таск гусов.
-			//--------------- Goose -------------------------
+			// приёмная часть гусов.
+		    GooseReceiverFile*	GooseCfgFile = GooseReceiver_ConfigCreate();
+		    if (GooseReceiver_ParseConfigFile(GooseCfgFile, _GooseREcfg) == true){
+			    GooseReceiver Goosereceiver = GooseReceiver_create();
+			    GooseReceiver_addSubscriberFromConfigFile(Goosereceiver,GooseCfgFile);
+			    GooseReceiver_start(Goosereceiver);															// стартанём приёмный таск гусов.
+		    }
+	        //--------------- Goose -------------------------
 #endif
+
 			if (!IedServer_isRunning(iedServer)) {
 				USART_TRACE_RED("Ошибка запуска сервера! Останов.\n");
 				IedServer_destroy(iedServer);
+			}else{
+				AddToQueueMB(ModbusSentQueue, 	MB_Rd_Revision		,MB_Slaveaddr);		// версию устройства
 			}
 
-//			osMutexRelease(xIEC850ServerStartMutex);
 
 #if (CONFIG_INCLUDE_GOOSE_SUPPORT == 1)
 			//--------------- Goose -------------------------
 			// передающая часть гусов. Start GOOSE publishing
-			IedServer_enableGoosePublishing(iedServer);
+		    //if (GoosePublishing_ParseConfigFile(iedServer, _GooseTRcfg) == true){
+		    	IedServer_enableGoosePublishing(iedServer);
+		    //}
 			//--------------- Goose -------------------------
 #endif
 			running = 1;
 
-
-			printf("memory gap = %u\r\n", xPortGetFreeHeapSize());
-			printf("task count = %u\r\n",(unsigned int)uxTaskGetNumberOfTasks());
+			USART_TRACE_BLUE("memory gap = %u\r\n", xPortGetFreeHeapSize());
+			USART_TRACE_BLUE("task count = %u\r\n",(unsigned int)uxTaskGetNumberOfTasks());
 			static signed char taskInfoBuf[48 * 8];
 			vTaskGetRunTimeStats((char *)taskInfoBuf);
-			printf("%s\r\n", taskInfoBuf);
+			USART_TRACE_BLUE("%s\r\n", taskInfoBuf);
 
 			// сокеты -------
 			Print_Sockets();
 			// --------------
 			while (running) {
 
-				IedServer_processIncomingData(iedServer);						// Должна вызываться периодически для приёма данных и соединений
+				IedServer_processIncomingData(iedServer);						// Должна вызываться периодически для приёма данных и соединений. Отвечаем на запросы тутже
 																				// проверяем было ли соединение на сокет?
-				IedServer_performPeriodicTasks(iedServer);						// Должна вызываться периодически монитор служб 61850
+				// сначала проанализируем данные
+				IedServer_PeriodicUpdateNewData(iedServer);						// обновление данных в модели из буферов памяти. занимает много времени.
 
-				IedServer_PeriodicUpdateNewData(iedServer);						// обновление данных в модели из буферов памяти
+				// по результату отправим отчёты и остальное
+				IedServer_performPeriodicTasks(iedServer);						// Должна вызываться периодически монитор служб 61850
+				taskYIELD();													// отпустим задачу.
+//				vTaskDelay(1);
 
 			}
 
@@ -578,7 +342,7 @@ extern osThreadId IEC850TaskHandle;
 void	controlHandlerForBinaryOutput(void* parameter, MmsValue* value, bool test)
 {
 	MmsType		TypeCMD;
-	bool 		newState;
+	bool 		newState = false;
 	uint16_t 	newStateBitstr = 0;
 	USART_TRACE_GREEN("controlHandlerForBinaryOutput MMS_BOOLEAN:\n");
 
@@ -603,25 +367,14 @@ void	controlHandlerForBinaryOutput(void* parameter, MmsValue* value, bool test)
 	    uint64_t timeStamp = Hal_getTimeInMs();
 
 
-#if defined (MR761) || defined (MR762) || defined (MR763)
+#if defined (MR771) || defined (MR761) || defined (MR762) || defined (MR763) ||\
+	defined (MR801) ||\
+	defined (MR5_700) || defined (MR5_500) || defined (MR741)
 	    // выключатель
 	    if (parameter == &iedModel_CTRL_CSWI1_Pos_Oper)	{
 	    	USART_TRACE_GREEN("команда управления выключателем &iedModel_CTRL_CSWI1_Pos_Oper\n");
 	    	CSWI_Pos_Oper_Set(newState, timeStamp);
-	    }
-#endif
-#if defined (MR771)
-	    // выключатель
-	    if (parameter == &iedModel_CTRL_CSWI1_Pos_Oper)	{
-	    	USART_TRACE_GREEN("команда управления выключателем &iedModel_CTRL_CSWI1_Pos_Oper\n");
-	    	CSWI_Pos_Oper_Set(newState, timeStamp);
-	    }
-#endif
-#if defined (MR801)
-	    // выключатель
-	    if (parameter == &iedModel_CTRL_CSWI1_Pos_Oper)	{
-	    	USART_TRACE_GREEN("команда управления выключателем &iedModel_CTRL_CSWI1_Pos_Oper\n");
-	    	CSWI_Pos_Oper_Set(newState, timeStamp);
+			AddToQueueMB(ModbusSentQueue, 	MB_Rd_ConfigSWCrash	,MB_Slaveaddr);			// вычитаем ресурс
 	    }
 #endif
 #if defined (MR851)
@@ -635,21 +388,6 @@ void	controlHandlerForBinaryOutput(void* parameter, MmsValue* value, bool test)
 	    	ATCC_ParOp_Pos_Oper(newState, timeStamp);
 	    }
 #endif
-#if defined (MR5_700)
-	    // выключатель
-	    if (parameter == &iedModel_CTRL_CSWI1_Pos_Oper)	{
-	    	USART_TRACE_GREEN("команда управления выключателем &iedModel_CTRL_CSWI1_Pos_Oper\n");
-	    	CSWI_Pos_Oper_Set(newState, timeStamp);
-	    }
-#endif
-#if defined (MR5_500)
-	    // выключатель
-	    if (parameter == &iedModel_CTRL_CSWI1_Pos_Oper)	{
-	    	USART_TRACE_GREEN("команда управления выключателем &iedModel_CTRL_CSWI1_Pos_Oper\n");
-	    	CSWI_Pos_Oper_Set(newState, timeStamp);
-	    }
-#endif
-
 
 
 	    if (parameter == &iedModel_CTRL_GGIO1_SPCSO1_Oper)	{
@@ -661,7 +399,7 @@ void	controlHandlerForBinaryOutput(void* parameter, MmsValue* value, bool test)
 	    	GGIO_SPCSO2_Oper(newState, timeStamp);
 	    }
 	    if (parameter == &iedModel_CTRL_GGIO1_SPCSO3_Oper)	{
-	    	USART_TRACE_GREEN("Сброс блокировки\n");
+	    	USART_TRACE_GREEN("Сброс блокировки или записи в журнале аварий\n");
 	    	GGIO_SPCSO3_Oper(newState, timeStamp);
 	    }
 
@@ -688,9 +426,9 @@ static void Netif_Config(char* ipAddress,char* Mask, char* Gateway)
   IP4_ADDR(&netmask, Mask[0], Mask[1] , Mask[2], Mask[3]);
   IP4_ADDR(&gw, Gateway[0], Gateway[1], Gateway[2], Gateway[3]);
 
-	USART_TRACE_BLUE("MAC:%.2X-%.2X-%.2X-%.2X-%.2X-%.2X \n",MAC_ADDR[0], MAC_ADDR[1], MAC_ADDR[2], MAC_ADDR[3],MAC_ADDR[4],MAC_ADDR[5]);	// временно чтобы отличались устройства
-	USART_TRACE_BLUE("IP:%d.%d.%d.%d \n", ipAddress[0], ipAddress[1], ipAddress[2], ipAddress[3]);
-	USART_TRACE_BLUE("Gateway:%d.%d.%d.%d \n",Gateway[0], Gateway[1], Gateway[2], Gateway[3]);
+  USART_TRACE_BLUE("MAC:%.2X-%.2X-%.2X-%.2X-%.2X-%.2X \n",MAC_ADDR[0], MAC_ADDR[1], MAC_ADDR[2], MAC_ADDR[3],MAC_ADDR[4],MAC_ADDR[5]);	// временно чтобы отличались устройства
+  USART_TRACE_BLUE("IP:%d.%d.%d.%d \n", ipAddress[0], ipAddress[1], ipAddress[2], ipAddress[3]);
+  USART_TRACE_BLUE("Gateway:%d.%d.%d.%d \n",Gateway[0], Gateway[1], Gateway[2], Gateway[3]);
 
 
   /* - netif_add(struct netif *netif, struct ip_addr *ipaddr,
@@ -713,19 +451,21 @@ static void Netif_Config(char* ipAddress,char* Mask, char* Gateway)
 
   if (netif_is_link_up(&gnetif))
   {
-    /* When the netif is fully configured this function must be called.*/
+    /* Когда netif полностью настроен, эта функция должна быть вызвана. */
     netif_set_up(&gnetif);
   }
   else
   {
-    /* When the netif link is down this function must be called */
+    /* Когда netif отключена, эту функцию нужно вызвать */
     netif_set_down(&gnetif);
   }
+
+  // функция обработки физических подключений/отключений. По статусу линка
 /*
-  // Set the link callback function, this function is called on change of link status
+  // ethernetif_update_config - по изменению LINK вызываем
   netif_set_link_callback(&gnetif, ethernetif_update_config);
 
-  // create a binary semaphore used for informing ethernetif of frame reception
+  // через семафор из прерывания управление
   osSemaphoreDef(Netif_SEM);
   Netif_LinkSemaphore = osSemaphoreCreate(osSemaphore(Netif_SEM) , 1 );
 
@@ -739,10 +479,48 @@ static void Netif_Config(char* ipAddress,char* Mask, char* Gateway)
   osThreadDef(LinkThr, ethernetif_set_link, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 2);
 #endif
   osThreadCreate (osThread(LinkThr), &link_arg);
-
 */
 }
 
+/***********************************************************************
+ *
+ ***********************************************************************/
+void Network_Start(void)
+{
+// проверка на валидность IP адреса
+  if (IP_ADDR[0] == 0xFF || IP_ADDR[3] == 0xFF || IP_ADDR[0] == 0 || IP_ADDR[1] == 0 ){
+	  IP_ADDR[0] = first_IP_ADDR0;
+	  IP_ADDR[1] = first_IP_ADDR1;
+	  IP_ADDR[2] = first_IP_ADDR2;
+	  IP_ADDR[3] = first_IP_ADDR3;
+  }
+// проверка на валидность IP NTP адреса
+  if (SNTP_IP_ADDR[0] == 0xFF || SNTP_IP_ADDR[3] == 0xFF || SNTP_IP_ADDR[0] == 0 || SNTP_IP_ADDR[1] == 0 ){
+	  SNTP_IP_ADDR[0] = NTP_IP_ADDR0;
+	  SNTP_IP_ADDR[1] = NTP_IP_ADDR1;
+	  SNTP_IP_ADDR[2] = NTP_IP_ADDR2;
+	  SNTP_IP_ADDR[3] = NTP_IP_ADDR3;
+//			  SNTP_Period = 0;
+  }
+	MAC_ADDR[0]	= MAC_ADDR0;
+	MAC_ADDR[1]	= MAC_ADDR1;
+	MAC_ADDR[2]	= MAC_ADDR2;
+	MAC_ADDR[3]	= IP_ADDR[1];//MAC_ADDR3;
+	MAC_ADDR[4]	= IP_ADDR[2];//MAC_ADDR4;
+	MAC_ADDR[5]	= IP_ADDR[3];//IP_ADDR[2];//MAC_ADDR5;
+
+	GW_ADDR[0] = IP_ADDR[0];
+	GW_ADDR[1] = IP_ADDR[1];
+	GW_ADDR[2] = IP_ADDR[2];
+	GW_ADDR[3] = 1;
+
+	// запускаем таск "TCP/IP"
+	tcpip_init( NULL, NULL );												// создаем tcp_ip stack, таск TCP/IP
+	Netif_Config((char*)IP_ADDR,(char*)NETMASK_ADDR,(char*)GW_ADDR);		// Initialize the LwIP stack
+
+    //netif_set_addr(&gnetif, &first_ipaddr , &netmask, &gw);
+    //netif_set_up(&gnetif);
+}
 /***********************************************************************
  * activeSgChangedHandler
  * изменение номера ActSG группы уставок из ethernet.
@@ -776,33 +554,18 @@ static void	editSgConfirmedHandler(void* parameter, SettingGroupControlBlock* sg
 //--------------------------------------------------------------------
 static void		loadActiveSgValues (int actSG)
 {
-#if defined (MR761) || defined (MR762) || defined (MR763)
-		writeNmbSG = actSG;
-		writeNmb = 7;
-#endif
-#if defined (MR771)
-		writeNmbSG = actSG;
-		writeNmb = 7;
-#endif
-#if defined (MR801)
-		writeNmbSG = actSG;
-		if (actSG == 1) 	writeNmb = 7;
-		else
-		if (actSG == 2) 	writeNmb = 8;
-#endif
-#if defined (MR901) || defined (MR902)
-		writeNmbSG = actSG;
-		if (actSG == 1) 	writeNmb = 7;
-		else
-		if (actSG == 2) 	writeNmb = 8;
-#endif
-#if defined (MR5_500) || defined (MR5_600) || defined (MR5_700)
-		writeNmbSG = actSG;
-	if (actSG == 1) 	writeNmb = 7;
-	else
-	if (actSG == 2) 	writeNmb = 8;
-#endif
+#if defined (MR771) || defined (MR761) || defined (MR762) || defined (MR763) ||\
+	defined (MR801) ||\
+	defined (MR901) || defined (MR902) ||\
+	defined (MR851) ||\
+	defined (MR5_500) || defined (MR5_600) || defined (MR5_700) || defined (MR741)
 
+		writeNmbSG = actSG;
+
+		AddToQueueMB(ModbusSentTime,  MB_Wrt_SG_set_ManNumb	,MB_Slaveaddr);		// приоритет
+//    	AddToQueueMB(ModbusSentQueue, MB_Rd_NumbSG			,MB_Slaveaddr);		// ставим задачу вычитать новые уставки
+
+#endif
 
 	// тут функция переключения группы уставок с вычитыванием всех
   // IedServer_updateInt32AttributeValue(iedServer, &iedModel_LD0_LLN0_RstTms_setVal, 1);
@@ -813,58 +576,33 @@ static void		loadEditSgValues (int editSG)
 //    IedServer_updateInt32AttributeValue(iedServer, &iedModel_SE_LD0_LLN0_RstTms_setVal, 2);
 }
 
-/***********************************************************************
- * AddToFileMessageString
- * добавим в конец файла строку
- ***********************************************************************/
-int		AddToFileMessageString(const TCHAR* file, TCHAR* message){
 
-  	FIL 	Myfile;
-  	int		ret;
+/**
+ * This is the AcseAuthenticator callback function that is invoked on each client connection attempt.
+ * When returning true the server stack accepts the client. Otherwise the connection is rejected.
+ */
+static bool
+clientAuthenticator(void* parameter, AcseAuthenticationParameter authParameter, void** securityToken)
+{
+    if (authParameter->mechanism == ACSE_AUTH_PASSWORD) {
+        if (authParameter->value.password.passwordLength == strlen(password1)) {
+            if (memcmp(authParameter->value.password.octetString, password1,
+                    authParameter->value.password.passwordLength) == 0)
+            {
+                *securityToken = (void*) password1;
+                return true;
+            }
 
-	if(f_open(&Myfile,file, FA_OPEN_APPEND | FA_WRITE) == FR_OK){
-		if(f_write(&Myfile,message, strlen(message), NULL) == FR_OK){
-			f_close(&Myfile);
-			ret = true;
+        }
+        if (authParameter->value.password.passwordLength == strlen(password2)) {
+            if (memcmp(authParameter->value.password.octetString, password2,
+                    authParameter->value.password.passwordLength) == 0)
+            {
+                *securityToken = (void*) password2;
+                return true;
+            }
+        }
+    }
 
-		}else ret = false;
-	}else ret = false;
-
-	return	ret;
-}
-/***********************************************************************
- * AddToFileMessageWord
- * добавим в конец файла сырые байты
- * numb - число байт
- ***********************************************************************/
-int		AddToFileMessageWord(const TCHAR* file, uint8_t* Data,uint16_t numb,uint8_t	mode){
-
-  	FIL 	Myfile;
-  	int		ret,i;
-	RTC_TimeTypeDef sTime;
-	RTC_DateTypeDef sDate;
-
-	HAL_RTC_GetTime((RTC_HandleTypeDef *)&hrtc, &sTime, FORMAT_BIN);			// Читаем время
-	HAL_RTC_GetDate((RTC_HandleTypeDef *)&hrtc, &sDate, FORMAT_BIN);			// читаем дату
-
-
-	if(f_open(&Myfile,file, mode) == FR_OK){
-
-		//f_lseek(&Myfile,0);		// затирает символы под собой
-
-		for(i=0;i<numb;i++){
-			f_write(&Myfile,(void*)&Data[i+1], 1, NULL);
-			f_write(&Myfile,(void*)&Data[i], 1, NULL);
-			i++;
-		}
-
-		// сначала прочитаем размер файла, если превышает лимит, то отрежем хвост
-		//f_lseek(&Myfile,8*128);		// перейдём на конец и лишнее обрежем
-		//f_truncate(&Myfile);
-	f_close(&Myfile);
-
-	set_timestampFile((char *)file,sDate.Year,sDate.Month,sDate.Date,sTime.Hours,sTime.Minutes,sTime.Seconds);
-	}else ret = false;
-
-	return	ret;
+    return false;
 }

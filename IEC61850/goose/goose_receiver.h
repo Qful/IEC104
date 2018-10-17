@@ -25,6 +25,7 @@
 #define GOOSE_RECEIVER_H_
 
 #include <goose_subscriber.h>
+#include <goose_receiver_internal.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,7 +37,6 @@ extern "C" {
  */
 /**@{*/
 
-
 typedef struct sGooseReceiver* GooseReceiver;
 
 /**
@@ -47,8 +47,24 @@ typedef struct sGooseReceiver* GooseReceiver;
  *
  * \return the new GooseReceiver instance
  */
+void	GooseReceiver_addSubscriberFromConfigFile(GooseReceiver self, GooseReceiverFile* cfgFile);
+
+GooseReceiverFile*
+GooseReceiver_ConfigCreate(void);
+
+void
+GooseReceiver_ConfigDestroy(GooseReceiverFile* self);
+
 GooseReceiver
 GooseReceiver_create(void);
+
+char*	newStringwithSize(const char* string, int size);
+GooseReceiverMAC*		GooseReceiverMAC_create(void);
+GooseReceiverMAC*		GooseReceiverMAC_add(GooseReceiverMAC* Cfg);
+GooseReceiverGocbRef*	GooseReceiverGocbRef_create(void);
+GooseReceiverGocbRef*	GooseReceiverGocbRef_add(GooseReceiverGocbRef* Cfg);
+GooseReceiverCfg*		GooseReceiverCfg_create(void);
+GooseReceiverCfg*		GooseReceiverCfg_add(GooseReceiverCfg* Cfg);
 
 /**
  * \brief sets the interface for the GOOSE receiver

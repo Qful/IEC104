@@ -170,14 +170,14 @@ MEM_Chipselect(GPIO_PIN_SET);
     */
     GPIO_InitStruct.Pin = /*GPIO_PIN_4|*/GPIO_PIN_5|GPIO_PIN_6;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Pull = GPIO_PULLDOWN;//GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     GPIO_InitStruct.Pin = GPIO_PIN_5;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Pull = GPIO_PULLDOWN;//GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
@@ -214,11 +214,11 @@ MEM_Chipselect(GPIO_PIN_SET);
 
 
     /* NVIC configuration for DMA transfer complete interrupt (SPI1_TX) */
-    HAL_NVIC_SetPriority(SPIx_DMA_TX_IRQn, 0, 1);
+    HAL_NVIC_SetPriority(SPIx_DMA_TX_IRQn, 4, 0);
     HAL_NVIC_EnableIRQ(SPIx_DMA_TX_IRQn);
 
     /* NVIC configuration for DMA transfer complete interrupt (SPI1_RX) */
-    HAL_NVIC_SetPriority(SPIx_DMA_RX_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(SPIx_DMA_RX_IRQn, 4, 0);
     HAL_NVIC_EnableIRQ(SPIx_DMA_RX_IRQn);
 
   /* USER CODE END SPI1_MspInit 1 */

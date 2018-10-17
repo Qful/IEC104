@@ -9,6 +9,7 @@
 #include "time.h"
 #include "stdlib.h"
 #include "string.h"
+#include <port.h>
 
 #include "stm32f4xx_hal_spi.h"
 #include "stm32f4xx_hal_gpio.h"
@@ -28,6 +29,8 @@ uint8_t 	GetFromBUF1(uint8_t* dst, uint16_t AddrByte, uint16_t Size);
 uint8_t 	SendToBUF1(uint8_t* src, uint16_t AddrByte, uint16_t Size);
 uint8_t 	SendBUF1ToMem(uint16_t AddrPage);
 uint8_t 	GetMemtoBUF1(uint16_t AddrPage);
+
+int HAL_SPI_DataInDMA_Tx(SPI_HandleTypeDef *hspi);
 //*******************************************************************************
 // void AT45DB161D_spi_init(void)
 //
@@ -114,6 +117,61 @@ int8_t	MEM_ID_Read (MEMDeviceIDTypeDef *IDInfo){
 void MEM_Reset (void){
 
 }
+/*************************************************************************
+ * memory_Powerof2_SetMode
+ * режим буфера и страниц 512 байт
+ *************************************************************************/
+int8_t 		memory_Powerof2_SetMode (void){
+
+	uint8_t 	DataOut[4];
+
+	while(!((AT45DB_StatusRegisterRead()>>7) & 1 )){}		// подождём готовность памяти
+
+	DataOut[0] = 0x3D;
+	DataOut[1] = 0x2A;
+	DataOut[2] = 0x80;
+	DataOut[3] = 0xA6;
+
+	// ---------------
+	MEM_Chipselect(GPIO_PIN_RESET);
+	if(HAL_SPI_Transmit_DMA(&SpiHandle,DataOut,4) != HAL_OK){
+		USART_TRACE_RED("Ошибка передачи SPI. \n");
+		MEM_Chipselect(GPIO_PIN_SET);
+		return FALSE;
+	}
+	// ---------------
+	while (HAL_SPI_GetState(&SpiHandle) != HAL_SPI_STATE_READY){}
+	MEM_Chipselect(GPIO_PIN_SET);
+	return TRUE;
+
+}
+/*************************************************************************
+ * memory_DataFlash_SetMode
+ * режим буфера и страниц 528 байт
+ *************************************************************************/
+int8_t 		memory_DataFlash_SetMode (void){
+
+	uint8_t 	DataOut[4];
+
+	while(!((AT45DB_StatusRegisterRead()>>7) & 1 )){}		// подождём готовность памяти
+
+	DataOut[0] = 0x3D;
+	DataOut[1] = 0x2A;
+	DataOut[2] = 0x80;
+	DataOut[3] = 0xA7;
+
+	// ---------------
+	MEM_Chipselect(GPIO_PIN_RESET);
+	if(HAL_SPI_Transmit_DMA(&SpiHandle,DataOut,4) != HAL_OK){
+		USART_TRACE_RED("Ошибка передачи SPI. \n");
+		MEM_Chipselect(GPIO_PIN_SET);
+		return FALSE;
+	}
+	// ---------------
+	while (HAL_SPI_GetState(&SpiHandle) != HAL_SPI_STATE_READY){}
+	MEM_Chipselect(GPIO_PIN_SET);
+	return TRUE;
+}
 
 /*************************************************************************
  * memory_read
@@ -125,13 +183,17 @@ uint16_t	AddrPage,AddrByte;
 uint16_t	AddrPageSecond,AddrByteSecond;
 uint16_t	i;
 
-	AddrPage = 	Addr / PAGE_SIZE_528;
-	AddrByte = Addr % PAGE_SIZE_528;
+	AddrPage = 	Addr / (uint16_t)PAGE_SIZE_528;
+	AddrByte = Addr % (uint16_t)PAGE_SIZE_528;
 
-	AddrPageSecond = (Addr + Size) / PAGE_SIZE_528;						// номер страницы конца блока данных.
-	AddrByteSecond = (Addr + Size) % PAGE_SIZE_528;						// номер ячейки конца блока данных.
+	AddrPageSecond = (Addr + Size) / (uint16_t)PAGE_SIZE_528;						// номер страницы конца блока данных.
+	AddrByteSecond = (Addr + Size) % (uint16_t)PAGE_SIZE_528;						// номер ячейки конца блока данных.
 
-	if (AddrPageSecond == AddrPage){									// вмещается в одну страницу
+	if (( (AddrPageSecond - 1) == AddrPage) && (AddrByteSecond == 0)){	// вместилось в одну
+		AddrPageSecond = AddrPage;
+	}
+
+	if ((AddrPageSecond == AddrPage)){			// вмещается в одну страницу
 		if (AddrPage == AddrMemInFirstBuf){								// если в текущем буфере
 			if (!GetFromBUF1(dst,AddrByte,Size)) return FALSE;
 		}else{															// данные в другой странице
@@ -155,41 +217,6 @@ uint16_t	i;
 	}
 */
 return TRUE;
-/*
-	AddrPage = 	Addr / PAGE_SIZE_528;
-	AddrByte = Addr % PAGE_SIZE_528;
-
-	while(!((AT45DB_StatusRegisterRead()>>7) & 1 )){}			// подождём готовность памяти
-
-	DataOut[0] = AT45DB_MM_PAGE_READ;									// CMD
-	DataOut[1] = (uint8_t)(AddrPage >> 6);								// P11-P6
-	DataOut[2] = (uint8_t)(AddrPage << 2) | (uint8_t)(AddrByte >> 8);	// P5-P0, B9, B8
-	DataOut[3] = (uint8_t) AddrByte;									// B7-B0
-
-	// 	4 Dummy Bytes
-	DataOut[4] = (uint8_t) 0;
-	DataOut[5] = (uint8_t) 0;
-	DataOut[6] = (uint8_t) 0;
-	DataOut[7] = (uint8_t) 0;
-
-	MEM_Chipselect(GPIO_PIN_RESET);
-
-	if(HAL_SPI_Transmit_DMA(&SpiHandle,DataOut,8) != HAL_OK){
-		USART_TRACE_RED("Ошибка передачи SPI. \n");
-		return FALSE;
-	}
-	while (HAL_SPI_GetState(&SpiHandle) != HAL_SPI_STATE_READY){}
-
-	if(HAL_SPI_Receive_DMA(&SpiHandle,dst,Size) != HAL_OK){
-		USART_TRACE_RED("Ошибка приема SPI. \n");
-		return FALSE;
-	}
-	while (HAL_SPI_GetState(&SpiHandle) != HAL_SPI_STATE_READY){}
-
-	MEM_Chipselect(GPIO_PIN_SET);
-
-return TRUE;
-*/
 }
 /*************************************************************************
  * memory_write_to_mem
@@ -204,6 +231,10 @@ int8_t 	memory_write_to_mem (uint8_t *src, uint32_t Addr, uint16_t Size)
 	uint16_t		AddrPageSecond,AddrByteSecond;
 	uint16_t		SizeInFirstPage,SizeInSecondPage;
 
+	if (Size > PAGE_SIZE_528){
+		USART_TRACE_RED("SPIMEM. Не вмещается в одну страницу!!!\n");
+		return FALSE;
+	}
 //	USART_TRACE_GREEN("SPIMEM. пишем в память: Addr = %.7u, Size = %.3u :", Addr, Size);
 //	for (i=0;i<Size;i++){printf(" 0x%.2X",src[i]);}
 //	printf("\n");
@@ -254,26 +285,23 @@ int8_t 	memory_write (uint8_t *src, uint32_t Addr, uint16_t Size)
 	uint16_t		SizeInFirstPage,SizeInSecondPage;
 	uint16_t		nPage,i;
 
-	/*
-	if (Size != 12){
-		USART_TRACE_GREEN("пишем в память: Addr = %.7u, Size = %.3u : '%s'\n", Addr, Size,src);
-	}else{
-		USART_TRACE_GREEN("пишем в память: Addr = %.7u, Size = %.3u :", Addr, Size);
-		for (i=0;i<Size;i++){printf(" 0x%.2X",src[i]);}
-		printf("\n");
-	}
-*/
 	// -------------------------------------------------------------------------------------------------------------
 	// -------------------------------------------------------------------------------------------------------------
 	// нужно проверить выходит ли за границы буфера, если выходит то работаем с 2-мя буферами.
-	AddrPage = 	Addr / PAGE_SIZE_528;						// высчитаем номер страницы.
-	AddrByte = Addr % PAGE_SIZE_528;						// адрес на странице.
+	AddrPage = 	Addr / PAGE_SIZE_528;											// высчитаем номер страницы.
+	AddrByte = Addr % PAGE_SIZE_528;											// адрес на странице.
 
-	AddrPageSecond = (Addr + Size) / PAGE_SIZE_528;			// номер страницы конца блока данных.
-	AddrByteSecond = (Addr + Size) % PAGE_SIZE_528;			// номер ячейки конца блока данных.
+	AddrPageSecond = (Addr + Size) / PAGE_SIZE_528;								// номер страницы конца блока данных.
+	AddrByteSecond = (Addr + Size) % PAGE_SIZE_528;								// номер ячейки конца блока данных.
 
-	if (AddrPageSecond == AddrPage){						// вмещается в одну страницу
-		SizeInFirstPage = Size;								// тут просто льём кусок и всё.
+/*
+	if (( (AddrPageSecond - 1) == AddrPage) && (AddrByteSecond == 0)){			// вместилось в одну
+		AddrPageSecond = AddrPage;
+	}
+*/
+	// в одной странице---------------------
+	if ((AddrPageSecond == AddrPage)){											// вмещается в одну страницу
+		SizeInFirstPage = Size;													// тут просто льём кусок и всё.
 		SizeInSecondPage = 0;
 
 		if (AddrPage == AddrMemInFirstBuf){										// если в текущем буфере
@@ -281,17 +309,24 @@ int8_t 	memory_write (uint8_t *src, uint32_t Addr, uint16_t Size)
 		}else{																	// если в новую страницу пошли, то просто ту закидываем и вычитываем следующую
 
 			if(AddrMemInFirstBuf >= 0)											// если первый заход
-				if (!SendBUF1ToMem(AddrMemInFirstBuf)) return FALSE;			// перекидываем буфер в память SPI
+				if (!SendBUF1ToMem(AddrMemInFirstBuf)) return FALSE;			// перекидываем буфер в память SPI, нам нужен другой адрес
+
 			AddrMemInFirstBuf = AddrPage;										// новый адрес страницы
 			if (!GetMemtoBUF1(AddrMemInFirstBuf)) return FALSE;					// перекидываем из SPI в буфер1
 			if (!SendToBUF1(src,AddrByte,SizeInFirstPage)) return FALSE;		// закидываем в буфер
 		}
+	}
+	// !в одной странице---------------------
+	else{																		// не вмещаемся в одну страницу будем лить в несколько
+		SizeInFirstPage = PAGE_SIZE_528 - AddrByte;								// размер блока в первой странице.
+		SizeInSecondPage = AddrByteSecond;										// размер блока в последней странице.
+		nPage = AddrPageSecond - AddrPage;										// число страниц
 
-	} else{													// не вмещаемся в одну страницу будем лить в несколько
-
-		SizeInFirstPage = PAGE_SIZE_528 - AddrByte;			// размер блока в первой странице.
-		SizeInSecondPage = AddrByteSecond;					// размер блока в последней странице.
-		nPage = AddrPageSecond - AddrPage;					// число страниц
+		if(AddrMemInFirstBuf < 0)												// если первый заход, перечитаем страницу из памяти
+		{
+			AddrMemInFirstBuf = AddrPage;
+			if (!GetMemtoBUF1(AddrMemInFirstBuf)) return FALSE;					// перекидываем из SPI в буфер1
+		}
 
 		// закончим предыдущий буфер
 		if (AddrPage == AddrMemInFirstBuf){										// если начинаем в текущем буфере
@@ -399,10 +434,12 @@ int8_t 	Page_memory_read (uint8_t *dst, uint16_t PageAddr, uint16_t PageSize){
 
 	uint8_t 	DataOut[8];
 
-	DataOut[0] = AT45DB_MM_PAGE_READ;				// CMD
-	DataOut[1] = (uint8_t)(PageAddr >> 6);			// A20-A16
-	DataOut[2] = (uint8_t)(PageAddr << 2);			// A15-A8
-	DataOut[3] = (uint8_t) 0;						// A7-A0
+	while(!((AT45DB_StatusRegisterRead()>>7) & 1 )){}			// подождём готовность памяти
+
+	DataOut[0] = AT45DB_MM_PAGE_READ;						// CMD
+	DataOut[1] = (uint8_t)(PageAddr >> 6) & 0b00111111;		// A20-A16
+	DataOut[2] = (uint8_t)(PageAddr << 2) & 0b11111100;		// A15-A8
+	DataOut[3] = (uint8_t) 0;								// A7-A0
 
 	// 	4 Dummy Bytes
 	DataOut[4] = (uint8_t) 0;
@@ -416,13 +453,15 @@ int8_t 	Page_memory_read (uint8_t *dst, uint16_t PageAddr, uint16_t PageSize){
     	USART_TRACE_RED("Ошибка передачи SPI. \n");
     	return FALSE;
     }
-    while (HAL_SPI_GetState(&SpiHandle) != HAL_SPI_STATE_READY){}
+//    while (HAL_SPI_GetState(&SpiHandle) != HAL_SPI_STATE_READY){}
+    while (HAL_SPI_DataInDMA_Tx(&SpiHandle)>0){}		// ждём освобождение буфера
 
-    if(HAL_SPI_Receive_DMA(&SpiHandle,dst,PAGE_SIZE_512) != HAL_OK){
+    if(HAL_SPI_Receive_DMA(&SpiHandle,dst,PageSize) != HAL_OK){
     	USART_TRACE_RED("Ошибка приема SPI. \n");
     	return FALSE;
     }
-    while (HAL_SPI_GetState(&SpiHandle) != HAL_SPI_STATE_READY){}
+//    while (HAL_SPI_GetState(&SpiHandle) != HAL_SPI_STATE_READY){}
+    while (HAL_SPI_DataInDMA_Tx(&SpiHandle)>0){}		// ждём освобождение буфера
 
     MEM_Chipselect(GPIO_PIN_SET);
 
@@ -438,85 +477,74 @@ int8_t 	Block_memory_read (uint8_t *dst, uint16_t PageAddr, uint16_t PageSize,  
 uint16_t	i;
 
 	for (i=0; i<NumberOfPages ;i++){
-		if (!Page_memory_read(dst+i*PageSize,PageAddr,PageSize)) return FALSE;
+		if (!Page_memory_read(dst+i*PageSize,PageAddr+i,PageSize)) return FALSE;
 	}
 
 	return TRUE;
 }
 /*************************************************************************
 * Page_memory_write
+* запись напрямую в память целого блока со стиранием содержимого через 2 буфер
 * PageAddr - адрес страницы
 * PageSize - размер страницы
+*
+* ps. если нужна модификация то
+*  сначала 0x55 - Main Memory Page to Buffer Transfer
+*  затем   0x85 - Main Memory Page Program through Buffer
+*  затем   0x59 - Auto Page Rewrite
  *************************************************************************/
 int8_t 		Page_memory_write(uint8_t *src, uint16_t PageAddr, uint16_t PageSize){
 
 	uint8_t 	DataOut[8];
 
-	// тут есть возможночть работать с 2-мя буферами. Пока пишутся данные в память можно
-	// закинуть во второй буфер, но по освобождении памяти не забыть включить запись его в память.
-
-	// читаем из памяти в буфер 1
-	DataOut[0] = AT45DB_MM_PAGE_TO_B1_XFER;				// CMD
-	DataOut[1] = (uint8_t)(PageAddr >> 6);			// A20-A16
-	DataOut[2] = (uint8_t)(PageAddr << 2);			// A15-A8
-	DataOut[3] = (uint8_t) 0;						// A7-A0
-
-    MEM_Chipselect(GPIO_PIN_RESET);
-
-    if(HAL_SPI_Transmit_DMA(&SpiHandle,DataOut,4) != HAL_OK){
-    	USART_TRACE_RED("Ошибка передачи SPI. \n");
-    	return FALSE;
-    }
-    while (HAL_SPI_GetState(&SpiHandle) != HAL_SPI_STATE_READY){}
-    MEM_Chipselect(GPIO_PIN_SET);
-
 	while(!((AT45DB_StatusRegisterRead()>>7) & 1 )){}			// подождём готовность памяти
-
 
     // заливаем в буфер блок данных
-	DataOut[0] = AT45DB_BUFFER_1_WRITE;	// CMD
-	DataOut[1] = 0;						// xxxx
-	DataOut[2] = 0;						// BFA9-8
-	DataOut[3] = 0;						// BFA7-0
-
-    MEM_Chipselect(GPIO_PIN_RESET);
-
-    if(HAL_SPI_Transmit_DMA(&SpiHandle,DataOut,4) != HAL_OK){
-    	USART_TRACE_RED("Ошибка передачи команды записи в буфер памяти SPI. \n");
-    	return FALSE;
-    }
-    while (HAL_SPI_GetState(&SpiHandle) != HAL_SPI_STATE_READY){}
-
-    if(HAL_SPI_Transmit_DMA(&SpiHandle,src,PAGE_SIZE_512) != HAL_OK){
-    	USART_TRACE_RED("Ошибка передачи данных в буфер памяти SPI. \n");
-    	return FALSE;
-    }
-    while (HAL_SPI_GetState(&SpiHandle) != HAL_SPI_STATE_READY){}
-
-    MEM_Chipselect(GPIO_PIN_SET);
-
-	while(!((AT45DB_StatusRegisterRead()>>7) & 1 )){}			// подождём готовность памяти
-
-	MEM_Chipselect(GPIO_PIN_RESET);
-    // переписываем буфер в main memory
-	DataOut[0] = AT45DB_B1_TO_MM_PAGE_PROG_WITH_ERASE;	// CMD
-	DataOut[1] = (uint8_t)(PageAddr >> 6);			// A20-A16
-	DataOut[2] = (uint8_t)(PageAddr << 2);			// A15-A8
+	DataOut[0] = AT45DB_MM_PAGE_PROG_THRU_BUFFER2;		// CMD
+	DataOut[1] = (uint8_t)(PageAddr >> 6) & 0b00111111;	// A20-A16
+	DataOut[2] = (uint8_t)(PageAddr << 2) & 0b11111100;	// A15-A8
 	DataOut[3] = (uint8_t) 0;							// A7-A0
 
+    MEM_Chipselect(GPIO_PIN_RESET);
+    if(HAL_SPI_Transmit_DMA(&SpiHandle,DataOut,4) != HAL_OK){
+    	USART_TRACE_RED("Ошибка передачи команды записи в буфер памяти SPI. \n");
+    	goto reterr;
+    }
+    while (HAL_SPI_DataInDMA_Tx(&SpiHandle)>0){}		// ждём освобождение буфера
+//    while (HAL_SPI_GetState(&SpiHandle) != HAL_SPI_STATE_READY){}
+
+    if(HAL_SPI_Transmit_DMA(&SpiHandle,src,PageSize) != HAL_OK){
+    	USART_TRACE_RED("Ошибка передачи данных в буфер памяти SPI. \n");
+    	goto reterr;
+    }
+    while (HAL_SPI_DataInDMA_Tx(&SpiHandle)>0){}
+    MEM_Chipselect(GPIO_PIN_SET);
+/*
+	while(!((AT45DB_StatusRegisterRead()>>7) & 1 )){}			// подождём готовность памяти
+
+    // переписываем буфер в main memory
+	DataOut[0] = AT45DB_B1_TO_MM_PAGE_PROG_WITH_ERASE;	// CMD
+	DataOut[1] = (uint8_t)(PageAddr >> 6) & 0b00111111;	// A20-A16
+	DataOut[2] = (uint8_t)(PageAddr << 2) & 0b11111100;	// A15-A8
+	DataOut[3] = (uint8_t) 0;							// A7-A0
+
+	MEM_Chipselect(GPIO_PIN_RESET);
 	if(HAL_SPI_Transmit_DMA(&SpiHandle,DataOut,4) != HAL_OK){
 		USART_TRACE_RED("Ошибка передачи команды перезаписи из буфера в память SPI. \n");
-		return FALSE;
+    	goto reterr;
 	}
-    while (HAL_SPI_GetState(&SpiHandle) != HAL_SPI_STATE_READY){}
-
+    while (HAL_SPI_DataInDMA_Tx(&SpiHandle)>0){}
     MEM_Chipselect(GPIO_PIN_SET);
-
+*/
 	return TRUE;
+reterr:
+MEM_Chipselect(GPIO_PIN_SET);
+return false;
 }
 
 /*************************************************************************
 * Block_memory_write
+* src адрес источника
 * PageSize - размер страницы
 * NumberOfPages - число страниц
  *************************************************************************/
@@ -525,7 +553,7 @@ int8_t 		Block_memory_write(uint8_t *src, uint16_t PageAddr, uint16_t PageSize, 
 	uint16_t	i;
 
 		for (i=0; i<NumberOfPages ;i++){
-			if (!Page_memory_write(src+i*PageSize,PageAddr,PageSize)) return FALSE;
+			if (!Page_memory_write(src+i*PageSize,PageAddr+i,PageSize)) return FALSE;
 		}
 
 		return TRUE;
@@ -609,7 +637,7 @@ void memory_to_buffer2_transfer (uint16_t page){
 //*******************************************************************************
 uint8_t AT45DB_StatusRegisterRead(void)
 {
-
+	uint8_t		ret=0;
 	uint8_t 	DataOut[3],DataIn[3];
 	DataOut[0] = AT45DB_READ_STATE_REGISTER;
 
@@ -619,8 +647,9 @@ uint8_t AT45DB_StatusRegisterRead(void)
       	USART_TRACE_RED("Ошибка приема-передачи регистра статуса. \n");
       }
 	MEM_Chipselect(GPIO_PIN_SET);
-    return DataIn[1];
-
+	if (DataIn[0] != 0) ret = DataIn[0]; else
+	if (DataIn[1] != 0) ret = DataIn[1];
+	return ret;
 /*
 	// медленно но без ошибок ФИФО
 	uint8_t		Data = AT45DB_READ_STATE_REGISTER;
@@ -762,6 +791,19 @@ void MEM_Chipselect(GPIO_PinState select){
 uint8_t GetFromMEM(uint8_t* dst, uint16_t AddrPage, uint16_t AddrByte, uint16_t Size){
 
 uint8_t 	DataOut[9];
+uint8_t		sta = 0;
+
+/*
+	while(!(sta & 1<<7)){
+		sta = AT45DB_StatusRegisterRead();
+	}
+
+	if(sta & 1){				// режим страниц 512
+
+	} else{						// режим страниц 528
+
+	}
+*/
 
 	while(!((AT45DB_StatusRegisterRead()>>7) & 1 )){}			// подождём готовность памяти
 
@@ -793,6 +835,7 @@ uint8_t 	DataOut[9];
 	MEM_Chipselect(GPIO_PIN_SET);
 
 	return TRUE;
+
 }
 //*******************************************************************************
 // GetFromBUF1
@@ -929,4 +972,16 @@ uint8_t GetMemtoBUF1(uint16_t AddrPage){
 	while (HAL_SPI_GetState(&SpiHandle) != HAL_SPI_STATE_READY){}
 	MEM_Chipselect(GPIO_PIN_SET);
 	return TRUE;
+}
+/*************************************************************************
+  * @brief  HAL_SPI_DataInDMA_Tx
+  * сколько байт лежит в dma
+  *
+ *************************************************************************/
+
+int HAL_SPI_DataInDMA_Tx(SPI_HandleTypeDef *hspi){
+int		Datanumb;
+
+Datanumb = /*hspi->TxXferSize - */hspi->hdmatx->Instance->NDTR;
+return	Datanumb;
 }

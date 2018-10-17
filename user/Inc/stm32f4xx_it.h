@@ -55,6 +55,8 @@ void DebugMon_Handler(void);
 
 void SysTick_Handler(void);
 void ETH_IRQHandler(void);
+void DMA_STREAM_IRQHANDLER(void);
+void EXTI15_10_IRQHandler(void);
 /*
 void USART1_DMA_RX_IRQHandler(void);
 void USART1_DMA_TX_IRQHandler(void);

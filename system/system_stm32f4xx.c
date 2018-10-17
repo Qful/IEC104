@@ -132,7 +132,7 @@
                is no need to call the 2 first functions listed above, since SystemCoreClock
                variable is updated automatically.
   */
-  uint32_t SystemCoreClock = 16000000;
+  uint32_t SystemCoreClock = 16000000;	//16000000
   __I uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
 
 /**
@@ -526,9 +526,9 @@ void SystemInit_ExtMemCtl(void)
   //                          (0 <<  4) |   /* Address Hold Time */
   //                          (1 <<  0);    /* Address SetUp Time */
   /* Configure and enable Bank1_SRAM2 */
-  // -- Bank1 NE1 - RAM 1024K x 8 --
+  // -- Bank1 NE1 - RAM --
   FSMC_Bank1->BTCR[0]  = 0x00005001; //0x00005001:   | ASYNCWAIT=0,EXTMOD=1,WAITEN=0,WREN=1 | WAITCFG=0,WRAPMOD=0,WAITPOL=0,BURSTEN=0 | nc,FACCEN=0,MWID=00(8bit) | MTYP=00(SRAM),MUXEN=0,MBKEN=1
-  FSMC_Bank1->BTCR[1]  = 0x02210515; //0x02210717     0x00000201;
+  FSMC_Bank1->BTCR[1]  = 0x02210515; //0x02210515     0x00000201;
   FSMC_Bank1E->BWTR[0] = 0x02210515; //0x02210515 //0x0FFFFFFF
 #endif /* STM32F405xx || STM32F415xx || STM32F407xx || STM32F417xx */
 

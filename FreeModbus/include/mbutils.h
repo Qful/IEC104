@@ -34,6 +34,11 @@
 #ifdef __cplusplus
 PR_BEGIN_EXTERN_C
 #endif
+
+#include "mb.h"
+
+extern const char *eMB_strerr(eMBErrorCode err);
+
 /*! \defgroup modbus_utils Utilities
  *
  * This module contains some utility functions which can be used by

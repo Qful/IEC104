@@ -56,7 +56,7 @@ PR_BEGIN_EXTERN_C
 /*! \brief If Modbus Slave ASCII support is enabled. */
 #define MB_SLAVE_ASCII_ENABLED                  (  0 )
 /*! \brief If Modbus Slave RTU support is enabled. */
-#define MB_SLAVE_RTU_ENABLED                    (  0 )
+#define MB_SLAVE_RTU_ENABLED                    (  1 )
 /*! \brief If Modbus Slave TCP support is enabled. */
 #define MB_SLAVE_TCP_ENABLED                    (  0 )
 /*! \brief The character timeout value for Modbus ASCII.
@@ -89,6 +89,8 @@ PR_BEGIN_EXTERN_C
 #define MB_FUNC_READ_INPUT_ENABLED              (  1 )
 /*! \brief If the <em>Read Holding Registers</em> function should be enabled. */
 #define MB_FUNC_READ_HOLDING_ENABLED            (  1 )
+/*! \brief If the <em>Read Holding Registers</em> function should be enabled. */
+#define MB_FUNC_READ_HOLDING_W_ADDR_ENABLED     (  1 )
 /*! \brief If the <em>Write Single Register</em> function should be enabled. */
 #define MB_FUNC_WRITE_HOLDING_ENABLED           (  1 )
 /*! \brief If the <em>Write Multiple registers</em> function should be enabled. */
@@ -113,12 +115,20 @@ PR_BEGIN_EXTERN_C
 
 //   Если мастер отправить широковещательный кадр, то будет ждать это время. Затем может послать другой кадр.
 #define MB_MASTER_DELAY_MS_CONVERT              (200 )
+#define MB_MASTER_DELAY_nS_CONVERT              (200000 )
 
 /*! \brief If master send a frame which is not broadcast,the master will wait sometime for slave. And if slave is not respond
  * in this time,the master will process this timeout error. Then master can send other frame */
 
 //   Если мастер отправить не широковещательный кадр, то будет ждать ответа это время. Если slave не ответил за это время то timeout error. Затем может послать другой кадр.
-#define MB_MASTER_TIMEOUT_MS_RESPOND            (70 )	//
+#if defined (MR5_700) || defined (MR5_600) || defined (MR5_500) || defined (MR851) || defined (MR741)
+#define MB_MASTER_TIMEOUT_MS_RESPOND            (70)
+#define MB_MASTER_TIMEOUT_nS_RESPOND            (70000000 )
+#else
+#define MB_MASTER_TIMEOUT_MS_RESPOND            (11 )		//было 70 до 24102017  Андрей сказал 20мс ставлю 25		18052018 поменяли на 11мс
+#define MB_MASTER_TIMEOUT_nS_RESPOND            (11000000 )	//было 70 до 24102017  Андрей сказал 20мс ставлю 25
+
+#endif
 
 /*! \brief The total slaves in Modbus Master system. Default 16.
  * \note : The slave ID must be continuous from 1.*/

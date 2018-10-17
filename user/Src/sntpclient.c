@@ -60,17 +60,18 @@ static int xUDPSocket = NULL;
 static void prvReadTime( struct SNtpPacket * pxPacket );
 void 		prvNTPPacketInit(void);
 
-BOOL		Hal_setTimeToMB_Date( uint16_t * MDateBuf );
-
 // очереди -----------------------------
 extern xQueueHandle 	ModbusSentTime;		// очередь для отправки в модбас
 extern xQueueHandle 	ModbusSentQueue;		// очередь для отправки в модбас
 
 
 extern bool			SetTimeNow;
-extern uint8_t		writeNmb;
+//extern uint8_t		writeNmb;
 extern uint16_t		SNTP_Period;
 extern int8_t		TimeZone_my;
+
+extern uint64_t 	nextSynchTime;
+//extern uint32_t 	nextSynchTime;
 /*  Часы ------------------------------------------------------------*/
 extern RTC_HandleTypeDef hrtc;
 /*  -----------------------------------------------------------------*/
@@ -184,7 +185,8 @@ void prvNTPPacketInit(void)
 {
 	memset (&xNTPPacket, '\0', sizeof(xNTPPacket));
 
-	xNTPPacket.flags = 0xDB;							/* value 0xDB : mode 3 (client), version 3, leap indicator unknown 3 */ // Индикатор коррекции(2 бита), Номер версии(3 бита),Режим(3 бита)
+	xNTPPacket.flags = 0x23;						/* value 0xDB : mode 3 (client), version 3, leap indicator unknown 3 */ // Индикатор коррекции(2 бита), Номер версии(3 бита),Режим(3 бита)
+													/* value 0x23 : mode 3 (client), version 4, leap indicator nowarning 0 */
 	xNTPPacket.stratum = 3;							//Часовой слой(8 бит) (2-15	Вторичный сервер, использующий NTP)
 	xNTPPacket.poll = 10;								/* 10 means 1 << 10 = 1024 seconds */ 	// Интервал опроса(8 бит)  Значение равно двоичному логарифму секунд.
 	xNTPPacket.precision = 250;						/* = 250 = 0.015625 seconds */		 	//Точность
@@ -214,6 +216,8 @@ void prvNTPPacketInit(void)
 //#define		StrobeSynchTime		11
 #define		Secunda				1000
 
+#define	Timecorrecr		3
+
 static void prvReadTime( struct SNtpPacket * pxPacket )
 {
 //	uint64_t	PreviousMS = 0;
@@ -221,11 +225,12 @@ static void prvReadTime( struct SNtpPacket * pxPacket )
 	uint64_t	OriginateTimeMS;
 	int64_t		CorrectTimeMS;
 
-	uint16_t		DelayTimeMS;
+	uint16_t	DelayTimeMS;
 
-	uint16_t		StrobeSynchTime;
+	uint16_t	StrobeSynchTime;
+	uint16_t	DelayTimeMSForWait = 0;
 
-	uint16_t		DelayTimeMSForWait = 0;
+	uint64_t 	currTime;
 
 //	FF_TimeStruct_t xTimeStruct;
 //	time_t uxPreviousSeconds;
@@ -269,11 +274,13 @@ static void prvReadTime( struct SNtpPacket * pxPacket )
 
 	if (CorrectTimeMS < 0){
 		DelayTimeMS = (-CorrectTimeMS)%1000;
-		USART_TRACE_GREEN("-ms %u, lev %u\n",DelayTimeMS,StrobeSynchTime);
+//		USART_TRACE_GREEN("-ms %u, lev %u\n",DelayTimeMS,StrobeSynchTime);
 	} else {
 		DelayTimeMS = CorrectTimeMS%1000;
-		USART_TRACE_RED("+ms %u, lev %u\n",DelayTimeMS,StrobeSynchTime);
+//		USART_TRACE_RED("+ms %u, lev %u\n",DelayTimeMS,StrobeSynchTime);
 	}
+
+	DelayTimeMS++;			// добавим 1мс на время обработки
 
 //#define	Time1ms
 #define	Time1ms_debug
@@ -298,9 +305,16 @@ static void prvReadTime( struct SNtpPacket * pxPacket )
 			DelayTimeMSForWait = Secunda-StrobeSynchTime + DelayTimeMS;		// только в следующей секунде
 		}
 	}
-	vTaskDelay(DelayTimeMSForWait);
+    if (CorrectTimeMS != 0) {
+		USART_TRACE_RED("время из NTP. уход:%ims дробная:%ums, отправка запроса:%ums, ping:%ums , синхр.MB через:%ums\n",(int16_t)CorrectTimeMS,DelayTimeMS, StrobeSynchTime,(uint16_t)TravelTimeMs,DelayTimeMSForWait);
+    }else{
+    	USART_TRACE_GREEN("время из NTP. уход:%ims дробная:%ums, отправка запроса:%ums, ping:%ums , синхр.MB через:%u ms\n",(int16_t)CorrectTimeMS,DelayTimeMS, StrobeSynchTime,(uint16_t)TravelTimeMs,DelayTimeMSForWait);
+    }
+
+	vTaskDelay(DelayTimeMSForWait);		// отнимем время перехода к функции отправки
 	taskENTER_CRITICAL();
-	if (CorrectTimeMS != 0) Hal_setTimeInMs(Hal_getTimeInMs() + CorrectTimeMS + TimeZone_my*60*60*1000);					// готов диапазон, работает
+	currTime = Hal_getTimeInMs();
+	if (CorrectTimeMS != 0) Hal_setTimeInMs(currTime + CorrectTimeMS + TimeZone_my*60*60*1000);					// готов диапазон, работает
     taskEXIT_CRITICAL();
 
     // калибровка ухода часов
@@ -308,14 +322,18 @@ static void prvReadTime( struct SNtpPacket * pxPacket )
 
     // установим часы только если ушли в сторону.
     if (CorrectTimeMS != 0) {
-		writeNmb = MB_Wr_Set_Time;
+//		writeNmb = MB_Wr_Set_Time;
 		SetTimeNow = true;
 		AddToQueueMB(ModbusSentTime, 	MB_Wrt_Set_Time		,MB_Slaveaddr);		// установка времени	ModbusSentTime
-		USART_TRACE_RED("время из NTP. уход:%i ms дробная:%u ms, ping:%u ms , пауза:%u ms\n",(int16_t)CorrectTimeMS,DelayTimeMS,(uint16_t)TravelTimeMs,DelayTimeMSForWait);
+//		USART_TRACE_RED("время из NTP. уход:%ims дробная:%ums, начал обработку:%ums, ping:%ums , синхр.MB через:%ums\n",(int16_t)CorrectTimeMS,DelayTimeMS, StrobeSynchTime,(uint16_t)TravelTimeMs,DelayTimeMSForWait);
 		taskYIELD();// отпустим задачу. для быстрой установки времени
     }else{
-    	USART_TRACE_GREEN("время из NTP. уход:%i ms дробная:%u ms, ping:%u ms , пауза:%u ms\n",(int16_t)CorrectTimeMS,DelayTimeMS,(uint16_t)TravelTimeMs,DelayTimeMSForWait);
+ //   	USART_TRACE_GREEN("время из NTP. уход:%ims дробная:%ums, начал обработку:%ums, ping:%ums , синхр.MB через:%u ms\n",(int16_t)CorrectTimeMS,DelayTimeMS, StrobeSynchTime,(uint16_t)TravelTimeMs,DelayTimeMSForWait);
     }
+
+    // следующая пересинхронизация часов по графику если вырубить сервер
+	nextSynchTime = (currTime + CorrectTimeMS + TimeZone_my*60*60*1000) + msInDay;
+
 
 #else
 

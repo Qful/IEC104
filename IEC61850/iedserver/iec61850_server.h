@@ -134,6 +134,8 @@ IedServer_processIncomingData(IedServer self);
 void
 IedServer_performPeriodicTasks(IedServer self);
 
+void
+IedServer_performPeriodicGooseTasks(IedServer self);
 /**
  * \brief Stop handling client connections for non-threaded mode
  *
@@ -151,6 +153,9 @@ IedServer_stopThreadless(IedServer self);
  */
 IedModel*
 IedServer_getDataModel(IedServer self);
+
+MmsDevice*
+IedServer_getMmsDevice(IedServer self);
 
 /**
  * \brief Check if IedServer instance is listening for client connections
@@ -511,9 +516,8 @@ IedServer_updateAttributeValue(IedServer self, DataAttribute* dataAttribute, Mms
  * \param value the new float value of the data attribute.
  */
 //void
-int
-IedServer_updateFloatAttributeValue(IedServer self, DataAttribute* dataAttribute, float value);
-
+int	IedServer_updateFloatAttributeValue(IedServer self, DataAttribute* dataAttribute, float value);
+int	IedServer_updateFloatAttributeValueWithTime(IedServer self, DataAttribute* dataAttribute,DataAttribute* dataAttributeTime, uint64_t time, float value);
 /**
  * \brief Update the value of an IEC 61850 integer32 data attribute.
  *
@@ -527,8 +531,8 @@ IedServer_updateFloatAttributeValue(IedServer self, DataAttribute* dataAttribute
  * \param value the new integer value of the data attribute.
  */
 //void
-int
-IedServer_updateInt32AttributeValue(IedServer self, DataAttribute* dataAttribute, int32_t value);
+int		IedServer_updateInt32AttributeValue(IedServer self, DataAttribute* dataAttribute, int32_t value);
+int		IedServer_updateInt32AttributeValueWithTime(IedServer self, DataAttribute* dataAttribute,DataAttribute* dataAttributeTime, uint64_t time, int32_t value);
 
 /**
  * \brief Update the value of an IEC 61850 integer64 data attribute (like BCR actVal)
@@ -575,8 +579,8 @@ IedServer_updateUnsignedAttributeValue(IedServer self, DataAttribute* dataAttrib
  * \param value the new bit string integer value of the data attribute.
  */
 //void
-int
-IedServer_updateBitStringAttributeValue(IedServer self, DataAttribute* dataAttribute, uint32_t value);
+int	IedServer_updateBitStringAttributeValue(IedServer self, DataAttribute* dataAttribute, uint32_t value);
+int	IedServer_updateBitStringAttributeValueWithTime(IedServer self, DataAttribute* dataAttribute,DataAttribute* dataAttributeTime, uint64_t time, uint32_t value);
 
 /**
  * \brief Update the value of an IEC 61850 boolean data attribute.
@@ -590,9 +594,10 @@ IedServer_updateBitStringAttributeValue(IedServer self, DataAttribute* dataAttri
  * \param dataAttribute the data attribute handle
  * \param value the new boolean value of the data attribute.
  */
-//void
-int
-IedServer_updateBooleanAttributeValue(IedServer self, DataAttribute* dataAttribute, bool value);
+
+int	IedServer_updateBooleanAttributeValue(IedServer self, DataAttribute* dataAttribute, bool value);
+// обновляем время раньше чем данные, иначе в отчет идёт предыдущее время
+int	IedServer_updateBooleanAttributeValueWithTime(IedServer self, DataAttribute* dataAttribute,DataAttribute* dataAttributeTime, uint64_t time, bool value);
 
 /**
  * \brief Update the value of an IEC 61850 visible string data attribute.
@@ -654,8 +659,8 @@ IedServer_updateTimestampAttributeValue(IedServer self, DataAttribute* dataAttri
  * \param quality the new quality value
  *
  */
-void
-IedServer_updateQuality(IedServer self, DataAttribute* dataAttribute, Quality quality);
+int	IedServer_updateQuality(IedServer self, DataAttribute* dataAttribute, Quality quality);
+int	IedServer_updateQualityWithTime(IedServer self, DataAttribute* dataAttribute, DataAttribute* dataAttributeTime, uint64_t time, Quality quality);
 
 /**@}*/
 
@@ -1050,8 +1055,12 @@ void
 IedServer_setWriteAccessPolicy(IedServer self, FunctionalConstraint fc, AccessPolicy policy);
 
 
-//void
-int	IedServer_updateBitStrinAttributeValue(IedServer self, DataAttribute* dataAttribute, uint32_t value);
+int	IedServer_DataUpdateInGoosesDatasets(IedServer self);
+
+int	IedServer_NumPltUpdate_swRev(IedServer self, char*	swrev);
+
+void	MmsGooses_RUNMode(IedServer self);				// режим проверки данных в надобности отправки гусов
+void	MmsGooses_PAUSEMode(IedServer self);				// пропускаем проверку на изменение данных в DS гусов
 
 /**@}*/
 

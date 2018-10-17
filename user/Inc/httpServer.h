@@ -28,6 +28,9 @@ void StartHTTPTask(void const * argument);
 void http_server_serve(Socket self);
 void SSH_server_serve(Socket self);
 void SSH_Transmit(Socket self, uint8_t *pData, uint16_t Size);
+
+void GetRunTimeStats( char *pcWriteBuffer );
+
 #ifdef __cplusplus
 }
 #endif

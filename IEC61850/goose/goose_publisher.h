@@ -26,10 +26,12 @@
 
 #include "linked_list.h"
 #include "mms_value.h"
+#include "PrpHsr_value.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 typedef struct sCommParameters {
     uint8_t vlanPriority;
@@ -75,6 +77,19 @@ GoosePublisher_increaseStNum(GoosePublisher self);
 
 void
 GoosePublisher_reset(GoosePublisher self);
+
+/*
+void		HSR_on(GoosePublisher self);
+void		PRP_on(GoosePublisher self);
+void		HSRSeqNum_increase(GoosePublisher self);
+void		PRPSeqNum_increase(GoosePublisher self);
+void		HSRSeqNum_reset(GoosePublisher self);
+void		PRPSeqNum_reset(GoosePublisher self);
+bool		Goose_getAppendHSR(GoosePublisher self);
+bool		Goose_getAppendPRP(GoosePublisher self);
+*/
+
+uint8_t*	Goose_getbufferAddr(GoosePublisher self);
 
 #ifdef __cplusplus
 }

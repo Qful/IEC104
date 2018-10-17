@@ -23,6 +23,8 @@
 /* FatFs includes component */
 #include "ff_gen_drv.h"
 #include "sram_diskio.h"
+#include "spi_diskio.h"
+
 
 #define RECEIVE_BUF_SIZE 	MMS_MAXIMUM_PDU_SIZE
 #define SEND_BUF_SIZE 		MMS_MAXIMUM_PDU_SIZE
@@ -43,14 +45,14 @@
 
 // Атрибуту Validity значения invalid и questionable присваиваются в зависимости от состояния перечисленных дополнительных идентификаторов качества атрибута detailQual.
 
-#define QUALITY_DETAIL_OVERFLOW 4		// Overflow: активация этого идентификатора должна производиться в том случае, если соответствующее значение данных не может быть правильно представлено (только для измерений).Например превышать диапазон.
-#define QUALITY_DETAIL_OUT_OF_RANGE 8	// OutOfRange: активация этого идентификатора должна производиться в том случае, если значение измеренной величины выходит за пределы предопределенного допустимого диапазона значений
-#define QUALITY_DETAIL_BAD_REFERENCE 16	// BadReference: активация этого идентификатора должна производиться в том случае, если устройство потеряло калибровку.
-#define QUALITY_DETAIL_OSCILLATORY 32	// Oscillatory: для предотвращения излишней перегрузки каналов передачи данных желательно подавлять частые изменения состояний дискретных входов. Если за заданное время сигнал дважды изменяет свое значение на одно и то же, тогда фиксируется дребезг и должен быть активирован идентификатор oscillatory.
-#define QUALITY_DETAIL_FAILURE 64		// Failure: данный идентификатор должен активироваться, если функция самодиагностики устройства обнаружила внутреннюю или внешнюю неисправность.
-#define QUALITY_DETAIL_OLD_DATA 128		// oldData: данный идентификатор должен активироваться, если соответствующие данные не обновлялись в течение определенного времени.
-#define QUALITY_DETAIL_INCONSISTENT 256	// inconsistency: данный идентификатор должен активироваться, если функция самодиагностики обнаруживает несоответствие данных действительности.
-#define QUALITY_DETAIL_INACCURATE 512	// inaccurate: данный идентификатор должен активироваться, если значение данных не соответствует требуемым точностным характеристикам. Например, значение коэффициента мощности может вычисляться с большой погрешностью при малых токах.
+#define QUALITY_DETAIL_OVERFLOW 4		// Overflow: 		если соответствующее значение данных не может быть правильно представлено (только для измерений).Например превышать диапазон.
+#define QUALITY_DETAIL_OUT_OF_RANGE 8	// OutOfRange: 		если значение измеренной величины выходит за пределы предопределенного допустимого диапазона значений
+#define QUALITY_DETAIL_BAD_REFERENCE 16	// BadReference: 	если устройство потеряло калибровку.
+#define QUALITY_DETAIL_OSCILLATORY 32	// Oscillatory: 	для предотвращения излишней перегрузки каналов передачи данных желательно подавлять частые изменения состояний дискретных входов. Если за заданное время сигнал дважды изменяет свое значение на одно и то же, тогда фиксируется дребезг и должен быть активирован идентификатор oscillatory.
+#define QUALITY_DETAIL_FAILURE 64		// Failure: 		если функция самодиагностики устройства обнаружила внутреннюю или внешнюю неисправность.
+#define QUALITY_DETAIL_OLD_DATA 128		// oldData: 		если соответствующие данные не обновлялись в течение определенного времени.
+#define QUALITY_DETAIL_INCONSISTENT 256	// inconsistency: 	если функция самодиагностики обнаруживает несоответствие данных действительности.
+#define QUALITY_DETAIL_INACCURATE 512	// inaccurate:  	если значение данных не соответствует требуемым точностным характеристикам. Например, значение коэффициента мощности может вычисляться с большой погрешностью при малых токах.
 //
 #define QUALITY_SOURCE_SUBSTITUTED 1024	// substituted: значение данных устанавливается пользователем.
 //
@@ -110,10 +112,19 @@
 #define CTLMODELEDENUM_DirectWithEnhancedSecurity		3
 #define CTLMODELEDENUM_SboWithEnhancedSecurity			4
 
+
+
+// маска Q T для функций изменения данных в структуре
+//#define QUALITY_mask 	0x8000
+//#define TIME_mask 		0x4000
+typedef enum
+{
+	QUALITY_mask = 0x8000,
+	TIME_mask = 0x4000,
+} QT_mask;
+
 void 		ReStartIEC850_task(void);
 void 		StartIEC850Task(void const * argument);
 uint64_t 	Hal_getTimeInMs (void);
-int			AddToFileMessageString(const TCHAR* file, TCHAR* message);
-int			AddToFileMessageWord(const TCHAR* file, uint8_t* Data,uint16_t numb,uint8_t	mode);
 
 #endif /* IEC850_H_ */

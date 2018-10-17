@@ -33,6 +33,7 @@ ENTRY(Reset_Handler)
 /* Highest address of the user mode stack */
 //_estack = 0x2001FFFF;    /* end of RAM для внутренней памяти*/
 _estack = 0x600FFFFF;      /* end of RAM для внешней памяти AS6C8008 объем 8Мбит*/
+//_estack = 0x601FFFFF;      /* end of RAM для внешней памяти AS6C1608 объем 2Мбайта*/
 
 /* Generate a link error if heap and stack don't fit into RAM */
 _Min_Heap_Size = 0x200;      /* required amount of heap  */
@@ -44,10 +45,15 @@ MEMORY
 FLASHBOOT (rx)  : ORIGIN = 0x08000000, LENGTH = 128K	/*1024K-32K*/
 FLASH (rx)      : ORIGIN = 0x08020000, LENGTH = 896K	/*1024K-32K*/
 //FLASH (rx)      : ORIGIN = 0x08000000, LENGTH = 1024K	/*1024K-32K*/
-RAM (xrw)       : ORIGIN = 0x60000000, LENGTH = 1024K
+RAM (xrw)       : ORIGIN = 0x60000000, LENGTH = 1024K   /*1024K 2048K*/
 RAMINT (xrw)    : ORIGIN = 0x20000000, LENGTH = 128K
 //CFLASH (rx) 	: ORIGIN = 0x080F7FFF, LENGTH = 32K
 CCMRAM (rw)     : ORIGIN = 0x10000000, LENGTH = 64K
+
+//MEMORY_B0 (rx)  : ORIGIN = 0x60000000, LENGTH = 1024K
+//MEMORY_B1 (rx)  : ORIGIN = 0x64000000, LENGTH = 1024K
+//MEMORY_B2 (rx)  : ORIGIN = 0x68000000, LENGTH = 1024K
+//MEMORY_B3 (rx)  : ORIGIN = 0x6C000000, LENGTH = 1024K
 }
 
 /* Define output sections */
@@ -209,7 +215,17 @@ SECTIONS
     . = ALIGN(4);
   } >RAM				/* RAM*/
 
-  
+/*
+  // MEMORY_bank1 section, code must be located here explicitly            
+  // Example: extern int foo(void) __attribute__ ((section (".mb1text"))); 
+  .memory_b1_text :
+  {
+    *(.mb1text)        // .mb1text sections (code) 
+    *(.mb1text*)       // .mb1text* sections (code)  
+    *(.mb1rodata)      // read-only data (constants) 
+    *(.mb1rodata*)
+  } >MEMORY_B1
+*/  
 
   /* Remove information from the standard libraries */
   /DISCARD/ :

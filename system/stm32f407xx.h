@@ -6924,7 +6924,7 @@ USB_OTG_HostChannelTypeDef;
   #define ETH_DMASR_TPS_Waiting         ((uint32_t)0x00200000)  /* Running - waiting for status */
   #define ETH_DMASR_TPS_Reading         ((uint32_t)0x00300000)  /* Running - reading the data from host memory */
   #define ETH_DMASR_TPS_Suspended       ((uint32_t)0x00600000)  /* Suspended - Tx Descriptor unavailabe */
-  #define ETH_DMASR_TPS_Closing         ((uint32_t)0x00700000)  /* Running - closing Rx descriptor */
+  #define ETH_DMASR_TPS_Closing         ((uint32_t)0x00700000)  /* Running - closing Tx descriptor */
 #define ETH_DMASR_RPS         ((uint32_t)0x000E0000)  /* Receive process state */
   #define ETH_DMASR_RPS_Stopped         ((uint32_t)0x00000000)  /* Stopped - Reset or Stop Rx Command issued */
   #define ETH_DMASR_RPS_Fetching        ((uint32_t)0x00020000)  /* Running - fetching the Rx descriptor */

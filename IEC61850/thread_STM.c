@@ -62,8 +62,9 @@ static	xSemaphoreHandle xIEC850Mutex = NULL;			// ìüşòåêñ äîñòóïà â TCP/IP áóôåğ
 //    sem_init((sem_t*) self, 0, initialValue);
 
 	//xIEC850Mutex = xSemaphoreCreateMutex();
+taskENTER_CRITICAL();
 	vSemaphoreCreateBinary( xIEC850Mutex);
-
+taskEXIT_CRITICAL();
 	USART_TRACE_RED("Ñîçäàëè ñåìàôîğ %X\n",(unsigned int)xIEC850Mutex);
 
     return xIEC850Mutex;
@@ -76,9 +77,10 @@ static	xSemaphoreHandle xIEC850Mutex = NULL;			// ìüşòåêñ äîñòóïà â TCP/IP áóôåğ
  *************************************************************************/
 void		Semaphore_wait(Semaphore xMutex)
 {
-//	USART_TRACE_RED("çàáèğàåì ñåìàôîğ %X\n",xMutex);
-	xSemaphoreTake( xMutex, portMAX_DELAY); 								// ïîäîæäåì ñåìàôîğ îñâîáîæäåíèÿ ïîğòà portMAX_DELAY portTICK_RATE_MS
-
+	//	USART_TRACE_RED("çàáèğàåì ñåìàôîğ %X\n",xMutex);
+//	taskENTER_CRITICAL();
+	if (xMutex) xSemaphoreTake( xMutex, portMAX_DELAY); 								// ïîäîæäåì ñåìàôîğ îñâîáîæäåíèÿ ïîğòà portMAX_DELAY portTICK_RATE_MS
+//	taskEXIT_CRITICAL();
 }
 /*************************************************************************
  * Semaphore_post
@@ -86,8 +88,10 @@ void		Semaphore_wait(Semaphore xMutex)
  *************************************************************************/
 void	Semaphore_post(Semaphore xMutex)
 {
-//	USART_TRACE_RED("âåğíóëè ñåìàôîğ %X\n",xMutex);
-	xSemaphoreGive( xMutex );
+	//	USART_TRACE_RED("âåğíóëè ñåìàôîğ %X\n",xMutex);
+//	taskENTER_CRITICAL();
+	if (xMutex) xSemaphoreGive( xMutex );
+//	taskEXIT_CRITICAL();
 }
 /*************************************************************************
  * Semaphore_destroy
@@ -96,7 +100,9 @@ void	Semaphore_post(Semaphore xMutex)
 void	Semaphore_destroy(Semaphore xMutex)
 {
 	USART_TRACE_RED("Óäàëèëè ñåìàôîğ %X\n",(unsigned int)xMutex);
-	vSemaphoreDelete(xMutex);
+//	taskENTER_CRITICAL();
+	if (xMutex) vSemaphoreDelete(xMutex);
+//	taskEXIT_CRITICAL();
 }
 
 /*********************************************************************************************
@@ -132,35 +138,38 @@ Thread	Thread_create(ThreadExecutionFunction function, void* parameter, bool aut
  *************************************************************************/
 static void	destroyAutomaticThread(void const *parameter)
 {
-    Thread 		thread = (Thread) parameter;
-//    osThreadId	ThreadId = thread->pthread;
+   Thread 		thread = (Thread) parameter;
 
    thread->function(thread->parameter);				// âûïîëíÿåì ôóíêöèş
 
    GLOBAL_FREEMEM(thread);
 
-   //osThreadTerminate(ThreadId);					// çàâåğøàåì ïîòîê
    osThreadTerminate(osThreadGetId());				// çàâåğøàåì òåêóùèé ïîòîê
 }
 /*************************************************************************
  * Thread_start
  * çàïóñêàåì ïîòîê
  *************************************************************************/
-void	Thread_start(Thread thread)
+void	Thread_start(Thread thread, osPriority	prior, uint16_t		STACK_SIZE, char* name)
 {
-	// ñîçäà¸ì è çàïóñêàåì òàñê îäèí ğàç, è ñğàçó æå óäàëÿåì.
-	if (thread->autodestroy == true) {
-		//pthread_create(&thread->pthread, NULL, destroyAutomaticThread, thread);
-		//pthread_detach(thread->pthread);
-		osThreadDef(GooseRe, destroyAutomaticThread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE*8);
-		thread->pthread = osThreadCreate (osThread(GooseRe), thread);
+	  TaskHandle_t handle;
 
+	  //osThreadId osThreadCreate (const osThreadDef_t *thread_def, void *argument){
+	  //if (xTaskCreate((TaskFunction_t)thread_def->pthread,(const portCHAR *)thread_def->name,thread_def->stacksize, argument, makeFreeRtosPriority(thread_def->tpriority),&handle) != pdPASS)
+
+	// ñîçäà¸ì è çàïóñêàåì òàñê êîòîğûé ñàì óäàëèòñÿ
+	if (thread->autodestroy == true) {
+
+		xTaskCreate((TaskFunction_t)destroyAutomaticThread, name, STACK_SIZE, ( void * ) thread, prior - osPriorityIdle, &handle );
+		thread->pthread = handle;
+	//	osThreadDef(GooseRe, destroyAutomaticThread, prior, 0, STACK_SIZE);		//osPriorityNormal
+	//	thread->pthread = osThreadCreate (osThread(GooseRe), thread);
 	}
-	// ñîçäà¸ì è çàïóñêàåì òàñê.
 	else {
-		//pthread_create(&thread->pthread, NULL, thread->function, thread->parameter);
-		osThreadDef(GooseRe, thread->function, osPriorityNormal, 0, configMINIMAL_STACK_SIZE*8);
-		thread->pthread = osThreadCreate (osThread(GooseRe), thread->parameter);
+		xTaskCreate((TaskFunction_t)thread->function, name, STACK_SIZE, ( void * ) thread->parameter, prior - osPriorityIdle, &handle );
+		thread->pthread = handle;
+	//	osThreadDef(GooseRe, thread->function, prior, 0, STACK_SIZE);			//osPriorityNormal
+	//	thread->pthread = osThreadCreate (osThread(GooseRe), thread->parameter);
 	}
 
 	thread->state = 1;

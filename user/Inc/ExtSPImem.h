@@ -13,12 +13,14 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+//Configure УPower of 2Ф (Binary) Page Size 3Dh + 2Ah + 80h + A6h
 #define PAGE_SIZE_512							0x200	//0x200			//512
+//Configure Standard DataFlash Page Size 3Dh + 2Ah + 80h + A7h
 #define PAGE_SIZE_528							0x210	//0x210			//528
 
 
 #define	SPI_DEVICE_SIZE							4096 * PAGE_SIZE_528
-//#define	SECTOR_COUNT							4096				= 0x40<<SPIMemoryID.DensityCode;
+#define	SPI_SECTOR_COUNT						4096				//= 0x40<<SPIMemoryID.DensityCode;
 
 #define AT45DB_BUFFER_1_WRITE                 	0x84    // Buffer 1 Write
 #define AT45DB_BUFFER_2_WRITE                 	0x87    // Buffer 2 Write
@@ -33,6 +35,7 @@
 #define AT45DB_READ_STATE_REGISTER            	0xD7	// чтение регистра статуса
 #define AT45DB_MM_PAGE_READ                   	0xD2    // Main Memory Page Read
 #define AT45DB_MM_PAGE_PROG_THRU_BUFFER1      	0x82  	// Main Memory Page Program Through Buffer 1
+#define AT45DB_MM_PAGE_PROG_THRU_BUFFER2      	0x85  	// Main Memory Page Program Through Buffer 2
 #define AT45DB_ID_READ            			  	0x9F	// чтение ID
 
 
@@ -78,6 +81,9 @@ typedef struct
 void 		AT45DB161D_spi_init(void);
 int8_t		MEM_ID_Read (MEMDeviceIDTypeDef *IDInfo );
 void 		MEM_Reset (void);
+
+int8_t 		memory_Powerof2_SetMode (void);
+int8_t 		memory_DataFlash_SetMode (void);
 
 int8_t 		memory_write_to_mem (uint8_t *src, uint32_t Addr, uint16_t Size);			// запись пр€мо в пам€ть
 

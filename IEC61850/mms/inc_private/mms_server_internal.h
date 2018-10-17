@@ -61,27 +61,27 @@
 #endif
 
 struct sMmsServer {
-    IsoServer isoServer;
-    MmsDevice* device;
+    IsoServer 				isoServer;
+    MmsDevice* 				device;
 
-    MmsReadVariableHandler readHandler;
-    void* readHandlerParameter;
+    MmsReadVariableHandler 	readHandler;
+    void* 					readHandlerParameter;
 
-    MmsReadAccessHandler readAccessHandler;
-    void* readAccessHandlerParameter;
+    MmsReadAccessHandler 	readAccessHandler;
+    void* 					readAccessHandlerParameter;
 
     MmsWriteVariableHandler writeHandler;
-    void* writeHandlerParameter;
+    void* 					writeHandlerParameter;
 
-    MmsConnectionHandler connectionHandler;
-    void* connectionHandlerParameter;
+    MmsConnectionHandler 	connectionHandler;
+    void* 					connectionHandlerParameter;
 
     MmsNamedVariableListChangedHandler variableListChangedHandler; //TODO this is only required if dynamic data sets are supported!
-    void* variableListChangedHandlerParameter;
+    void* 					variableListChangedHandlerParameter;
 
-    Map openConnections;
-    Map valueCaches;
-    bool isLocked;
+    Map 		openConnections;
+    Map 		valueCaches;
+    bool 		isLocked;
 
     ByteBuffer* reportBuffer; /* global buffer for encoding reports */
 

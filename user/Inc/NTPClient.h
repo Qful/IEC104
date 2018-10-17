@@ -6,7 +6,9 @@
 
 #define __NTPCLIENT_H__
 
-//#define NTP_PORT	123
+#ifndef	NTP_PORT
+#define NTP_PORT	123
+#endif
 
 typedef uint32_t quint32;
 typedef int32_t qint32;

@@ -105,9 +105,17 @@ static  DMA_HandleTypeDef hdma_tx_RS485_2;
     GPIO_InitStruct.Pin = GPIO_PIN_10 | GPIO_PIN_11;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
+    GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF8_UART4;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+    /*##-3- Configure the NVIC for UART ########################################*/
+    HAL_NVIC_SetPriority(UART4_IRQn, 6, 0);		//0
+
+    /* Enable the UART Data Register not empty Interrupt */
+    __HAL_UART_ENABLE_IT(huart, UART_IT_IDLE);
+
+    HAL_NVIC_EnableIRQ(UART4_IRQn);
 
     // Configure the DMA handler for Transmission process
     hdma_tx_MODBUS.Instance                 = UART4_TX_DMA_STREAM;
@@ -137,12 +145,12 @@ static  DMA_HandleTypeDef hdma_tx_RS485_2;
     hdma_rx_MODBUS.Init.MemInc              = DMA_MINC_ENABLE;
     hdma_rx_MODBUS.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
     hdma_rx_MODBUS.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-    hdma_rx_MODBUS.Init.Mode                = DMA_NORMAL;//DMA_CIRCULAR;//DMA_NORMAL;
-    hdma_rx_MODBUS.Init.Priority            = DMA_PRIORITY_MEDIUM;
+    hdma_rx_MODBUS.Init.Mode                = DMA_CIRCULAR;//DMA_CIRCULAR;//DMA_NORMAL;
+    hdma_rx_MODBUS.Init.Priority            = DMA_PRIORITY_VERY_HIGH;//DMA_PRIORITY_MEDIUM;
     hdma_rx_MODBUS.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
     hdma_rx_MODBUS.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-    hdma_rx_MODBUS.Init.MemBurst            = DMA_MBURST_INC4;
-    hdma_rx_MODBUS.Init.PeriphBurst         = DMA_PBURST_INC4;
+    hdma_rx_MODBUS.Init.MemBurst            = DMA_MBURST_SINGLE;//DMA_MBURST_INC4;
+    hdma_rx_MODBUS.Init.PeriphBurst         = DMA_MBURST_SINGLE;//DMA_PBURST_INC4;
 
     HAL_DMA_Init(&hdma_rx_MODBUS);
     // Associate the initialized DMA handle to the UART handle
@@ -153,9 +161,6 @@ static  DMA_HandleTypeDef hdma_tx_RS485_2;
 
     HAL_NVIC_SetPriority(UART4_DMA_RX_IRQn, 6, 0);	//0,0
     HAL_NVIC_EnableIRQ(UART4_DMA_RX_IRQn);
-
-    HAL_NVIC_SetPriority(UART4_IRQn, 6, 0);
-    HAL_NVIC_EnableIRQ(UART4_IRQn);
 
   }
   // ---------------------------- DEBUG ----------------------------------
@@ -171,7 +176,7 @@ static  DMA_HandleTypeDef hdma_tx_RS485_2;
     GPIO_InitStruct.Pin = GPIO_PIN_9|GPIO_PIN_10;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
+    GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -217,13 +222,13 @@ static  DMA_HandleTypeDef hdma_tx_RS485_2;
     HAL_DMA_Init(&hdma_rx_DEBUG);
 
     // NVIC configuration for DMA transfer complete interrupt (USARTx_TX)
-    HAL_NVIC_SetPriority(USART1_DMA_TX_IRQn, 6, 0);	//0,1
+    HAL_NVIC_SetPriority(USART1_DMA_TX_IRQn, 5, 0);	//6
     HAL_NVIC_EnableIRQ(USART1_DMA_TX_IRQn);
 
-    HAL_NVIC_SetPriority(USART1_DMA_RX_IRQn, 6, 0);	//0,1
+    HAL_NVIC_SetPriority(USART1_DMA_RX_IRQn, 5, 0);	//6
     HAL_NVIC_EnableIRQ(USART1_DMA_RX_IRQn);
 
-    HAL_NVIC_SetPriority(USART1_IRQn, 6, 0);
+    HAL_NVIC_SetPriority(USART1_IRQn, 5, 0);		//6
     HAL_NVIC_EnableIRQ(USART1_IRQn);
 
   }
@@ -283,7 +288,7 @@ static  DMA_HandleTypeDef hdma_tx_RS485_2;
     __HAL_LINKDMA(huart, hdmarx, hdma_rx_RS485_1);
 
     // NVIC configuration for DMA transfer complete interrupt (USARTx_TX)
-    HAL_NVIC_SetPriority(USART2_DMA_TX_IRQn, 6, 1);	//0,1
+    HAL_NVIC_SetPriority(USART2_DMA_TX_IRQn, 6, 0);
 //    HAL_NVIC_EnableIRQ(USART2_DMA_TX_IRQn);
     // NVIC configuration for DMA transfer complete interrupt (USARTx_RX)
     HAL_NVIC_SetPriority(USART2_DMA_RX_IRQn, 6, 0);
@@ -355,7 +360,7 @@ static  DMA_HandleTypeDef hdma_tx_RS485_2;
     __HAL_LINKDMA(huart, hdmarx, hdma_rx_RS485_2);
 
 
-    HAL_NVIC_SetPriority(USART3_DMA_TX_IRQn, 6, 1);	//0,1
+    HAL_NVIC_SetPriority(USART3_DMA_TX_IRQn, 6, 0);
   //  HAL_NVIC_EnableIRQ(USART3_DMA_TX_IRQn);
 
     HAL_NVIC_SetPriority(USART3_DMA_RX_IRQn, 6, 0);

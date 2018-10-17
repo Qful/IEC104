@@ -52,22 +52,22 @@ typedef struct {
  * @{
  */
 
-#define	TRG_OPT_NO	0
+#define	TRG_OPT_NO				0
 
 /** Report will be triggerd when data changes */
-#define TRG_OPT_DATA_CHANGED 1
+#define TRG_OPT_DATA_CHANGED 	1
 
 /** Report will be triggered when quality changes */
 #define TRG_OPT_QUALITY_CHANGED 2
 
 /** Report will be triggered when data is updated */
-#define TRG_OPT_DATA_UPDATE 4
+#define TRG_OPT_DATA_UPDATE 	4
 
 /** Report will be triggered periodically */
-#define TRG_OPT_INTEGRITY 8
+#define TRG_OPT_INTEGRITY 		8
 
 /** Report will be triggered by GI (general interrogation) request */
-#define TRG_OPT_GI 16
+#define TRG_OPT_GI 				16
 /** @} */
 
 /**

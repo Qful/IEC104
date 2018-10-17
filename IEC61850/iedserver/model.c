@@ -132,6 +132,7 @@ IedModel_lookupDataSet(IedModel* model, const char* dataSetReference  /* e.g. ie
 LogicalDevice*
 IedModel_getDevice(IedModel* model, const char* deviceName)
 {
+	if (model == NULL) return NULL;
     LogicalDevice* device = model->firstChild;
 
     while (device != NULL) {
@@ -544,6 +545,7 @@ ModelNode_getChildCount(ModelNode* modelNode) {
 ModelNode*
 ModelNode_getChild(ModelNode* self, const char* name)
 {
+	if (self == NULL)	return NULL;
     // check for separator
    const char* separator = strchr(name, '.');
 

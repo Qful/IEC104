@@ -43,6 +43,7 @@ extern "C" {
 IedModel*
 ConfigFileParser_createModelFromConfigFile(FileHandle fileHandle);
 
+void	terminateString(char* string, char ch);
 /**@}*/
 
 /**@}*/

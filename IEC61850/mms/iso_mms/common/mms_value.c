@@ -220,6 +220,11 @@ bool
 MmsValue_update(MmsValue* self, const MmsValue* update)
 {
 	if (self->type == update->type) {
+
+		// обновим функции обновления данных
+		self->NumbFunction 		= update->NumbFunction;
+		self->ParamsFunction	= update->ParamsFunction;
+
 		switch (self->type) {
 		case MMS_STRUCTURE:
 		case MMS_ARRAY:
@@ -332,6 +337,18 @@ MmsValue_deleteAllBitStringBits(MmsValue* self)
 	for (i = 0; i < byteSize; i++) {
 		self->value.bitString.buf[i] = 0;
 	}
+}
+
+bool	MmsValue_getAllBitStringBits(MmsValue* self){
+
+	bool	ret = false;
+	int byteSize = getBitStringByteSize(self);
+
+	int i;
+	for (i = 0; i < byteSize; i++) {
+		if (self->value.bitString.buf[i] > 0) ret = true;
+	}
+	return	ret;
 }
 
 void
@@ -2124,4 +2141,62 @@ MmsValue_printToBuffer(const MmsValue* self, char* buffer, int bufferSize)
     }
 
     return buffer;
+}
+
+int		MmsValue_setFunctionDataUpdate(MmsValue* value, uint16_t NumbFunc, uint16_t Params){
+
+	if (value != NULL){
+		value->NumbFunction 	= NumbFunc;
+		value->ParamsFunction 	= Params;
+		return	0;
+	}
+	return -1;
+}
+
+int		MmsValue_getFunctionDataUpdate(MmsValue* value, uint16_t* NumbFunc, uint16_t* Params){
+
+	if (value != NULL){
+		*NumbFunc = value->NumbFunction;
+		*Params = value->ParamsFunction;
+		return	0;
+	}
+	return -1;
+}
+//-----------------------------------------------------------------------
+int	MmsValue_getDataToStr(char*	Str,int StrSize, const MmsValue* self){
+
+	int	ret = false;
+
+    const char* currentStr = MmsValue_printToBuffer(self, Str, StrSize);
+
+
+/*
+	MmsType TypeCMD = MmsValue_getType(self);			//тип переменной
+	switch(TypeCMD){
+ //   MMS_UNSIGNED
+ //   MMS_FLOAT
+  //  MMS_OCTET_STRING
+  //  MMS_VISIBLE_STRING
+  //  MMS_STRING
+	case	MMS_INTEGER:
+			{
+			}
+		break;
+
+	case	MMS_BOOLEAN:
+			{
+				bool data = MmsValue_getBoolean(self);
+			}
+		break;
+	case	MMS_BIT_STRING:
+			{
+				uint32_t data = MmsValue_getBitStringAsInteger(self);
+			}
+		break;
+	default:
+		 USART_TRACE_RED("MmsValue_getDataToStr команда не опознана\n");
+		break;
+	}
+*/
+	return	ret;
 }

@@ -162,7 +162,11 @@ DWORD get_fattime (void)
 * биты 0Ч4 Ч день мес€ца, допускаютс€ значени€ 1Ч31;
 * биты 5Ч8 Ч мес€ц года, допускаютс€ значени€ 1Ч12;
 * биты 9Ч15 Ч год, счита€ от 1980 года (Ђэпоха MS-DOSї), возможны значени€ от 0 до 127 включительно, то есть 1980Ч2107 годы.
+*
 * ƒва байта, отвечающие отметке времени, распредел€ютс€ так:
+* биты 0Ч4 Ч счЄтчик секунд (по две), допустимы значени€ 0Ч29, то есть 0Ч58 секунд;
+* биты 5Ч10 Ч минуты, допустимы значени€ 0Ч59;
+* биты 11Ч15 Ч часы, допустимы значени€ 0Ч23.
 */
 
 DWORD get_fatdate (void)
@@ -181,18 +185,11 @@ DWORD get_fatdate (void)
 	return	sectmp;
 }
 
-FRESULT set_timestampFile (
-    char *obj,     /* ”казатель на им€ файла */
-    int year,
-    int month,
-    int mday,
-    int hour,
-    int min,
-    int sec
-)
+FRESULT set_timestampFile (char *obj, int year, int month, int mday, int hour, int min, int sec)
 {
     FILINFO fno;
-    fno.fdate = (WORD)((year * 512U) | month * 32U | (mday+1));
+//    fno.fdate = (WORD)((year * 512U) | month * 32U | (mday+1));
+    fno.fdate = ((WORD)(year * 512U) & 0b1111111000000000) | (WORD)((month * 32U) & 0b111100000) | (WORD)((mday)&0b11111);
     fno.ftime = (WORD)(hour * 2048U | min * 32U | sec / 2U);
     return f_utime(obj, &fno);
 }

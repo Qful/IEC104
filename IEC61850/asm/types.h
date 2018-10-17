@@ -1,60 +1,103 @@
 #ifndef __ASM_ARM_TYPES_H
 #define __ASM_ARM_TYPES_H
 
-#ifndef __ASSEMBLY__
+#define __bitwise
 
-typedef unsigned short umode_t;
+#include <stdint.h>
+#include <sys/types.h>
+
+
+#define BITS_PER_LONG 32
 
 /*
- * __xx is ok: it doesn't pollute the POSIX namespace. Use these in the
- * header files exported to user space
- */
-
-typedef __signed__ char __s8;
-typedef unsigned char __u8;
-
-typedef __signed__ short __s16;
-typedef unsigned short __u16;
-
-typedef __signed__ int __s32;
-typedef unsigned int __u32;
-
+#ifndef __ASSEMBLY__
+typedef unsigned short umode_t;
 #if defined(__GNUC__)
 __extension__ typedef __signed__ long long __s64;
 __extension__ typedef unsigned long long __u64;
 #endif
+#endif
+*/
 
-#endif /* __ASSEMBLY__ */
+typedef int8_t __s8;
+typedef uint8_t __u8;
+typedef int16_t __s16;
+typedef uint16_t __u16;
+typedef int32_t __s32;
+typedef uint32_t __u32;
+typedef int64_t __s64;
+typedef uint64_t __u64;
+
+typedef uint16_t  __le16;
+typedef uint16_t  __be16;
+typedef uint32_t  __le32;
+typedef uint32_t  __be32;
+typedef uint64_t  __le64;
+typedef uint64_t  __be64;
+
+typedef uint16_t  __sum16;
+typedef uint32_t  __wsum;
+
+typedef uint64_t u64;
+typedef int64_t s64;
+
+typedef __u32 u32;
+typedef __s32 s32;
+
+typedef __u16 u16;
+typedef __s16 s16;
+
+typedef __u8  u8;
+typedef __s8  s8;
+
+typedef unsigned short		umode_t;
+
+typedef struct {
+	uid_t val;
+} kuid_t;
+
+typedef struct {
+	gid_t val;
+} kgid_t;
+
+typedef unsigned __bitwise gfp_t;
+
+#define spinlock_t					osMutexId				/* в линуксе Спин-блокировка это мьютексы в фриртосе */
+
 
 /*
  * These aren't exported outside the kernel to avoid name space clashes
  */
-#ifdef __KERNEL__
 
-#define BITS_PER_LONG 32
+//-----------------------------------------------------------------
 
-#ifndef __ASSEMBLY__
+struct timer_list {
+	struct timer_list *next, *prev;
+};
 
-typedef signed char s8;
-typedef unsigned char u8;
+struct list_head {
+	struct list_head *next, *prev;
+};
 
-typedef signed short s16;
-typedef unsigned short u16;
+struct callback_head {
+	struct callback_head *next;
+	void (*func)(struct callback_head *head);
+} __attribute__((aligned(sizeof(void *))));
+#define rcu_head 	callback_head
 
-typedef signed int s32;
-typedef unsigned int u32;
+typedef void (*rcu_callback_t)(struct rcu_head *head);
+typedef void (*call_rcu_func_t)(struct rcu_head *head, rcu_callback_t func);
+//-----------------------------------------------------------------
 
-typedef signed long long s64;
-typedef unsigned long long u64;
+#ifndef __aligned_u64
+# define __aligned_u64 __u64 __attribute__((aligned(8)))
+#endif
 
-/* Dma addresses are 32-bits wide.  */
+typedef struct {
+	int counter;
+} atomic_t;
 
-typedef u32 dma_addr_t;
-typedef u32 dma64_addr_t;
-
-#endif /* __ASSEMBLY__ */
-
-#endif /* __KERNEL__ */
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
 #endif
 

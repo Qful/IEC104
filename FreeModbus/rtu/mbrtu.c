@@ -66,8 +66,8 @@ typedef enum
 } eMBSndState;
 
 /* ----------------------- Static variables ---------------------------------*/
-static volatile eMBSndState eSndState;
-static volatile eMBRcvState eRcvState;
+static volatile eMBSndState eSlaveSndState;
+static volatile eMBRcvState eSlaveRcvState;
 
 volatile UCHAR  ucRTUBuf[MB_SER_PDU_SIZE_MAX];
 
@@ -131,7 +131,7 @@ eMBRTUStart( void )
      * to STATE_RX_IDLE. This makes sure that we delay startup of the
      * modbus protocol stack until the bus is free.
      */
-    eRcvState = STATE_RX_INIT;
+    eSlaveRcvState = STATE_RX_INIT;
     vMBPortSerialEnable( TRUE, FALSE );
     vMBPortTimersEnable(  );
 
@@ -174,7 +174,7 @@ eMBRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USHORT * pusLength )
     }
     else
     {
-        eStatus = MB_EIO;
+        eStatus = MB_EIO_Rx;
     }
 
     EXIT_CRITICAL_SECTION(  );
@@ -193,7 +193,7 @@ eMBRTUSend( UCHAR ucSlaveAddress, const UCHAR * pucFrame, USHORT usLength )
      * slow with processing the received frame and the master sent another
      * frame on the network. We have to abort sending the frame.
      */
-    if( eRcvState == STATE_RX_IDLE )
+    if( eSlaveRcvState == STATE_RX_IDLE )
     {
         /* First byte before the Modbus-PDU is the slave address. */
         pucSndBufferCur = ( UCHAR * ) pucFrame - 1;
@@ -209,12 +209,12 @@ eMBRTUSend( UCHAR ucSlaveAddress, const UCHAR * pucFrame, USHORT usLength )
         ucRTUBuf[usSndBufferCount++] = ( UCHAR )( usCRC16 >> 8 );
 
         /* Activate the transmitter. */
-        eSndState = STATE_TX_XMIT;
+        eSlaveSndState = STATE_TX_XMIT;
         vMBPortSerialEnable( FALSE, TRUE );
     }
     else
     {
-        eStatus = MB_EIO;
+        eStatus = MB_EIO_Tx;
     }
     EXIT_CRITICAL_SECTION(  );
     return eStatus;
@@ -226,12 +226,12 @@ xMBRTUReceiveFSM( void )
     BOOL            xTaskNeedSwitch = FALSE;
     UCHAR           ucByte;
 
-    assert_param( eSndState == STATE_TX_IDLE );
+    assert_param( eSlaveSndState == STATE_TX_IDLE );
 
     /* Always read the character. */
     ( void )xMBPortSerialGetByte( ( CHAR * ) & ucByte );
 
-    switch ( eRcvState )
+    switch ( eSlaveRcvState )
     {
         /* If we have received a character in the init state we have to
          * wait until the frame is finished.
@@ -254,7 +254,7 @@ xMBRTUReceiveFSM( void )
     case STATE_RX_IDLE:
         usRcvBufferPos = 0;
         ucRTUBuf[usRcvBufferPos++] = ucByte;
-        eRcvState = STATE_RX_RCV;
+        eSlaveRcvState = STATE_RX_RCV;
 
         /* Enable t3.5 timers. */
         vMBPortTimersEnable( );
@@ -272,7 +272,7 @@ xMBRTUReceiveFSM( void )
         }
         else
         {
-            eRcvState = STATE_RX_ERROR;
+        	eSlaveRcvState = STATE_RX_ERROR;
         }
         vMBPortTimersEnable();
         break;
@@ -285,9 +285,9 @@ xMBRTUTransmitFSM( void )
 {
     BOOL            xNeedPoll = FALSE;
 
-    assert_param( eRcvState == STATE_RX_IDLE );
+    assert_param( eSlaveRcvState == STATE_RX_IDLE );
 
-    switch ( eSndState )
+    switch ( eSlaveSndState )
     {
         /* We should not get a transmitter event if the transmitter is in
          * idle state.  */
@@ -310,7 +310,7 @@ xMBRTUTransmitFSM( void )
             /* Disable transmitter. This prevents another transmit buffer
              * empty interrupt. */
             vMBPortSerialEnable( TRUE, FALSE );
-            eSndState = STATE_TX_IDLE;
+            eSlaveSndState = STATE_TX_IDLE;
         }
         break;
     }
@@ -323,7 +323,7 @@ xMBRTUTimerT35Expired( void )
 {
     BOOL            xNeedPoll = FALSE;
 
-    switch ( eRcvState )
+    switch ( eSlaveRcvState )
     {
         /* Timer t35 expired. Startup phase is finished. */
     case STATE_RX_INIT:
@@ -342,13 +342,13 @@ xMBRTUTimerT35Expired( void )
 
         /* Function called in an illegal state. */
     default:
-        assert_param( ( eRcvState == STATE_RX_INIT ) ||
-                ( eRcvState == STATE_RX_RCV ) || ( eRcvState == STATE_RX_ERROR ) );
+        assert_param( ( eSlaveRcvState == STATE_RX_INIT ) ||
+                ( eSlaveRcvState == STATE_RX_RCV ) || ( eSlaveRcvState == STATE_RX_ERROR ) );
          break;
     }
 
     vMBPortTimersDisable(  );
-    eRcvState = STATE_RX_IDLE;
+    eSlaveRcvState = STATE_RX_IDLE;
 
     return xNeedPoll;
 }

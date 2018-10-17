@@ -272,7 +272,7 @@ PhyComAddress_create(uint8_t vlanPriority, uint16_t vlanId, uint16_t appId, uint
  * \return the new data set instance
  */
 DataSet*
-DataSet_create(const char* name, LogicalNode* parent);
+DataSet_create(const char* name, LogicalNode* parent, bool deletable);
 
 /**
  * \brief returns the number of elements (entries) of the data set
@@ -307,8 +307,10 @@ DataSetEntry_getNext(DataSetEntry* self);
  *
  * \return the new data set entry instance
  */
+//DataSetEntry*
+//DataSetEntry_create(DataSet* dataSet, const char* variable, int index, const char* component);
 DataSetEntry*
-DataSetEntry_create(DataSet* dataSet, const char* variable, int index, const char* component);
+DataSetEntry_create(DataSet* dataSet,const char* logicalDevice, const char* variable, int index, const char* component);
 
 /**@}*/
 

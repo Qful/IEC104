@@ -178,16 +178,17 @@ MmsServer_insertIntoCache(MmsServer self, MmsDomain* domain, char* itemId, MmsVa
         MmsValueCache_insertValue(cache, itemId, value);
     }
 }
-
-MmsDataAccessError
-mmsServer_setValue(MmsServer self, MmsDomain* domain, char* itemId, MmsValue* value,
-        MmsServerConnection connection)
+/*******************************************************
+ * mmsServer_setValue
+ * запись переменных
+ *
+ *******************************************************/
+MmsDataAccessError		mmsServer_setValue(MmsServer self, MmsDomain* domain, char* itemId, MmsValue* value, MmsServerConnection connection)
 {
     MmsDataAccessError indication;
 
     if (self->writeHandler != NULL) {
-        indication = self->writeHandler(self->writeHandlerParameter, domain,
-                itemId, value, connection);
+        indication = self->writeHandler(self->writeHandlerParameter, domain, itemId, value, connection);
     } else {
         MmsValue* cachedValue;
 

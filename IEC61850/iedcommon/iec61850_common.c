@@ -65,13 +65,17 @@ Quality_unsetFlag(Quality* self, int flag)
 Quality
 Quality_fromMmsValue(const MmsValue* mmsValue)
 {
-    return (Quality) MmsValue_getBitStringAsInteger(mmsValue);
+	Quality	qual;
+	qual = (Quality) MmsValue_getBitStringAsInteger(mmsValue);
+    return qual;
 }
 
 Dbpos
 Dbpos_fromMmsValue(const MmsValue* mmsValue)
 {
-    return (Dbpos) MmsValue_getBitStringAsIntegerBigEndian(mmsValue);
+	Dbpos	ret;
+	ret = (Dbpos) MmsValue_getBitStringAsIntegerBigEndian(mmsValue);
+    return ret;
 }
 
 MmsValue*
