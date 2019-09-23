@@ -35,9 +35,9 @@
 PR_BEGIN_EXTERN_C
 #endif
 /* ----------------------- Defines ------------------------------------------*/
-#define MB_ADDRESS_BROADCAST    ( 0 )   /*! Modbus broadcast address. */
-#define MB_ADDRESS_MIN          ( 1 )   /*! Smallest possible slave address. */
-#define MB_ADDRESS_MAX          ( 247 ) /*! Biggest possible slave address. */
+#define MB_ADDRESS_BROADCAST    			  ( 0 )   				/*! Modbus broadcast address. */
+#define MB_ADDRESS_MIN          			  ( 1 )   				/*! Smallest possible slave address. */
+#define MB_ADDRESS_MAX          			  ( 247 ) 				/*! Biggest possible slave address. */
 #define MB_FUNC_NONE                          (  0 )
 #define MB_FUNC_READ_COILS                    (  1 )				//+ Чтение статуса дискретных выходов.
 #define MB_FUNC_READ_DISCRETE_INPUTS          (  2 )				//+ Чтение статуса дискретных входов.
@@ -55,6 +55,19 @@ PR_BEGIN_EXTERN_C
 #define MB_FUNC_DIAG_GET_COM_EVENT_LOG        ( 12 )				// Возвращает слово сотояния,счетчик событий и поле байтов событий.
 #define MB_FUNC_OTHER_REPORT_SLAVEID          ( 17 )				// Чтение ID подчиненного.
 #define MB_FUNC_ERROR                         ( 128 )
+
+/* ----------------------- размры запросов ---------------------------------*/
+#define MB_FUNCREQ_READ_COILS_SIZE					( 8 )		//1
+#define MB_FUNCREQ_READ_DISCRETE_INPUTS_SIZE		( 8 )		//2
+#define MB_FUNCREQ_READ_HOLDING_REGISTER_SIZE		( 8 )		//3
+#define MB_FUNCREQ_READ_INPUT_REGISTER_SIZE			( 8 )		//4
+#define MB_FUNCREQ_WRITE_SINGLE_COIL_SIZE			( 8 )		//5
+#define MB_FUNCREQ_WRITE_REGISTER_SIZE				( 8 )		//6
+
+#define MB_FUNCREQ_WRITE_MULTIPLE_COILS_SIZE  		( 9 )		//15   добавить сами байты данных
+#define MB_FUNCREQ_WRITE_MULTIPLE_REGISTERS_SIZE  	( 9 )		//16   добавить сами байты данных
+
+#define MB_FUNCREQ_READ_HOLDING_REGISTER_W_ADDR_SIZE (8 )		//19
 /* ----------------------- Type definitions ---------------------------------*/
     typedef enum
 {

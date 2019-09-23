@@ -12,9 +12,18 @@
 #if defined (MR761)	|| defined (MR762) || defined (MR763)
 #include "static_model_MR76x.h"
 #endif
-#if defined (MR801)
+#if  defined (MR761OBR)
+#include "static_model_MR761OBR.h"
+#endif
+
+#if defined	(MR801) && defined (OLD)
 #include "static_model_MR801.h"
 #endif
+
+#if defined	(MR801) && defined (T12N5D58R51)
+#include "static_model_MR801_T12N5D58R51.h"
+#endif
+
 #if defined (MR901) || defined (MR902)
 #include "static_model_MR901_902.h"
 #endif

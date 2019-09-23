@@ -44,9 +44,10 @@ typedef struct sGooseReceiverMAC {
 
 // список ссылок гусов (устройства)
 typedef struct sGooseReceiverGocbRef {
-	uint16_t	numbGocbRef;						// номер записи
-	char*		gocbRef;							// гусс запись
-    uint16_t 	AppId;								// AppId для записи
+	uint16_t	numbGocbRef;						// номер записи			в файле конфига
+	char*		gocbRef;							// гусс запись			в файле конфига
+    uint16_t 	AppId;								// AppId для записи		в файле конфига
+    uint32_t 	confRev;							// conRev				в файле конфига
 	struct sGooseReceiverGocbRef* sibling;			// следующая запись
 };
 

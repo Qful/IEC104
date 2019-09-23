@@ -49,7 +49,14 @@
 
 #include "iso_server.h"
 
+#include "hsr_prp_main.h"
+#include "lib_memory.h"
 /* Private define ------------------------------------------------------------*/
+RedModeType 	RedMode;
+
+struct prp_rct	PRP_Traler;
+struct hsr_tag	HSR_Tag;
+
 /* The time to block waiting for input. */
 #define TIME_WAITING_FOR_INPUT ( 100 )
 /* Stack size of the interface thread */
@@ -95,7 +102,34 @@ osSemaphoreId s_xSemaphore = NULL;
 ETH_HandleTypeDef heth;
 
 extern osSemaphoreId Netif_LinkSemaphore;
+/*************************************************************************
+ * SetRedundansyMode
+ * вызавается после инита ETHERNET
+ *************************************************************************/
+void 		SetRedundansyMode(RedModeType RedMode){
 
+	switch (RedMode){
+		case RM_OFF:
+			PHY_SetPortsNormalMode();
+			set_redundancyMode(RM_OFF);
+			set_HardwareCRCMode(HardwareCRC);
+			break;
+
+		case RM_HSR_V1:
+			PHY_SetPortsHSRMode((char*)&MAC_ADDR);
+			set_redundancyMode(RM_HSR_V1);
+			set_HardwareCRCMode(SoftwareCRC);
+			break;
+
+		case RM_PRP_V1:
+			PHY_SetPortsPRPMode();
+			set_redundancyMode(RM_PRP_V1);
+			set_HardwareCRCMode(HardwareCRC);
+		break;
+	}
+
+    USART_TRACE_BLUE("режим резервирования:%i \n", RedMode);
+}
 /*************************************************************************
  *
  *************************************************************************/
@@ -104,11 +138,33 @@ uint16_t PHY_ReadStaticMACTable(uint8_t * addr)
 	uint8_t		MACrd[9];
 	uint16_t	numb = 0,i,j;
 	uint8_t		port;
+	uint8_t		cmd;
+
+	if(addr){
+		char* prt;
+		port = HAL_ETH_SoftSMIRead(14) & 0b111;
+		if (port == 6)	 prt = "1"; else
+		if (port == 5)	 prt = "2"; else
+		if (port == 4)	 prt = "1,2"; else
+		if (port == 3)	 prt = "3"; else
+		if (port == 2)	 prt = "1,3"; else
+		if (port == 1)	 prt = "2,3"; else
+		prt = "1,2,3";
+
+		sprintf((char *)addr,"<table border=1 align=center>");
+		addr += strlen((char *)addr );
+		sprintf((char *)addr,"<tr><th>разрешенные MAC для портов: %s</th></tr>",prt);
+		addr += strlen((char *)addr );
+	}
+
+	USART_0TRACE("StaticMACTable\n");
 
 	for(i=0;i<8;i++){
 
-		HAL_ETH_SoftSMIWrite(121,ReadMAC | StaticMAC_Sel | (uint8_t)((i>>8) & 0b11));		// режим записи
-		HAL_ETH_SoftSMIWrite(122,(uint8_t)(i & 0xFF));		//	номер записи
+		cmd = (uint8_t)ReadMAC | (uint8_t)StaticMAC_Sel | (uint8_t)((i>>8) & 0b11);		// режим записи
+		HAL_ETH_SoftSMIWrite(121,cmd);
+		cmd = (uint8_t)(i & 0xFF);						//	номер записи
+		HAL_ETH_SoftSMIWrite(122,cmd);
 
 	   // настроим статические адреса
 		MACrd[0] = (uint8_t)HAL_ETH_SoftSMIRead(123);	//57,56bits
@@ -121,12 +177,19 @@ uint16_t PHY_ReadStaticMACTable(uint8_t * addr)
 		MACrd[7] = (uint8_t)HAL_ETH_SoftSMIRead(130);	//MAC LB
 		MACrd[8] = (uint8_t)HAL_ETH_SoftSMIRead(131);	//MAC LB
 
+		if(addr){
+			if (MACrd[2] & 0b1<<3){
+				sprintf((char *)addr, "<tr><th>0x%.2X-0x%.2X-0x%.2X-0x%.2X-0x%.2X-0x%.2X</th></tr>",MACrd[3],MACrd[4],MACrd[5],MACrd[6],MACrd[7],MACrd[8]);
+				addr += strlen((char *)addr );
+			}
+		}
+
 	    USART_0TRACE("%.4u: ",i);
 
 	    if ((MACrd[3] == 0x02)&&(MACrd[4] == 0x02))printf("\033[1;31m");
 	    {
 
-			port = ((MACrd[2]) & 0b111) ;
+			port = ((MACrd[2]) & 0b111);
 			USART_0TRACE("forvarding Port %u, ",port);
 		    if (MACrd[2] & 0b1<<3){USART_0TRACE("   Valid, ");}
 		    else {USART_0TRACE("notValid, ");}
@@ -141,23 +204,47 @@ uint16_t PHY_ReadStaticMACTable(uint8_t * addr)
 	    if ((MACrd[3] == 0x02)&&(MACrd[4] == 0x02))printf("\033[1;m");
 	}
 
+	if(addr){
+		sprintf((char *)addr,"</table>");	addr += strlen((char *)addr );
+	}
 return	numb;
 }
 /*************************************************************************
+ * PHY_WriteStaticMACTable добавление в статическую таблицу записи.
+ * addr		: номер записи (максимум 8 записей. 0...7)
+ * MAC		: MAC адрес записи
+ * forvard	: порт в который пропускать адрес
  *
+ * 57-54	FID				VLAN ID идентификатор
+ * 53		UseFID			использовать FID
+ * 52		Override		игнорировать порт (выкл приём и передачу)
+ * 51		Valid			достоверность записи. (использовать или нет)
+ * 50-48	Forvarding		проброс записи:
+ * 			Ports							000 - никуда
+ * 											001 - в 1 порт
+ * 											010 - в 2 порт
+ * 											100 - в 3 порт
+ * 											011 - в 1,2 порты
+ * 											110 - в 2,3 порты
+ * 											101 - в 1,3 порты
+ * 											111 - во все порты
+ * 47-0		MAC addres		MAC адрес для проброса.
+ *
+ * предварительно очистить функцией PHY_SetMACFilter
  *************************************************************************/
-uint16_t PHY_WriteStaticMACTable(uint16_t	addr, uint8_t * MAC)
+uint16_t PHY_WriteStaticMACTable(uint16_t	addr, uint8_t * MAC, uint8_t	forvard)
 {
 
     // настроим статические адреса
-    HAL_ETH_SoftSMIWrite(124,0);		//57,56bits
-    HAL_ETH_SoftSMIWrite(125,Forvard_to_Port1 | Forvard_to_Port2 | Forvard_to_Port3);	//55-48 bits
-    HAL_ETH_SoftSMIWrite(126,MAC[0]);		//MAC HB
-    HAL_ETH_SoftSMIWrite(127,MAC[1]);		//MAC
-    HAL_ETH_SoftSMIWrite(128,MAC[2]);		//MAC
-    HAL_ETH_SoftSMIWrite(129,MAC[3]);		//MAC
-    HAL_ETH_SoftSMIWrite(130,MAC[4]);		//MAC
-    HAL_ETH_SoftSMIWrite(131,MAC[5]);		//MAC LB
+    HAL_ETH_SoftSMIWrite(124,0);						//57,56bits
+    //HAL_ETH_SoftSMIWrite(125,Forvard_to_Port1 | Forvard_to_Port2 | Forvard_to_Port3);	//55-48 bits
+    HAL_ETH_SoftSMIWrite(125,Override_ON | Valid_ON | (forvard&0b111));//Valid_ON
+    HAL_ETH_SoftSMIWrite(126,MAC[0]);					//MAC HB
+    HAL_ETH_SoftSMIWrite(127,MAC[1]);					//MAC
+    HAL_ETH_SoftSMIWrite(128,MAC[2]);					//MAC
+    HAL_ETH_SoftSMIWrite(129,MAC[3]);					//MAC
+    HAL_ETH_SoftSMIWrite(130,MAC[4]);					//MAC
+    HAL_ETH_SoftSMIWrite(131,MAC[5]);					//MAC LB
 
 	HAL_ETH_SoftSMIWrite(121,WriteMAC | StaticMAC_Sel | (uint8_t)((addr>>8) & 0b11));
 	HAL_ETH_SoftSMIWrite(122,(uint8_t)(addr & 0xFF));
@@ -201,14 +288,14 @@ uint16_t PHY_ReadDynamicMACTable(uint8_t * addr)
 		if(addr){
 			if((MACrd[3] == MAC_ADDR[0]) && (MACrd[4] == MAC_ADDR[1]) && (MACrd[5] == MAC_ADDR[2]) && (MACrd[6] == MAC_ADDR[3])){
 				//sprintf((char *)addr, "PHY Порт:%i MAC:0x%.2X-0x%.2X-0x%.2X-0x%.2X-0x%.2X-0x%.2X<br>",port,MACrd[3],MACrd[4],MACrd[5],MACrd[6],MACrd[7],MACrd[8]);
-				sprintf((char *)addr, "<tr><th>%i</th><th>0x%.2X-0x%.2X-0x%.2X-0x%.2X-0x%.2X-0x%.2X</th></tr>",port,MACrd[3],MACrd[4],MACrd[5],MACrd[6],MACrd[7],MACrd[8]);
+				sprintf((char *)addr, "<tr><th>%i</th><th>0x%.2X-0x%.2X-0x%.2X-0x%.2X-0x%.2X-0x%.2X(%.3D)</th></tr>",port,MACrd[3],MACrd[4],MACrd[5],MACrd[6],MACrd[7],MACrd[8],MACrd[8]);
 
 				addr += strlen((char *)addr );
 			}
 		}
 
 	    USART_0TRACE("%.4u: ",i);
-	    if ((MACrd[3] == MAC_ADDR[0])&&(MACrd[4] == MAC_ADDR[1]))printf("\033[1;31m");
+	    if ((MACrd[3] == MAC_ADDR[0])&&(MACrd[4] == MAC_ADDR[1])){USART_0TRACE("\033[1;31m");}
 	    {
 	    	if (MACrd[0] & MAC_Empty){	USART_0TRACE("Пустой, ");}
 	    	  	else{USART_0TRACE("      , ")}
@@ -223,7 +310,7 @@ uint16_t PHY_ReadDynamicMACTable(uint8_t * addr)
 			}
 			USART_0TRACE("\r\n");
 	    }
-	    if ((MACrd[3] == 0x02)&&(MACrd[4] == 0x02))printf("\033[1;m");
+	    if ((MACrd[3] == 0x02)&&(MACrd[4] == 0x02)){USART_0TRACE("\033[1;m");}
 
 	    if (i>=numb) break;
 	}
@@ -256,6 +343,7 @@ int 		PHY_Port2TxOn(uint16_t param){
 	HAL_ETH_SoftSMIWrite(34,TransmitENABLE | param);	// откл обучения из 2-го порта	T:R:L
 	return 0;
 }
+
 /*************************************************************************
 *  PHY_SetPortsHSRMode
 *
@@ -266,13 +354,13 @@ int 		PHY_Port2TxOn(uint16_t param){
 *	2. все неизвесные нам пакеты прокидываем в 1,2 порт.	Reg 14 bit2..0 = 011, Reg 14 bit7 = 1
 *	3. при передаче пакетов отключаем ненужный нам порт.	Reg 18 bit2 = 0, Reg 34 bit2 = 0. или MIIM Reg 1 bit1 = 1,Reg 2 bit1 = 1
 *
-*	p.s. нужно предусмотреть защиту от broadcast storm
+*	p.s. нужно предусмотреть защиту от broadcast storm, при отключении ненужного нам порта отключится и передача в него, возможна потеря пакетов.
 *
  *************************************************************************/
 int 		PHY_SetPortsHSRMode(char*	MAC){
 
-    HAL_ETH_SoftSMIWrite(18,TransmitENABLE | ReseiveENABLE | LearningENABLE);
-    HAL_ETH_SoftSMIWrite(34,TransmitENABLE | ReseiveENABLE | LearningENABLE);
+    HAL_ETH_SoftSMIWrite(18,TransmitENABLE | ReseiveENABLE | LearningDISABLE);//LearningENABLE
+    HAL_ETH_SoftSMIWrite(34,TransmitENABLE | ReseiveENABLE | LearningDISABLE);//LearningENABLE
     HAL_ETH_SoftSMIWrite(14,UnknownPacketEnable | DriveStrength16mA | UnknownPacketPort_1 | UnknownPacketPort_2 | UnknownPacketPort_3);			// проброс неизвестных пакетов  | UnknownPacketPort_1 | UnknownPacketPort_2 | UnknownPacketPort_3
 
     // эти MAC адреса не будут ретранслироваться свичем. Считает их локальными
@@ -284,33 +372,19 @@ int 		PHY_SetPortsHSRMode(char*	MAC){
     HAL_ETH_SoftSMIWrite(146,MAC[1]);
     HAL_ETH_SoftSMIWrite(147,MAC[0]);
 
-
 	HAL_ETH_SoftSMIWrite(21,SelfAddressFilteringEnableMACA1);		// включения MAC фильтра на порт 1
 	HAL_ETH_SoftSMIWrite(37,SelfAddressFilteringEnableMACA1);		// включения MAC фильтра на порт 2
 
+	HAL_ETH_SoftSMIWrite(2,DynamicMAC_flush);
+
+	USART_TRACE_BLUE("HSRMode:%.2X-%.2X-%.2X-%.2X-%.2X-%.2X \n",MAC[0], MAC[1], MAC[2], MAC[3],MAC[4],MAC[5]);	// временно чтобы отличались устройства
+
 	return 0;
-}
-/*************************************************************************
-*  PHY_setSwitchMode
-*  режим работы свича
- *************************************************************************/
-void	PHY_setSwitchMode(void* self)
-{
-	IsoServer selfServer = self;
-	if(IsoServer_getAppendPRP(selfServer)){
-		PHY_SetPortsPRPMode();
-	} else
-	if(IsoServer_getAppendHSR(selfServer)){
-		PHY_SetPortsHSRMode((char*)&MAC_ADDR);
-	} else{
-		PHY_SetPortsNormalMode();
-	}
 }
 /*************************************************************************
 *  PHY_SetPortsPRPMode
  *************************************************************************/
 int 		PHY_SetPortsPRPMode(void){
-
 // изоляция портов для PRP работает. Передача ведётся в оба порта, для выбора направления, нужно отключать не нужный порт.
 
 	// -------------------------------------------------------------------
@@ -345,7 +419,15 @@ int 		PHY_SetPortsNormalMode(void){
 	HAL_ETH_SoftSMIWrite(21,0);
 	HAL_ETH_SoftSMIWrite(37,0);
 
+	USART_TRACE("PHY_SetPortsNormalMode\n");
+
     return	0;
+}
+/*************************************************************************
+ * PHY_SetPortsMode
+ *************************************************************************/
+int 		PHY_SetPortsMode(void){
+	SetRedundansyMode(RedMode);
 }
 /*************************************************************************
  * PHY_SetPortsStaticMAC
@@ -357,143 +439,93 @@ int PHY_SetPortsStaticMAC(char*	port1, char*	port2)
     return	-1;
 }
 /*************************************************************************
- * PHY_SetMACFilter
+ * PHY_DebugOutMode
  *************************************************************************/
-int PHY_SetMACFilter(PHY_PortNumber	port)
+void PHY_DebugOutMode(void){
+uint16_t tmp;
+
+	USART_TRACE_BLUE("KSZ8873 config ------------\n");
+	tmp = HAL_ETH_SoftSMIRead(0x00);
+	USART_TRACE_BLUE("Chip ID0: 0x%.2X\n",tmp);
+	tmp = HAL_ETH_SoftSMIRead(0x01);
+	USART_TRACE_BLUE("Chip ID1: 0x%.2X\n",tmp);
+	tmp = HAL_ETH_SoftSMIRead(0x04);
+	USART_TRACE_BLUE("Global Control 2: 0x%.2X\n",tmp);
+	tmp = HAL_ETH_SoftSMIRead(0x06);
+	USART_TRACE_BLUE("Global Control 4(Port3): 0x%.2X\n",tmp);
+	tmp = HAL_ETH_SoftSMIRead(0x07);
+	USART_TRACE_BLUE("Broadcast Storm Protection Rate: 0x%.2X\n",tmp);
+	tmp = HAL_ETH_SoftSMIRead(0x1C);
+	USART_TRACE_BLUE("Port 1 Control 12: 0x%.2X\n",tmp);
+	tmp = HAL_ETH_SoftSMIRead(0x2C);
+	USART_TRACE_BLUE("Port 2 Control 12: 0x%.2X\n",tmp);
+	tmp = HAL_ETH_SoftSMIRead(0x1F);
+	USART_TRACE_BLUE("Port 1 Status 1: 0x%.2X\n",tmp);
+	tmp = HAL_ETH_SoftSMIRead(0x2F);
+	USART_TRACE_BLUE("Port 2 Status 1: 0x%.2X\n",tmp);
+	tmp = HAL_ETH_SoftSMIRead(0x3F);
+	USART_TRACE_BLUE("Port 3 Status 1: 0x%.2X\n",tmp);
+	USART_TRACE_BLUE("---------------------------\n");
+
+}
+/*************************************************************************
+ * PHY_SetMACFilter
+ * 8 мак адресов всего, по адресу 122 указать номер записи.
+ * 124-131 - сама запись полезных 57 бит. 131 младшие биты.
+ *
+ * 57-54	FID				VLAN ID идентификатор
+ * 53		UseFID			использовать FID
+ * 52		Override		игнорировать порт (выкл приём и передачу)
+ * 51		Valid			достоверность записи. (использовать или нет)
+ * 50-48	Forvarding		проброс записи:
+ * 			Ports							000 - никуда
+ * 											001 - в 1 порт
+ * 											010 - в 2 порт
+ * 											100 - в 3 порт
+ * 											011 - в 1,2 порты
+ * 											110 - в 2,3 порты
+ * 											101 - в 1,3 порты
+ * 											111 - во все порты
+ * 47-0		MAC addres		MAC адрес для проброса.
+ *
+ * 1. отключаем обучения из x-го порта.							18reg
+ * 2. чистим таблицу DynamicMAC_flush							 2reg
+ * 3. отключаем проброс неизвестных MAC в интересующий порт.  	14reg
+ * 4. после этого MAC адрес из статической таблицы будет направлен
+ *     в соответствии с указаным в записи маршрутом. и если там указан
+ *     порт с фильтром то он будет проброшен туда. Иначе будет полная
+ *     изуляция порта.
+ *
+ *     PHYReg14 можно заменить на HAL_ETH_SoftSMIRead(14); читать из чипа.
+ *************************************************************************/
+int PHY_SetMACFilter(PHY_PortNumber	port, uint8_t	mode)
 {
-	uint16_t	ret,i,j;
+	static uint8_t	PHYReg14=0b11000111;
+	uint8_t		reg,regLearn,regPort;
+
+	if (port > PHY_Port3) return -1;
+
+	PHYReg14 = HAL_ETH_SoftSMIRead(14);
 
 	switch(port){
-//------------------------------------------------------------------
-	case	PHY_Port1:
-//	    HAL_ETH_SoftSMIWrite(21,SelfAddressFilteringEnablePort1 | SelfAddressFilteringEnablePort2);		// включения MAC фильтра на порт
-//	    HAL_ETH_SoftSMIWrite(37,SelfAddressFilteringEnablePort1 | SelfAddressFilteringEnablePort2);		// включения MAC фильтра на порт
-/*
-	    // 142 - 147
-	    HAL_ETH_SoftSMIWrite(142,0x01);
-	    HAL_ETH_SoftSMIWrite(143,0x00);
-	    HAL_ETH_SoftSMIWrite(144,0x01);
-	    HAL_ETH_SoftSMIWrite(145,0xCD);
-	    HAL_ETH_SoftSMIWrite(146,0x0C);
-	    HAL_ETH_SoftSMIWrite(147,0x01);
-
-	    HAL_ETH_SoftSMIWrite(148,0x01);
-	    HAL_ETH_SoftSMIWrite(149,0x00);
-	    HAL_ETH_SoftSMIWrite(150,0x01);
-	    HAL_ETH_SoftSMIWrite(151,0xCD);
-	    HAL_ETH_SoftSMIWrite(152,0x0C);
-	    HAL_ETH_SoftSMIWrite(153,0x01);
-*/
-
-// фильтр на 2 порт
-/*
-	    HAL_ETH_SoftSMIWrite(18,0b110);	// откл обучения из 1-го порта
-	    HAL_ETH_SoftSMIWrite(34,0b111);	// откл обучения из 2-го порта	T:R:L
-	    HAL_ETH_SoftSMIWrite(2,StaticMAC_flush | DynamicMAC_flush);		// очстка таблицы
-	    HAL_ETH_SoftSMIWrite(14,0b1<<7 | 0b1<<6 | 0b101);		//
-*/
-
-//	    HAL_ETH_SoftSMIWrite(5,1<<6);		//
-
-	    // закрывает порт на приём и передачу всего
-//	    HAL_ETH_SoftSMIWrite(26,1<<1);		//loopback
-//	    HAL_ETH_SoftSMIWrite(42,1<<1);
-
-	    // отправляет
-//	    HAL_ETH_SoftSMIWrite(29,1<<0);		//remote loopback
-//	    HAL_ETH_SoftSMIWrite(45,1<<0);
-
-//	    HAL_ETH_SoftSMIWrite(16,1<<7);		//Broadcast storm protection
-//	    HAL_ETH_SoftSMIWrite(32,1<<7);
-
-//	    HAL_ETH_SoftSMIWrite(3,1<<6);		//tail tag mode
-
-/*
-	    // настроим статические адреса
-	    HAL_ETH_SoftSMIWrite(124,0);		//57,56bits
-	    HAL_ETH_SoftSMIWrite(125,0b11111);	//55-48 bits
-	    HAL_ETH_SoftSMIWrite(126,0x00);		//MAC HB
-	    HAL_ETH_SoftSMIWrite(127,0x1E);		//MAC
-	    HAL_ETH_SoftSMIWrite(128,0x06);		//MAC
-	    HAL_ETH_SoftSMIWrite(129,0xCC);		//MAC
-	    HAL_ETH_SoftSMIWrite(130,0xBD);		//MAC
-	    HAL_ETH_SoftSMIWrite(131,0x7A);		//MAC LB
-
-	    HAL_ETH_SoftSMIWrite(121,0);		// рнжим записи
-	    HAL_ETH_SoftSMIWrite(122,0x00);		//	номер записи
-
-	    // настроим статические адреса
-	    HAL_ETH_SoftSMIWrite(124,0);		//57,56bits
-	    HAL_ETH_SoftSMIWrite(125,0b11111);	//55-48 bits
-	    HAL_ETH_SoftSMIWrite(126,0x02);		//MAC HB
-	    HAL_ETH_SoftSMIWrite(127,0x02);		//MAC
-	    HAL_ETH_SoftSMIWrite(128,0x8c);		//MAC
-	    HAL_ETH_SoftSMIWrite(129,0xa8);		//MAC
-	    HAL_ETH_SoftSMIWrite(130,0x00);		//MAC
-	    HAL_ETH_SoftSMIWrite(131,0x7d);		//MAC LB
-
-	    HAL_ETH_SoftSMIWrite(121,0);		// рнжим записи
-	    HAL_ETH_SoftSMIWrite(122,0x01);		//	номер записи
-
-	    // настроим статические адреса
-	    HAL_ETH_SoftSMIWrite(124,0);		//57,56bits
-	    HAL_ETH_SoftSMIWrite(125,0b11111);	//55-48 bits
-	    HAL_ETH_SoftSMIWrite(126,0x02);		//MAC HB
-	    HAL_ETH_SoftSMIWrite(127,0x02);		//MAC
-	    HAL_ETH_SoftSMIWrite(128,0x8c);		//MAC
-	    HAL_ETH_SoftSMIWrite(129,0xa8);		//MAC
-	    HAL_ETH_SoftSMIWrite(130,0x00);		//MAC
-	    HAL_ETH_SoftSMIWrite(131,0x7e);		//MAC LB
-
-	    HAL_ETH_SoftSMIWrite(121,0);		// рнжим записи
-	    HAL_ETH_SoftSMIWrite(122,0x02);		//	номер записи
-
-	    // настроим статические адреса
-	    HAL_ETH_SoftSMIWrite(124,0);		//57,56bits
-	    HAL_ETH_SoftSMIWrite(125,0b11111);	//55-48 bits
-	    HAL_ETH_SoftSMIWrite(126,0x1C);		//MAC HB
-	    HAL_ETH_SoftSMIWrite(127,0x1B);		//MAC
-	    HAL_ETH_SoftSMIWrite(128,0x0D);		//MAC
-	    HAL_ETH_SoftSMIWrite(129,0x96);		//MAC
-	    HAL_ETH_SoftSMIWrite(130,0xA7);		//MAC
-	    HAL_ETH_SoftSMIWrite(131,0xAF);		//MAC LB
-
-	    HAL_ETH_SoftSMIWrite(121,0);		// рнжим записи
-	    HAL_ETH_SoftSMIWrite(122,0x03);		//	номер записи
-*/
-	    // настроим статические адреса
-	    HAL_ETH_SoftSMIWrite(124,0);		//57,56bits
-	    HAL_ETH_SoftSMIWrite(125,0b11111);	//55-48 bits
-	    HAL_ETH_SoftSMIWrite(126,0x01);		//MAC HB
-	    HAL_ETH_SoftSMIWrite(127,0x0C);		//MAC
-	    HAL_ETH_SoftSMIWrite(128,0xCD);		//MAC
-	    HAL_ETH_SoftSMIWrite(129,0x01);		//MAC
-	    HAL_ETH_SoftSMIWrite(130,0x00);		//MAC
-	    HAL_ETH_SoftSMIWrite(131,0x01);		//MAC LB
-
-	    HAL_ETH_SoftSMIWrite(121,0);		// режим записи
-	    HAL_ETH_SoftSMIWrite(122,0x04);		// номер записи
-
-
-	    ret = HAL_ETH_SoftSMIRead(0);
-		USART_TRACE_RED("PHY ID0: 0x%.2X\n",ret);
-	    ret = HAL_ETH_SoftSMIRead(1);
-		USART_TRACE_RED("PHY ID1: 0x%.2X\n",ret);
-	    ret = HAL_ETH_SoftSMIRead(15);
-		USART_TRACE_RED("PHY ADDR: %u\n",ret>>2);
-
-		break;
-//------------------------------------------------------------------
-	case	PHY_Port2:
-//	    HAL_ETH_SoftSMIWrite(37,SelfAddressFilteringEnablePort2);		// включения MAC фильтра на порт
-	    															// 148 - 153
-		break;
-//------------------------------------------------------------------
-	case	PHY_Port3:
-
-		break;
-//------------------------------------------------------------------
+	case	PHY_Port1:	regLearn = 18;	regPort = UnknownPacketPort_1;	break;
+	case	PHY_Port2:	regLearn = 32;	regPort = UnknownPacketPort_2;	break;
+	case	PHY_Port3:	regLearn = 50;	regPort = UnknownPacketPort_3;	break;
 	}
+
+    if (mode) {
+	    HAL_ETH_SoftSMIWrite(regLearn,TransmitENABLE | ReseiveENABLE | LearningDISABLE);
+	    HAL_ETH_SoftSMIWrite(2,DynamicMAC_flush);
+    	reg = PHYReg14 & ~regPort;
+    }
+    else {
+	    HAL_ETH_SoftSMIWrite(regLearn,TransmitENABLE | ReseiveENABLE | LearningENABLE);
+    	reg = PHYReg14 | regPort;
+    }
+
+    HAL_ETH_SoftSMIWrite(14,reg);											// все порты проброс в остальные порты.
+    PHYReg14 = reg;
+    //USART_TRACE("PHY_Port%u filter:0x%.2x\n",port+1,reg);
   return 0;
 }
 /*************************************************************************
@@ -716,7 +748,13 @@ static void low_level_init(struct netif *netif)
   heth.Init.PhyAddress = 1;
   heth.Init.MACAddr = &MAC_ADDR[0];
   heth.Init.RxMode = ETH_RXINTERRUPT_MODE;
-  heth.Init.ChecksumMode = ETH_CHECKSUM_BY_HARDWARE;
+ //if ((RM_HSR_V0 == get_redundancyMode())||(RM_HSR_V1 == get_redundancyMode()))
+ if(get_HardwareCRCMode() == HardwareCRC)
+ {
+	 heth.Init.ChecksumMode = ETH_CHECKSUM_BY_HARDWARE;
+ }else{
+	 heth.Init.ChecksumMode = ETH_CHECKSUM_BY_SOFTWARE;
+ }
   heth.Init.MediaInterface = ETH_MEDIA_INTERFACE_MII;//ETH_MEDIA_INTERFACE_MII;
 
   hal_eth_init_status = HAL_ETH_Init(&heth);
@@ -779,29 +817,6 @@ static void low_level_init(struct netif *netif)
   /* Enable MAC and DMA transmission and reception */
   HAL_ETH_Start(&heth);
   
-#ifndef KSZ8873
-  /**** Configure PHY to generate an interrupt when Eth Link state changes ****/
-  /* Read Register Configuration */
-  HAL_ETH_ReadPHYRegister(&heth, PHY_MICR, &regvalue);
-  
-  regvalue |= (PHY_MICR_INT_EN | PHY_MICR_INT_OE);
-
-  /* Enable Interrupts */
-  HAL_ETH_WritePHYRegister(&heth, PHY_MICR, regvalue );
-  
-  /* Read Register Configuration */
-  HAL_ETH_ReadPHYRegister(&heth, PHY_MISR, &regvalue);
-  
-  regvalue |= PHY_MISR_LINK_INT_EN;
-    
-  /* Enable Interrupt on change of link status */
-  HAL_ETH_WritePHYRegister(&heth, PHY_MISR, regvalue);
-#else
-//	HAL_ETH_SoftSMIWrite(188,1<<7);		// прерывание по изменению LINK на портах P1 P2
-//	HAL_ETH_SoftSMIWrite(187,1<<7);		// сброс флага прерывания
-
-#endif
-
 #endif /* LWIP_ARP || LWIP_ETHERNET */
 }
 
@@ -828,6 +843,7 @@ static void low_level_init(struct netif *netif)
   * 		проще на стадии свертывания стека. Но это будет для каждого типа протокола отдельно.
   *
   */
+#if !defined (HSR_Debug_Mode) && !defined (PRP_Debug_Mode)
 static err_t low_level_output(struct netif *netif, struct pbuf *p)
 {
   err_t errval;
@@ -839,9 +855,12 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
   uint32_t byteslefttocopy = 0;
   uint32_t payloadoffset = 0;
 
+//  addprpTag(p);
+  uint16_t totalSize = p->tot_len;
+
   DmaTxDesc = heth.TxDesc;						// текущий дескриптор
   bufferoffset = 0;
-  
+
   // copy frame from pbufs to driver buffers
   for(q = p; q != NULL; q = q->next)
   {
@@ -856,6 +875,13 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
     // Get bytes in current lwIP buffer
     // размер текущего буфера lwIP
     byteslefttocopy = q->len;
+/*
+#if ETHARP_SUPPORT_HSR
+    if ((RM_HSR_V0 == get_redundancyMode())||(RM_HSR_V1 == get_redundancyMode())){
+    	if (totalSize<66) byteslefttocopy = 66;
+    }
+#endif
+*/
     payloadoffset = 0;
 
     // Check if the length of data to copy is bigger than Tx buffer size
@@ -877,8 +903,188 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
         errval = ERR_USE;
         goto error;
       }
-      
+
       buffer = (uint8_t *)(DmaTxDesc->Buffer1Addr);
+
+      byteslefttocopy = byteslefttocopy - (ETH_TX_BUF_SIZE - bufferoffset);			// размер оставшихся данных
+      payloadoffset = payloadoffset + (ETH_TX_BUF_SIZE - bufferoffset);				// адрес след. куска в pbuf
+      framelength = framelength + (ETH_TX_BUF_SIZE - bufferoffset);					// общий размер фрейма в отпр. буфере (ETH)
+      bufferoffset = 0;																// размер после последнего куска (ненужный хвост).
+    }
+
+    // Copy the remaining bytes
+    // Скопируйте оставшиеся байты
+    memcpy( (uint8_t*)((uint8_t*)buffer + bufferoffset), (uint8_t*)((uint8_t*)q->payload + payloadoffset), byteslefttocopy );
+    bufferoffset = bufferoffset + byteslefttocopy;
+    framelength = framelength + byteslefttocopy;
+  }
+
+#if ETHARP_SUPPORT_PRP
+  	if (RM_PRP_V1 == get_redundancyMode()){
+
+  		struct eth_prp_hdr  prphdr;
+  		uint16_t 			length;
+
+  		length = totalSize - SIZEOF_ETH_HDR;
+#if ETHARP_SUPPORT_VLAN
+  		if (Vlan_ON == get_VlanMode()){
+  			length -= SIZEOF_VLAN_HDR;
+  		}
+#endif
+
+  	    PrpSetTpid(PP_HTONS(ETHTYPE_PRP));
+  	    length += SIZEOF_PRP_HDR;
+  		PrpSetLSDUsize(length);
+  		PrpSetLanA();
+  		GetPrpTagPostInc(&prphdr);
+
+  	    memcpy( (uint8_t*)((uint8_t*)buffer + bufferoffset), (uint8_t*)&prphdr, SIZEOF_PRP_HDR );
+  	    bufferoffset = bufferoffset + SIZEOF_PRP_HDR;
+  	    framelength = framelength + SIZEOF_PRP_HDR;
+  	}
+#endif
+
+#if ETHARP_SUPPORT_HSR
+    if ((RM_HSR_V0 == get_redundancyMode())||(RM_HSR_V1 == get_redundancyMode())){
+    	if (framelength<66) framelength = 66;
+    }
+#endif
+
+#if ETHARP_SUPPORT_PRP
+    if (RM_PRP_V1 == get_redundancyMode()){
+   if (framelength<66) {
+	   framelength = 66;
+   }
+    }
+#endif
+
+  // Prepare transmit descriptors to give to DMA
+  if (HAL_ETH_TransmitFrame(&heth, framelength) != HAL_OK){
+	  USART_TRACE_RED("HAL_ETH_TransmitFrame error\n");
+  }
+
+  errval = ERR_OK;
+
+error:
+
+  // When Transmit Underflow flag is set, clear it and issue a Transmit Poll Demand to resume transmission
+  if ((heth.Instance->DMASR & ETH_DMASR_TUS) != (uint32_t)RESET)
+  {
+    // Clear TUS ETHERNET DMA flag
+    heth.Instance->DMASR = ETH_DMASR_TUS;
+
+    // Resume DMA transmission
+    heth.Instance->DMATPDR = 0;
+  }
+  return errval;
+}
+#endif
+
+#if defined (HSR_Debug_Mode) || defined (PRP_Debug_Mode)
+/*****************************************************************
+ * low_level_output в зависимости от режима HSR/PRP будем подставлять нужные данные.
+ * Пересоберём пакет в зависимости от режима резервирования. Если это PRP то просто добавим в конец трейлер PRP
+ *
+ *****************************************************************/
+static err_t low_level_output(struct netif *netif, struct pbuf *p)
+{
+  err_t errval;
+  struct pbuf *q;												// временный указатель на буфер
+  uint8_t *buffer = (uint8_t *)(heth.TxDesc->Buffer1Addr);		// берём буфер текущего свободного дескриптора
+  __IO ETH_DMADescTypeDef *DmaTxDesc;
+  uint32_t framelength = 0;
+  uint32_t bufferoffset = 0;
+  uint32_t byteslefttocopy = 0;
+  uint32_t payloadoffset = 0;
+  uint16_t AddSize = 0;					// размер для увеличения буфера на HSR/PRP трейлеры
+  uint8_t *my_p = NULL;
+//-----------------------------------------------------
+// перепакуем буфер в 2 разных с разными данными для отправки
+// 1. выделим память под буфер.
+// 2. перепишем данные со вставкой нужных данных HSR/PRP
+// 3. отправим в буфер интерфейса
+
+//-----------------------------------------------------
+
+  DmaTxDesc = heth.TxDesc;										// текущий дескриптор
+  bufferoffset = 0;
+  
+  // copy frame from pbufs to driver buffers
+  for(q = p; q != NULL; q = q->next)
+  {
+// -----------
+// поменяем указатель на наш буфер.
+// q = my_p;
+// в буфере my_p заменим размеры данных и перепакуем ->payload
+#if defined (PRP_Debug_Mode)
+	AddSize = sizeof(struct prp_rct);
+#endif
+#if defined (HSR_Debug_Mode)
+	AddSize = sizeof(struct hsr_tag);
+#endif
+
+	if(my_p != NULL) GLOBAL_FREEMEM(my_p);
+
+	my_p = GLOBAL_MALLOC((q->len) + AddSize);
+	if(my_p != NULL) {
+
+// в режиме PRP нужен хвост
+#if defined (PRP_Debug_Mode)
+		memcpy(my_p,q->payload,q->len);
+
+		{
+			uint16_t  sz = q->len - 14 + AddSize;
+			uint16_t typeP = (uint16_t)my_p[12]<<8 | (uint16_t)my_p[13];
+			if (ETHTYPE_VLAN == typeP) sz -= 4;
+
+			PRP_Traler.lan_id_and_LSDU_size = htons((uint16_t)LAN_Addr_0 << 8 | (sz & 0xfff));//(q->len - 0*12)
+		}
+
+		// теперь нужно добавить трейлет PRP
+		PRP_Traler.sequence_nr = htons(htons(PRP_Traler.sequence_nr)+1);
+		PRP_Traler.PRP_suffix = htons(PRPsuffix);
+
+		memcpy(my_p+(q->len),&PRP_Traler,AddSize);
+
+#endif
+	}//!if(q != NULL) {
+	// переписали повально всё. Но нам нужны заголовки
+// -----------
+
+    // Is this buffer available? If not, goto error
+	// доступен этот буфер? нет, то выходим с ошибкой
+    if((DmaTxDesc->Status & ETH_DMATXDESC_OWN) != (uint32_t)RESET)
+    {
+      errval = ERR_USE;
+      goto error;
+    }
+
+    // Get bytes in current lwIP buffer
+    // размер текущего буфера lwIP
+    byteslefttocopy = q->len + AddSize;
+    payloadoffset = 0;
+
+    // Check if the length of data to copy is bigger than Tx buffer size
+    // превышает ли длина данных, размер буфера Tx. Пока превышает перекладываем частями в нужное количество буферов дескрипторов
+    while( (byteslefttocopy + bufferoffset) > ETH_TX_BUF_SIZE )
+    {
+      // Copy data to Tx buffer
+      // копируем данные в Tx буфер
+      memcpy( (uint8_t*)((uint8_t*)buffer + bufferoffset), (uint8_t*)((uint8_t*)my_p + payloadoffset), (ETH_TX_BUF_SIZE - bufferoffset) );
+
+      // Point to next descriptor
+      // укажем на следующиий дескриптор
+      DmaTxDesc = (ETH_DMADescTypeDef *)(DmaTxDesc->Buffer2NextDescAddr);
+
+      // Check if the buffer is available
+      // доступен этот буфер? нет, то выходим с ошибкой
+      if((DmaTxDesc->Status & ETH_DMATXDESC_OWN) != (uint32_t)RESET)
+      {
+        errval = ERR_USE;
+        goto error;
+      }
+      
+      buffer = (uint8_t *)(DmaTxDesc->Buffer1Addr);									// берём указатель на буфер
       
       byteslefttocopy = byteslefttocopy - (ETH_TX_BUF_SIZE - bufferoffset);			// размер оставшихся данных
       payloadoffset = payloadoffset + (ETH_TX_BUF_SIZE - bufferoffset);				// адрес след. куска в pbuf
@@ -888,7 +1094,7 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
     
     // Copy the remaining bytes
     // Скопируйте оставшиеся байты
-    memcpy( (uint8_t*)((uint8_t*)buffer + bufferoffset), (uint8_t*)((uint8_t*)q->payload + payloadoffset), byteslefttocopy );
+    memcpy( (uint8_t*)((uint8_t*)buffer + bufferoffset), (uint8_t*)((uint8_t*)my_p + payloadoffset), byteslefttocopy );
     bufferoffset = bufferoffset + byteslefttocopy;
     framelength = framelength + byteslefttocopy;
   }
@@ -909,10 +1115,15 @@ error:
     // Resume DMA transmission
     heth.Instance->DMATPDR = 0;
   }
+
+  if(my_p != NULL) GLOBAL_FREEMEM(my_p);
+
   return errval;
 }
-
+#endif
 /**
+  * Должен выделить pbuf и передать байты входящего пакета из интерфейса в pbuf.
+  *
   * @brief Should allocate a pbuf and transfer the bytes of the incoming
   * packet from the interface into the pbuf.
   *
@@ -1036,10 +1247,14 @@ void ethernetif_input( void const * argument )
         	ret_error = netif->input( p, netif);			// вызываем функцию приема данных она же: (err_t)tcpip_input(struct pbuf *p, struct netif *inp)
           if (ret_error != ERR_OK )
           {
+        	  // из-за нехватки памяти попадает сюда и циклиться. нужно както это решить
         	  USART_TRACE_RED("ethernetif_input ERROR: %s\n",lwip_strerr(ret_error));
         	  Port_On(LED1);
         	  Port_On(LED_out_RED);
               pbuf_free(p);
+//              vTaskDelay(100);
+              // перезапустимся временно, пока не знаю как решить эту беду. Нужно FTP переносить переменные во внешнюю память
+              NVIC_SystemReset();
           }else{
         	  Port_Off(LED1);
         	  Port_Off(LED_out_RED);

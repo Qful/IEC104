@@ -36,6 +36,7 @@
 PR_BEGIN_EXTERN_C
 #endif
 
+#include <stdint.h>
 /* ----------------------- Defines ------------------------------------------*/
 
 /* ----------------------- Type definitions ---------------------------------*/
@@ -50,6 +51,15 @@ typedef enum
 
 typedef enum
 {
+    EV_TCPMB_READY            	= 1<<0,         /*!< Startup finished. */
+    EV_TCPMB_REQUEST_RECEIVED   = 1<<1,         /*!< Приняли запрос из TCP */
+    EV_TCPMB_REQUEST_SENT   	= 1<<2,         /*!< Отправили запрос из TCP в 485 */
+    EV_TCPMB_EXECUTE          	= 1<<3,         /*!< Обработка ответа из 485, подготовка ответа в TCP */
+    EV_TCPMB_RESPONSE_SENT     	= 1<<4          /*!< Отправка ответа в TCP */
+} eMBTCPEventType;
+
+typedef enum
+{
     EV_MASTER_READY                    = 1<<0,  /*!< Startup finished. */
     EV_MASTER_FRAME_RECEIVED           = 1<<1,  /*!< Frame received. */			// можно выполеять после EV_MASTER_EXECUTE. т.к. данные ещё лежат в нём.
     EV_MASTER_EXECUTE                  = 1<<2,  /*!< Execute function. */		//
@@ -58,10 +68,13 @@ typedef enum
 //    EV_MASTER_PROCESS_SUCESS           = 1<<5,  /*!< Request process success. */
 //    EV_MASTER_FRAME_SENT_WAIT	   	   = 1<<5, // ожидаем окончания отправки пакета. Нельзя слать новый запрос.
     EV_MASTER_FRAME_RECEIVE_WAIT	   = 1<<6, // ожидаем ответа от слэйва. Нельзя слать новый запрос.
+    EV_MASTER_FRAME_SENT_AFTER_WAIT	   = 1<<7, // Запрос с предварительным ожиданием ответа.
 // функции работы в режиме слейва. с другим адресом
 //    EV_SLAVE_FRAME_RECEIVED           = 1<<7,
 //    EV_SLAVE_EXECUTE                  = 1<<8,
+
 } eMBMasterEventType;
+
 
 typedef enum
 {
@@ -88,9 +101,9 @@ typedef enum
 /* ----------------------- Supporting functions -----------------------------*/
 BOOL            xMBPortEventInit( void );
 
-BOOL            xMBPortEventPost( eMBEventType eEvent );
+BOOL            xMBPortEventPost( eMBTCPEventType eEvent );
 
-BOOL            xMBPortEventGet(  /*@out@ */ eMBEventType * eEvent );
+BOOL            xMBPortEventGet(  /*@out@ */ eMBTCPEventType * eEvent );
 
 BOOL            xMBMasterPortEventInit( void );
 
@@ -201,6 +214,10 @@ void            vMBTCPPortClose( void );
 void            vMBTCPPortDisable( void );
 
 BOOL            xMBTCPPortGetRequest( UCHAR **ppucMBTCPFrame, USHORT * usTCPLength );
+
+USHORT			xMBTCPPortGetRequestSize(void);
+
+void			xMBTCPPortSetResponseSize(USHORT usTCPLength );
 
 BOOL            xMBTCPPortSendResponse( const UCHAR *pucMBTCPFrame, USHORT usTCPLength );
 

@@ -54,10 +54,10 @@
 // читать только по 8
 // --------------------------------------------------------
 #define MB_WriteSysNoteaddr   		0x2000		//адрес в который пишем номер сообщения для чтения из 0x2100
-#define MB_StartSysNoteaddr   		0x2100
+#define MB_Addr_SysNote   		0x2100
 #define MB_EndSysNoteaddr   		0x3800
-#define MB_NumbSysNote	   			8
-#define MB_NumbSysNoteASCII			8
+#define MB_Size_SysNote	   			8
+#define MB_Size_SysNoteASCII			8
 #define MB_SizeSysNote	   			511			// число записей в журнале
 
 #define MB_OffsetSysNoteMessage	 	0			// слова в котором код сообщения
@@ -68,13 +68,13 @@
 #define MB_offset_Word				0
 #define MB_offset_ASCII				8			// не использовать, в будущем уберут
 
-#define MB_StartErrorNoteaddr  		0
+#define MB_Addr_ErrorNote  		0
 #define MB_EndErrorNoteaddr   		0
 
-#define MB_NumbErrorNote			0			// число слов в одной аварии
-#define MB_NumbErrorNoteASCII		0
+#define MB_Size_ErrorNote			0			// число слов в одной аварии
+#define MB_Size_ErrorNoteASCII		0
 #define MB_NextErrorNote			0			// приращение по журналу
-#define MB_NumbErrorNoteTime		0			// число слов времени события
+#define MB_Size_ErrorNoteTime		0			// число слов времени события
 #define MB_SizeErrorNote	   		0			// число записей в журнале
 
 #define MB_OffsetErrorNoteMessage 	0			// слова в котором код сообщения
@@ -83,16 +83,16 @@
 // --------------------------------------------------------
 
 // кратно 28байт
-#define _LimitNoteSize				(MB_NumbErrorNote * 80)		// 64 записей по журналу ошибок	224 записей по журналу системы
+#define _LimitNoteSize				(MB_Size_ErrorNote * 80)		// 64 записей по журналу ошибок	224 записей по журналу системы
 
 // журнал осциллограмм ---------
-#define MB_StartOscNoteaddr			0x3800
+#define MB_Addr_OscNote			0x3800
 #define MB_EndOscNoteaddr   		0x4800
-#define MB_NumbOscNote				20			// размер одной записи
+#define MB_Size_OscNote				20			// размер одной записи
 #define MB_SizeOscNote	   			100			// число записей в журнале
-//#define MB_SizeOscNote	   			(0x9000 - 0x8000)/MB_NumbOscNote			// число записей в журнале
+//#define MB_SizeOscNote	   			(0x9000 - 0x8000)/MB_Size_OscNote			// число записей в журнале
 
-#define MB_NumbOscNoteTime			8			// число слов времени события
+#define MB_Size_OscNoteTime			8			// число слов времени события
 
 #define MB_OffsetOscNoteMessage	 	0			// слова в котором код сообщения
 // --------------------------------------------------------
@@ -100,7 +100,7 @@
 #define MB_Code_OscNoteREADY		8
 
 // осциллограмы -------------------------------------------
-#define MB_StartOscaddr				0x0900
+#define MB_Addr_Osc				0x0900
 #define MB_SizeAllOsc				0x0D00
 
 #define MB_SizeOscBlock				1024
@@ -110,10 +110,10 @@
 #define MB_Osc_LEN					14
 
 // --------------------------------------------------------
-#define MB_StartOtherUstavkiaddr	0x1040
-#define MB_NumbOtherUstavki			(0x107B - MB_StartOtherUstavkiaddr)
+#define MB_Addr_OtherUstavki	0x1040
+#define MB_Size_OtherUstavki			(0x107B - MB_Addr_OtherUstavki)
 
-#define MB_offset_KTT				(0x102B - MB_StartOtherUstavkiaddr)
+#define MB_offset_KTT				(0x102B - MB_Addr_OtherUstavki)
 
 // конфигурация измерительного транса ------------------------------------------
 
@@ -122,10 +122,10 @@
 // конфигурация выходных логических сигналов -------------------------------------
 
 // Группы уставок ----------------------------------------------------------------
-#define MB_StartUstavkiaddr0		0x1000
+#define MB_Addr_Ustavkiaddr0		0x1000
 #define MB_StartUstavkiaddr1		0x101c
-//#define MB_NumbUstavki			MB_StartUstavkiaddr1 - MB_StartUstavkiaddr0			// размер блока уставок
-#define MB_NumbUstavki				(MB_StartSystemCfg - MB_StartUstavkiaddr0)			// без варинтов групп уставок. Так было раньше, сейчас я не знаю
+//#define MB_Size_Ustavki			MB_StartUstavkiaddr1 - MB_Addr_Ustavkiaddr0			// размер блока уставок
+#define MB_Size_Ustavki				(MB_Addr_SystemCfg - MB_Addr_Ustavkiaddr0)			// без варинтов групп уставок. Так было раньше, сейчас я не знаю
 
 #define MB_offset_Ktn1				0x09
 #define MB_offset_Ktnnp1			0x0B
@@ -144,8 +144,8 @@
 
 
 // ----------------------------------------------------------------------------------------------
-#define MB_StartDiscreetaddr   		0x1800			// адрес и размер для комманд чтения (3,4)
-#define MB_NumbDiscreet   			0x0B			// 0x22
+#define MB_Addr_Discreet	   		0x1800			// адрес и размер для комманд чтения (3,4)
+#define MB_Size_Discreet   			0x0B			// 0x22
 
 // ---------------------------------
 #define MB_offsetLocalCtrl			0x00		// ручной режим
@@ -214,7 +214,7 @@
 #define MB_bOffsetAllErrDriveRPN	0b11111	// Наличие неисправности
 
 
-#define MB_bOffsetALLFaults		(0b111111<<3)	// Наличие любой неисправности
+#define MB_bOffset_errorALLModul		(0b111111<<3)	// Наличие любой неисправности
 
 
 // ---------------------------------
@@ -344,8 +344,8 @@
 6 Индикатор «Журнал системы»
 */
 // ----------------------------------------------------------------------------------------------
-#define MB_StartAnalogINaddr   	0x1900		// база данных аналогов
-#define MB_NumbAnalog   		16			//
+#define MB_Addr_Analog   	0x1900		// база данных аналогов
+#define MB_Size_Analog   		16			//
 
 #define MB_offset_Ivv1			0
 #define MB_offset_Isv1			1
@@ -362,19 +362,25 @@
 #define MB_offset_Upp2			15
 
 // ----------------------------------------------------------------------------------------------
-#define	MB_StartRPNaddr			0x1A00
-#define	MB_NumbRPN				2//4
+#define	MB_Addr_RPN			0x1A00
+#define	MB_Size_RPN				2//4
 
 #define MB_offset_CurrPosRPN	0//0		// 2 слова
 #define MB_offset_CntSwRPN		1//2		// 2 слова
 
-// ----------------------------------------------------------------------------------------------
-#define MB_StartDateNaddr   	0x0200
-#define MB_NumbDate		   		7
+/********************************************************************************
+ * дата и время
+ ********************************************************************************/
 
-// ----------------------------------------------------------------------------------------------
-#define MB_StartRevNaddr   		0x0500		// версия 17 слов
-#define MB_NumbWordRev	   		16			// 16
+#define MB_Addr_Date   						(0x0200)
+#define MB_Size_Date	   					7
+
+/********************************************************************************
+ * версия
+ ********************************************************************************/
+
+#define MB_Addr_Rev		   							0x0500
+#define MB_Size_Rev		   							16				// 16 слов
 
 // адреса в байтах
 #define MB_offset_ModelDev		0x0			// строка с моделью устройства
@@ -401,43 +407,44 @@
 #define MB_addr_OscNote_OFF		0x0000		// а нету этой функции
 
 
-#define MB_addr_UstavkiModify	0x1812		//сброс флага изменения уставок
+#define MB_Addr_UstavkiModify	0x1812		//сброс флага изменения уставок
 
 #define MB_CTRL_OFF				0xFF00
 
 // ----------------------------------------------------------------------------------------------
-#define MB_Startaddr_SG			0
-#define MB_NumbSG		   		0
+#define MB_Addr_SG			0
+#define MB_Size_SG		   		0
 
 // Параметры системы (они же IP адрес) -----------------------------------------------------------
-#define MB_StartSystemCfg		0x1078
-#define MB_NumbSystemCfg		4
+#define MB_Addr_SystemCfg		0x1078
+#define MB_Size_SystemCfg		4
 #define MB_offset_IP			2
 
 // ----------------------------------------------------------------------------------------------
-#define MB_Startaddr_Goose		0x0D80
-#define MB_NumbGoose	   		1
+#define MB_Addr_Goose			0x0D80
+#define MB_Size_Goose	   		1
 
 // ----------------------------------------------------------------------------------------------
 // Все уставки одним блоком
 // ----------------------------------------------------------------------------------------------
-#define MB_StartDUMP_Ustavki	0x01000
-#define MB_NumbDUMP_Ustavki	   	(0x1A03 - MB_StartDUMP_Ustavki)
+#define MB_Addr_DUMP_Ustavki	0x01000
+#define MB_Size_DUMP_Ustavki	   	(0x1A03 - MB_Addr_DUMP_Ustavki)
 // ----------------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------------
 
 // --------------------------------------
-#define MB_Startaddr_SG_set_0	0
-#define MB_Startaddr_SG_set_1	0
+#define MB_Addr_SG_set_0	0
+#define MB_Addr_SG_set_1	0
+#define MB_addr_CMD_1_OnOff		0
 
-#define MB_StartConfigF_SG0		0
-#define MB_NumbConfigF			0
+#define MB_Addr_ConfigF		0
+#define MB_Size_ConfigF			0
 
-#define MB_StartConfigU_SG0		0
-#define MB_NumbConfigU			0
+#define MB_Addr_ConfigU		0
+#define MB_Size_ConfigU			0
 
-#define MB_StartConfigOut		0
-#define MB_NumbConfigOut		0
+#define MB_Addr_ConfigOut		0
+#define MB_Size_ConfigOut		0
 
 #define MB_StartConfigExZ_SG0  	0
 #define MB_NumbConfigExZ		0
@@ -448,39 +455,39 @@
 #define MB_StartConfigI2I1I0_SG0	0
 #define MB_NumbConfigI2I1I0			0
 
-#define MB_StartConfigTRPWR		0
-#define MB_NumbConfigTRPWR		0
+#define MB_Addr_ConfigTRPWR		0
+#define MB_Size_ConfigTRPWR		0
 
-#define MB_StartConfigVLSIn		0
-#define MB_NumbConfigVLSIn		0
+#define MB_Addr_ConfigVLSIn		0
+#define MB_Size_ConfigVLSIn		0
 
-#define MB_StartConfigVLSOut	0
-#define MB_NumbConfigVLSOut		0
+#define MB_Addr_ConfigVLSOut	0
+#define MB_Size_ConfigVLSOut		0
 
 // конфигурация АВР  ----------------------------------------------------------------------------
-#define MB_StartConfigAWR	   	0
-#define MB_NumbConfigAWR		0
+#define MB_Addr_ConfigAWR	   	0
+#define MB_Size_ConfigAWR		0
 
 // конфигурация АПВ  ----------------------------------------------------------------------------
-#define MB_StartConfigAPW	   	0
-#define MB_NumbConfigAPW		0
+#define MB_Addr_ConfigAPW	   	0
+#define MB_Size_ConfigAPW		0
 
 // конфигурация измерительного транса  в группе уставок------------------------------------------
 #define MB_StartConfigTRMeas	0
 #define MB_NumbConfigTRMeas		0
 
 // ресурс выключателя ---------------------------------------------------------------------------
-#define MB_StartSWCrash			0
+#define MB_Addr_SWCrash			0
 #define MB_Size_SWCrash  		0
 
 // конфигурация выключателя ---------------------------------------------------------------------
-#define MB_StartConfigSW	   	0
+#define MB_Addr_ConfigSW	   	0
 #define MB_Size_ConfSW			0
-#define MB_NumbConfigSW			0
+#define MB_Size_ConfigSW			0
 
 // Параметры автоматики -------------------------------------------------------------------------
-#define MB_StartAutomat			0
-#define MB_NumbAutomat			0
+#define MB_Addr_Automat			0
+#define MB_Size_Automat			0
 
 
 // --------------------------------------

@@ -130,9 +130,9 @@ Handleset_destroy(HandleSet self);
  * \return the newly create TcpServerSocket instance
  */
 ServerSocket
-TcpServerSocket_create(const char* address, int port);
+TcpServerSocket_create(const char* address, int port, bool keepalive);
 
-ServerSocket
+Socket
 UDPClientSocket_create(const char* address, int port);
 
 ServerSocket
@@ -252,8 +252,6 @@ Socket_read(Socket self, uint8_t* buf, int size);
  * \return number of bytes transmitted of -1 in case of an error
  */
 int	Socket_write(Socket self, uint8_t* buf, int size);
-
-int	Socket_write_PRPHSR(Socket self, uint8_t* buf, int size);
 
 /**
  * \brief Get the address of the peer application (IP address and port number)

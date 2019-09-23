@@ -11,6 +11,7 @@
 #include "ConfBoard.h"
 #include "usart.h"
 #include "gpio.h"
+#include "main.h"
 
 extern UART_HandleTypeDef BOOT_UART;			//USART1
 extern UART_HandleTypeDef RS485_1;				//USART2
@@ -110,10 +111,14 @@ static  DMA_HandleTypeDef hdma_tx_RS485_2;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
     /*##-3- Configure the NVIC for UART ########################################*/
-    HAL_NVIC_SetPriority(UART4_IRQn, 6, 0);		//0
-
-    /* Enable the UART Data Register not empty Interrupt */
-    __HAL_UART_ENABLE_IT(huart, UART_IT_IDLE);
+#if (NewModbusMaster)
+    HAL_NVIC_SetPriority(UART4_IRQn, 6, 0);
+#else
+    HAL_NVIC_SetPriority(UART4_IRQn, 6, 0);
+#endif
+    // Enable the UART Data Register not empty Interrupt
+    // Receive Data register not empty interrupt UART_IT_RXNE
+    __HAL_UART_ENABLE_IT(huart, UART_IT_IDLE );
 
     HAL_NVIC_EnableIRQ(UART4_IRQn);
 
@@ -145,8 +150,8 @@ static  DMA_HandleTypeDef hdma_tx_RS485_2;
     hdma_rx_MODBUS.Init.MemInc              = DMA_MINC_ENABLE;
     hdma_rx_MODBUS.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
     hdma_rx_MODBUS.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-    hdma_rx_MODBUS.Init.Mode                = DMA_CIRCULAR;//DMA_CIRCULAR;//DMA_NORMAL;
-    hdma_rx_MODBUS.Init.Priority            = DMA_PRIORITY_VERY_HIGH;//DMA_PRIORITY_MEDIUM;
+    hdma_rx_MODBUS.Init.Mode                = DMA_CIRCULAR;				//DMA_CIRCULAR - было до 17.05.2019
+    hdma_rx_MODBUS.Init.Priority            = DMA_PRIORITY_VERY_HIGH;	//DMA_PRIORITY_MEDIUM;
     hdma_rx_MODBUS.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
     hdma_rx_MODBUS.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
     hdma_rx_MODBUS.Init.MemBurst            = DMA_MBURST_SINGLE;//DMA_MBURST_INC4;
@@ -222,13 +227,13 @@ static  DMA_HandleTypeDef hdma_tx_RS485_2;
     HAL_DMA_Init(&hdma_rx_DEBUG);
 
     // NVIC configuration for DMA transfer complete interrupt (USARTx_TX)
-    HAL_NVIC_SetPriority(USART1_DMA_TX_IRQn, 5, 0);	//6
+    HAL_NVIC_SetPriority(USART1_DMA_TX_IRQn, 6, 0);	//6
     HAL_NVIC_EnableIRQ(USART1_DMA_TX_IRQn);
 
-    HAL_NVIC_SetPriority(USART1_DMA_RX_IRQn, 5, 0);	//6
+    HAL_NVIC_SetPriority(USART1_DMA_RX_IRQn, 6, 0);	//6
     HAL_NVIC_EnableIRQ(USART1_DMA_RX_IRQn);
 
-    HAL_NVIC_SetPriority(USART1_IRQn, 5, 0);		//6
+    HAL_NVIC_SetPriority(USART1_IRQn, 6, 0);		//6
     HAL_NVIC_EnableIRQ(USART1_IRQn);
 
   }

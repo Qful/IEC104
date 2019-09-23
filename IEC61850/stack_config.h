@@ -32,7 +32,7 @@
 
 // память выделяемая для каждого клиента.
 /* Maximum MMS PDU SIZE - default is 65000 */
-#define MMS_MAXIMUM_PDU_SIZE 			8192				//16384 было до 05.03.2018					//4096//2048//1200//4096//8192//2048
+#define MMS_MAXIMUM_PDU_SIZE 			10240//8192				//16384 было до 05.03.2018					//4096//2048//1200//4096//8192//2048
 
 // reserve 64k for dynamic memory allocation  this can be optimized maybe there is a good guess for the required memory size
 // sendNextReportEntry()
@@ -118,6 +118,9 @@
 #define CONFIG_GOOSE_DEFAULT_DST_ADDRESS {0x01, 0x0c, 0xcd, 0x01, 0x00, 0x01}
 
 //------------------------------------------------------------------------------------------------------------------------
+// поддержка SAMPLED VALUES в сборке ----------------------------------------------------------------------------------------------
+#define CONFIG_IEC61850_SAMPLED_VALUES_SUPPORT		0//1
+//------------------------------------------------------------------------------------------------------------------------
 /* include support for IEC 61850 control services */
 #define CONFIG_IEC61850_CONTROL_SERVICE 						1
 
@@ -145,7 +148,7 @@
 
 //------------------------------------------------------------------------------------------------------------------------
 /* include support for IEC 61850 log services */
-#define CONFIG_IEC61850_LOG_SERVICE 							1			// пока не поддерживаем
+#define CONFIG_IEC61850_LOG_SERVICE 							0			// пока не поддерживаем
 
 //------------------------------------------------------------------------------------------------------------------------
 /* MMS virtual file store base path - where MMS file services are looking for files */
@@ -157,7 +160,6 @@
 #define CONFIG_MMS_MAX_NUMBER_OF_OPEN_FILES_PER_CONNECTION 		3
 
 //------------------------------------------------------------------------------------------------------------------------
-/* Maximum number of the domain specific data sets - this also includes the static (pre-configured) and dynamic data sets */
 /*Максимальное количество наборов данных для конкретных доменов - это также включает статические (предварительно настроенные) и динамические наборы данных*/
 #define CONFIG_MMS_MAX_NUMBER_OF_DOMAIN_SPECIFIC_DATA_SETS 		30
 
@@ -167,9 +169,7 @@
 /* Maximum number of VMD specific data sets */
 #define CONFIG_MMS_MAX_NUMBER_OF_VMD_SPECIFIC_DATA_SETS 		10
 
-/* Maximum number of the members in a data set (named variable list) */
-/*Максимальное количество членов в наборе данных (список имен переменных)*/
-
+/*Максимальное количество элементов в наборе данных (список имен переменных)*/
 #define CONFIG_MMS_MAX_NUMBER_OF_DATA_SET_MEMBERS 				100				// ограничим число записей до
 //------------------------------------------------------------------------------------------------------------------------
 

@@ -74,8 +74,8 @@ eMBMasterReqErrCode
 eMBMasterReqReadDiscreteInputs( UCHAR ucSndAddr, USHORT usDiscreteAddr, USHORT usNDiscreteIn, LONG lTimeOut )
 {
     UCHAR           *ucMBFrame;
-    uint8_t			SizeAnswer;
-    uint8_t			SizeData;
+    uint16_t		SizeAnswer;
+    uint16_t		SizeData;
     eMBMasterReqErrCode    eErrStatus = MB_MRE_NO_ERR;
 
     if ( ucSndAddr > MB_MASTER_TOTAL_SLAVE_NUM ) eErrStatus = MB_MRE_ILL_ARG;
@@ -137,7 +137,7 @@ eMBException	eMBMasterFuncReadDiscreteInputs( UCHAR * pucFrame, USHORT * usLen )
 		if ((usDiscreteCnt >= 1) && ucNBytes == pucFrame[MB_PDU_FUNC_READ_DISCCNT_OFF])
         {
 	       	/* Make callback to fill the buffer. */
-			eRegStatus = eMBMasterRegDiscreteCB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], 1/*usRegAddress-MB_StartDiscreetaddr*/, usDiscreteCnt );
+			eRegStatus = eMBMasterRegDiscreteCB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], 1/*usRegAddress-MB_Addr_Discreet*/, usDiscreteCnt );
 
 			/* If an error occured convert it into a Modbus exception. */
 			if( eRegStatus != MB_ENOERR )

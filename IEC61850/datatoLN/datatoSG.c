@@ -24,9 +24,16 @@ extern  xQueueHandle 	ModbusSentTime;			// срочная очередь для отправки в модбас
  * MR801
  *******************************************************/
 #if defined (MR801)
-#include "static_model_MR801.h"
 
-extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+#if defined	(MR801) && defined (OLD)
+#include "static_model_MR801.h"
+#endif
+
+#if defined	(MR801) && defined (T12N5D58R51)
+#include "static_model_MR801_T12N5D58R51.h"
+#endif
+
+extern uint16_t   ucMDiscInBuf[MB_Size_Discreet];
 extern uint8_t				writeNmb;
 extern uint8_t	  			writeNmbSG;			// номер группы уставок.
 
@@ -46,6 +53,10 @@ int		Set_SG	(uint16_t QTnum, uint64_t currentTime )
 			if (currSG != IedServer_getActiveSettingGroup(iedServer,LogicalDevice_getSettingGroupControlBlock(&iedModel_Generic_LD0))) {
 				IedServer_changeActiveSettingGroup(iedServer,LogicalDevice_getSettingGroupControlBlock(&iedModel_Generic_LD0),currSG );
 				USART_TRACE("Изменилась группа уставок. %u\n",iedModel_LD0_LLN0_sgcb0.actSG);
+
+				AddToQueueMB(ModbusSentQueue, 	MB_Rd_NumbSG		,MB_Slaveaddr);		// возможно изменилась группа. прочитаем
+				Get_AllUstavki(ModbusSentQueue,MB_Slaveaddr);
+
 				ret = true;
 			}
 			// -------------------- были ли изменения журнала системы ---------------------------
@@ -54,12 +65,9 @@ int		Set_SG	(uint16_t QTnum, uint64_t currentTime )
 				ucMDiscInBuf[MB_offset_Jurnals] ^= MB_bOffsetSysNote;
 
 
-				AddToQueueMB(ModbusSentTime, 	MB_Wrt_Reset_SysNote	,MB_Slaveaddr);		// сбросим флаг    было ModbusSentQueue
+				AddToQueueMB(ModbusSentTime, 	MB_Wrt_Reset_SysNote	,MB_Slaveaddr);		// сбросим флаг
 		    	AddToQueueMB(Rd_SysNoteQueue, 	MB_Wrt_SysNoteAdr0		,MB_Slaveaddr);	    // установим 0 адрес
 				AddToQueueMB(Rd_SysNoteQueue, 	MB_Rd_SysNote			,MB_Slaveaddr);	    // прочитаем записи журнала
-
-//				AddToQueueMB(ModbusSentQueue, 	MB_Wrt_OscNoteAdr0		,MB_Slaveaddr);		// ставим задачу сброса записи
-//				AddToQueueMB(Rd_SysNoteQueue, 	MB_Rd_OscNote			,MB_Slaveaddr);		// ставим задачу чтения журнала осцилл.
 
 				AddToQueueMB(ModbusSentQueue, 	MB_Rd_NumbSG			,MB_Slaveaddr);		// возможно изменилась группа. прочитаем
 				AddToQueueMB(ModbusSentQueue, 	MB_Rd_ConfigSW			,MB_Slaveaddr);		// в выключателе тоже изменения могут быть
@@ -87,7 +95,7 @@ return	ret;
 #if defined (MR901) || defined (MR902)
 #include "static_model_MR901_902.h"
 
-extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   ucMDiscInBuf[MB_Size_Discreet];
 extern uint8_t				writeNmb;
 extern uint8_t	  			writeNmbSG;			// номер группы уставок.
 
@@ -139,7 +147,7 @@ int		Set_SG	(uint16_t QTnum, uint64_t currentTime )
 /*******************************************************
  * MR771 MR761 MR762 MR763
  *******************************************************/
-#if defined	(MR771) || defined	(MR761) || defined	(MR762) || defined	(MR763)
+#if defined	(MR771) || defined	(MR761) || defined	(MR762) || defined	(MR763) || defined	(MR761OBR)
 
 #if defined	(MR771)
 #include "static_model_MR771.h"
@@ -149,9 +157,21 @@ int		Set_SG	(uint16_t QTnum, uint64_t currentTime )
 #include "static_model_MR76x.h"
 #endif
 
-extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
-extern uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
-extern uint16_t   ucSGBuf[MB_NumbSG];
+#if  defined (MR761OBR)
+#include "static_model_MR761OBR.h"
+#endif
+
+extern uint16_t   ucMDiscInBuf[MB_Size_Discreet];
+#if defined (AN_PERV)
+extern float   ucMAnalogInBuf[];
+#else
+	#if defined (AN_DUBLEDATA)
+	extern	uint32_t   ucMAnalogInBuf[MB_Size_Analog/2];
+	#else
+	extern	uint16_t   ucMAnalogInBuf[MB_Size_Analog];
+	#endif
+#endif
+extern uint16_t   ucSGBuf[MB_Size_SG];
 extern uint16_t   usConfigUstavkiStart;			// группа уставок
 
 extern uint8_t				writeNmb;
@@ -165,20 +185,38 @@ int		Set_SG	(uint16_t QTnum, uint64_t currentTime )
 	bool	ret = false;
 	uint8_t	currSG = 0;
 
-	//currSG = ucMAnalogInBuf[MB_offset_SG] + 1;
+#if !defined (MR761OBR)
+			if ((ucMDiscInBuf[MB_offset_SG] & MB_bOffsetSG0)>0){ currSG = 1; usConfigUstavkiStart = MB_Addr_Ustavkiaddr0;}
+	else	if ((ucMDiscInBuf[MB_offset_SG] & MB_bOffsetSG1)>0){ currSG = 2; usConfigUstavkiStart = MB_StartUstavkiaddr1;}
+	else	if ((ucMDiscInBuf[MB_offset_SG] & MB_bOffsetSG2)>0){ currSG = 3; usConfigUstavkiStart = MB_StartUstavkiaddr2;}
+	else	if ((ucMDiscInBuf[MB_offset_SG] & MB_bOffsetSG3)>0){ currSG = 4; usConfigUstavkiStart = MB_StartUstavkiaddr3;}
+	else	if ((ucMDiscInBuf[MB_offset_SG] & MB_bOffsetSG4)>0){ currSG = 5; usConfigUstavkiStart = MB_StartUstavkiaddr4;}
+	else	if ((ucMDiscInBuf[MB_offset_SG] & MB_bOffsetSG5)>0){ currSG = 6; usConfigUstavkiStart = MB_StartUstavkiaddr5;}
+
+	ucSGBuf[0] = currSG;
+#endif
+
+#if defined (MR761OBR)
 	currSG = ucSGBuf[0] + 1;
 
 	// выбираем нужную группу
 	 {
-		 uint16_t	adin = (uint16_t)MB_NumbUstavki;
+		 uint16_t	adin = (uint16_t)MB_Size_Ustavki;					// число уставок
 		 adin = adin * ucSGBuf[0];
-		 usConfigUstavkiStart = (uint16_t)MB_StartUstavkiaddr0 + adin;
+		 usConfigUstavkiStart = (uint16_t)MB_Addr_Ustavkiaddr0 + adin;
 	 }
+
+#endif
 
 
 	if (currSG != IedServer_getActiveSettingGroup(iedServer,LogicalDevice_getSettingGroupControlBlock(&iedModel_Generic_LD0))) {
 		IedServer_changeActiveSettingGroup(iedServer,LogicalDevice_getSettingGroupControlBlock(&iedModel_Generic_LD0),currSG );
 			USART_TRACE("Изменилась группа уставок. %u\n",iedModel_LD0_LLN0_sgcb0.actSG);
+
+// 18.03.2019 почемуто не перечитывались уставки при смене группы. добавил чтение
+//	    	AddToQueueMB(ModbusSentQueue, MB_Rd_Ustavki			,MB_Slaveaddr);		// ставим задачу вычитать новые уставки
+			AddToQueueMB(ModbusSentQueue, 	MB_Rd_NumbSG		,MB_Slaveaddr);		// возможно изменилась группа. прочитаем
+			Get_AllUstavki(ModbusSentQueue,MB_Slaveaddr);
 
 //	    	AddToQueueMB(ModbusSentQueue, MB_Rd_Ustavki			,MB_Slaveaddr);		// ставим задачу вычитать новые уставки
 //	    	AddToQueueMB(ModbusSentQueue, MB_Rd_ConfigSWCrash	,MB_Slaveaddr);
@@ -190,21 +228,50 @@ int		Set_SG	(uint16_t QTnum, uint64_t currentTime )
 			ret = true;
 	}
 	// -------------------- были ли изменения  ---------------------------
-	if ((ucMDiscInBuf[MB_offset_Jurnals] & MB_bOffsetSysNote)>0) {
+	if ((ucMDiscInBuf[MB_offset_SysNote] & MB_bOffsetSysNote)>0) {
 		USART_TRACE("Новая запись журнала системы.\n");
 		writeNmb = 9;
-		ucMDiscInBuf[MB_offset_Jurnals] ^= MB_bOffsetSysNote;
+		ucMDiscInBuf[MB_offset_SysNote] ^= MB_bOffsetSysNote;
 
 		AddToQueueMB(ModbusSentTime, MB_Wrt_Reset_SysNote	,MB_Slaveaddr);		// сбросим флаг    было ModbusSentQueue
     	AddToQueueMB(Rd_SysNoteQueue, MB_Wrt_SysNoteAdr0	,MB_Slaveaddr);	    // установим 0 адрес
 		AddToQueueMB(Rd_SysNoteQueue, MB_Rd_SysNote			,MB_Slaveaddr);	    // прочитаем записи журнала
 
 
-#if ((defined	(MR761) || defined	(MR762) || defined	(MR763)) && (_REVISION_DEVICE <=302)) || (defined	(MR771) && (_REVISION_DEVICE <=106))
+#if ((defined	(MR761) || defined	(MR762) || defined	(MR763)) && (_REVISION_DEVICE <=303)) || (defined	(MR771) && (_REVISION_DEVICE <=106)) || defined	(MR761OBR)
 		AddToQueueMB(ModbusSentQueue, 	MB_Rd_NumbSG		,MB_Slaveaddr);		// возможно изменилась группа. прочитаем
 //		AddToQueueMB(ModbusSentQueue, 	MB_Rd_ConfigSW		,MB_Slaveaddr);		// в группе уставок
 // учтавки читаются в функции получения номера группы уставок
 //		AddToQueueMB(ModbusSentQueue, MB_Rd_Ustavki			,MB_Slaveaddr);		// ставим задачу вычитать новые уставки
+#else
+//TODO: чтение журнала сбивает чтение уставок. по какойто причине. проявилось в 761 v3.04 пришлось добавить "повторное чнение".
+/*
+ * 0x200044D0 0x600B7476 [19.03.2019 14:53:26.925] DBG: Получили конфиг системы.
+0x200044D0 0x600B7476 [19.03.2019 14:53:26.926] DBG: IP из MODBUS совпадает с константой.
+0x20004538 0x600B7476 [19.03.2019 14:53:26.937] DBG: Задача Общ cmd:19 addr:25A4 size:120 (err:0)
+0x200044D0 0x600B7476 [19.03.2019 14:53:26.939] DBG: 0-121. Получили группы уставок.(0x25A4)
+0x20004538 0x600B7476 [19.03.2019 14:53:26.949] DBG: Задача Общ cmd:19 addr:261C size:120 (err:0)
+0x200044D0 0x600B7476 [19.03.2019 14:53:26.951] DBG: 120-241. Получили группы уставок.(0x261C)
+0x20004538 0x600B7476 [19.03.2019 14:53:26.959] DBG: Задача Общ cmd:19 addr:2694 size:120 (err:0)
+0x200044D0 0x600B7476 [19.03.2019 14:53:26.961] DBG: 240-361. Получили группы уставок.(0x2694)
+0x20004538 0x600B7476 [19.03.2019 14:53:26.970] DBG: Задача Общ cmd:19 addr:270C size:120 (err:0)
+0x20004538 0x600B7476 [19.03.2019 14:53:26.988] DBG: Задача Общ cmd:19 addr:2784 size:120 (err:0)
+0x20004538 0x600B7476 [19.03.2019 14:53:26.999] DBG: Задача Общ cmd:19 addr:27FC size:120 (err:0)
+0x20004538 0x600B7476 [19.03.2019 14:53:27.011] DBG: Задача Общ cmd:19 addr:2874 size:120 (err:0)
+0x20004538 0x600B7476 [19.03.2019 14:53:27.028] DBG: Задача Общ cmd:19 addr:28EC size:120 (err:0)
+0x20004538 0x600B7476 [19.03.2019 14:53:27.040] DBG: Задача Общ cmd:19 addr:2964 size:120 (err:0)
+0x20004538 0x600B7476 [19.03.2019 14:53:27.050] DBG: Задача Общ cmd:19 addr:29DC size:28 (err:0)
+0x20004538 0x600B7476 [19.03.2019 14:53:27.062] DBG: Задача Общ cmd:19 addr:29F8 size:120 (err:0)
+0x200044D0 0x600B7476 [19.03.2019 14:53:27.067] DBG: 0-121. Получили группы уставок.(0x29F8)
+0x20004538 0x600B7476 [19.03.2019 14:53:27.078] DBG: Задача Общ cmd:19 addr:2A70 size:120 (err:0)
+0x200044D0 0x600B7476 [19.03.2019 14:53:27.080] DBG: 120-241. Получили группы уставок.(0x2A70)
+0x20004538 0x600B7476 [19.03.2019 14:53:27.090] DBG: Задача Общ cmd:19 addr:2AE8 size:120 (err:0)
+0x200044D0 0x600B7476 [19.03.2019 14:53:27.092] DBG: 240-361. Получили группы уставок.(0x2AE8)
+0x20004538 0x600B7476 [19.03.2019 14:53:27.100] DBG: Задача Общ cmd:19 addr:2B60 size:59 (err:0)
+0x200044D0 0x600B7476 [19.03.2019 14:53:27.102] DBG: 360-420. Получили группы уставок.(0x2B60)
+ *
+ */
+		AddToQueueMB(ModbusSentQueue, 	MB_Rd_NumbSG		,MB_Slaveaddr);		// возможно изменилась группа. прочитаем
 #endif
 	}
 
@@ -223,8 +290,8 @@ int		Set_SG	(uint16_t QTnum, uint64_t currentTime )
 
 	// -------------------- были ли изменения в уставках ---------------------------
 	// начиная с ревизии 1.07(MR771), или 303(MR761,MR762,MR763)
-#if ((defined	(MR761) || defined	(MR762) || defined	(MR763)) && (_REVISION_DEVICE >302)) || (defined	(MR771) && (_REVISION_DEVICE >106))
-	if ((ucMDiscInBuf[MB_offset_UstavkiModify] & MB_bOffsetUstavkiModify)>0) {
+#if ((defined	(MR761) || defined	(MR762) || defined	(MR763)) && (_REVISION_DEVICE >303)) || (defined (MR771) && (_REVISION_DEVICE >106)) || defined	(MR761OBR)
+	if ((ucMDiscInBuf[MB_offset_UstavkiModify] & MB_bOffset_errorUstavkiModify)>0) {
 		USART_TRACE("были изменения в уставках\n");
 		AddToQueueMB(ModbusSentQueue, MB_Wrt_Reset_Ustavki	,MB_Slaveaddr);		// сбросим флаг изменения уставок
     	AddToQueueMB(ModbusSentQueue, MB_Rd_Ustavki			,MB_Slaveaddr);		// ставим задачу вычитать новые уставки
@@ -256,8 +323,8 @@ return	ret;
 #if defined (MR851)
 #include "static_model_MR851.h"
 
-extern uint16_t   	ucMDiscInBuf[MB_NumbDiscreet];
-extern uint16_t   	ucSGBuf[MB_NumbSG];
+extern uint16_t   	ucMDiscInBuf[MB_Size_Discreet];
+extern uint16_t   	ucSGBuf[MB_Size_SG];
 extern uint16_t   	usConfigUstavkiStart;			// группа уставок
 extern uint8_t		writeNmb;
 
@@ -330,7 +397,7 @@ extern uint16_t   usConfigStartI2I1I0;	// конфигурация Дополнительные защиты
 
 #endif
 
-extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   ucMDiscInBuf[MB_Size_Discreet];
 
 /*******************************************************
  * Set_SG  изменяем группу уставок

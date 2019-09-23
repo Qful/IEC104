@@ -17,7 +17,7 @@
 
 #endif
 
-#if defined (MR771) || defined (MR761) || defined (MR762) || defined (MR763)
+#if defined (MR771) || defined (MR761) || defined (MR762) || defined (MR763) || defined (MR761OBR)
 
 #define MJ_USTAVKI_CHANGE			((uint16_t)03)
 #define MJ_MENU_USTAVKI_CHANGE		((uint16_t)27)

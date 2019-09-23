@@ -23,7 +23,7 @@
 
 #include "libiec61850_platform_includes.h"
 
-uint32_t	GLOBALMemoryUsedLim = 0;							//максимально использованной памяти
+uint32_t	GLOBALMemoryUsedLim = 0;							//максимальный адрес использованной памяти
 uint32_t	GLOBALMemoryUsedCurr = 0;							//текущее выделение
 
 
@@ -48,33 +48,24 @@ void*
 Memory_malloc(size_t size)
 {
 	portENTER_CRITICAL();
-	//taskENTER_CRITICAL();
     void* memory = malloc(size);
-    //taskEXIT_CRITICAL();
     portEXIT_CRITICAL();
-//    printf("Memory_malloc 0x%x:%u\n", memory,size);
 
     if (memory == NULL){
         noMemoryAvailableHandler();
     } else{
-    	uint32_t	tmp = (uint32_t)memory + (uint32_t)size;
-    	if (GLOBALMemoryUsedLim<tmp) GLOBALMemoryUsedLim = tmp;
+    	GLOBALMemoryUsedCurr = (uint32_t)memory + (uint32_t)size;
+    	if (GLOBALMemoryUsedLim<GLOBALMemoryUsedCurr) GLOBALMemoryUsedLim = GLOBALMemoryUsedCurr;
     }
-
     return memory;
 }
 
 
-void*
-Memory_calloc(size_t nmemb, size_t size)
+void*	Memory_calloc(size_t nmemb, size_t size)
 {
 	portENTER_CRITICAL();
-	//taskENTER_CRITICAL();
     void* memory = calloc(nmemb, size);
-    //taskEXIT_CRITICAL();
     portEXIT_CRITICAL();
-
-//    printf("Memory_calloc 0x%x:%u\n", memory,size);
 
     if (memory == NULL){
         noMemoryAvailableHandler();
@@ -87,16 +78,11 @@ Memory_calloc(size_t nmemb, size_t size)
 }
 
 
-void *
-Memory_realloc(void *ptr, size_t size)
+void *	Memory_realloc(void *ptr, size_t size)
 {
-
 	portENTER_CRITICAL();
-	//taskENTER_CRITICAL();
     void* memory = realloc(ptr, size);
-    //taskEXIT_CRITICAL();
     portEXIT_CRITICAL();
-//    printf("Memory_realloc 0x%x:%u\n", memory,size);
 
     if (memory == NULL){
         noMemoryAvailableHandler();
@@ -104,21 +90,13 @@ Memory_realloc(void *ptr, size_t size)
     	GLOBALMemoryUsedCurr = (uint32_t)memory + (uint32_t)size;
     	if (GLOBALMemoryUsedLim<GLOBALMemoryUsedCurr) GLOBALMemoryUsedLim = GLOBALMemoryUsedCurr;
     }
-
     return memory;
 }
 
-void
-Memory_free(void* memb)
+void	Memory_free(void* memb)
 {
 	portENTER_CRITICAL();
-	//taskENTER_CRITICAL();
     free(memb);
-    //taskEXIT_CRITICAL();
     portEXIT_CRITICAL();
-
-
-//    printf("Memory_free 0x%x\n",memb);
-
 }
 

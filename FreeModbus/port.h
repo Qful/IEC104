@@ -32,6 +32,7 @@
 
 #include <assert.h>
 #include <inttypes.h>
+#include <stdbool.h>
 
 #define	INLINE
 #define PR_BEGIN_EXTERN_C           extern "C" {
@@ -40,7 +41,9 @@
 #define ENTER_CRITICAL_SECTION()	portENTER_CRITICAL()	//EnterCriticalSection() ( __disable_irq() )
 #define EXIT_CRITICAL_SECTION()    portEXIT_CRITICAL() 		//ExitCriticalSection()  ( __enable_irq() )
 
+//#ifndef BOOL
 typedef uint8_t 		BOOL;
+//#endif
 
 typedef unsigned char 	UCHAR;
 typedef char    		CHAR;

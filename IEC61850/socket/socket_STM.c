@@ -39,9 +39,13 @@
 
 #include "iso_server.h"
 #include "iec61850_server.h"
-#include "PrpHsr_value.h"
+#include "hsr_prp_main.h"
 
 extern IedServer iedServer;
+
+// все используемые сокеты
+ServerSocket SocketTCPMB;
+
 
 #define INET6_ADDRSTRLEN	24
 #define INET_ADDRSTRLEN		24
@@ -375,130 +379,6 @@ Socket_write(Socket self, uint8_t* buf, int size)
 //    return send(self->fd, buf, size, MSG_NOSIGNAL);
 }
 /*************************************************************************
- * Socket_write_PRPHSR
- * ќтправка пакета с резервированием.
- * добавл€ем PRP/HSR пр€мо сдесь.
- * PRP просто. ¬ хвост дабавим 6 байт
- * HSR сложнее. отправим сначала голову пакета потом вставим HSR часть
- * следом корректируем размер сообщени€ и шлЄм остальное
- *************************************************************************/
-int	Socket_write_PRPHSR(Socket self, uint8_t* buf, int size)
-{
-	 int n=0;
-
-    if (self->fd == -1) return -1;
-
-#if defined (UseHSR_)
-	uint8_t* selfBuf = GLOBAL_CALLOC(1,size + 6 );
-	int globalN = 0;
-
-	memcpy(selfBuf+globalN,buf,12);
-	globalN +=12;
-
-	IsoServer IsoServ = IedServer_getIsoServer(iedServer);
-
-	if(IsoServer_getAppendHSR(IsoServ)){
-		 Port_Toggle(LEDtst2);
-		 PHY_Port2TxOff(ReseiveENABLE | LearningENABLE);
-		 {
-			uint8_t	buffer[6];
-
-		 // корректировка и отправка
-			HSRParameters 	HSRparam;
-			HSRparam.hsrHead = HSRsuffix;
-			HSRparam.hsrIdNet = LAN_Addr_0;
-
-		    n = 0;
-			buffer[n++] = HSRparam.hsrHead / 256;
-			buffer[n++] = HSRparam.hsrHead % 256;
-
-		    // размер пакета
-			HSRparam.hsrSize = size - 12; //self->payloadStart + gooseLength - 22;
-
-			uint16_t Netid = HSRparam.hsrIdNet<<12;
-			Netid += HSRparam.hsrSize & 0xb111111111111;
-
-			buffer[n++] = Netid / 256;
-			buffer[n++] = Netid % 256;
-
-			IsoServer_HSRSeqNum_increase(IsoServ);
-			HSRparam.hsrSeqNum =  IsoServer_gethsrSeqNum(IsoServ);
-
-			buffer[n++] = HSRparam.hsrSeqNum / 256;
-			buffer[n++] = HSRparam.hsrSeqNum % 256;
-
-			memcpy(selfBuf + globalN, buffer, 6);
-			globalN +=6;
-
-			memcpy(selfBuf + globalN, buf+12, size-12);
-
-			n = 0;
-			int selfsize = size + 6;
-		    while (n < selfsize)
-		    {
-		    	int sent = send(self->fd, selfBuf + n, selfsize - n, MSG_NOSIGNAL); 	// client? допустим, мы на сервере! :)
-		    	if (sent < 0)	{ GLOBAL_FREEMEM(selfBuf); return -1;	}       // если произошла ошибка, здесь мы должны прервать выполнение цикла
-			 	n += sent;
-		    }
-
-		 }
-		 vTaskDelay(1);
-		 Port_Toggle(LEDtst2);
-	     PHY_Port2TxOn(ReseiveENABLE | LearningENABLE);
-		 PHY_Port1TxOff(ReseiveENABLE | LearningENABLE);
-/*
-		 // корректировка и отправка
-		 out[_Addr_IdNet] =  out[_Addr_IdNet] & 0x0F;
-		 out[_Addr_IdNet] |= LAN_Addr_1;
-		 Goose_output(out, packetSize);
-*/
-		 vTaskDelay(1);
-		 Port_Toggle(LEDtst2);
-	     PHY_Port1TxOn(ReseiveENABLE | LearningENABLE);
-
-	}
-    GLOBAL_FREEMEM(selfBuf);
-#endif
-
-#if defined (UsePRP)
-	IsoServer IsoServ = IedServer_getIsoServer(iedServer);
-
-	if(IsoServer_getAppendPRP(IsoServ)){
-		 int	packetSize = size;
-		 char* out = buf;
-		 int IdNetPRP = packetSize + _Addr_IdNetPRP;
-
-		 Port_Toggle(LEDtst2);
-		 PHY_Port2TxOff(ReseiveDISABLE | LearningENABLE);
-//		 IsoServer_setPHYTransmitport(PHY_PORT_1);
-		 out[IdNetPRP] =  out[IdNetPRP] & 0x0F;
-		 out[IdNetPRP] |= LAN_Addr_0;
-		 Goose_output(out, packetSize);
-		 vTaskDelay(1);
-		 Port_Toggle(LEDtst2);
-	     PHY_Port2TxOn(ReseiveDISABLE | LearningENABLE);
-		 PHY_Port1TxOff(ReseiveDISABLE | LearningENABLE);
-		 out[IdNetPRP] =  out[IdNetPRP] & 0x0F;
-		 out[IdNetPRP] |= LAN_Addr_1;
-		 Goose_output(out, packetSize);
-		 vTaskDelay(1);
-		 Port_Toggle(LEDtst2);
-	     PHY_Port1TxOn(ReseiveDISABLE | LearningENABLE);
-
-    }
-#endif
-
-#if !defined (UsePRP) && !defined (UseHSR)
-    while (n < size)
-    {
-      int sent = send(self->fd, buf + n, size - n, MSG_NOSIGNAL); // client? допустим, мы на сервере! :)
-      if (sent < 0)	return -1;	       // если произошла ошибка, здесь мы должны прервать выполнение цикла
-      n += sent;
-    }
-#endif
-    return size;
-}
-/*************************************************************************
  * Socket_getPeerAddress
  * создает буфер дл€ хранени€ в строковом виде IP и порт клиента.
  *************************************************************************/
@@ -610,7 +490,7 @@ static void	activateKeepAlive(int sd)
  * TcpServerSocket_create
  * —оздаем TCP сокет, настроим порт. Ќо пока не будем слушать.
  *************************************************************************/
-ServerSocket		TcpServerSocket_create(const char* address, int port)
+ServerSocket		TcpServerSocket_create(const char* address, int port, bool keepalive)
 {
     ServerSocket serverSocket = NULL;
 
@@ -637,7 +517,7 @@ ServerSocket		TcpServerSocket_create(const char* address, int port)
 
         if (bind(fd, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) >= 0) {		// прив€жем порт к адресу
 
-			serverSocket = GLOBAL_MALLOC(sizeof(struct sServerSocket));
+			serverSocket = (ServerSocket)GLOBAL_MALLOC((size_t)sizeof(struct sServerSocket));
             serverSocket->fd = fd;
             serverSocket->backLog = 0;
         }
@@ -648,7 +528,9 @@ ServerSocket		TcpServerSocket_create(const char* address, int port)
         }
 
 #if CONFIG_ACTIVATE_TCP_KEEPALIVE == 1
-        activateKeepAlive(fd);								// искусственное поддержание активности соединени€
+        if (keepalive){
+        	activateKeepAlive(fd);								// искусственное поддержание активности соединени€
+        }
 #endif
 
  //       setSocketNonBlocking((Socket) serverSocket);		// не блокировать сокет
@@ -700,9 +582,9 @@ ServerSocket	UDPServerSocket_create(const char* address, int port)
  * UDPClientSocket_create
  * —оздаем UDP сокет, настроим порт.
  *************************************************************************/
-ServerSocket	UDPClientSocket_create(const char* address, int port)
+Socket	UDPClientSocket_create(const char* address, int port)
 {
-    ServerSocket serverSocket = NULL;
+	Socket serverSocket = NULL;
 
     int fd;
 
@@ -716,9 +598,9 @@ ServerSocket	UDPClientSocket_create(const char* address, int port)
 
         if (bind(fd, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) >= 0) {		// прив€жем порт к адресу
 
-			serverSocket = GLOBAL_MALLOC(sizeof(struct sServerSocket));
+			serverSocket = (Socket)GLOBAL_MALLOC(sizeof(struct sSocket));
             serverSocket->fd = fd;
-            serverSocket->backLog = 0;
+//            serverSocket->backLog = 0;
         }
         else {
         	USART_TRACE_RED("ошибка открыти€ порта.\n");

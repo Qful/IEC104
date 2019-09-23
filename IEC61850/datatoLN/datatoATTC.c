@@ -23,10 +23,20 @@
 #include "static_model_MR851.h"
 
 
-extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
-extern uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
-extern uint16_t   ucMUstavkiInBuf[MB_NumbUstavki];
-extern uint16_t   ucRPNBuf[MB_NumbRPN];
+extern uint16_t   ucMDiscInBuf[MB_Size_Discreet];
+
+#if defined (AN_PERV)
+extern float   ucMAnalogInBuf[];
+#else
+	#if defined (AN_DUBLEDATA)
+	extern	uint32_t   ucMAnalogInBuf[MB_Size_Analog/2];
+	#else
+	extern	uint16_t   ucMAnalogInBuf[MB_Size_Analog];
+	#endif
+#endif
+
+extern uint16_t   ucMUstavkiInBuf[MB_Size_Ustavki];
+extern uint16_t   ucRPNBuf[MB_Size_RPN];
 
 /*******************************************************
  * Set_PDPR наполняем оперативными данными

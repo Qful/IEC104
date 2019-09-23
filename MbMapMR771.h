@@ -8,6 +8,8 @@
 #ifndef MBMAPMR771_H_
 #define MBMAPMR771_H_
 
+#include "bitmask.h"
+
 #define _REVISION_DEVICE	107		//1.07		 последняя с гусами скорость 5000000(4687500)
 //#define _REVISION_DEVICE	106		//1.06		 скорость 115200
 
@@ -70,10 +72,10 @@
 // читать только по 8
 // --------------------------------------------------------
 #define MB_WriteSysNoteaddr   		0x0600		//адрес в который пишем номер сообщения для чтения
-#define MB_StartSysNoteaddr   		0x0600
+#define MB_Addr_SysNote   		0x0600
 #define MB_EndSysNoteaddr   		0x0700
-#define MB_NumbSysNote	   			9
-#define MB_NumbSysNoteASCII			9
+#define MB_Size_SysNote	   			9
+#define MB_Size_SysNoteASCII			9
 #define MB_SizeSysNote	   			256			// число записей в журнале
 
 #define MB_OffsetSysNoteMessage	 	8			// слова в котором код сообщения
@@ -85,35 +87,35 @@
 #define MB_offset_Word				0
 #define MB_offset_ASCII				8			// не использовать, в будущем уберут
 
-#define MB_StartErrorNoteaddr  		0x0700
+#define MB_Addr_ErrorNote  		0x0700
 #define MB_EndErrorNoteaddr   		0x0800
-#define MB_NumbErrorNote			56			// число слов в одной аварии
-#define MB_NumbErrorNoteASCII		48			//
+#define MB_Size_ErrorNote			56			// число слов в одной аварии
+#define MB_Size_ErrorNoteASCII		48			//
 #define MB_NextErrorNote			0			// приращение по журналу
 
 #define MB_OffsetErrorNoteMessage 	0			// слова в котором код сообщения
 // --------------------------------------------------------
 #define MB_Code_ErrorNoteEndJurnal	0
 // --------------------------------------------------------
-#define MB_NumbErrorNoteTime		8			// число слов времени события
+#define MB_Size_ErrorNoteTime		8			// число слов времени события
 #define MB_SizeErrorNote	   		80			// число записей в журнале
 
 // журнал осциллограмм ---------
-#define MB_StartOscNoteaddr			0x0800
+#define MB_Addr_OscNote			0x0800
 #define MB_EndOscNoteaddr   		0x0D00
-#define MB_NumbOscNote				20			// размер одной записи
+#define MB_Size_OscNote				20			// размер одной записи
 #define MB_SizeOscNote	   			100			// число записей в журнале
 
-#define MB_NumbOscNoteTime			8			// число слов времени события
+#define MB_Size_OscNoteTime			8			// число слов времени события
 
-//#define MB_SizeOscNote	   			(0x9000 - 0x8000)/MB_NumbOscNote			// число записей в журнале
+//#define MB_SizeOscNote	   			(0x9000 - 0x8000)/MB_Size_OscNote			// число записей в журнале
 #define MB_OffsetOscNoteMessage	 	2			// слово по которому решаем что есть запись. будет месяц. нулевого не бывает
 // --------------------------------------------------------
 #define MB_Code_OscNoteEndJurnal	0
 #define MB_Code_OscNoteREADY		8
 
 // осциллограмы -------------------------------------------
-#define MB_StartOscaddr				0x0900
+#define MB_Addr_Osc				0x0900
 #define MB_SizeAllOsc				0x0D00
 
 #define MB_SizeOscBlock				1024
@@ -124,16 +126,16 @@
 
 
 // кратно 28байт
-#define _LimitNoteSize				MB_NumbErrorNote * 80		// 64 записей по журналу ошибок	224 записей по журналу системы
+#define _LimitNoteSize				MB_Size_ErrorNote * 80		// 64 записей по журналу ошибок	224 записей по журналу системы
 
 // конфигурация ----------------------------------------------
 #define MB_StartConfig		   	0x1000			// уставки
 
 
 // конфигурация выключателя ----------------------------------------------
-#define MB_StartConfigSW	   	0x28F0			// конфигурация выключателя
+#define MB_Addr_ConfigSW	   	0x28F0			// конфигурация выключателя
 #define MB_Size_ConfSW			16				// 16 слов
-#define MB_NumbConfigSW			16
+#define MB_Size_ConfigSW			16
 
 #define	MB_rOffsetControlSW		0				// управление выключателем
 #define	MB_bControlSW_Button	1<<0
@@ -151,14 +153,14 @@
 //----------------------------------------------------------------------------------------------
 // Группы уставок
 //----------------------------------------------------------------------------------------------
-#define MB_StartUstavkiaddr0	0x1000			// группа уставок 1
+#define MB_Addr_Ustavkiaddr0	0x1000			// группа уставок 1
 #define MB_StartUstavkiaddr1	0x1428			// группа уставок 2
 #define MB_StartUstavkiaddr2	0x1850			// группа уставок 3
 #define MB_StartUstavkiaddr3	0x1C78			// группа уставок 4
 #define MB_StartUstavkiaddr4	0x20A0			// группа уставок 5
 #define MB_StartUstavkiaddr5	0x24C8			// группа уставок 6
 
-#define MB_NumbUstavki			MB_StartUstavkiaddr1-MB_StartUstavkiaddr0			// размер блока уставок			0x1D5
+#define MB_Size_Ustavki			MB_StartUstavkiaddr1-MB_Addr_Ustavkiaddr0			// размер блока уставок			0x1D5
 
 
 // конфигурация защиты по сопротивлению ----------------------------------------------
@@ -202,8 +204,8 @@
 
 
 // конфигурация АПВ  в группе уставок ----------------------------------------------
-#define MB_StartConfigAPW	   	0x1264 - MB_StartConfig			// конфигурация АПВ
-#define MB_NumbConfigAPW		10				// 10 слов
+#define MB_Addr_ConfigAPW	   	0x1264 - MB_StartConfig			// конфигурация АПВ
+#define MB_Size_ConfigAPW		10				// 10 слов
 
 #define MB_offset_ConfAPW		0x00			// конфигурация АПВ
 #define MB_offset_InBlok		0x01			// вход блокировки
@@ -223,7 +225,7 @@
 
 #define MB_bOffset_Ktt_I_Input	1<<7			// токовый вход 0=1А, 1=5А
 
-#define MB_offset_MTZ_I1		0x1004 - MB_StartUstavkiaddr0		// адрес конфигурации ступени МТЗ защиты
+#define MB_offset_MTZ_I1		0x1004 - MB_Addr_Ustavkiaddr0		// адрес конфигурации ступени МТЗ защиты
 #define MB_offset_MTZ_I2		MB_offset_MTZ_I1+10
 #define MB_offset_MTZ_I3		MB_offset_MTZ_I1+20
 #define MB_offset_MTZ_I4		MB_offset_MTZ_I1+30
@@ -241,7 +243,7 @@
 #define MB_bOffset_MTZ_I_Config_Napravl_dn			1<<7				// направление обратное
 
 
-#define MB_offset_Ig_I1		0x104A - MB_StartUstavkiaddr0		// адрес конфигурации ступени МТЗ защиты
+#define MB_offset_Ig_I1		0x104A - MB_Addr_Ustavkiaddr0		// адрес конфигурации ступени МТЗ защиты
 #define MB_offset_Ig_I2		MB_offset_Ig_I1+10
 #define MB_offset_Ig_I3		MB_offset_Ig_I1+20
 #define MB_offset_Ig_I4		MB_offset_Ig_I1+30
@@ -272,7 +274,7 @@
 
 
 // конфигурация токовой защиты от обрыва провода  ----------------------------------------------
-#define MB_StartConfigI2I1	   	0x109A - MB_StartUstavkiaddr0			// конфигурация
+#define MB_StartConfigI2I1	   	0x109A - MB_Addr_Ustavkiaddr0			// конфигурация
 #define MB_NumbConfigI2I1		10				// 10 слов
 #define MB_offset_ConfI2I1		0x00			// конфигурация
 
@@ -280,12 +282,12 @@
 
 // конфигурация защиты от повышения напряжения -------------------------------------------------
 // U
-#define MB_offset_Uup_U1		0x10A4 - MB_StartUstavkiaddr0		// адрес конфигурации защиты напряжения
+#define MB_offset_Uup_U1		0x10A4 - MB_Addr_Ustavkiaddr0		// адрес конфигурации защиты напряжения
 #define MB_offset_Uup_U2		MB_offset_Uup_U1+8
 #define MB_offset_Uup_U3		MB_offset_Uup_U1+16
 #define MB_offset_Uup_U4		MB_offset_Uup_U1+24
 
-#define MB_offset_Udn_U1		0x10C4 - MB_StartUstavkiaddr0		// адрес конфигурации защиты напряжения
+#define MB_offset_Udn_U1		0x10C4 - MB_Addr_Ustavkiaddr0		// адрес конфигурации защиты напряжения
 #define MB_offset_Udn_U2		MB_offset_Udn_U1+8
 #define MB_offset_Udn_U3		MB_offset_Udn_U1+16
 #define MB_offset_Udn_U4		MB_offset_Udn_U1+24
@@ -298,12 +300,12 @@
 #define MB_bOffset_Udn_U_Config_Stat		0b11<<0
 
 // F
-#define MB_offset_Fup_1		0x10E4 - MB_StartUstavkiaddr0		// адрес конфигурации защиты частоте
+#define MB_offset_Fup_1		0x10E4 - MB_Addr_Ustavkiaddr0		// адрес конфигурации защиты частоте
 #define MB_offset_Fup_2		MB_offset_Fup_1+8
 #define MB_offset_Fup_3		MB_offset_Fup_1+16
 #define MB_offset_Fup_4		MB_offset_Fup_1+24
 
-#define MB_offset_Fdn_1		0x1104 - MB_StartUstavkiaddr0		// адрес конфигурации защиты про частоте
+#define MB_offset_Fdn_1		0x1104 - MB_Addr_Ustavkiaddr0		// адрес конфигурации защиты про частоте
 #define MB_offset_Fdn_2		MB_offset_Fdn_1+8
 #define MB_offset_Fdn_3		MB_offset_Fdn_1+16
 #define MB_offset_Fdn_4		MB_offset_Fdn_1+24
@@ -316,7 +318,7 @@
 #define MB_bOffset_Fdn_Config_Stat		0b11<<0
 
 //конфигурация тепловых защит  -------------------------------------------------
-#define MB_offset_Qup_1					0x1124 - MB_StartUstavkiaddr0
+#define MB_offset_Qup_1					0x1124 - MB_Addr_Ustavkiaddr0
 #define MB_offset_Qup_2					MB_offset_Qup_1 + 4
 
 #define MB_offset_Qup_Config			0						// Конфигурация
@@ -324,14 +326,14 @@
 #define MB_bOffset_Qup_Config_Stat		0b11					// состояние
 
 //блокировка по тепловой модели  -------------------------------------------------
-#define MB_offset_BlkQ					0x112C - MB_StartUstavkiaddr0
+#define MB_offset_BlkQ					0x112C - MB_Addr_Ustavkiaddr0
 
 #define MB_offset_BlkQ_Config			0						// Конфигурация
 // биты
 #define MB_bOffset_BlkQ_Config_Stat		0b11					// состояние
 
 //конфигурация внешних защит -------------------------------------------------
-#define MB_offset_Ext_1		0x1134 - MB_StartUstavkiaddr0		// адрес конфигурации ступени МТЗ защиты
+#define MB_offset_Ext_1		0x1134 - MB_Addr_Ustavkiaddr0		// адрес конфигурации ступени МТЗ защиты
 #define MB_offset_Ext_2		MB_offset_Ext_1+8
 #define MB_offset_Ext_3		MB_offset_Ext_2+8
 #define MB_offset_Ext_4		MB_offset_Ext_3+8
@@ -354,7 +356,7 @@
 #define MB_bOffset_Ext_Config_Stat		0b11<<0						// состояние
 
 // конфигурация Cинхронизма УППН -------------------------------------------------
-#define MB_StartConfigKS_UPPN		0x1408 - MB_StartUstavkiaddr0		// адрес конфигурации защиты напряжения
+#define MB_StartConfigKS_UPPN		0x1408 - MB_Addr_Ustavkiaddr0		// адрес конфигурации защиты напряжения
 
 //конфигурация
 #define MB_offset_KS_Config				0			// Конфигурация
@@ -365,7 +367,7 @@
 #define MB_bOffset_KS_Config_Stat		1<<0		// состояние
 
 // структура сопротивлений для определения местя повреждения ---------------------------------------
-#define MB_StartConfig_Z_CrashDetect		0x141E - MB_StartUstavkiaddr0		// адрес конфигурации
+#define MB_StartConfig_Z_CrashDetect		0x141E - MB_Addr_Ustavkiaddr0		// адрес конфигурации
 
 #define MB_offset_Z_CrashDetect_X1f				MB_StartConfig_Z_CrashDetect + 0
 #define MB_offset_Z_CrashDetect_X2f				MB_StartConfig_Z_CrashDetect + 1
@@ -387,8 +389,8 @@
 //----------------------------------------------------------------------------------------------
 // база данных дискретных сигналов
 //----------------------------------------------------------------------------------------------
-#define MB_StartDiscreetaddr   	0x0D00			// адрес и размер для комманд чтения (3,4)
-#define MB_NumbDiscreet   		0x29			// 0x22
+#define MB_Addr_Discreet	   	0x0D00			// адрес и размер для комманд чтения (3,4)
+#define MB_Size_Discreet   		0x29			// 0x22
 
 
 #define MB_offset_ErrorOFF		0x14		// аварийное отключение
@@ -1123,9 +1125,18 @@
 
 // ------------------------------------
 // состояние выключателя
-#define MB_offset_SW_status		0x17
-#define MB_b_SW_OFF				1<<1
-#define MB_b_SW_ON				1<<2
+#define MB_offset_SW_status			(0x17)
+#define MB_b_SW_OFF					BIT1
+#define MB_b_SW_ON					BIT2
+
+// ---------------------------------
+#define MB_offset_SG				(0x17)		// инфо по группе уставок
+#define MB_bOffsetSG0				BIT5
+#define MB_bOffsetSG1				BIT6
+#define MB_bOffsetSG2				BIT7
+#define MB_bOffsetSG3				BIT8
+#define MB_bOffsetSG4				BIT9
+#define MB_bOffsetSG5				BITA
 
 // АПВ
 #define MB_offset_SW_ON_APW		0x0E
@@ -1193,26 +1204,26 @@
 #define MB_offset_errorM5		0x18
 #define MB_offset_errorUstavki	0x18
 
-#define MB_bOffsetModule1		1<<7			// Наличие неисправности модуля 1
-#define MB_bOffsetModule2		1<<8			// Наличие неисправности модуля 2 8-дискр 8-реле
-#define MB_bOffsetModule3		1<<9			// Наличие неисправности модуля 3 16 дискретов
-#define MB_bOffsetModule4		1<<10			// Наличие неисправности модуля 4 16-дискр 16-реле
-#define MB_bOffsetModule5		1<<11			// Наличие неисправности модуля 5 аналог
-#define MB_bOffsetUstavki		1<<12			// Наличие неисправности уставок
+#define MB_bOffset_errorM1		1<<7			// Наличие неисправности модуля 1
+#define MB_bOffset_errorM2		1<<8			// Наличие неисправности модуля 2 8-дискр 8-реле
+#define MB_bOffset_errorM3		1<<9			// Наличие неисправности модуля 3 16 дискретов
+#define MB_bOffset_errorM4		1<<10			// Наличие неисправности модуля 4 16-дискр 16-реле
+#define MB_bOffset_errorM5		1<<11			// Наличие неисправности модуля 5 аналог
+#define MB_bOffset_errorUstavki		1<<12			// Наличие неисправности уставок
 
-#define MB_bOffsetALLFaults		0b111111<<7		// Наличие любой неисправности
+#define MB_bOffset_errorALLModul		0b111111<<7		// Наличие любой неисправности
 
 // ---------------------------------
-#define MB_offsetHardFaults1	0x19			// неисправность выключателя
+#define MB_offset_errorHard1	0x19			// неисправность выключателя
 
-#define MB_bOffsetErrorSWAll	0b11111100
+#define MB_bOffset_errorSWAll	0b11111100
 #define MB_bOffsetErrorSWExt1	1<<2
 #define MB_bOffsetErrorBKExt1	1<<3
 #define MB_bOffsetErrorSWctrl1	1<<4
 #define MB_bOffsetErrorUROV1	1<<5
 #define MB_bOffsetErrorCtrl1	1<<6
-#define MB_bOffsetErrorCtrl2	1<<7
-#define MB_bOffsetErrorCtrl3	1<<8
+#define MB_bOffset_errorCtrl2	1<<7
+#define MB_bOffset_errorCtrl3	1<<8
 
 // ---------------------------------
 #define MB_offset_LogicError	0x1A			// ошибки по логике
@@ -1220,11 +1231,11 @@
 
 // ---------------------------------
 #define MB_offset_UstavkiModify	0x1A		// Изменения в уставках
-#define MB_bOffsetUstavkiModify	1<<0x0E		// Изменения в уставках
+#define MB_bOffset_errorUstavkiModify	1<<0x0E		// Изменения в уставках
 
 // ----------------------------------------------------------------------------------------------
-#define MB_StartAnalogINaddr   	0x0E00		// база данных аналогов
-#define MB_NumbAnalog   		98			// 264 слов
+#define MB_Addr_Analog   	0x0E00		// база данных аналогов
+#define MB_Size_Analog   		98			// 264 слов
 
 
 #define MB_offset_Ia			0
@@ -1265,14 +1276,17 @@
 #define MB_offset_dfi			96		// dfi
 #define MB_offset_dF			97		// dF
 
-// ----------------------------------------------------------------------------------------------
-#define MB_StartDateNaddr   	0x0200
-#define MB_NumbDate		   		7
+/********************************************************************************
+ * дата и время
+ ********************************************************************************/
+
+#define MB_Addr_Date   						(0x0200)
+#define MB_Size_Date	   					7
 
 // ----------------------------------------------------------------------------------------------
-#define MB_Startaddr_SG			0x0400
+#define MB_Addr_SG			0x0400
 #define MB_addr_SG				0x0400
-#define MB_NumbSG		   		1
+#define MB_Size_SG		   		1
 
 #define MB_selectGroupe0		0x0000
 #define MB_selectGroupe1		0x0001
@@ -1284,16 +1298,19 @@
 // ресурс выключателя ------------------------------------------------------------------------------
 //#define MB_Sw_CNT				0x0410
 //#define MB_NumbSw_CNT	   		8
-#define MB_StartSWCrash			0x1A00
+#define MB_Addr_SWCrash			0x1A00
 //#define MB_NumbSWCrash   		8
 #define MB_Size_SWCrash  		8
 
 #define MB_offset_Oper_cnt		0		// число оперативных переключений
 #define MB_offset_Error_cnt		1		// число аварийных отключений
 
-// ----------------------------------------------------------------------------------------------
-#define MB_StartRevNaddr   		0x0500		// версия 17 слов
-#define MB_NumbWordRev	   		16			//
+/********************************************************************************
+ * версия
+ ********************************************************************************/
+
+#define MB_Addr_Rev		   							0x0500
+#define MB_Size_Rev		   							16				// 16 слов
 
 // адреса в байтах
 #define MB_offset_ModelDev		0x0			// строка с моделью устройства
@@ -1316,63 +1333,82 @@
 #define MB_addr_SwOFF  			0x0D08		//адрес выключеня off
 #define MB_addr_SwON   			0x0D09		//адрес включеня on
 
-#define MB_addr_UstavkiModify	0x0D12		//сброс влага изменения уставок
+#define MB_Addr_UstavkiModify	0x0D12		//сброс влага изменения уставок
 
 #define MB_Sw   				0xFF00		//on
 #define MB_CTRL_OFF				0xFF00
 
 // Общие уставки --------------------------------------------------------------------------------
-#define MB_StartOtherUstavkiaddr		0x28F0
-#define MB_NumbOtherUstavki				0x2A93 - MB_StartOtherUstavkiaddr
+#define MB_Addr_OtherUstavki		0x28F0
+#define MB_Size_OtherUstavki				0x2A93 - MB_Addr_OtherUstavki
 
 // конфигурация выключателя -----
-#define MB_offset_ConfigSW	   			0x28F0 - MB_StartOtherUstavkiaddr
+#define MB_offset_ConfigSW	   			0x28F0 - MB_Addr_OtherUstavki
 
 #define	MB_rOffsetControlSW				0				// управление выключателем
 
 // Параметры автоматики -------------------------------------------------------------------------
-#define MB_StartAutomat					0x294E
-#define MB_NumbAutomat					0x29E8 - MB_StartAutomat + 1
+#define MB_Addr_Automat					0x294E
+#define MB_Size_Automat					0x29E8 - MB_Addr_Automat + 1
 
 // Параметры УРОВ ---
-#define MB_offset_UROV					(0x2A8E - MB_StartOtherUstavkiaddr)
+#define MB_offset_UROV					(0x2A8E - MB_Addr_OtherUstavki)
 
 #define MB_bOffset_UROV_ModeI			(1<<0)
 #define MB_bOffset_UROV_ModeSWctrl		(1<<1)
 
 // Параметры системы (они же IP адрес) -----------------------------------------------------------
-#define MB_StartSystemCfg		0x05C0	//0x2A00
-#define MB_NumbSystemCfg		16		//12
-#define MB_offset_IP			0		//4		// F
+#define MB_Addr_SystemCfg							0x05C0	//0x2A00
+#define MB_Size_SystemCfg							16		//12
 
+#define MB_offset_IP								0				// IP адрес
+#define MB_offset_SNTP								2
+#define MB_offset_CONFIG							4
+#define MB_offset_MAC								5
+#define MB_offset_SNTP_TPeriod						8
+#define MB_offset_SNTP_Timezone						9
+
+#define MB_offset_Q_TestMode						4				// думаю нужно битстринговое конфигурирование всего всякого
+
+
+#define _bTestModeOffset							0
+#define _bRedundnacyOffset							2
+
+// биты
+#define MB_bOffset_Q_TestMode						(0b11<<_bTestModeOffset)		// тестирование
+#define MB_bOffset_Redundnacy						(0b11<<_bRedundnacyOffset)		// резервирование
+
+#define MB_bMask_Q_TestMode							(BIT0 | BIT1)
+#define MB_bMask_Redundnacy							(BIT0 | BIT1)
 
 // ----------------------------------------------------------------------------------------------
-#define MB_Startaddr_Goose		0x0D80
-#define MB_NumbGoose	   		9
+#define MB_Addr_Goose		0x0D80
+#define MB_Size_Goose	   		9
 
 // ----------------------------------------------------------------------------------------------
 // Все уставки одним блоком
 // ----------------------------------------------------------------------------------------------
-#define MB_StartDUMP_Ustavki	0x01000
-#define MB_NumbDUMP_Ustavki	   	(0x2A93 - MB_StartDUMP_Ustavki)
+#define MB_Addr_DUMP_Ustavki	0x01000
+#define MB_Size_DUMP_Ustavki	   	(0x2A93 - MB_Addr_DUMP_Ustavki)
 // ----------------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------------
 
 // пустые -----------------------------
-#define MB_Startaddr_SG_set_0	0
-#define MB_Startaddr_SG_set_1	0
+#define MB_Addr_SG_set_0	0
+#define MB_Addr_SG_set_1	0
+#define MB_addr_CMD_1_OnOff		0
 
 #define MB_addr_DRIVE_UP		0
 #define MB_addr_DRIVE_DWN		0
 
-#define MB_StartConfigF_SG0		0
-#define MB_NumbConfigF			0
+#define MB_Addr_ConfigF		0
+#define MB_Size_ConfigF			0
 
-#define MB_StartConfigU_SG0		0
-#define MB_NumbConfigU			0
+#define MB_Addr_ConfigU		0
+#define MB_Size_ConfigU			0
 
-#define MB_StartConfigOut		0
-#define MB_NumbConfigOut		0
+#define MB_Addr_ConfigOut		0
+#define MB_Size_ConfigOut		0
 
 #define MB_StartConfigExZ_SG0  	0
 #define MB_NumbConfigExZ		0
@@ -1383,24 +1419,24 @@
 #define MB_StartConfigI2I1I0_SG0	0
 #define MB_NumbConfigI2I1I0			0
 
-#define MB_StartOtherUstavkiaddr	0
-#define MB_NumbOtherUstavki			0
+#define MB_Addr_OtherUstavki	0
+#define MB_Size_OtherUstavki			0
 
-#define MB_StartConfigAWR		0
-#define MB_NumbConfigAWR		0
+#define MB_Addr_ConfigAWR		0
+#define MB_Size_ConfigAWR		0
 
-#define MB_StartConfigTRPWR		0
-#define MB_NumbConfigTRPWR		0
+#define MB_Addr_ConfigTRPWR		0
+#define MB_Size_ConfigTRPWR		0
 
-#define MB_StartConfigVLSIn		0
-#define MB_NumbConfigVLSIn		0
+#define MB_Addr_ConfigVLSIn		0
+#define MB_Size_ConfigVLSIn		0
 
-#define MB_StartConfigVLSOut	0
-#define MB_NumbConfigVLSOut		0
+#define MB_Addr_ConfigVLSOut	0
+#define MB_Size_ConfigVLSOut		0
 
 
-#define MB_NumbRPN				0
-#define MB_StartRPNaddr			0
+#define MB_Size_RPN				0
+#define MB_Addr_RPN			0
 
 #define MB_addr_Set_ExtMode		0
 #define MB_addr_Clr_ExtMode		0

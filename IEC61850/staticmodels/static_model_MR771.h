@@ -1181,6 +1181,86 @@ extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind32_stVal;
 extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind32_q;
 extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind32_t;
 
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind33;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind33_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind33_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind33_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind34;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind34_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind34_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind34_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind35;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind35_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind35_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind35_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind36;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind36_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind36_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind36_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind37;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind37_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind37_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind37_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind38;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind38_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind38_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind38_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind39;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind39_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind39_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind39_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind40;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind40_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind40_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind40_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind41;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind41_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind41_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind41_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind42;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind42_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind42_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind42_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind43;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind43_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind43_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind43_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind44;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind44_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind44_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind44_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind45;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind45_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind45_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind45_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind46;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind46_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind46_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind46_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind47;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind47_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind47_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind47_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind48;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind48_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind48_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind48_t;
+
 //----------------------------------------------------------------------------
 
 extern DataObject iedModel_GGIO_VLSGGIO1_Mod;

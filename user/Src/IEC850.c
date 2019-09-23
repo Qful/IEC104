@@ -72,8 +72,11 @@
 #if defined (MR771)
 #include "static_model_MR771.h"
 #endif
-#if defined (MR801)
+#if defined	(MR801) && defined (OLD)
 #include "static_model_MR801.h"
+#endif
+#if defined	(MR801) && defined (T12N5D58R51)
+#include "static_model_MR801_T12N5D58R51.h"
 #endif
 #if defined (MR851)
 #include "static_model_MR851.h"
@@ -84,12 +87,20 @@
 #if defined (MR761) || defined (MR762) || defined (MR763)
 #include "static_model_MR76x.h"
 #endif
+#if  defined (MR761OBR)
+#include "static_model_MR761OBR.h"
+#endif
 #if defined	(MR741)
 #include "static_model_MR741.h"
 #endif
+
 #include "iedserverdataupdate.h"
 #include "goose_receiver.h"
 
+#include "sv_publisher.h"
+#include "sv_subscriber.h"
+
+#include "datatoSPCS.h"
 /*Modbus includes ------------------------------------------------------------*/
 #include "mb.h"
 #include "mb_m.h"
@@ -104,13 +115,26 @@ IedServer iedServer = NULL;
 static char* password1 = "user";
 static char* password2 = "admin";
 
-static int running = 0;
+static int running = 0;					// глобальнай флаг управления 850сервера. обнуление приведёт к переиниту 61850 сервера
 
 uint64_t 	nextSynchTime = 0;
 //uint32_t 	nextSynchTime = 0;
 bool 		resynch = false;
 
 osThreadId defaultTaskHandle;
+
+
+#if (CONFIG_IEC61850_SAMPLED_VALUES_SUPPORT == 1)
+// --------------------------------------------
+// тест SV потом удалить
+SampledValuesPublisher svPublisher;
+SV_ASDU asdu1;
+int float1;
+int float2;
+float fVal1 = 1234.5678f;
+float fVal2 = 0.12345f;
+// --------------------------------------------
+#endif
 
 /* extern Variables ----------------------------------------------------------*/
 
@@ -130,6 +154,7 @@ extern	uint8_t	  writeNmbSG;			// номер группы уставок.
 extern struct netif 	gnetif;
 
 
+extern osMutexId xNetworkStartMutex;
 extern osMutexId xIEC850StartMutex;
 extern osMutexId xFTPStartMutex;				// мьютекс готовности к запуску FTP
 
@@ -140,19 +165,23 @@ extern struct link_str link_arg;
 extern RTC_HandleTypeDef hrtc;
 /*  -----------------------------------------------------------------*/
 
+extern uint16_t   ucGooseBufSent[MB_Size_Goose];
+extern uint16_t   ucGooseBufDrop[MB_Size_Goose];
+
 /*  очередь ---------------------------------------------------------*/
 extern	xQueueHandle 	ModbusSentQueue;	// очередь для отправки в модбас
 extern xQueueHandle 	ModbusSentTime;		// очередь для отправки в модбас
 
+extern uint16_t		GLOBAL_QUALITY;
 /*  -----------------------------------------------------------------*/
+static void		ModelNameModify(IedModel* self, uint16_t	numb);
+
 static bool		clientAuthenticator(void* parameter, AcseAuthenticationParameter authParameter, void** securityToken);
-void			controlHandlerForBinaryOutput(void* parameter, MmsValue* value, bool test);
 
-void 			sigint_handler(int signalId);
 
-static void 	Netif_Config(char* ipAddress,char* Mask, char* Gateway);
-void 			Network_Start(void);
-
+void			IedServer_setControlAllObj(IedServer self);
+//ControlHandlerResult			controlHandlerFor_CMDGGIO(void* parameter, MmsValue* value, bool test);
+ControlHandlerResult			controlHandlerForBinaryOutput(void* parameter, MmsValue* value, bool test);
 
 static bool		activeSgChangedHandler (void* parameter, SettingGroupControlBlock* sgcb,	 uint8_t newActSg, ClientConnection connection);
 static bool		editSgChangedHandler (void* parameter, SettingGroupControlBlock* sgcb,  uint8_t newEditSg, ClientConnection connection);
@@ -160,20 +189,6 @@ static void		editSgConfirmedHandler(void* parameter, SettingGroupControlBlock* s
 static void		loadActiveSgValues (int actSG);
 static void		loadEditSgValues (int editSG);
 
-/*************************************************************************
- * sigint_handler
- *************************************************************************/
-/* Фактически, сигнал — это асинхронное уведомление процесса о каком-либо событии.
- * Когда сигнал послан процессу, операционная система прерывает выполнение процесса.
- * Если процесс установил собственный обработчик сигнала, операционная система
- * запускает этот обработчик, передав ему информацию о сигнале.
- * Если процесс не установил обработчик, то выполняется обработчик по умолчанию.
- */
-void
-sigint_handler(int signalId)
-{
-    running = 0;
-}
 /*************************************************************************
  * connectionHandler
  *************************************************************************/
@@ -191,21 +206,14 @@ static void	connectionHandler (IedServer self, ClientConnection connection, bool
  *************************************************************************/
 void StartIEC850Task(void const * argument){
 
-// 1. ждем семафора готовности настроек IP
-	    osStatus status = osMutexWait(xIEC850StartMutex,TIMEOUT_startServer);		// блокируемся	TIMEOUT_startServer
-	    if (status != osOK) {
-	    	// не запустился, всё нам конец.
-			USART_TRACE_RED("не получили IP. Нет связи MB.\n");
-	    }else{
-	    	USART_TRACE_GREEN("Получили IP, запускаем сервак.\n");
-	    }
-		Port_Off(LED_out_RED);
-
-	    Network_Start();
-
-	    // получили время включеня модуля.
-		HAL_RTC_GetTime((RTC_HandleTypeDef *)&hrtc, &StartsTime, FORMAT_BIN);
-		HAL_RTC_GetDate((RTC_HandleTypeDef *)&hrtc, &StartsDate, FORMAT_BIN);
+		if (filesystem_Read_GlobalConfig(_xGlobalcfg)){							// читаем конфиг перед запуском сервера
+			// есть файл конфигурации
+		}else{
+			// нету файла конфигурации
+#ifndef _SPCECIALSWRevision
+			ModelNameModify(&iedModel,(uint16_t)IP_ADDR[3]);
+#endif
+		}
 
 		iedServer = IedServer_create(&iedModel,(uint16_t)IP_ADDR[3]);			// создадим IED электронное устройство
 		//IedServer_setAuthenticator(iedServer, clientAuthenticator, NULL); 	// вкл. парольный доступ
@@ -217,46 +225,50 @@ void StartIEC850Task(void const * argument){
     	// разрешаем запуск тасков зависящих от старта текущего таска
 		osMutexRelease(xFTPStartMutex);
 
-	    // режим работы свича ----------------------------------------
-		PHY_setSwitchMode(isoServer);
 
 	    Port_Off(LED1);
 		Port_Off(LED_out_GREEN);
 
-	for(;;) {
-
-		// -------------------------------------------------------------------------------------------------------------------
-		// Функции контроля над объектами, при управлении от клиента
-		// -------------------------------------------------------------------------------------------------------------------
-
-	    // управление выключателем
-#if defined (MR771) || defined (MR761) || defined (MR762) || defined (MR763) || defined (MR801) ||\
-	defined (MR5_500) || defined (MR5_700) || defined (MR741)
-	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_CSWI1_Pos, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_CSWI1_Pos_Oper);
-	    IedServer_setControlHandler(iedServer, &iedModel_CTRL_XCBR1_Mod,(ControlHandler) controlHandlerForBinaryOutput, &iedModel_CTRL_XCBR1_Mod_Oper);
-#endif
-	    // управление приводом
-#if defined (MR851)
-	    IedServer_setControlHandler(iedServer, &iedModel_RPN_ATCC1_TapChg, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_RPN_ATCC1_TapChg_Oper);
-	    IedServer_setControlHandler(iedServer, &iedModel_RPN_ATCC1_ParOp, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_RPN_ATCC1_ParOp_Oper);
-
-#endif
-
-		IedServer_setControlHandler(iedServer, &iedModel_CTRL_GGIO1_SPCSO1, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_GGIO1_SPCSO1_Oper);
-		IedServer_setControlHandler(iedServer, &iedModel_CTRL_GGIO1_SPCSO2, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_GGIO1_SPCSO2_Oper);
-		IedServer_setControlHandler(iedServer, &iedModel_CTRL_GGIO1_SPCSO3, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_GGIO1_SPCSO3_Oper);
-		IedServer_setControlHandler(iedServer, &iedModel_CTRL_GGIO1_SPCSO4, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_GGIO1_SPCSO4_Oper);
-
-	    // this is optional - performs operative checks
-		// IedServer_setPerformCheckHandler(iedServer, &iedModel_GGIO_INGGIO1_SPCSO1, checkHandler, &iedModel_GGIO_INGGIO1_SPCSO1);
 /*****************************************************************************************************
  *
  * многоклиентский доступ
  *
  *****************************************************************************************************/
 		while (1){
+// Функции контроля над объектами, при управлении от клиента
+			IedServer_setControlAllObj(iedServer);
+
+			// this is optional - performs operative checks
+			// IedServer_setPerformCheckHandler(iedServer, &iedModel_GGIO_INGGIO1_SPCSO1, checkHandler, &iedModel_GGIO_INGGIO1_SPCSO1);
 
 			IedServer_setConnectionIndicationHandler(iedServer, (IedConnectionIndicationHandler) connectionHandler, NULL);
+
+#if (CONFIG_IEC61850_LOG_SERVICE == 1)
+			LogStorage statusLog = SqliteLogStorage_createInstance("log_status.db");
+			LogStorage_setMaxLogEntries(statusLog, 10);
+			IedServer_setLogStorage(iedServer, "MR801N150LD0/LLN0$EventLog", statusLog);
+
+
+
+#if 1
+			uint64_t entryID = LogStorage_addEntry(statusLog, Hal_getTimeInMs());		// добавляем запись, возвращает ID записи
+
+			MmsValue* value = MmsValue_newIntegerFromInt32(123);
+			uint8_t blob[256];
+			int blobSize = MmsValue_encodeMmsData(value, blob, 0, true);
+			LogStorage_addEntryData(statusLog, entryID, "MR801N150LD0/IN58GGIO1$ST$Ind1$stVal", blob, blobSize, 0);
+			MmsValue_delete(value);
+
+			value = MmsValue_newUtcTimeByMsTime(Hal_getTimeInMs());
+			blobSize = MmsValue_encodeMmsData(value, blob, 0, true);
+			MmsValue_delete(value);
+
+			LogStorage_addEntryData(statusLog, entryID, "MR801N150LD0/IN58GGIO1$ST$Ind1$t", blob, blobSize, 0);
+			LogStorage_getEntries(statusLog, 0, Hal_getTimeInMs(), NULL, (LogEntryDataCallback) NULL, NULL);
+//			LogStorage_getEntries(statusLog, 0, Hal_getTimeInMs(), entryCallback, (LogEntryDataCallback) entryDataCallback, NULL);
+#endif
+
+#endif
 
 		#if (CONFIG_MMS_THREADLESS_STACK == 1)
 			IedServer_startThreadless(iedServer, 102);		    // настраиваем сервер открываем порт и слушаем соединения.
@@ -279,12 +291,22 @@ void StartIEC850Task(void const * argument){
 			    GooseReceiver Goosereceiver = GooseReceiver_create();
 			    GooseReceiver_addSubscriberFromConfigFile(Goosereceiver,GooseCfgFile);
 			    GooseReceiver_start(Goosereceiver);															// стартанём приёмный таск гусов.
+		    }else{
+		    	// если нет конфига приёмных гусов, то обнулим GoIN флаги у ЦП.
+		    	int i;
+		    	for(i=0;i<MB_Size_Goose;i++){
+		    		ucGooseBufSent[i] = 0;
+		    		ucGooseBufDrop[i] = 0;
+		    	}
+
+		    	AddToQueueMB(ModbusSentTime, MB_Wrt_Set_Goose	,MB_Slaveaddr);
+		    	AddToQueueMB(ModbusSentTime, MB_Wrt_Set_Goose	,MB_Slaveaddr);
 		    }
 	        //--------------- Goose -------------------------
 #endif
 
 			if (!IedServer_isRunning(iedServer)) {
-				USART_TRACE_RED("Ошибка запуска сервера! Останов.\n");
+				USART_TRACE_RED("Err. IEC server. stop\n");
 				IedServer_destroy(iedServer);
 			}else{
 				AddToQueueMB(ModbusSentQueue, 	MB_Rd_Revision		,MB_Slaveaddr);		// версию устройства
@@ -295,28 +317,57 @@ void StartIEC850Task(void const * argument){
 			//--------------- Goose -------------------------
 			// передающая часть гусов. Start GOOSE publishing
 		    //if (GoosePublishing_ParseConfigFile(iedServer, _GooseTRcfg) == true){
-		    	IedServer_enableGoosePublishing(iedServer);
+		    	IedServer_enableGoosePublishing(iedServer);								// если HSR или PRP нужен переинит
+    			AddToQueueMB(ModbusSentQueue, MB_Rd_Syscfg		,MB_Slaveaddr);			// ставим задачу чтения конфига
 		    //}
 			//--------------- Goose -------------------------
 #endif
+
+#if (CONFIG_IEC61850_SAMPLED_VALUES_SUPPORT == 1)
+			//--------------- SV -------------------------
+    		 svPublisher = SampledValuesPublisher_create("vboxnet0");
+    		 asdu1 = SampledValuesPublisher_addASDU(svPublisher, "svpub1", NULL, 1);
+    		 float1 = SV_ASDU_addFLOAT(asdu1);
+    		 float2 = SV_ASDU_addFLOAT(asdu1);
+    		 SampledValuesPublisher_setupComplete(svPublisher);
+#endif
 			running = 1;
 
-			USART_TRACE_BLUE("memory gap = %u\r\n", xPortGetFreeHeapSize());
-			USART_TRACE_BLUE("task count = %u\r\n",(unsigned int)uxTaskGetNumberOfTasks());
-			static signed char taskInfoBuf[48 * 8];
-			vTaskGetRunTimeStats((char *)taskInfoBuf);
-			USART_TRACE_BLUE("%s\r\n", taskInfoBuf);
-
 			// сокеты -------
-			Print_Sockets();
+//			Print_Sockets();
 			// --------------
 			while (running) {
+#if (CONFIG_IEC61850_SAMPLED_VALUES_SUPPORT == 1)
+// -----------------------------------------------
+// при частоте SmpRate = 80 выборок за период и количестве мгновенных значений в одном кадре noASDU = 1, фактическая частота формирования кадров
+// составит 80 пактов за период или 4 кГц. В случае частоты взятия выборок SmpRate = 256 выборок за период и количестве выборок в кадре noASDU = 8,
+// фактическая частота формирования кадров в сеть составит лишь 1,6 кГц.
+//
+// Отметим, что фактически присвоение метки абсолютного времени каждой выборке не требуется – требуется лишь чтобы выборки,
+// сформированные различными устройствами в один и тот же момент времени имели один и тот же идентификатор. Таким идентификатором
+// является поле smpCnt – счётчик выборок. Счётчик за одну секунду пробегает значения от 0 до (SmpRate*50-1).
+// Номера присваиваются формируемым выборкам одновременно, так что устройство-приёмник данных МЭК 61850-9-2 может легко установить
+// соответствие между получаемыми значениями и производить вычисления на их основе. Для того чтобы все устройства сопряжения формировали
+// данные с одними и теми же номерами используется внешний синхронизирующий импульс. При использовании секундного импульса счётчик smpCnt
+// принимает значение 0 каждый раз при приходе синхроимпульса. Причём выборке с номером «0» соответствует выборка, взятая в момент прихода импульса.
+	            SV_ASDU_setFLOAT(asdu1, float1, fVal1);
+		        SV_ASDU_setFLOAT(asdu1, float2, fVal2);
+
+		        SV_ASDU_increaseSmpCnt(asdu1);
+		        fVal1 += 1.1f;
+		        fVal2 += 0.1f;
+		        SampledValuesPublisher_publish(svPublisher);
+
+// -----------------------------------------------
+#endif
 
 				IedServer_processIncomingData(iedServer);						// Должна вызываться периодически для приёма данных и соединений. Отвечаем на запросы тутже
 																				// проверяем было ли соединение на сокет?
 				// сначала проанализируем данные
-				IedServer_PeriodicUpdateNewData(iedServer);						// обновление данных в модели из буферов памяти. занимает много времени.
 
+//				if (GLOBAL_QUALITY == QUALITY_VALIDITY_GOOD){					// нет обменов нет анализа
+					IedServer_PeriodicUpdateNewData(iedServer);					// обновление данных в модели из буферов памяти. занимает много времени.
+//				}
 				// по результату отправим отчёты и остальное
 				IedServer_performPeriodicTasks(iedServer);						// Должна вызываться периодически монитор служб 61850
 				taskYIELD();													// отпустим задачу.
@@ -332,25 +383,117 @@ void StartIEC850Task(void const * argument){
  * !многоклиентский доступ
  *
  *****************************************************************************************************/
-	}
 }
+
+/*************************************************************************
+ * IedServer_setControlAllObj
+ *  активация Функций контроля над всеми объектами, при управлении от клиента
+ *************************************************************************/
+void	IedServer_setControlAllObj(IedServer self){
+
+    // управление выключателем
+#if defined (MR771) || defined (MR761) || defined (MR762) || defined (MR763) || (defined (MR801) && defined (OLD)) || defined (MR761OBR) ||\
+defined (MR5_500) || defined (MR5_700) || defined (MR741)
+
+    IedServer_setControlHandler(self, &iedModel_CTRL_CSWI1_Pos, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_CSWI1_Pos_Oper);
+    IedServer_setControlHandler(self, &iedModel_CTRL_XCBR1_Mod,(ControlHandler) controlHandlerForBinaryOutput, &iedModel_CTRL_XCBR1_Mod_Oper);
+#endif
+
+// управление приводом
+#if defined (MR851)
+    IedServer_setControlHandler(self, &iedModel_RPN_ATCC1_TapChg, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_RPN_ATCC1_TapChg_Oper);
+    IedServer_setControlHandler(self, &iedModel_RPN_ATCC1_ParOp, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_RPN_ATCC1_ParOp_Oper);
+
+#endif
+
+#if  defined (MR761OBR)
+	setControlGGIO2_SPCSOx(self);
+#endif
+
+
+#if defined	(MR801) && defined (T12N5D58R51)
+    IedServer_setControlHandler(self, &iedModel_CTRL_CSWI1_Pos, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_CSWI1_Pos_Oper);
+    IedServer_setControlHandler(self, &iedModel_CTRL_XCBR1_Mod,(ControlHandler) controlHandlerForBinaryOutput, &iedModel_CTRL_XCBR1_Mod_Oper);
+/*
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO1, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO1_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO2, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO2_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO3, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO3_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO4, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO4_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO5, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO5_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO6, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO6_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO7, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO7_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO8, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO8_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO9, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO9_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO10, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO10_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO11, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO11_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO12, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO12_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO13, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO13_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO14, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO14_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO15, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO15_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO16, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO16_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO17, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO17_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO18, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO18_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO19, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO19_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO20, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO20_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO21, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO21_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO22, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO22_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO23, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO23_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO24, (ControlHandler) controlHandlerFor_CMDGGIO,&iedModel_CTRL_CMD24GGIO1_SPCSO24_Oper);
+*/
+
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO1, (ControlHandler) controlHandlerFor_CMDGGIO,1);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO2, (ControlHandler) controlHandlerFor_CMDGGIO,2);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO3, (ControlHandler) controlHandlerFor_CMDGGIO,3);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO4, (ControlHandler) controlHandlerFor_CMDGGIO,4);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO5, (ControlHandler) controlHandlerFor_CMDGGIO,5);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO6, (ControlHandler) controlHandlerFor_CMDGGIO,6);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO7, (ControlHandler) controlHandlerFor_CMDGGIO,7);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO8, (ControlHandler) controlHandlerFor_CMDGGIO,8);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO9, (ControlHandler) controlHandlerFor_CMDGGIO,9);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO10, (ControlHandler) controlHandlerFor_CMDGGIO,10);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO11, (ControlHandler) controlHandlerFor_CMDGGIO,11);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO12, (ControlHandler) controlHandlerFor_CMDGGIO,12);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO13, (ControlHandler) controlHandlerFor_CMDGGIO,13);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO14, (ControlHandler) controlHandlerFor_CMDGGIO,14);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO15, (ControlHandler) controlHandlerFor_CMDGGIO,15);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO16, (ControlHandler) controlHandlerFor_CMDGGIO,16);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO17, (ControlHandler) controlHandlerFor_CMDGGIO,17);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO18, (ControlHandler) controlHandlerFor_CMDGGIO,18);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO19, (ControlHandler) controlHandlerFor_CMDGGIO,19);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO20, (ControlHandler) controlHandlerFor_CMDGGIO,20);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO21, (ControlHandler) controlHandlerFor_CMDGGIO,21);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO22, (ControlHandler) controlHandlerFor_CMDGGIO,22);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO23, (ControlHandler) controlHandlerFor_CMDGGIO,23);
+	IedServer_setControlHandler(self, &iedModel_CTRL_CMD24GGIO1_SPCSO24, (ControlHandler) controlHandlerFor_CMDGGIO,24);
+
+#endif
+
+// для всех приборов
+	IedServer_setControlHandler(self, &iedModel_CTRL_GGIO1_SPCSO1, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_GGIO1_SPCSO1_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_GGIO1_SPCSO2, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_GGIO1_SPCSO2_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_GGIO1_SPCSO3, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_GGIO1_SPCSO3_Oper);
+	IedServer_setControlHandler(self, &iedModel_CTRL_GGIO1_SPCSO4, (ControlHandler) controlHandlerForBinaryOutput,&iedModel_CTRL_GGIO1_SPCSO4_Oper);
+
+}
+
 /*************************************************************************
  * controlHandlerForBinaryOutput
  *  Функция контроля над бинарным объектом. После изменения этих данных от
  *  клиента, будет вызываться эта функция.
  *************************************************************************/
-void	controlHandlerForBinaryOutput(void* parameter, MmsValue* value, bool test)
+ControlHandlerResult	controlHandlerForBinaryOutput(void* parameter, MmsValue* value, bool test)
 {
+	ControlHandlerResult ret = CONTROL_RESULT_OK;
 	MmsType		TypeCMD;
 	bool 		newState = false;
 	uint16_t 	newStateBitstr = 0;
-	USART_TRACE_GREEN("controlHandlerForBinaryOutput MMS_BOOLEAN:\n");
+//	USART_TRACE_GREEN("controlHandlerForBinaryOutput MMS_BOOLEAN:\n");
 
 	TypeCMD = MmsValue_getType(value);
 	switch(TypeCMD){
 
 	case	MMS_BOOLEAN:
-		 	 	 	 	 USART_TRACE("принята команда контроля MMS_BOOLEAN:\n");
+		 	 	 	 	 USART_TRACE("управление BOOLEAN:\n");
 		 	 	 	 	 if (MmsValue_getBoolean(value))	{USART_TRACE_GREEN("on\n");}
 		 	 	 	 	 else  {USART_TRACE_RED("off\n");}
 
@@ -367,7 +510,7 @@ void	controlHandlerForBinaryOutput(void* parameter, MmsValue* value, bool test)
 	    uint64_t timeStamp = Hal_getTimeInMs();
 
 
-#if defined (MR771) || defined (MR761) || defined (MR762) || defined (MR763) ||\
+#if defined (MR771) || defined (MR761) || defined (MR762) || defined (MR763) || defined (MR761OBR) ||\
 	defined (MR801) ||\
 	defined (MR5_700) || defined (MR5_500) || defined (MR741)
 	    // выключатель
@@ -408,119 +551,9 @@ void	controlHandlerForBinaryOutput(void* parameter, MmsValue* value, bool test)
 	    	USART_TRACE_GREEN("Сброс индикации\n");
 	    	GGIO_LEDGGIO1_SPCSO1_Oper(newState, timeStamp);
 	    }
+return ret;
 }
 
-/**
-  * @brief  Initializes the lwIP stack
-  * @param  None
-  * @retval None
-  */
-static void Netif_Config(char* ipAddress,char* Mask, char* Gateway)
-{
-  struct ip_addr ipaddr;
-  struct ip_addr netmask;
-  struct ip_addr gw;
-
-  /* IP address default setting */
-  IP4_ADDR(&ipaddr, ipAddress[0], ipAddress[1], ipAddress[2], ipAddress[3]);
-  IP4_ADDR(&netmask, Mask[0], Mask[1] , Mask[2], Mask[3]);
-  IP4_ADDR(&gw, Gateway[0], Gateway[1], Gateway[2], Gateway[3]);
-
-  USART_TRACE_BLUE("MAC:%.2X-%.2X-%.2X-%.2X-%.2X-%.2X \n",MAC_ADDR[0], MAC_ADDR[1], MAC_ADDR[2], MAC_ADDR[3],MAC_ADDR[4],MAC_ADDR[5]);	// временно чтобы отличались устройства
-  USART_TRACE_BLUE("IP:%d.%d.%d.%d \n", ipAddress[0], ipAddress[1], ipAddress[2], ipAddress[3]);
-  USART_TRACE_BLUE("Gateway:%d.%d.%d.%d \n",Gateway[0], Gateway[1], Gateway[2], Gateway[3]);
-
-
-  /* - netif_add(struct netif *netif, struct ip_addr *ipaddr,
-  struct ip_addr *netmask, struct ip_addr *gw,
-  void *state, err_t (* init)(struct netif *netif),
-  err_t (* input)(struct pbuf *p, struct netif *netif))
-
-  Adds your network interface to the netif_list. Allocate a struct
-  netif and pass a pointer to this structure as the first argument.
-  Give pointers to cleared ip_addr structures when using DHCP,
-  or fill them with sane numbers otherwise. The state pointer may be NULL.
-
-  The init function pointer must point to a initialization function for
-  your ethernet netif interface. The following code illustrates it's use.*/
-
-  netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);				// ethernetif_init - запуск таска для приема. tcpip_input - функция приема данных
-
-  /*  Registers the default network interface. */
-  netif_set_default(&gnetif);
-
-  if (netif_is_link_up(&gnetif))
-  {
-    /* Когда netif полностью настроен, эта функция должна быть вызвана. */
-    netif_set_up(&gnetif);
-  }
-  else
-  {
-    /* Когда netif отключена, эту функцию нужно вызвать */
-    netif_set_down(&gnetif);
-  }
-
-  // функция обработки физических подключений/отключений. По статусу линка
-/*
-  // ethernetif_update_config - по изменению LINK вызываем
-  netif_set_link_callback(&gnetif, ethernetif_update_config);
-
-  // через семафор из прерывания управление
-  osSemaphoreDef(Netif_SEM);
-  Netif_LinkSemaphore = osSemaphoreCreate(osSemaphore(Netif_SEM) , 1 );
-
-  link_arg.netif = &gnetif;
-  link_arg.semaphore = Netif_LinkSemaphore;
-  // Create the Ethernet link handler thread
-  USART_TRACE_MAGENTA("(LinkThr) Create the Ethernet link handler thread.\n");
-#if defined(__GNUC__)
-  osThreadDef(LinkThr, ethernetif_set_link, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 2);	// configMINIMAL_STACK_SIZE * 5 уменьшил
-#else
-  osThreadDef(LinkThr, ethernetif_set_link, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 2);
-#endif
-  osThreadCreate (osThread(LinkThr), &link_arg);
-*/
-}
-
-/***********************************************************************
- *
- ***********************************************************************/
-void Network_Start(void)
-{
-// проверка на валидность IP адреса
-  if (IP_ADDR[0] == 0xFF || IP_ADDR[3] == 0xFF || IP_ADDR[0] == 0 || IP_ADDR[1] == 0 ){
-	  IP_ADDR[0] = first_IP_ADDR0;
-	  IP_ADDR[1] = first_IP_ADDR1;
-	  IP_ADDR[2] = first_IP_ADDR2;
-	  IP_ADDR[3] = first_IP_ADDR3;
-  }
-// проверка на валидность IP NTP адреса
-  if (SNTP_IP_ADDR[0] == 0xFF || SNTP_IP_ADDR[3] == 0xFF || SNTP_IP_ADDR[0] == 0 || SNTP_IP_ADDR[1] == 0 ){
-	  SNTP_IP_ADDR[0] = NTP_IP_ADDR0;
-	  SNTP_IP_ADDR[1] = NTP_IP_ADDR1;
-	  SNTP_IP_ADDR[2] = NTP_IP_ADDR2;
-	  SNTP_IP_ADDR[3] = NTP_IP_ADDR3;
-//			  SNTP_Period = 0;
-  }
-	MAC_ADDR[0]	= MAC_ADDR0;
-	MAC_ADDR[1]	= MAC_ADDR1;
-	MAC_ADDR[2]	= MAC_ADDR2;
-	MAC_ADDR[3]	= IP_ADDR[1];//MAC_ADDR3;
-	MAC_ADDR[4]	= IP_ADDR[2];//MAC_ADDR4;
-	MAC_ADDR[5]	= IP_ADDR[3];//IP_ADDR[2];//MAC_ADDR5;
-
-	GW_ADDR[0] = IP_ADDR[0];
-	GW_ADDR[1] = IP_ADDR[1];
-	GW_ADDR[2] = IP_ADDR[2];
-	GW_ADDR[3] = 1;
-
-	// запускаем таск "TCP/IP"
-	tcpip_init( NULL, NULL );												// создаем tcp_ip stack, таск TCP/IP
-	Netif_Config((char*)IP_ADDR,(char*)NETMASK_ADDR,(char*)GW_ADDR);		// Initialize the LwIP stack
-
-    //netif_set_addr(&gnetif, &first_ipaddr , &netmask, &gw);
-    //netif_set_up(&gnetif);
-}
 /***********************************************************************
  * activeSgChangedHandler
  * изменение номера ActSG группы уставок из ethernet.
@@ -554,7 +587,7 @@ static void	editSgConfirmedHandler(void* parameter, SettingGroupControlBlock* sg
 //--------------------------------------------------------------------
 static void		loadActiveSgValues (int actSG)
 {
-#if defined (MR771) || defined (MR761) || defined (MR762) || defined (MR763) ||\
+#if defined (MR771) || defined (MR761) || defined (MR762) || defined (MR763) || defined (MR761OBR) ||\
 	defined (MR801) ||\
 	defined (MR901) || defined (MR902) ||\
 	defined (MR851) ||\
@@ -563,7 +596,8 @@ static void		loadActiveSgValues (int actSG)
 		writeNmbSG = actSG;
 
 		AddToQueueMB(ModbusSentTime,  MB_Wrt_SG_set_ManNumb	,MB_Slaveaddr);		// приоритет
-//    	AddToQueueMB(ModbusSentQueue, MB_Rd_NumbSG			,MB_Slaveaddr);		// ставим задачу вычитать новые уставки
+//18.03.2019 добавил, не читал группу
+		AddToQueueMB(ModbusSentQueue, MB_Rd_NumbSG			,MB_Slaveaddr);		// ставим задачу вычитать новые уставки
 
 #endif
 
@@ -605,4 +639,24 @@ clientAuthenticator(void* parameter, AcseAuthenticationParameter authParameter, 
     }
 
     return false;
+}
+/******************************************************************************
+ * добавим к имени уникальность Nx
+ * x - последняя цифра IP
+ ******************************************************************************/
+static void ModelNameModify(IedModel* self, uint16_t	numb)
+// ------ добавим к имени уникальность
+{
+	uint8_t	addIPtoName[50];
+	portCHAR pagehits[5];
+
+	memset(addIPtoName,0,50);
+	strcat((char *)addIPtoName,(const char *)self->name);
+	sprintf(pagehits,"N%u",numb);
+	strcat((char *)addIPtoName, pagehits);
+
+	uint8_t	ln = strlen((const char *)addIPtoName)+1;
+	self->name = (char*)GLOBAL_MALLOC(ln);
+	memset(self->name,0,ln);
+	strcat((char *)self->name,(const char *)addIPtoName);
 }

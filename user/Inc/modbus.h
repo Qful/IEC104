@@ -51,6 +51,8 @@
 #define MODBUS_H_
 
 /* ----------------------- Modbus includes ----------------------------------*/
+#include "MBmaster.h"
+
 #include "mb.h"
 #include "mb_m.h"
 #include "mbconfig.h"
@@ -66,9 +68,12 @@
 #define	MB_SlaveAddres					1
 #define	MB_MasterAddres					2
 
-#define	_SizeModbusRX					250
+#define	_SizeModbusRX					2048//250			// в байтах а ответы в
+#define	_SizeModbusTX					250//250
 
 /* ----------------------- Defines ------------------------------------------*/
+#define MB_SIZE_TCPMB_FRAME                		( 7 )
+
 
 #define MB_PDU_REQ_READ_ADDR_OFF                ( MB_PDU_DATA_OFF + 0 )
 #define MB_PDU_REQ_READ_REGCNT_OFF              ( MB_PDU_DATA_OFF + 2 )
@@ -157,10 +162,10 @@
 #define RT_WAITING_NO                   0               /**< Non-block. */
 
 
-#define		MaxSizeBlok		120//0x7C			// максимум что можно передать в одном пакете
-#define		_MB_Tr_Limit	5					// максимальное число запросов без ответа
-
-#define		_GooseSpeedSize		31				// фиксированый размер срочного сообщения для гусов
+#define		MaxSizeBlokUNICON	0x80//0x7C			// максимум что можно передать в одном пакете 0x7C по стандарту. всё что больше будет в ответе размер не байт а слово. в Униконе запросы 0x80
+#define		MaxSizeBlok			0x7C//0x7C			// максимум что можно передать в одном пакете 0x7C (19команда) по стандарту. всё что больше будет в ответе размер не байт а слово.
+#define		MaxSizeBlok_3_4		0x7D//0x7C			// максимум что можно передать в одном пакете 0x7D (3,4 команда) по стандарту в Униконе запросы 0x80
+#define		_MB_Tr_Limit		5					// максимальное число запросов без ответа
 
 #define		SizeAddr		1
 #define		SizeFunct		1
@@ -172,6 +177,7 @@
 #define		SizeNumbByte	1
 #define		SizeNumbWord	2
 #define		SizeCRC			2
+
 typedef struct					// для передачи через очереди структур.
 {
   uint8_t 	MBSlaveAddr;
@@ -180,6 +186,8 @@ typedef struct					// для передачи через очереди структур.
 //  uint16_t 	MBCRC;
 } MBFrame;
 
+
+uint16_t	GetMaxSizeBlockStandartMB(void);					// максимальный размер запроса в стандартный модбас
 
 BOOL		Hal_setTimeFromMB_Date( uint16_t *MDateBuf );		// функция установки часов из буфера модбас
 int8_t		Hal_setIPFromMB_Date( uint16_t * MDateBuf );		// функция установки IP адреса из буфера модбас
@@ -191,12 +199,14 @@ uint16_t	Hal_get_SizeMessageFromMB( uint8_t * MDateBuf );	// получаем размер соо
 BOOL		xModbus_Set_SizeAnswer( uint16_t Size, uint16_t Addr );
 uint16_t	xModbus_Get_SizeAnswer( uint16_t * Size );
 BOOL    	xModbus_Get_AddrAnswer( uint16_t * Addr );
+uint16_t   xModbus_Get_SizeWaitingAnswer( uint16_t * Size );
 
 void    vMBMODBUSPortRxDisable( void );
 void    vMBMasterPortRecieverDMAStart(uint16_t	size);
 void 	Modbus_SendCmd(uint8_t MB_SlaveAddr, uint8_t MB_Funct, uint16_t addr, uint16_t numb, uint16_t *Data, uint16_t len);
 
-eMBMasterReqErrCode	eMBMasterSendMessage(ModbusMessage*	Message,LONG lTimeOut);
+eMBMasterReqErrCode	eMBMasterSendMessage(ModbusMessageFull*	Message, LONG lTimeOut);
+
 int8_t	AddToQueueMB(xQueueHandle SentQueue, uint16_t	MB_Rd_cmd, uint8_t	Slaveaddr);
 int8_t	AddToQueueMB_FS(const char* file, uint8_t* 	Data, uint16_t 		numb,uint8_t	mode, FSAfterHandler	handler, void*	parameter);
 
@@ -216,5 +226,6 @@ void	GGIO_SPCSO1_Oper(bool newState, uint64_t timeStamp);
 void	GGIO_SPCSO2_Oper(bool newState, uint64_t timeStamp);
 void	GGIO_SPCSO3_Oper(bool newState, uint64_t timeStamp);
 
+uint8_t*	GetModbus_DataRX_Buf(void);
 
 #endif /* MODBUS_H_ */

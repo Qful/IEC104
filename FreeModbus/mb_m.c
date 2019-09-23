@@ -59,6 +59,25 @@
 
 #include "iec61850_server.h"
 
+#include "MBTCP_main.h"
+#include "MBmaster.h"
+
+// очереди -----------------------------
+extern	xQueueHandle 	ModbusSentTime;			// очередь для отправки срочных сообщений модбас
+extern	xQueueHandle 	ModbusSentQueue;		// очередь для отправки в модбас
+extern	xQueueHandle 	ModbusSentQueueFromTCPMB;		// очередь запросов из TCP/MB
+//extern	xQueueHandle 	ModbusResponseQueue;	// очередь для ожидания ответов
+extern	xQueueHandle 	Rd_SysNoteQueue;		// очередь для запросов журналу системы
+extern	xQueueHandle 	Rd_ErrorNoteQueue;		// очередь для запросов журналу аварий
+extern	xQueueHandle 	Rd_OscNoteQueue;		// очередь для запросов журналу осциллографа
+extern	xQueueHandle 	Rd_FileQueue;			// очередь для запросов файлов
+//extern	xQueueHandle 	Rd_UstavkiQueue;		// очередь для запросов уставок
+extern	xQueueHandle	Wr_GooseQueue;			// очередь гусов
+extern	xQueueHandle	xDebugUsartOut;			// очередь для отправки в юсартдебаг
+
+extern TIM_HandleTypeDef   TimHandle;	// Timer handler declaration для таймаутов MODBUS
+
+
 extern	errMB_data	cntErrorMD;
 extern  uint32_t	cntMBmessage;					// счетчик пакетов с MB.
 
@@ -76,7 +95,6 @@ static eMBMasterErrorEventType 	eMBMasterCurErrorType;
 
 static UCHAR    				ucMBAddress;
 static eMBMode  				eMBCurrentMode;
-
 
 static enum
 {
@@ -319,6 +337,7 @@ eMBMasterDisable( void )
     return eStatus;
 }
 
+
 /*************************************************************************
  * eMBMasterPoll
  * функция обрабатывает события в хранилище xMasterOsEvent до конца.
@@ -338,12 +357,18 @@ eMBMasterPoll( void )
     USHORT   					usLength;
     eMBException 				eException;
 
+    UCHAR   					*ucMBTCPFrame;
+    USHORT   					*usTCPLength;
+
     int             			i;
     eMBErrorCode    			eStatus = MB_ENOERR;
     eMBMasterEventType    		eEvent = 0;
     eMBMasterErrorEventType 	errorType;
 
+
     if( eMBState != STATE_ENABLED )        return MB_EILLSTATE;	 	// проверим, готов ли модбас для работы
+
+restart:
 
     // будем отрабатывать все события пока не опустошим
     while(xMBMasterPortEventGet( &eEvent ) == TRUE)
@@ -359,39 +384,62 @@ eMBMasterPoll( void )
  * ждём ответа от клиента
  *********************************************************************************/
         case EV_MASTER_FRAME_RECEIVE_WAIT:
-//				USART_TRACE_RED("------------------------------\n");
-//				USART_TRACE_RED("EV_MASTER_FRAME_RECEIVE_WAIT. Режим ожидания с выкл. таймером\n");
-				//xMBMasterPortEventClear(EV_MASTER_FRAME_SENT_WAIT);
+        	if (vMBMasterGetCurTimerMode()== MB_TMODE_STOP){
+				xMBMasterPortEventClear(EV_MASTER_FRAME_RECEIVE_WAIT);
+        	}
 			break;
 /*********************************************************************************
  * проверка принятых данных на целостность
  * принимаем все адреса устройств.
  *********************************************************************************/
         case EV_MASTER_FRAME_RECEIVED:															// Приняли фрейм, проверим на целостность и обработаем
-        	eStatus = peMBMasterFrameReceiveCur( &ucRcvAddress, &ucMBFrame, &usLength );		// получили параметры пакета. Address, Length, Frame
 
-			if ( eStatus == MB_ERECV  )
+			// для TCP/Modbus нужна отдельная функция обработки. И соответственно не лазим по списку функций
+// ---------------------------------------------------
+// запрос TCP modbus
+			if (SendRequestWithWait == eMBTCPGetState())
 			{
-				cntMBmessage++; 																// подсчитаем число ответов
-				xMBMasterPortEventPost( EV_MASTER_EXECUTE );									// если нам, то переходим к дальнейшей работе с данными.
+				eMBTCPSetState(Stopped);
+	    		  // нужно переписать принятые данные минуя заголовок TCP/Modbus
+	    		  xMBTCPPortGetBuff(&ucMBTCPFrame, &usTCPLength);
+	    		  // теперь копируем по адресу ucMBFrame размером не важно
+	    		  eStatus = peMBMasterFrameReceiveCur( &ucRcvAddress, &ucMBFrame, usTCPLength );		// получили параметры пакета. Address, Length, Frame
+	    		  if ((eStatus == MB_ERECV )&&(*usTCPLength < MB_TCP_BUF_SIZE)){
+
+		    	    memcpy(ucMBTCPFrame,ucMBFrame,*usTCPLength);
+	            	eStatus = MB_ENOERR;			// так как EXECUTE не вызываем снимем статус, иначе вернётся из функции с указанием ошибки
+
+	    		  } else{
+						USART_TRACE_RED("EV_MASTER_FRAME_RECEIVED - %u\n",eStatus);
+						vMBMasterSetErrorType( EV_ERROR_RECEIVE_DATA);
+						xMBMasterPortEventPost( EV_MASTER_ERROR_PROCESS );
+
+						if (  eStatus == MB_CRCERR_Rx ) 	cntErrorMD.errALLCRC++;
+	    		  }
+
+	              ( void )xMBPortEventPost( EV_TCPMB_EXECUTE );									// переводим в режим отправки ответа
+
+			}else{
+// ---------------------------------------------------
+// обычный режим работы
+			eStatus = peMBMasterFrameReceiveCur( &ucRcvAddress, &ucMBFrame, &usLength );			// получили параметры пакета. Address, Length, Frame
+
+				if ( eStatus == MB_ERECV  )
+				{
+					cntMBmessage++; 																// подсчитаем число ответов
+					xMBMasterPortEventPost( EV_MASTER_EXECUTE );									// если нам, то переходим к дальнейшей работе с данными.
+				}
+				else{
+					USART_TRACE_RED("EV_MASTER_FRAME_RECEIVED - %u\n",eStatus);
+					vMBMasterSetErrorType( EV_ERROR_RECEIVE_DATA);
+					xMBMasterPortEventPost( EV_MASTER_ERROR_PROCESS );
+
+					if (  eStatus == MB_CRCERR_Rx ) 	cntErrorMD.errALLCRC++;
+				}
 			}
-			else{
-				USART_TRACE_RED("EV_MASTER_FRAME_RECEIVED - %u\n",eStatus);
-				vMBMasterSetErrorType( EV_ERROR_RECEIVE_DATA);
-				xMBMasterPortEventPost( EV_MASTER_ERROR_PROCESS );
+// ---------------------------------------------------
+			//if (WaitPreResponse == eMBTCPGetState())  eMBTCPSetState(SendRequestWithWait);
 
-				if (  eStatus == MB_CRCERR_Rx ) 	cntErrorMD.errALLCRC++;
-
-/*
-				if (  eStatus == MB_CRCERR_Rx ) 		//USART_TRACE_RED("FrameReceiveERROR CRC.  ");
-				if (  eStatus == MB_ERECVDATAERROR )	//USART_TRACE_RED("FrameReceiveERROR SIZE. ");
-
-				vMBMasterGetPDUSndBuf( &ucMBFrame );
-				uint8_t	i;
-				for(i=0;i<8;i++) USART_0TRACE("0x%.2X ",ucMBFrame[i]);
-				USART_0TRACE("\n");
-*/
-			}
 			break;
 /*********************************************************************************
  * обработка принятых данных
@@ -461,19 +509,31 @@ eMBMasterPoll( void )
  * если удачно, то выставляем событие ожидания(EV_MASTER_FRAME_RECEIVE_WAIT)
  *********************************************************************************/
         case EV_MASTER_FRAME_SENT:
+
         	vMBMasterGetPDUSndBuf( &ucMBFrame );
         	{
 				uint8_t		reSend = 50;	// попыток отправки. ошибка может только из HAL_UART_Transmit_DMA)
 				while(eStatus != MB_ESENT){
 					reSend --; if (reSend == 0) break;
-					eStatus = peMBMasterFrameSendCur( ucMBMasterGetDestAddress(), ucMBFrame, usMBMasterGetPDUSndLength() );
+					// может быть такая ситуация что данные отправляются в данный момент. Повторная отправка имеет смысл после принятия ответа или таймаута без ответа.
+					// -------------------------------------------------------
+					uint16_t	Len = usMBMasterGetPDUSndLength();
+					uint8_t		adr =  ucMBMasterGetDestAddress();
+					if (adr == 0) adr = 1;
+					if (Len == 0) {Len = 5;
+						USART_0TRACE("fsl:%u|%u|0x%X\n",Len,adr,ucMBFrame);
+					}
+					eStatus = peMBMasterFrameSendCur( adr, ucMBFrame, Len );
+					if (eStatus != MB_ESENT){
+						USART_TRACE_RED("MB_EIO_Tx: %u попыток отправки. eStatus:%u\n",50-reSend,eStatus);
+						vTaskDelay(1);		// немного подождём
+					}
 				}
         	}
 			if (eStatus == MB_ESENT){
 			    // надо перенести в прерывание по окончанию передачи. иначе бывают задержки и запускается когда уже поздно
 			    //xMBMasterPortEventPost( EV_MASTER_FRAME_RECEIVE_WAIT );	// ждём окончания отправки
 				//vMBMasterPortTimersRespondTimeoutEnable( );				// на случай проблем запустим таймер
-			    //Port_On(LEDtst2);
 
 			    // сменим статус на MB_ENOERR. выше уровнем пока не нужен статус MB_ESENT. Возможно для очереди ответов он понадобится
 			    eStatus = MB_ENOERR;
@@ -515,8 +575,16 @@ eMBMasterPoll( void )
 // -------------------------------------------------------------------------------
         }
     }
+    // обработали все события. Можно отослать запрос TCP в модбас линию
+   	if (WaitPreResponse == eMBTCPGetState())	{
+   		eMBTCPSetState(SendRequestWithWait);
+   		// нужно вернуться, иначе вывалиться и может запустить иной запрос.
+   		goto restart;
+   	}
+
     return eStatus;
 }
+
 
 /* Get whether the Modbus Master is run in master mode.*/
 BOOL xMBMasterGetCBRunInMasterMode( void )

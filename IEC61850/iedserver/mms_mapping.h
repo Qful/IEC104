@@ -108,6 +108,12 @@ void
 MmsMapping_enableGoosePublishing(MmsMapping* self);
 
 void
+MmsMapping_enableGooseSimulation(MmsMapping* self);
+
+void
+MmsMapping_disableGooseSimulation(MmsMapping* self);
+
+void
 MmsMapping_disableGoosePublishing(MmsMapping* self);
 
 char*

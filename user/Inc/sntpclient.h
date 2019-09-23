@@ -25,4 +25,6 @@ typedef enum
 int 	sntp_client_serve(Socket self, const char* address, int port, int sent);
 BOOL	Hal_setTimeToMB_Date( uint16_t * MDateBuf );
 
+void	sntpSend_tcpip_thread(void *arg);
+
 #endif /* SNTPCLIENT_H_ */

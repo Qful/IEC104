@@ -51,7 +51,7 @@ PR_BEGIN_EXTERN_C
 
 #define IDU_FUNC_VZGGIO          		(  31 )
 #define IDU_FUNC_AVRGGIO          		(  32 )
-#define IDU_FUNC_XCBRGGIO	         	(  33 )		// полностью идентична IDU_FUNC_SPCSO
+#define IDU_FUNC_XCBRGGIO	         	(  33 )		// полностью идентична IDU_FUNC_SPCSO нужно удалить
 
 #define IDU_FUNC_CSWI	          		(  34 )
 #define IDU_FUNC_XCBR	          		(  35 )
@@ -71,14 +71,15 @@ PR_BEGIN_EXTERN_C
 #define IDU_FUNC_LSGGIO		         	(  48 )
 #define IDU_FUNC_NBLKGGIO				(  49 )
 #define IDU_FUNC_FLSGGIO				(  50 )
+#define IDU_FUNC_RSTGGIO				(  51 )
 
-#define IDU_FUNC_SPCSO		         	(  51 )		// полностью идентична IDU_FUNC_XCBRGGIO
+#define IDU_FUNC_SPCSO		         	(  52 )		// полностью идентична IDU_FUNC_XCBRGGIO
 
-#define IDU_FUNC_ATCC		         	(  52 )
+#define IDU_FUNC_ATCC		         	(  53 )
 
-#define IDU_FUNC_RDRE		         	(  53 )
+#define IDU_FUNC_RDRE		         	(  54 )
 
-#define IDU_FUNC_SG			         	(  54 )
+#define IDU_FUNC_SG			         	(  55 )
 #define IDU_FUNC_HANDLERS_MAX           (  IDU_FUNC_SG + 1 )			// макс число функций
 
 /* ----------------------- Type definitions ---------------------------------*/

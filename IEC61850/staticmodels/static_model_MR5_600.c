@@ -2621,8 +2621,8 @@ DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_Check;
 IedModel iedModel = {
     "MR5PO60",
     &iedModel_Generic_LD0,
-    &iedModelds_LD0_LLN0_dataset0,			// DataSet
-    &iedModel_LD0_LLN0_report0,				// ReportControlBlock
+    NULL,//&iedModelds_LD0_LLN0_dataset0,			// DataSet
+    NULL,//&iedModel_LD0_LLN0_report0,				// ReportControlBlock
     NULL,//&iedModel_LD0_LLN0_gse0,			// GSEControlBlock
     NULL,									// SVControlBlock
     &iedModel_LD0_LLN0_sgcb0,				// SettingGroupControlBlock
@@ -4996,6 +4996,7 @@ DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_Check 		= { DataAttributeModelType
 /***********************************************************************
  * DataSet
  ***********************************************************************/
+/*
 DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda0 = {"GGIO",false,"IN8GGIO1$ST$Ind1", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda1 };
 DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda1 = {"GGIO",false,"IN8GGIO1$ST$Ind2", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda2 };
 DataSetEntry iedModelds_LD0_LLN0_dataset0_fcda2 = {"GGIO",false,"IN8GGIO1$ST$Ind3", -1, NULL, NULL, &iedModelds_LD0_LLN0_dataset0_fcda3 };
@@ -5194,9 +5195,8 @@ DataSetEntry iedModelds_LD0_LLN0_dataset20_fcda14 = {"GGIO",false,"IN8GGIO1$ST$I
 DataSetEntry iedModelds_LD0_LLN0_dataset20_fcda15 = {"GGIO",false,"IN8GGIO1$ST$Ind8$q"		, -1, NULL, NULL, NULL };
 #define 	_numDS20		16
 #define 	linkDS20		&iedModelds_LD0_LLN0_dataset20_fcda0
-/***********************************************************************
- * DataSet
- ***********************************************************************/
+
+
 DataSet iedModelds_LD0_LLN0_dataset0 = {"LD0", "LLN0$DS0",	_numDS0, 	linkDS0, 	&iedModelds_LD0_LLN0_dataset1,	false};			// IN42GGIO
 DataSet iedModelds_LD0_LLN0_dataset1 = {"LD0", "LLN0$DS1",	_numDS1, 	linkDS1, 	&iedModelds_LD0_LLN0_dataset2,	false};			// LED16
 DataSet iedModelds_LD0_LLN0_dataset2 = {"LD0", "LLN0$DS2",	_numDS2, 	linkDS2, 	&iedModelds_LD0_LLN0_dataset3,	false};			// XCBR1
@@ -5241,7 +5241,7 @@ ReportControlBlock iedModel_LD0_LLN0_report17 = { &iedModel_LD0_LLN0, "BRCB_701"
 ReportControlBlock iedModel_LD0_LLN0_report18 = { &iedModel_LD0_LLN0, "BRCB_801", 	"LLN0$BR$BRCB_801", true, "DS7", 0, TRG_OPT_NO, 		111, 	3000, 	5000, 	&iedModel_LD0_LLN0_report19};
 ReportControlBlock iedModel_LD0_LLN0_report19 = { &iedModel_LD0_LLN0, "BRCB_901", 	"LLN0$BR$BRCB_901", true, "DS8", 0, TRG_OPT_NO, 		111, 	3000, 	5000, 	&iedModel_LD0_LLN0_report20};
 ReportControlBlock iedModel_LD0_LLN0_report20 = { &iedModel_LD0_LLN0, "BRCB_1001", 	"LLN0$BR$BRCB_1001",true, "DS9", 0, TRG_OPT_NO, 		111, 	3000, 	5000, 	NULL};
-
+*/
 
 static PhyComAddress iedModel_LD0_LLN0_gse0_address = {  4,  1,  999,  {0x1, 0xc, 0xcd, 0x1, 0x0, 0x1} };//4096
 static PhyComAddress iedModel_LD0_LLN0_gse1_address = {  4,  1,  999,  {0x1, 0xc, 0xcd, 0x1, 0x0, 0x2} };

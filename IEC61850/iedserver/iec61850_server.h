@@ -202,6 +202,13 @@ IedServer_getIsoServer(IedServer self);
  */
 void
 IedServer_enableGoosePublishing(IedServer self);
+/**
+ *
+ */
+void
+IedServer_enableGooseSimulation(IedServer self);
+void
+IedServer_disableGooseSimulation(IedServer self);
 
 /**
  * \brief Disable all GOOSE control blocks.
@@ -659,6 +666,7 @@ IedServer_updateTimestampAttributeValue(IedServer self, DataAttribute* dataAttri
  * \param quality the new quality value
  *
  */
+Quality	IedServer_GetQuality(DataAttribute* dataAttribute);
 int	IedServer_updateQuality(IedServer self, DataAttribute* dataAttribute, Quality quality);
 int	IedServer_updateQualityWithTime(IedServer self, DataAttribute* dataAttribute, DataAttribute* dataAttributeTime, uint64_t time, Quality quality);
 

@@ -2011,9 +2011,9 @@ static void*	serverThread (void* parameter)
     ServerSocket serverSocket;
 
     if (self->localAddress)
-        serverSocket = TcpServerSocket_create(self->localAddress, self->tcpPort);
+        serverSocket = TcpServerSocket_create(self->localAddress, self->tcpPort, true);
     else
-        serverSocket = TcpServerSocket_create("0.0.0.0", self->tcpPort);
+        serverSocket = TcpServerSocket_create("0.0.0.0", self->tcpPort, true);
 
     if (serverSocket == NULL) {
         DEBUG_PRINT("Cannot create server socket\n");

@@ -119,7 +119,7 @@
 #define TCP_QUEUE_OOSEQ         		0
 
 /* TCP Maximum segment size. */
-#define TCP_MSS                 		(1500 - 40)	  /* TCP_MSS = (Ethernet MTU - IP header size - TCP header size) */
+#define TCP_MSS                 		(1500 - 40 - 6)	  /* TCP_MSS = (Ethernet MTU - IP header size - TCP header size) */ // - PRP/HSR Tag
 
 /* TCP sender buffer space (bytes). */
 #define TCP_SND_BUF             		(4*TCP_MSS)
@@ -132,6 +132,8 @@
 /* TCP receive window. */
 #define TCP_WND                 		(2*TCP_MSS)
 
+#define LWIP_WND_SCALE                  0
+#define TCP_RCV_SCALE                   0
 
 /* ---------- ICMP options ---------- */
 #define LWIP_ICMP                       1
@@ -148,12 +150,16 @@
 #define LWIP_UDP                1
 #define UDP_TTL                 255
 
+/* ---------- VLAN options ---------- */
+
+#define ETHARP_SUPPORT_VLAN             1	//  нужно для гусов
+//#define ETHARP_VLAN_CHECK            	1	// принимаем только пакеты с ID = 1
 
 /* ---------- HSR options ---------- */
+#define ETHARP_SUPPORT_HSR              1	//  поддержка HSR резервирования
 
-//#define ETH_SUPPORT_HSR			1					// поддержка HSR
-//#define ETH_HSR_SIZE				6					// размер HSR блока
-
+/* ---------- PRP options ---------- */
+#define ETHARP_SUPPORT_PRP              1	//  поддержка PRP резервирования
 
 /*
    ----------------------------------
@@ -195,8 +201,9 @@ The STM32F4x7 allows computing and verifying the IP, UDP, TCP and ICMP checksums
  - To use this feature let the following define uncommented.
  - To disable it and process by CPU comment the  the checksum.
 */
+#ifndef ETHARP_SUPPORT_HSR
 #define CHECKSUM_BY_HARDWARE
-
+#endif
 
 #ifdef CHECKSUM_BY_HARDWARE
   /* CHECKSUM_GEN_IP==0: Generate checksums by hardware for outgoing IP packets.*/
@@ -211,23 +218,23 @@ The STM32F4x7 allows computing and verifying the IP, UDP, TCP and ICMP checksums
   #define CHECKSUM_CHECK_UDP              0
   /* CHECKSUM_CHECK_TCP==0: Check checksums by hardware for incoming TCP packets.*/
   #define CHECKSUM_CHECK_TCP              0
-  /* CHECKSUM_CHECK_ICMP==0: Check checksums by hardware for incoming ICMP packets.*/
-  #define CHECKSUM_GEN_ICMP               0
+  /* CHECKSUM_CHECK_ICMP==0: Generate checksums by hardware for incoming ICMP packets.*/
+  #define CHECKSUM_GEN_ICMP               0 //0
 #else
   /* CHECKSUM_GEN_IP==1: Generate checksums in software for outgoing IP packets.*/
-  #define CHECKSUM_GEN_IP                 1
+  #define CHECKSUM_GEN_IP                 1 //- по мере отладки
   /* CHECKSUM_GEN_UDP==1: Generate checksums in software for outgoing UDP packets.*/
-  #define CHECKSUM_GEN_UDP                1
+  #define CHECKSUM_GEN_UDP                1 //+
   /* CHECKSUM_GEN_TCP==1: Generate checksums in software for outgoing TCP packets.*/
-  #define CHECKSUM_GEN_TCP                1
+  #define CHECKSUM_GEN_TCP                1 //- по мере отладки
   /* CHECKSUM_CHECK_IP==1: Check checksums in software for incoming IP packets.*/
-  #define CHECKSUM_CHECK_IP               1
+  #define CHECKSUM_CHECK_IP               1 //+
   /* CHECKSUM_CHECK_UDP==1: Check checksums in software for incoming UDP packets.*/
-  #define CHECKSUM_CHECK_UDP              1
+  #define CHECKSUM_CHECK_UDP              1 //+
   /* CHECKSUM_CHECK_TCP==1: Check checksums in software for incoming TCP packets.*/
-  #define CHECKSUM_CHECK_TCP              1
+  #define CHECKSUM_CHECK_TCP              1 //+
   /* CHECKSUM_CHECK_ICMP==1: Check checksums by hardware for incoming ICMP packets.*/
-  #define CHECKSUM_GEN_ICMP               1
+  #define CHECKSUM_GEN_ICMP               1 //+
 #endif
 
 
@@ -258,10 +265,12 @@ The STM32F4x7 allows computing and verifying the IP, UDP, TCP and ICMP checksums
    ---------- DEBUG options ----------
    -----------------------------------
 */
-
+#ifndef LWIP_DEBUG
 #define LWIP_DEBUG                      0//1
+#endif
 
-
+//#define TCP_INPUT_DEBUG                 LWIP_DBG_ON
+//#define TCP_OUTPUT_DEBUG                LWIP_DBG_ON
 /*
    ---------------------------------
    ---------- OS options ----------
@@ -271,7 +280,7 @@ The STM32F4x7 allows computing and verifying the IP, UDP, TCP and ICMP checksums
 // стек задачи "LwIP"
 
 #define TCPIP_THREAD_NAME              "TCP/IP"
-#define TCPIP_THREAD_STACKSIZE          1024//1000					// размер памяти для задачи
+#define TCPIP_THREAD_STACKSIZE          1500//1024//1000			// размер памяти для задачи
 #define TCPIP_MBOX_SIZE                 15							// число в sys_mbox_new(&mbox, TCPIP_MBOX_SIZE)
 #define TCPIP_THREAD_PRIO               (configMAX_PRIORITIES - 2)	// приоритет
 

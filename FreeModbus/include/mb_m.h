@@ -35,6 +35,9 @@
 PR_BEGIN_EXTERN_C
 #endif
 
+//#include "MBmaster.h"
+//#include "modbus.h"
+
 /*! \defgroup modbus Modbus
  * \code #include "mb_m.h" \endcode
  *
@@ -68,20 +71,37 @@ PR_BEGIN_EXTERN_C
  */
 #define MB_MASTER_TCP_PORT_USE_DEFAULT 0
 
+#define MB_DATA_SIZE					30
+#define MB_DATA_SIZE_FULL				252 // макс размер данных
 /* ----------------------- Type definitions ---------------------------------*/
 typedef struct
  {
-  uint8_t 	MBSlaveAddr;				// адрес получателя
+  uint8_t 	owner;						// получатель сообщения. Номер в списке или фикс адреса клиентов. например: 1 - собственные, 2 - TCP/MB, 3 - RS485, и т.д.
+  uint8_t 	MBSlaveAddr;				// адрес
   uint16_t 	MBFunct;					// команда модбас
   uint16_t 	StartAddr;					// адрес сообщения
   uint16_t 	SizeMessage;				// размер сообщения
-  uint16_t	ucData[30];					// содержание сообщения, включает адрес,число,значения. без CRC
+  uint8_t	ucData[MB_DATA_SIZE];		// содержание сообщения, включает адрес,число,значения. без CRC uint16_t
  }ModbusMessage;
 
- typedef struct
-  {
-   uint8_t 		ucData[5];
-  }ModbusHead;
+typedef struct
+ {
+  uint8_t 	owner;						// получатель сообщения. Номер в списке или фикс адреса клиентов. например: 1 - собственные, 2 - TCP/MB, 3 - RS485, и т.д.
+  uint8_t 	MBSlaveAddr;				// адрес
+  uint16_t 	MBFunct;					// команда модбас
+  uint16_t 	StartAddr;					// адрес сообщения
+  uint16_t 	SizeMessage;				// размер сообщения
+  uint8_t	ucData[MB_DATA_SIZE_FULL];	// содержание сообщения, включает адрес,число,значения. без CRC uint16_t
+ }ModbusMessageFull;
+
+typedef struct
+{
+	uint8_t 	owner;					// получатель сообщения. Номер в списке или фикс адреса клиентов. например: 1 - собственные, 2 - TCP/MB, 3 - RS485, и т.д.
+	uint8_t 	MBSlaveAddr;			// адрес MB который запрашивал получатель.
+	uint16_t 	MBFunct;				// команда модбас которую запрашивал получатель.
+	uint16_t 	MessageAddr;			// адрес сообщения
+	uint16_t 	MessageSize;			// размер сообщения
+}ModbusResponse;
 
 /*! \ingroup modbus
  * \brief Errorcodes used by all function in the Master request.
@@ -92,6 +112,7 @@ typedef enum
     MB_MRE_NO_REG,                  /*!< illegal register address. */
     MB_MRE_ILL_ARG,                 /*!< illegal argument. */
     MB_MRE_REV_DATA,                /*!< receive data error. */
+    MB_MRE_SNT_DATA,                /*!< transmit data error. */
     MB_MRE_TIMEDOUT,                /*!< timeout error occurred. */
     MB_MRE_MASTER_BUSY,             /*!< master is busy now. */
     MB_MRE_EXE_FUN                  /*!< execute function error. */
@@ -371,6 +392,9 @@ eMBMasterReqErrCode		eMBMasterReqReadDiscreteInputs( UCHAR ucSndAddr, USHORT usD
 
 eMBMasterReqErrCode		eMBMasterReqReadDataTimeW( UCHAR ucSndAddr, USHORT usTimeAddr, LONG lTimeOut );
 
+eMBMasterReqErrCode		eMBMasterSendAnyMessage(UCHAR ucSndAddr, UCHAR *SendBuff, uint16_t	sizeBuf, LONG lTimeOut );
+
+eMBException			eMBTCPPackResponse( UCHAR * pucFrame, USHORT * usLen );
 
 eMBException			eMBMasterFuncReportSlaveID( UCHAR * pucFrame, USHORT * usLen );
 eMBException			eMBMasterFuncReadInputRegister( UCHAR * pucFrame, USHORT * usLen );
@@ -401,6 +425,7 @@ BOOL 	xMBMasterRequestIsBroadcast( void );
 eMBMasterErrorEventType eMBMasterGetErrorType( void );
 void 	vMBMasterSetErrorType( eMBMasterErrorEventType errorType );
 eMBMasterReqErrCode eMBMasterWaitRequestFinish( void );
+
 /* ----------------------- Callback -----------------------------------------*/
 
 #ifdef __cplusplus

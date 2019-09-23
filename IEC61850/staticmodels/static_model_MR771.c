@@ -4538,11 +4538,92 @@ DataAttribute iedModel_GGIO_SSLGGIO1_Ind31_stVal;
 DataAttribute iedModel_GGIO_SSLGGIO1_Ind31_q;
 DataAttribute iedModel_GGIO_SSLGGIO1_Ind31_t;
 
+#if (_REVISION_DEVICE>=109)
 DataObject iedModel_GGIO_SSLGGIO1_Ind32;
 DataAttribute iedModel_GGIO_SSLGGIO1_Ind32_stVal;
 DataAttribute iedModel_GGIO_SSLGGIO1_Ind32_q;
 DataAttribute iedModel_GGIO_SSLGGIO1_Ind32_t;
 
+DataObject 	  iedModel_GGIO_SSLGGIO1_Ind33;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind33_stVal;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind33_q;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind33_t;
+
+DataObject    iedModel_GGIO_SSLGGIO1_Ind34;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind34_stVal;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind34_q;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind34_t;
+
+DataObject    iedModel_GGIO_SSLGGIO1_Ind35;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind35_stVal;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind35_q;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind35_t;
+
+DataObject    iedModel_GGIO_SSLGGIO1_Ind36;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind36_stVal;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind36_q;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind36_t;
+
+DataObject    iedModel_GGIO_SSLGGIO1_Ind37;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind37_stVal;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind37_q;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind37_t;
+
+DataObject    iedModel_GGIO_SSLGGIO1_Ind38;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind38_stVal;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind38_q;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind38_t;
+
+DataObject    iedModel_GGIO_SSLGGIO1_Ind39;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind39_stVal;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind39_q;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind39_t;
+
+DataObject    iedModel_GGIO_SSLGGIO1_Ind40;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind40_stVal;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind40_q;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind40_t;
+
+DataObject    iedModel_GGIO_SSLGGIO1_Ind41;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind41_stVal;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind41_q;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind41_t;
+
+DataObject    iedModel_GGIO_SSLGGIO1_Ind42;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind42_stVal;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind42_q;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind42_t;
+
+DataObject 	  iedModel_GGIO_SSLGGIO1_Ind43;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind43_stVal;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind43_q;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind43_t;
+
+DataObject    iedModel_GGIO_SSLGGIO1_Ind44;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind44_stVal;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind44_q;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind44_t;
+
+DataObject    iedModel_GGIO_SSLGGIO1_Ind45;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind45_stVal;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind45_q;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind45_t;
+
+DataObject    iedModel_GGIO_SSLGGIO1_Ind46;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind46_stVal;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind46_q;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind46_t;
+
+DataObject    iedModel_GGIO_SSLGGIO1_Ind47;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind47_stVal;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind47_q;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind47_t;
+
+DataObject    iedModel_GGIO_SSLGGIO1_Ind48;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind48_stVal;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind48_q;
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind48_t;
+#endif
 //----------------------------------------------------------------------------
 // VLS
 //----------------------------------------------------------------------------
@@ -4764,8 +4845,8 @@ DataAttribute iedModel_GGIO_LSGGIO1_Ind16_t;
 IedModel iedModel = {
 	_swREV,//"MR771",
     &iedModel_Generic_LD0,
-    &iedModelds_LD0_LLN0_dataset0,				// DataSet
-    &iedModel_LD0_LLN0_report0,					// ReportControlBlock
+    NULL,//&iedModelds_LD0_LLN0_dataset0,				// DataSet
+    NULL,//&iedModel_LD0_LLN0_report0,					// ReportControlBlock
     NULL,//&iedModel_LD0_LLN0_gse0,					// GSEControlBlock
     NULL,										// SVControlBlock
     &iedModel_LD0_LLN0_sgcb0,					// SettingGroupControlBlock
@@ -5624,7 +5705,7 @@ DataAttribute iedModel_GGIO_LEDGGIO1_Ind16_dU 		= { DataAttributeModelType, "dU"
 /*************************************************************************
  * SSL32GGIO1
  ************************************************************************/
-LogicalNode iedModel_GGIO_SSLGGIO1 			= { LogicalNodeModelType,   "SSL32GGIO1",    (ModelNode*)&iedModel_Generic_GGIO,   (ModelNode*)&iedModel_GGIO_VLSGGIO1,    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Mod};
+LogicalNode iedModel_GGIO_SSLGGIO1 			= { LogicalNodeModelType,   "SSL48GGIO1",    (ModelNode*)&iedModel_Generic_GGIO,   (ModelNode*)&iedModel_GGIO_VLSGGIO1,    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Mod};
 
 DataObject iedModel_GGIO_SSLGGIO1_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_GGIO_SSLGGIO1,    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Mod_q,0};
 DataAttribute iedModel_GGIO_SSLGGIO1_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Mod,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
@@ -5804,11 +5885,97 @@ DataAttribute iedModel_GGIO_SSLGGIO1_Ind31_stVal = {DataAttributeModelType,"stVa
 DataAttribute iedModel_GGIO_SSLGGIO1_Ind31_q = {DataAttributeModelType,"q",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind31,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind31_t,NULL,0,IEC61850_FC_ST,IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,NULL,0};
 DataAttribute iedModel_GGIO_SSLGGIO1_Ind31_t = {DataAttributeModelType,"t",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind31,NULL,NULL,0,IEC61850_FC_ST,IEC61850_TIMESTAMP, TRG_OPT_NO,NULL,0};
 //----------------------------------------------------------------------------
+#if (_REVISION_DEVICE < 109)
 DataObject iedModel_GGIO_SSLGGIO1_Ind32 = {DataObjectModelType,"Ind32",(ModelNode*) &iedModel_GGIO_SSLGGIO1,(ModelNode*) NULL ,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind32_stVal,0};
+#else
+DataObject iedModel_GGIO_SSLGGIO1_Ind32 = {DataObjectModelType,"Ind32",(ModelNode*) &iedModel_GGIO_SSLGGIO1,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind33 ,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind32_stVal,0};
+#endif
 DataAttribute iedModel_GGIO_SSLGGIO1_Ind32_stVal = {DataAttributeModelType,"stVal",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind32,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind32_q,NULL,0,IEC61850_FC_ST,IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED | TRG_OPT_GI,NULL,0};
 DataAttribute iedModel_GGIO_SSLGGIO1_Ind32_q = {DataAttributeModelType,"q",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind32,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind32_t,NULL,0,IEC61850_FC_ST,IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,NULL,0};
-DataAttribute iedModel_GGIO_SSLGGIO1_Ind32_t = {DataAttributeModelType,"t",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind32,NULL,NULL,0,IEC61850_FC_ST,IEC61850_TIMESTAMP, TRG_OPT_NO,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind32_t = {DataAttributeModelType,"t",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind32,NULL,NULL,0,IEC61850_FC_ST,IEC61850_TIMESTAMP, TRG_OPT_DATA_CHANGED,NULL,0};
+#if (_REVISION_DEVICE >= 109)
+DataObject iedModel_GGIO_SSLGGIO1_Ind33 = {DataObjectModelType,"Ind33",(ModelNode*) &iedModel_GGIO_SSLGGIO1,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind34 ,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind33_stVal,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind33_stVal = {DataAttributeModelType,"stVal",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind33,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind33_q,NULL,0,IEC61850_FC_ST,IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED | TRG_OPT_GI,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind33_q = {DataAttributeModelType,"q",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind33,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind33_t,NULL,0,IEC61850_FC_ST,IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind33_t = {DataAttributeModelType,"t",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind33,NULL,NULL,0,IEC61850_FC_ST,IEC61850_TIMESTAMP, TRG_OPT_DATA_CHANGED,NULL,0};
+//----------------------------------------------------------------------------
+DataObject iedModel_GGIO_SSLGGIO1_Ind34 = {DataObjectModelType,"Ind34",(ModelNode*) &iedModel_GGIO_SSLGGIO1,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind35 ,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind34_stVal,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind34_stVal = {DataAttributeModelType,"stVal",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind34,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind34_q,NULL,0,IEC61850_FC_ST,IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED | TRG_OPT_GI,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind34_q = {DataAttributeModelType,"q",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind34,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind34_t,NULL,0,IEC61850_FC_ST,IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind34_t = {DataAttributeModelType,"t",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind34,NULL,NULL,0,IEC61850_FC_ST,IEC61850_TIMESTAMP, TRG_OPT_DATA_CHANGED,NULL,0};
+//----------------------------------------------------------------------------
+DataObject iedModel_GGIO_SSLGGIO1_Ind35 = {DataObjectModelType,"Ind35",(ModelNode*) &iedModel_GGIO_SSLGGIO1,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind36 ,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind35_stVal,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind35_stVal = {DataAttributeModelType,"stVal",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind35,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind35_q,NULL,0,IEC61850_FC_ST,IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED | TRG_OPT_GI,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind35_q = {DataAttributeModelType,"q",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind35,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind35_t,NULL,0,IEC61850_FC_ST,IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind35_t = {DataAttributeModelType,"t",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind35,NULL,NULL,0,IEC61850_FC_ST,IEC61850_TIMESTAMP, TRG_OPT_DATA_CHANGED,NULL,0};
+//----------------------------------------------------------------------------
+DataObject iedModel_GGIO_SSLGGIO1_Ind36 = {DataObjectModelType,"Ind36",(ModelNode*) &iedModel_GGIO_SSLGGIO1,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind37 ,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind36_stVal,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind36_stVal = {DataAttributeModelType,"stVal",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind36,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind36_q,NULL,0,IEC61850_FC_ST,IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED | TRG_OPT_GI,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind36_q = {DataAttributeModelType,"q",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind36,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind36_t,NULL,0,IEC61850_FC_ST,IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind36_t = {DataAttributeModelType,"t",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind36,NULL,NULL,0,IEC61850_FC_ST,IEC61850_TIMESTAMP, TRG_OPT_DATA_CHANGED,NULL,0};
+//----------------------------------------------------------------------------
+DataObject iedModel_GGIO_SSLGGIO1_Ind37 = {DataObjectModelType,"Ind37",(ModelNode*) &iedModel_GGIO_SSLGGIO1,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind38 ,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind37_stVal,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind37_stVal = {DataAttributeModelType,"stVal",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind37,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind37_q,NULL,0,IEC61850_FC_ST,IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED | TRG_OPT_GI,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind37_q = {DataAttributeModelType,"q",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind37,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind37_t,NULL,0,IEC61850_FC_ST,IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind37_t = {DataAttributeModelType,"t",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind37,NULL,NULL,0,IEC61850_FC_ST,IEC61850_TIMESTAMP, TRG_OPT_DATA_CHANGED,NULL,0};
+//----------------------------------------------------------------------------
+DataObject iedModel_GGIO_SSLGGIO1_Ind38 = {DataObjectModelType,"Ind38",(ModelNode*) &iedModel_GGIO_SSLGGIO1,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind39 ,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind38_stVal,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind38_stVal = {DataAttributeModelType,"stVal",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind38,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind38_q,NULL,0,IEC61850_FC_ST,IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED | TRG_OPT_GI,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind38_q = {DataAttributeModelType,"q",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind38,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind38_t,NULL,0,IEC61850_FC_ST,IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind38_t = {DataAttributeModelType,"t",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind38,NULL,NULL,0,IEC61850_FC_ST,IEC61850_TIMESTAMP, TRG_OPT_DATA_CHANGED,NULL,0};
+//----------------------------------------------------------------------------
+DataObject iedModel_GGIO_SSLGGIO1_Ind39 = {DataObjectModelType,"Ind39",(ModelNode*) &iedModel_GGIO_SSLGGIO1,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind40 ,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind39_stVal,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind39_stVal = {DataAttributeModelType,"stVal",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind39,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind39_q,NULL,0,IEC61850_FC_ST,IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED | TRG_OPT_GI,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind39_q = {DataAttributeModelType,"q",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind39,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind39_t,NULL,0,IEC61850_FC_ST,IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind39_t = {DataAttributeModelType,"t",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind39,NULL,NULL,0,IEC61850_FC_ST,IEC61850_TIMESTAMP, TRG_OPT_DATA_CHANGED,NULL,0};
+//----------------------------------------------------------------------------
+DataObject iedModel_GGIO_SSLGGIO1_Ind40 = {DataObjectModelType,"Ind40",(ModelNode*) &iedModel_GGIO_SSLGGIO1,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind41 ,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind40_stVal,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind40_stVal = {DataAttributeModelType,"stVal",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind40,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind40_q,NULL,0,IEC61850_FC_ST,IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED | TRG_OPT_GI,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind40_q = {DataAttributeModelType,"q",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind40,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind40_t,NULL,0,IEC61850_FC_ST,IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind40_t = {DataAttributeModelType,"t",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind40,NULL,NULL,0,IEC61850_FC_ST,IEC61850_TIMESTAMP, TRG_OPT_DATA_CHANGED,NULL,0};
+//----------------------------------------------------------------------------
+DataObject iedModel_GGIO_SSLGGIO1_Ind41 = {DataObjectModelType,"Ind41",(ModelNode*) &iedModel_GGIO_SSLGGIO1,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind42 ,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind41_stVal,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind41_stVal = {DataAttributeModelType,"stVal",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind41,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind41_q,NULL,0,IEC61850_FC_ST,IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED | TRG_OPT_GI,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind41_q = {DataAttributeModelType,"q",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind41,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind41_t,NULL,0,IEC61850_FC_ST,IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind41_t = {DataAttributeModelType,"t",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind41,NULL,NULL,0,IEC61850_FC_ST,IEC61850_TIMESTAMP, TRG_OPT_DATA_CHANGED,NULL,0};
+//----------------------------------------------------------------------------
+DataObject iedModel_GGIO_SSLGGIO1_Ind42 = {DataObjectModelType,"Ind42",(ModelNode*) &iedModel_GGIO_SSLGGIO1,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind43 ,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind42_stVal,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind42_stVal = {DataAttributeModelType,"stVal",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind42,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind42_q,NULL,0,IEC61850_FC_ST,IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED | TRG_OPT_GI,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind42_q = {DataAttributeModelType,"q",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind42,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind42_t,NULL,0,IEC61850_FC_ST,IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind42_t = {DataAttributeModelType,"t",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind42,NULL,NULL,0,IEC61850_FC_ST,IEC61850_TIMESTAMP, TRG_OPT_DATA_CHANGED,NULL,0};
+//----------------------------------------------------------------------------
+DataObject iedModel_GGIO_SSLGGIO1_Ind43 = {DataObjectModelType,"Ind43",(ModelNode*) &iedModel_GGIO_SSLGGIO1,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind44 ,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind43_stVal,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind43_stVal = {DataAttributeModelType,"stVal",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind43,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind43_q,NULL,0,IEC61850_FC_ST,IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED | TRG_OPT_GI,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind43_q = {DataAttributeModelType,"q",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind43,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind43_t,NULL,0,IEC61850_FC_ST,IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind43_t = {DataAttributeModelType,"t",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind43,NULL,NULL,0,IEC61850_FC_ST,IEC61850_TIMESTAMP, TRG_OPT_DATA_CHANGED,NULL,0};
+//----------------------------------------------------------------------------
+DataObject iedModel_GGIO_SSLGGIO1_Ind44 = {DataObjectModelType,"Ind44",(ModelNode*) &iedModel_GGIO_SSLGGIO1,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind45 ,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind44_stVal,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind44_stVal = {DataAttributeModelType,"stVal",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind44,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind44_q,NULL,0,IEC61850_FC_ST,IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED | TRG_OPT_GI,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind44_q = {DataAttributeModelType,"q",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind44,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind44_t,NULL,0,IEC61850_FC_ST,IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind44_t = {DataAttributeModelType,"t",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind44,NULL,NULL,0,IEC61850_FC_ST,IEC61850_TIMESTAMP, TRG_OPT_DATA_CHANGED,NULL,0};
+//----------------------------------------------------------------------------
+DataObject iedModel_GGIO_SSLGGIO1_Ind45 = {DataObjectModelType,"Ind45",(ModelNode*) &iedModel_GGIO_SSLGGIO1,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind46 ,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind45_stVal,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind45_stVal = {DataAttributeModelType,"stVal",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind45,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind45_q,NULL,0,IEC61850_FC_ST,IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED | TRG_OPT_GI,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind45_q = {DataAttributeModelType,"q",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind45,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind45_t,NULL,0,IEC61850_FC_ST,IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind45_t = {DataAttributeModelType,"t",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind45,NULL,NULL,0,IEC61850_FC_ST,IEC61850_TIMESTAMP, TRG_OPT_DATA_CHANGED,NULL,0};
+//----------------------------------------------------------------------------
+DataObject iedModel_GGIO_SSLGGIO1_Ind46 = {DataObjectModelType,"Ind46",(ModelNode*) &iedModel_GGIO_SSLGGIO1,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind47 ,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind46_stVal,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind46_stVal = {DataAttributeModelType,"stVal",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind46,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind46_q,NULL,0,IEC61850_FC_ST,IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED | TRG_OPT_GI,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind46_q = {DataAttributeModelType,"q",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind46,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind46_t,NULL,0,IEC61850_FC_ST,IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind46_t = {DataAttributeModelType,"t",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind46,NULL,NULL,0,IEC61850_FC_ST,IEC61850_TIMESTAMP, TRG_OPT_DATA_CHANGED,NULL,0};
+//----------------------------------------------------------------------------
+DataObject iedModel_GGIO_SSLGGIO1_Ind47 = {DataObjectModelType,"Ind47",(ModelNode*) &iedModel_GGIO_SSLGGIO1,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind48 ,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind47_stVal,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind47_stVal = {DataAttributeModelType,"stVal",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind47,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind47_q,NULL,0,IEC61850_FC_ST,IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED | TRG_OPT_GI,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind47_q = {DataAttributeModelType,"q",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind47,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind47_t,NULL,0,IEC61850_FC_ST,IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind47_t = {DataAttributeModelType,"t",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind47,NULL,NULL,0,IEC61850_FC_ST,IEC61850_TIMESTAMP, TRG_OPT_DATA_CHANGED,NULL,0};
+//----------------------------------------------------------------------------
+DataObject iedModel_GGIO_SSLGGIO1_Ind48 = {DataObjectModelType,"Ind48",(ModelNode*) &iedModel_GGIO_SSLGGIO1,(ModelNode*) NULL ,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind48_stVal,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind48_stVal = {DataAttributeModelType,"stVal",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind48,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind48_q,NULL,0,IEC61850_FC_ST,IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED | TRG_OPT_GI,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind48_q = {DataAttributeModelType,"q",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind48,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind48_t,NULL,0,IEC61850_FC_ST,IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Ind48_t = {DataAttributeModelType,"t",(ModelNode*) &iedModel_GGIO_SSLGGIO1_Ind48,NULL,NULL,0,IEC61850_FC_ST,IEC61850_TIMESTAMP, TRG_OPT_DATA_CHANGED,NULL,0};
+//----------------------------------------------------------------------------
 
+#endif
 /*************************************************************************
  * VLS16GGIO1
  ************************************************************************/
@@ -10428,75 +10595,6 @@ iedModel_GGIO_INGGIO1_Ind40_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime
 iedModel_GGIO_INGGIO1_Ind41_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 iedModel_GGIO_INGGIO1_Ind42_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 
-// Обновление данных в структуре чеpеp функции
-iedModel_GGIO_INGGIO1_Ind1_stVal.mmsValue = MmsValue_newBoolean(0);
-iedModel_GGIO_INGGIO1_Ind2_stVal.mmsValue = MmsValue_newBoolean(0);
-iedModel_GGIO_INGGIO1_Ind3_stVal.mmsValue = MmsValue_newBoolean(0);
-iedModel_GGIO_INGGIO1_Ind4_stVal.mmsValue = MmsValue_newBoolean(0);
-iedModel_GGIO_INGGIO1_Ind5_stVal.mmsValue = MmsValue_newBoolean(0);
-iedModel_GGIO_INGGIO1_Ind6_stVal.mmsValue = MmsValue_newBoolean(0);
-iedModel_GGIO_INGGIO1_Ind7_stVal.mmsValue = MmsValue_newBoolean(0);
-iedModel_GGIO_INGGIO1_Ind8_stVal.mmsValue = MmsValue_newBoolean(0);
-iedModel_GGIO_INGGIO1_Ind9_stVal.mmsValue = MmsValue_newBoolean(0);
-iedModel_GGIO_INGGIO1_Ind10_stVal.mmsValue = MmsValue_newBoolean(0);
-iedModel_GGIO_INGGIO1_Ind11_stVal.mmsValue = MmsValue_newBoolean(0);
-iedModel_GGIO_INGGIO1_Ind12_stVal.mmsValue = MmsValue_newBoolean(0);
-iedModel_GGIO_INGGIO1_Ind13_stVal.mmsValue = MmsValue_newBoolean(0);
-iedModel_GGIO_INGGIO1_Ind14_stVal.mmsValue = MmsValue_newBoolean(0);
-iedModel_GGIO_INGGIO1_Ind15_stVal.mmsValue = MmsValue_newBoolean(0);
-iedModel_GGIO_INGGIO1_Ind16_stVal.mmsValue = MmsValue_newBoolean(0);
-
-iedModel_GGIO_INGGIO1_Ind1_q.mmsValue = MmsValue_newBitString(0);
-iedModel_GGIO_INGGIO1_Ind2_q.mmsValue = MmsValue_newBitString(0);
-iedModel_GGIO_INGGIO1_Ind3_q.mmsValue = MmsValue_newBitString(0);
-iedModel_GGIO_INGGIO1_Ind4_q.mmsValue = MmsValue_newBitString(0);
-iedModel_GGIO_INGGIO1_Ind5_q.mmsValue = MmsValue_newBitString(0);
-iedModel_GGIO_INGGIO1_Ind6_q.mmsValue = MmsValue_newBitString(0);
-iedModel_GGIO_INGGIO1_Ind7_q.mmsValue = MmsValue_newBitString(0);
-iedModel_GGIO_INGGIO1_Ind8_q.mmsValue = MmsValue_newBitString(0);
-iedModel_GGIO_INGGIO1_Ind9_q.mmsValue = MmsValue_newBitString(0);
-iedModel_GGIO_INGGIO1_Ind10_q.mmsValue = MmsValue_newBitString(0);
-iedModel_GGIO_INGGIO1_Ind11_q.mmsValue = MmsValue_newBitString(0);
-iedModel_GGIO_INGGIO1_Ind12_q.mmsValue = MmsValue_newBitString(0);
-iedModel_GGIO_INGGIO1_Ind13_q.mmsValue = MmsValue_newBitString(0);
-iedModel_GGIO_INGGIO1_Ind14_q.mmsValue = MmsValue_newBitString(0);
-iedModel_GGIO_INGGIO1_Ind15_q.mmsValue = MmsValue_newBitString(0);
-iedModel_GGIO_INGGIO1_Ind16_q.mmsValue = MmsValue_newBitString(0);
-/*
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind1_stVal.mmsValue, IDU_FUNC_INGGIO, 1 | TIME_mask);	// | QUALITY_mask если надо качество
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind2_stVal.mmsValue, IDU_FUNC_INGGIO, 2 | TIME_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind3_stVal.mmsValue, IDU_FUNC_INGGIO, 3 | TIME_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind4_stVal.mmsValue, IDU_FUNC_INGGIO, 4 | TIME_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind5_stVal.mmsValue, IDU_FUNC_INGGIO, 5 | TIME_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind6_stVal.mmsValue, IDU_FUNC_INGGIO, 6 | TIME_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind7_stVal.mmsValue, IDU_FUNC_INGGIO, 7 | TIME_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind8_stVal.mmsValue, IDU_FUNC_INGGIO, 8 | TIME_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind9_stVal.mmsValue, IDU_FUNC_INGGIO, 9 | TIME_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind10_stVal.mmsValue, IDU_FUNC_INGGIO, 10 | TIME_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind11_stVal.mmsValue, IDU_FUNC_INGGIO, 11 | TIME_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind12_stVal.mmsValue, IDU_FUNC_INGGIO, 12 | TIME_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind13_stVal.mmsValue, IDU_FUNC_INGGIO, 13 | TIME_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind14_stVal.mmsValue, IDU_FUNC_INGGIO, 14 | TIME_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind15_stVal.mmsValue, IDU_FUNC_INGGIO, 15 | TIME_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind16_stVal.mmsValue, IDU_FUNC_INGGIO, 16 | TIME_mask);
-
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind1_q.mmsValue, IDU_FUNC_INGGIO, 1 | QUALITY_mask);	// | QUALITY_mask если надо качество
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind2_q.mmsValue, IDU_FUNC_INGGIO, 2 | QUALITY_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind3_q.mmsValue, IDU_FUNC_INGGIO, 3 | QUALITY_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind4_q.mmsValue, IDU_FUNC_INGGIO, 4 | QUALITY_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind5_q.mmsValue, IDU_FUNC_INGGIO, 5 | QUALITY_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind6_q.mmsValue, IDU_FUNC_INGGIO, 6 | QUALITY_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind7_q.mmsValue, IDU_FUNC_INGGIO, 7 | QUALITY_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind8_q.mmsValue, IDU_FUNC_INGGIO, 8 | QUALITY_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind9_q.mmsValue, IDU_FUNC_INGGIO, 9 | QUALITY_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind10_q.mmsValue, IDU_FUNC_INGGIO, 10 | QUALITY_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind11_q.mmsValue, IDU_FUNC_INGGIO, 11 | QUALITY_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind12_q.mmsValue, IDU_FUNC_INGGIO, 12 | QUALITY_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind13_q.mmsValue, IDU_FUNC_INGGIO, 13 | QUALITY_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind14_q.mmsValue, IDU_FUNC_INGGIO, 14 | QUALITY_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind15_q.mmsValue, IDU_FUNC_INGGIO, 15 | QUALITY_mask);
-MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind16_q.mmsValue, IDU_FUNC_INGGIO, 16 | QUALITY_mask);
-*/
 //OUTGGIO1
 iedModel_GGIO_OUTGGIO1_Mod_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
 iedModel_GGIO_OUTGGIO1_Beh_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
@@ -10641,6 +10739,24 @@ iedModel_GGIO_SSLGGIO1_Ind29_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTim
 iedModel_GGIO_SSLGGIO1_Ind30_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 iedModel_GGIO_SSLGGIO1_Ind31_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
 iedModel_GGIO_SSLGGIO1_Ind32_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind33_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind34_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind35_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind36_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind37_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind38_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind39_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind40_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind42_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind43_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind44_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind45_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind46_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind47_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind48_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+
+
 //VLS
 iedModel_GGIO_VLSGGIO1_Mod_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
 iedModel_GGIO_VLSGGIO1_Beh_stVal.mmsValue = MmsValue_newIntegerFromInt16(STVALINT32_OK);
@@ -10887,6 +11003,396 @@ iedModel_MES_RFLO1_NamPlt_vendor.mmsValue = MmsValue_newVisibleString(_Vendor);
 iedModel_MES_RFLO1_NamPlt_swRev.mmsValue = MmsValue_newVisibleString(_swREV);
 
 USART_TRACE("------------------------------------------------------------\n");
+// ----------------------------------------------------------------------------
+// Указываем какие данные нужно анализировать для ускорения гусов
+// ----------------------------------------------------------------------------
+// Обновление данных в структуре чеpеp функции
+#if (1)
+iedModel_GGIO_INGGIO1_Ind1_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_INGGIO1_Ind2_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_INGGIO1_Ind3_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_INGGIO1_Ind4_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_INGGIO1_Ind5_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_INGGIO1_Ind6_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_INGGIO1_Ind7_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_INGGIO1_Ind8_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_INGGIO1_Ind9_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_INGGIO1_Ind10_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_INGGIO1_Ind11_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_INGGIO1_Ind12_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_INGGIO1_Ind13_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_INGGIO1_Ind14_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_INGGIO1_Ind15_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_INGGIO1_Ind16_stVal.mmsValue = MmsValue_newBoolean(0);
+
+iedModel_GGIO_INGGIO1_Ind1_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_INGGIO1_Ind2_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_INGGIO1_Ind3_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_INGGIO1_Ind4_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_INGGIO1_Ind5_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_INGGIO1_Ind6_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_INGGIO1_Ind7_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_INGGIO1_Ind8_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_INGGIO1_Ind9_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_INGGIO1_Ind10_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_INGGIO1_Ind11_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_INGGIO1_Ind12_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_INGGIO1_Ind13_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_INGGIO1_Ind14_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_INGGIO1_Ind15_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_INGGIO1_Ind16_q.mmsValue = MmsValue_newBitString(0);
+
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind1_stVal.mmsValue, IDU_FUNC_INGGIO, 1 | TIME_mask);	// | QUALITY_mask если надо качество
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind2_stVal.mmsValue, IDU_FUNC_INGGIO, 2 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind3_stVal.mmsValue, IDU_FUNC_INGGIO, 3 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind4_stVal.mmsValue, IDU_FUNC_INGGIO, 4 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind5_stVal.mmsValue, IDU_FUNC_INGGIO, 5 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind6_stVal.mmsValue, IDU_FUNC_INGGIO, 6 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind7_stVal.mmsValue, IDU_FUNC_INGGIO, 7 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind8_stVal.mmsValue, IDU_FUNC_INGGIO, 8 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind9_stVal.mmsValue, IDU_FUNC_INGGIO, 9 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind10_stVal.mmsValue, IDU_FUNC_INGGIO, 10 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind11_stVal.mmsValue, IDU_FUNC_INGGIO, 11 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind12_stVal.mmsValue, IDU_FUNC_INGGIO, 12 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind13_stVal.mmsValue, IDU_FUNC_INGGIO, 13 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind14_stVal.mmsValue, IDU_FUNC_INGGIO, 14 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind15_stVal.mmsValue, IDU_FUNC_INGGIO, 15 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind16_stVal.mmsValue, IDU_FUNC_INGGIO, 16 | TIME_mask);
+
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind1_q.mmsValue, IDU_FUNC_INGGIO, 1 | QUALITY_mask);	// | QUALITY_mask если надо качество
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind2_q.mmsValue, IDU_FUNC_INGGIO, 2 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind3_q.mmsValue, IDU_FUNC_INGGIO, 3 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind4_q.mmsValue, IDU_FUNC_INGGIO, 4 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind5_q.mmsValue, IDU_FUNC_INGGIO, 5 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind6_q.mmsValue, IDU_FUNC_INGGIO, 6 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind7_q.mmsValue, IDU_FUNC_INGGIO, 7 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind8_q.mmsValue, IDU_FUNC_INGGIO, 8 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind9_q.mmsValue, IDU_FUNC_INGGIO, 9 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind10_q.mmsValue, IDU_FUNC_INGGIO, 10 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind11_q.mmsValue, IDU_FUNC_INGGIO, 11 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind12_q.mmsValue, IDU_FUNC_INGGIO, 12 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind13_q.mmsValue, IDU_FUNC_INGGIO, 13 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind14_q.mmsValue, IDU_FUNC_INGGIO, 14 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind15_q.mmsValue, IDU_FUNC_INGGIO, 15 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_INGGIO1_Ind16_q.mmsValue, IDU_FUNC_INGGIO, 16 | QUALITY_mask);
+#endif
+
+#if (1)
+iedModel_GGIO_SSLGGIO1_Ind1_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind2_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind3_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind4_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind5_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind6_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind7_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind8_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind9_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind10_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind11_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind12_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind13_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind14_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind15_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind16_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind17_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind18_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind19_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind20_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind21_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind22_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind23_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind24_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind25_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind26_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind27_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind28_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind29_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind30_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind31_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind32_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind33_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind34_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind35_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind36_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind37_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind38_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind39_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind40_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind41_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind42_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind43_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind44_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind45_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind46_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind47_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_SSLGGIO1_Ind48_stVal.mmsValue = MmsValue_newBoolean(0);
+
+iedModel_GGIO_SSLGGIO1_Ind1_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind2_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind3_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind4_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind5_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind6_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind7_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind8_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind9_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind10_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind11_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind12_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind13_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind14_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind15_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind16_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind17_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind18_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind19_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind20_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind21_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind22_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind23_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind24_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind25_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind26_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind27_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind28_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind29_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind30_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind31_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind32_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind33_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind34_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind35_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind36_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind37_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind38_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind39_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind40_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind41_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind42_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind43_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind44_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind45_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind46_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind47_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+iedModel_GGIO_SSLGGIO1_Ind48_t.mmsValue = MmsValue_newUtcTimeByMsTime(currentTime);
+
+iedModel_GGIO_SSLGGIO1_Ind1_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind2_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind3_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind4_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind5_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind6_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind7_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind8_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind9_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind10_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind11_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind12_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind13_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind14_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind15_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind16_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind17_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind18_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind19_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind20_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind21_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind22_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind23_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind24_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind25_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind26_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind27_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind28_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind29_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind30_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind31_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind32_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind33_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind34_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind35_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind36_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind37_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind38_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind39_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind40_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind41_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind42_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind43_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind44_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind45_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind46_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind47_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_SSLGGIO1_Ind48_q.mmsValue = MmsValue_newBitString(0);
+
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind1_stVal.mmsValue, IDU_FUNC_SSLGGIO, 1 | TIME_mask);	// | QUALITY_mask если надо качество
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind2_stVal.mmsValue, IDU_FUNC_SSLGGIO, 2 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind3_stVal.mmsValue, IDU_FUNC_SSLGGIO, 3 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind4_stVal.mmsValue, IDU_FUNC_SSLGGIO, 4 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind5_stVal.mmsValue, IDU_FUNC_SSLGGIO, 5 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind6_stVal.mmsValue, IDU_FUNC_SSLGGIO, 6 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind7_stVal.mmsValue, IDU_FUNC_SSLGGIO, 7 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind8_stVal.mmsValue, IDU_FUNC_SSLGGIO, 8 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind9_stVal.mmsValue, IDU_FUNC_SSLGGIO, 9 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind10_stVal.mmsValue, IDU_FUNC_SSLGGIO, 10 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind11_stVal.mmsValue, IDU_FUNC_SSLGGIO, 11 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind12_stVal.mmsValue, IDU_FUNC_SSLGGIO, 12 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind13_stVal.mmsValue, IDU_FUNC_SSLGGIO, 13 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind14_stVal.mmsValue, IDU_FUNC_SSLGGIO, 14 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind15_stVal.mmsValue, IDU_FUNC_SSLGGIO, 15 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind16_stVal.mmsValue, IDU_FUNC_SSLGGIO, 16 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind17_stVal.mmsValue, IDU_FUNC_SSLGGIO, 17 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind18_stVal.mmsValue, IDU_FUNC_SSLGGIO, 18 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind19_stVal.mmsValue, IDU_FUNC_SSLGGIO, 19 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind20_stVal.mmsValue, IDU_FUNC_SSLGGIO, 20 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind21_stVal.mmsValue, IDU_FUNC_SSLGGIO, 21 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind22_stVal.mmsValue, IDU_FUNC_SSLGGIO, 22 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind23_stVal.mmsValue, IDU_FUNC_SSLGGIO, 23 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind24_stVal.mmsValue, IDU_FUNC_SSLGGIO, 24 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind25_stVal.mmsValue, IDU_FUNC_SSLGGIO, 25 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind26_stVal.mmsValue, IDU_FUNC_SSLGGIO, 26 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind27_stVal.mmsValue, IDU_FUNC_SSLGGIO, 27 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind28_stVal.mmsValue, IDU_FUNC_SSLGGIO, 28 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind29_stVal.mmsValue, IDU_FUNC_SSLGGIO, 29 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind30_stVal.mmsValue, IDU_FUNC_SSLGGIO, 30 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind31_stVal.mmsValue, IDU_FUNC_SSLGGIO, 31 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind32_stVal.mmsValue, IDU_FUNC_SSLGGIO, 32 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind33_stVal.mmsValue, IDU_FUNC_SSLGGIO, 33 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind34_stVal.mmsValue, IDU_FUNC_SSLGGIO, 34 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind35_stVal.mmsValue, IDU_FUNC_SSLGGIO, 35 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind36_stVal.mmsValue, IDU_FUNC_SSLGGIO, 36 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind37_stVal.mmsValue, IDU_FUNC_SSLGGIO, 37 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind38_stVal.mmsValue, IDU_FUNC_SSLGGIO, 38 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind39_stVal.mmsValue, IDU_FUNC_SSLGGIO, 39 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind40_stVal.mmsValue, IDU_FUNC_SSLGGIO, 40 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind41_stVal.mmsValue, IDU_FUNC_SSLGGIO, 41 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind42_stVal.mmsValue, IDU_FUNC_SSLGGIO, 42 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind43_stVal.mmsValue, IDU_FUNC_SSLGGIO, 43 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind44_stVal.mmsValue, IDU_FUNC_SSLGGIO, 44 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind45_stVal.mmsValue, IDU_FUNC_SSLGGIO, 45 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind46_stVal.mmsValue, IDU_FUNC_SSLGGIO, 46 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind47_stVal.mmsValue, IDU_FUNC_SSLGGIO, 47 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind48_stVal.mmsValue, IDU_FUNC_SSLGGIO, 48 | TIME_mask);
+
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind1_q.mmsValue, IDU_FUNC_SSLGGIO, 1 | QUALITY_mask);	// | QUALITY_mask если надо качество
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind2_q.mmsValue, IDU_FUNC_SSLGGIO, 2 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind3_q.mmsValue, IDU_FUNC_SSLGGIO, 3 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind4_q.mmsValue, IDU_FUNC_SSLGGIO, 4 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind5_q.mmsValue, IDU_FUNC_SSLGGIO, 5 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind6_q.mmsValue, IDU_FUNC_SSLGGIO, 6 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind7_q.mmsValue, IDU_FUNC_SSLGGIO, 7 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind8_q.mmsValue, IDU_FUNC_SSLGGIO, 8 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind9_q.mmsValue, IDU_FUNC_SSLGGIO, 9 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind10_q.mmsValue, IDU_FUNC_SSLGGIO, 10 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind11_q.mmsValue, IDU_FUNC_SSLGGIO, 11 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind12_q.mmsValue, IDU_FUNC_SSLGGIO, 12 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind13_q.mmsValue, IDU_FUNC_SSLGGIO, 13 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind14_q.mmsValue, IDU_FUNC_SSLGGIO, 14 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind15_q.mmsValue, IDU_FUNC_SSLGGIO, 15 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind16_q.mmsValue, IDU_FUNC_SSLGGIO, 16 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind17_q.mmsValue, IDU_FUNC_SSLGGIO, 17 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind18_q.mmsValue, IDU_FUNC_SSLGGIO, 18 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind19_q.mmsValue, IDU_FUNC_SSLGGIO, 19 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind20_q.mmsValue, IDU_FUNC_SSLGGIO, 20 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind21_q.mmsValue, IDU_FUNC_SSLGGIO, 21 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind22_q.mmsValue, IDU_FUNC_SSLGGIO, 22 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind23_q.mmsValue, IDU_FUNC_SSLGGIO, 23 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind24_q.mmsValue, IDU_FUNC_SSLGGIO, 24 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind25_q.mmsValue, IDU_FUNC_SSLGGIO, 25 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind26_q.mmsValue, IDU_FUNC_SSLGGIO, 26 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind27_q.mmsValue, IDU_FUNC_SSLGGIO, 27 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind28_q.mmsValue, IDU_FUNC_SSLGGIO, 28 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind29_q.mmsValue, IDU_FUNC_SSLGGIO, 29 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind30_q.mmsValue, IDU_FUNC_SSLGGIO, 30 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind31_q.mmsValue, IDU_FUNC_SSLGGIO, 31 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind32_q.mmsValue, IDU_FUNC_SSLGGIO, 32 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind33_q.mmsValue, IDU_FUNC_SSLGGIO, 33 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind34_q.mmsValue, IDU_FUNC_SSLGGIO, 34 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind35_q.mmsValue, IDU_FUNC_SSLGGIO, 35 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind36_q.mmsValue, IDU_FUNC_SSLGGIO, 36 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind37_q.mmsValue, IDU_FUNC_SSLGGIO, 37 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind38_q.mmsValue, IDU_FUNC_SSLGGIO, 38 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind39_q.mmsValue, IDU_FUNC_SSLGGIO, 39 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind40_q.mmsValue, IDU_FUNC_SSLGGIO, 40 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind41_q.mmsValue, IDU_FUNC_SSLGGIO, 41 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind42_q.mmsValue, IDU_FUNC_SSLGGIO, 42 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind43_q.mmsValue, IDU_FUNC_SSLGGIO, 43 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind44_q.mmsValue, IDU_FUNC_SSLGGIO, 44 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind45_q.mmsValue, IDU_FUNC_SSLGGIO, 45 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind46_q.mmsValue, IDU_FUNC_SSLGGIO, 46 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind47_q.mmsValue, IDU_FUNC_SSLGGIO, 47 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_SSLGGIO1_Ind48_q.mmsValue, IDU_FUNC_SSLGGIO, 48 | QUALITY_mask);
+#endif
+
+#if (1)
+iedModel_GGIO_VLSGGIO1_Ind1_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_VLSGGIO1_Ind2_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_VLSGGIO1_Ind3_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_VLSGGIO1_Ind4_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_VLSGGIO1_Ind5_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_VLSGGIO1_Ind6_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_VLSGGIO1_Ind7_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_VLSGGIO1_Ind8_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_VLSGGIO1_Ind9_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_VLSGGIO1_Ind10_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_VLSGGIO1_Ind11_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_VLSGGIO1_Ind12_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_VLSGGIO1_Ind13_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_VLSGGIO1_Ind14_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_VLSGGIO1_Ind15_stVal.mmsValue = MmsValue_newBoolean(0);
+iedModel_GGIO_VLSGGIO1_Ind16_stVal.mmsValue = MmsValue_newBoolean(0);
+
+iedModel_GGIO_VLSGGIO1_Ind1_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_VLSGGIO1_Ind2_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_VLSGGIO1_Ind3_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_VLSGGIO1_Ind4_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_VLSGGIO1_Ind5_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_VLSGGIO1_Ind6_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_VLSGGIO1_Ind7_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_VLSGGIO1_Ind8_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_VLSGGIO1_Ind9_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_VLSGGIO1_Ind10_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_VLSGGIO1_Ind11_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_VLSGGIO1_Ind12_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_VLSGGIO1_Ind13_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_VLSGGIO1_Ind14_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_VLSGGIO1_Ind15_q.mmsValue = MmsValue_newBitString(0);
+iedModel_GGIO_VLSGGIO1_Ind16_q.mmsValue = MmsValue_newBitString(0);
+
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind1_stVal.mmsValue, IDU_FUNC_INGGIO, 1 | TIME_mask);	// | QUALITY_mask если надо качество
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind2_stVal.mmsValue, IDU_FUNC_INGGIO, 2 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind3_stVal.mmsValue, IDU_FUNC_INGGIO, 3 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind4_stVal.mmsValue, IDU_FUNC_INGGIO, 4 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind5_stVal.mmsValue, IDU_FUNC_INGGIO, 5 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind6_stVal.mmsValue, IDU_FUNC_INGGIO, 6 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind7_stVal.mmsValue, IDU_FUNC_INGGIO, 7 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind8_stVal.mmsValue, IDU_FUNC_INGGIO, 8 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind9_stVal.mmsValue, IDU_FUNC_INGGIO, 9 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind10_stVal.mmsValue, IDU_FUNC_INGGIO, 10 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind11_stVal.mmsValue, IDU_FUNC_INGGIO, 11 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind12_stVal.mmsValue, IDU_FUNC_INGGIO, 12 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind13_stVal.mmsValue, IDU_FUNC_INGGIO, 13 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind14_stVal.mmsValue, IDU_FUNC_INGGIO, 14 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind15_stVal.mmsValue, IDU_FUNC_INGGIO, 15 | TIME_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind16_stVal.mmsValue, IDU_FUNC_INGGIO, 16 | TIME_mask);
+
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind1_q.mmsValue, IDU_FUNC_INGGIO, 1 | QUALITY_mask);	// | QUALITY_mask если надо качество
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind2_q.mmsValue, IDU_FUNC_INGGIO, 2 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind3_q.mmsValue, IDU_FUNC_INGGIO, 3 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind4_q.mmsValue, IDU_FUNC_INGGIO, 4 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind5_q.mmsValue, IDU_FUNC_INGGIO, 5 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind6_q.mmsValue, IDU_FUNC_INGGIO, 6 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind7_q.mmsValue, IDU_FUNC_INGGIO, 7 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind8_q.mmsValue, IDU_FUNC_INGGIO, 8 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind9_q.mmsValue, IDU_FUNC_INGGIO, 9 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind10_q.mmsValue, IDU_FUNC_INGGIO, 10 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind11_q.mmsValue, IDU_FUNC_INGGIO, 11 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind12_q.mmsValue, IDU_FUNC_INGGIO, 12 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind13_q.mmsValue, IDU_FUNC_INGGIO, 13 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind14_q.mmsValue, IDU_FUNC_INGGIO, 14 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind15_q.mmsValue, IDU_FUNC_INGGIO, 15 | QUALITY_mask);
+MmsValue_setFunctionDataUpdate(iedModel_GGIO_VLSGGIO1_Ind16_q.mmsValue, IDU_FUNC_INGGIO, 16 | QUALITY_mask);
+#endif
 }
 
 #endif

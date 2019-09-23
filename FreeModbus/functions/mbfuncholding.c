@@ -57,36 +57,46 @@ extern	IedDataUpdateHandler IedDataUpdateFuncHandlers[IDU_FUNC_HANDLERS_MAX];
 /*************************************************************************
  * MR771 MR761 MR762 MR763
  *************************************************************************/
-#if defined (MR771) || defined (MR761) || defined (MR762) || defined (MR763) ||\
+#if defined (MR771) || defined (MR761) || defined (MR762) || defined (MR763) || defined (MR761OBR) ||\
 	defined (MR801) || \
 	defined (MR901) || defined (MR902) ||\
 	defined (MR851) ||\
 	defined (MR5_500) || defined (MR5_600) || defined (MR5_700) ||\
 	defined (MR741)
 
-extern uint16_t   ucVLSOutBuf[MB_NumbConfigVLSOut];
-extern uint16_t   ucVLSInBuf[MB_NumbConfigVLSIn];
-extern uint16_t   ucMDateBuf[MB_NumbDate];
-extern uint16_t   ucMRevBuf[MB_NumbWordRev];
-extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
-extern uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
-extern uint16_t   ucConfigBufSW[MB_NumbConfigSW];
-extern uint16_t   ucSystemCfgBuf[MB_NumbSystemCfg];
-extern uint16_t   ucConfigTRMeasBuf[MB_NumbConfigTRMeas];
-extern uint16_t   ucMUstavkiInBuf[MB_NumbUstavki];
-extern uint16_t   ucConfigAPWBuf[MB_NumbConfigAPW];
-extern uint16_t   ucSGBuf[MB_NumbSG];
+extern uint16_t   ucVLSOutBuf[];
+extern uint16_t   ucVLSInBuf[];
+extern uint16_t   ucMDateBuf[];
+extern uint16_t   ucMRevBuf[];
+extern uint16_t   ucMDiscInBuf[];
 
-extern uint16_t   ucMAutomatBuf[MB_NumbAutomat];
-extern uint16_t   ucSWCrash[MB_Size_SWCrash];
+#if defined (AN_PERV)
+extern float   ucMAnalogInBuf[];
+#else
+	#if defined (AN_DUBLEDATA)
+	extern	uint32_t   ucMAnalogInBuf[MB_Size_Analog/2];
+	#else
+	extern	uint16_t   ucMAnalogInBuf[MB_Size_Analog];
+	#endif
+#endif
+
+extern uint16_t   ucConfigBufSW[];
+extern uint16_t   ucSystemCfgBuf[];
+extern uint16_t   ucConfigTRMeasBuf[];
+extern uint16_t   ucMUstavkiInBuf[];
+extern uint16_t   ucConfigAPWBuf[];
+extern uint16_t   ucSGBuf[];
+
+extern uint16_t   ucMAutomatBuf[];
+extern uint16_t   ucSWCrash[];
 // журнал системы -----------------------
-extern uint16_t   ucSysNoteBuf[MB_NumbSysNote];
-extern uint16_t   ucSysNoteBufPre[MB_NumbSysNote];								// последняя запись для поиска
-extern uint16_t   ucSysNoteBufNext[MB_NumbSysNote];							// последняя запись
+extern uint16_t   ucSysNoteBuf[];
+extern uint16_t   ucSysNoteBufPre[];							// последняя запись для поиска
+extern uint16_t   ucSysNoteBufNext[];							// последняя запись
 // журнал аварий -----------------------
-extern uint16_t   ucErrorNoteBuf[MB_NumbErrorNote];
-extern uint16_t   ucErrorNoteBufPre[MB_NumbErrorNoteTime];
-extern uint16_t   ucErrorNoteBufNext[MB_NumbErrorNoteTime];
+extern uint16_t   ucErrorNoteBuf[];
+extern uint16_t   ucErrorNoteBufPre[];
+extern uint16_t   ucErrorNoteBufNext[];
 
 
 extern uint16_t   usSysNoteStart;
@@ -106,7 +116,7 @@ extern uint16_t   usSystemCfgStart;				// параметры системы
 extern uint16_t   usConfigTRMeasStart;			// конфигурация измерительного транса
 extern uint16_t   usSGStart;
 
-extern uint16_t   usConfigAutomatStart;
+//extern uint16_t   usConfigAutomatStart;
 extern uint16_t   usConfigStartSWCrash;			// ресурс выключателя
 
 #endif
@@ -216,13 +226,11 @@ eMBFuncWriteMultipleHoldingRegister( UCHAR * pucFrame, USHORT * usLen )
 
 		// срочные дискреты 0D00
 			if (usMDiscInStart== MemForSave){
-				eRegStatus = eMBMasterToMemDB( &pucFrame[usRegDataOffs], usRegAddress, usRegCount, ucMDiscInBuf, usMDiscInStart, MB_NumbDiscreet );		// сохраняем данные в хранилище
+				eRegStatus = eMBMasterToMemDB( &pucFrame[usRegDataOffs], usRegAddress, usRegCount, ucMDiscInBuf, usMDiscInStart, MB_Size_Discreet );		// сохраняем данные в хранилище
 				if( eRegStatus == MB_ENOERR ){
 					if (iedServer){
-//					    Port_Off(LEDtst1);
 						NextPacketIgnor = true;
 						IedServer_DataUpdateInGoosesDatasets(iedServer);
-//					    Port_On(LEDtst1);
 					}
 				}
 			}

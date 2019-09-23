@@ -234,7 +234,7 @@ eMBRegisterCB( UCHAR ucFunctionCode, pxMBFunctionHandler pxHandler )
 
     if( ( 0 < ucFunctionCode ) && ( ucFunctionCode <= 127 ) )
     {
-        ENTER_CRITICAL_SECTION(  );
+//        ENTER_CRITICAL_SECTION(  );
         if( pxHandler != NULL )
         {
             for( i = 0; i < MB_FUNC_HANDLERS_MAX; i++ )
@@ -263,7 +263,7 @@ eMBRegisterCB( UCHAR ucFunctionCode, pxMBFunctionHandler pxHandler )
             /* Remove can't fail. */
             eStatus = MB_ENOERR;
         }
-        EXIT_CRITICAL_SECTION(  );
+//        EXIT_CRITICAL_SECTION(  );
     }
     else
     {

@@ -697,6 +697,8 @@ DataSetEntry_create(DataSet* dataSet,const char* logicalDevice, const char* vari
 
     self->sibling = NULL;
 
+    self->value = NULL;
+
     DataSet_addEntry(dataSet, self);
 
     return self;

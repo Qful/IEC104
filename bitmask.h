@@ -25,5 +25,12 @@
 #define 	BIT14		(1<<14)
 #define 	BIT15		(1<<15)
 
+#define 	BITA		(1<<10)
+#define 	BITB		(1<<11)
+#define 	BITC		(1<<12)
+#define 	BITD		(1<<13)
+#define 	BITE		(1<<14)
+#define 	BITF		(1<<15)
+
 
 #endif /* BITMASK_H_ */

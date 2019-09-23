@@ -14,9 +14,14 @@
 
 #include "datatoMMXU.h"
 
-#if defined (MR801)
+#if defined	(MR801) && defined (OLD)
 #include "static_model_MR801.h"
 #endif
+
+#if defined	(MR801) && defined (T12N5D58R51)
+#include "static_model_MR801_T12N5D58R51.h"
+#endif
+
 #if defined (MR851)
 #include "static_model_MR851.h"
 #endif
@@ -29,7 +34,9 @@
 #if defined (MR761) || defined (MR762) || defined (MR763)
 #include "static_model_MR76x.h"
 #endif
-
+#if  defined (MR761OBR)
+#include "static_model_MR761OBR.h"
+#endif
 #if defined (MR5_500)
 #include "static_model_MR5_500.h"
 #endif
@@ -48,7 +55,7 @@
  *******************************************************/
 #if defined (MR5_500) || defined (MR5_600) || defined (MR5_700) ||  defined (MR741)
 
-extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   ucMDiscInBuf[MB_Size_Discreet];
 
 /*******************************************************
  * Set_LLN0 наполняем оперативными данными
@@ -61,8 +68,8 @@ int		Set_LLN0	(uint16_t QTnum, uint64_t currentTime )
 	if (QTnum & TIME_mask) T = true; else T = false;		// менять ли время
 // -----------------------------------------------------------------------------
 	uint32_t	Health = STVALINT32_OK;
-	if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffsetUstavki)>0) 	{Health = STVALINT32_Warning;}
-	if ((ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetALLFaults)>0) 	{Health = STVALINT32_Warning;}
+	if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)>0) 	{Health = STVALINT32_Warning;}
+	if ((ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorALLModul)>0) 	{Health = STVALINT32_Warning;}
 
 	if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_LD0_LLN0_Health_stVal, Health)){
 		IedServer_updateInt32AttributeValue(iedServer, &iedModel_CTRL_LLN0_Health_stVal, Health);
@@ -79,7 +86,7 @@ int		Set_LLN0	(uint16_t QTnum, uint64_t currentTime )
 
 	//PhyHealth
 	uint32_t	LPHD_PhyHealth = STVALINT32_OK;
-	if ((ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetALLFaults)>0) {LPHD_PhyHealth = STVALINT32_Warning;}
+	if ((ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorALLModul)>0) {LPHD_PhyHealth = STVALINT32_Warning;}
 
 	if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_LD0_LPHD1_PhyHealth_stVal, LPHD_PhyHealth)){
 
@@ -105,11 +112,11 @@ return	ret;
 /*******************************************************
  * MR761 MR762 MR763 MR771
  *******************************************************/
-#if defined (MR761) || defined (MR762) || defined (MR763) || defined (MR771) ||\
+#if defined (MR761) || defined (MR762) || defined (MR763) || defined (MR771) || defined (MR761OBR) ||\
 	defined (MR801) || \
 	defined (MR901) || defined (MR902)
 
-extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   ucMDiscInBuf[MB_Size_Discreet];
 
 /*******************************************************
  * Set_LLN0 наполняем оперативными данными
@@ -123,39 +130,44 @@ int	ret = false;
 // -----------------------------------------------------------------------------
 
 		uint32_t	Health = STVALINT32_OK;
-//		if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffsetUstavki)>0) 	{Health = STVALINT32_Warning;}
-//		if ((ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule4)>0) 		{Health = STVALINT32_Warning;}
-//		if ((ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule5)>0) 		{Health = STVALINT32_Warning;}
-		if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetALLFaults) 		{Health = STVALINT32_Warning;}
+		if (ucMDiscInBuf[MB_offset_errorHard] & MB_bOffset_errorALLModul) 		{Health = STVALINT32_Warning;}
 
 		if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_LD0_LLN0_Health_stVal, Health)){
 			IedServer_updateInt32AttributeValue(iedServer, &iedModel_CTRL_LLN0_Health_stVal, Health);
 			IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_LLN0_Health_stVal, Health);
+#if !defined (MR761OBR)
 			IedServer_updateInt32AttributeValue(iedServer, &iedModel_MES_LLN0_Health_stVal,  Health);
+#endif
 			IedServer_updateInt32AttributeValue(iedServer, &iedModel_GGIO_LLN0_Health_stVal, Health);
 			if (T) IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_LD0_LLN0_Health_t,  currentTime);	ret = true;
 			if (T) IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_CTRL_LLN0_Health_t, currentTime);	ret = true;
 			if (T) IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_LLN0_Health_t, currentTime);	ret = true;
+#if !defined (MR761OBR)
 			if (T) IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_MES_LLN0_Health_t,  currentTime);	ret = true;
+#endif
 			if (T) IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_GGIO_LLN0_Health_t, currentTime);	ret = true;
 		}
 
 //PhyHealth
 		Health = STVALINT32_OK;
-		if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetALLFaults) {Health = STVALINT32_Warning;}
+		if (ucMDiscInBuf[MB_offset_errorHard] & MB_bOffset_errorALLModul) {Health = STVALINT32_Warning;}
 
 		if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_LD0_LPHD1_PhyHealth_stVal, Health)){
 
 			IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_LPHD1_PhyHealth_stVal, Health);
 			IedServer_updateInt32AttributeValue(iedServer, &iedModel_CTRL_LPHD1_PhyHealth_stVal, Health);
+#if !defined (MR761OBR)
 			IedServer_updateInt32AttributeValue(iedServer, &iedModel_MES_LPHD1_PhyHealth_stVal,  Health);
+#endif
 			IedServer_updateInt32AttributeValue(iedServer, &iedModel_GGIO_LPHD1_PhyHealth_stVal, Health);
 
 			if (T) {
 				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_LD0_LPHD1_PhyHealth_t,  currentTime);
 				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_LPHD1_PhyHealth_t, currentTime);
 				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_CTRL_LPHD1_PhyHealth_t, currentTime);
+#if !defined (MR761OBR)
 				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_MES_LPHD1_PhyHealth_t,  currentTime);
+#endif
 				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_GGIO_LPHD1_PhyHealth_t, currentTime);
 			}
 			ret = true;
@@ -166,7 +178,7 @@ int	ret = false;
 #endif
 
 #if defined (MR851)
-extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   ucMDiscInBuf[MB_Size_Discreet];
 
 /*******************************************************
  * Set_LLN0 наполняем оперативными данными
@@ -197,7 +209,7 @@ int		Set_LLN0	(uint16_t QTnum, uint64_t currentTime ){
 
 //PhyHealth
 		Health = STVALINT32_OK;
-		if ((ucMDiscInBuf[MB_offsetALLFaults] & MB_bOffsetALLFaults)>0) {Health = STVALINT32_Warning;}
+		if ((ucMDiscInBuf[MB_offsetALLFaults] & MB_bOffset_errorALLModul)>0) {Health = STVALINT32_Warning;}
 
 		if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_LD0_LPHD1_PhyHealth_stVal, Health)){
 			IedServer_updateInt32AttributeValue(iedServer, &iedModel_RPN_LPHD1_PhyHealth_stVal,  Health);

@@ -9,47 +9,34 @@
 #define MAIN_H_
 
 #include "stdint.h"
-#include "stdbool.h"
+#include <stdbool.h>
 #include "clocks.h"
 
+#include "hal_socket.h"
+#include "net.h"
 // ---------------------------------------
 // режим отладки резервирования. Узлы в процессе написания и отладки
 //#define	 HSR_Debug_Mode
-#define	 PRP_Debug_Mode
+//#define	 PRP_Debug_Mode
+// ---------------------------------------
+// размем буфера для вывода отладочной инфы в http
+#define 			_DebugtoWEB_bufferSize		1000
 // ---------------------------------------
 
-#if defined (MR771)
-#include "MbMapMR771.h"
+#define 	NewModbusMaster			1
+
+#if (defined (MR5_500) || defined (MR5_600) || defined (MR5_700) || defined (MR741)) || \
+	((defined (MR761) || defined	(MR762) || defined	(MR763)) && (_REVISION_DEVICE <=303)) ||\
+	(defined (MR771) && (_REVISION_DEVICE <=106)) ||\
+	(defined (MR801) && (_REVISION_DEVICE <=299))||\
+	((defined (MR901) || defined	(MR902)) && (_REVISION_DEVICE <=212))||\
+	(defined (MR851) && (_REVISION_DEVICE <=202))
+#else
+#define		FUNC_READ_HOLDING_REGISTER_W_ADDR_ON
 #endif
-#if defined (MR801)
-#include "MbMapMR801.h"
-#endif
-#if defined (MR851)
-#include "MbMapMR851.h"
-#endif
-#if defined (MR901) || defined (MR902)
-#include "MbMapMR90x.h"
-#endif
-#if defined (MR761) || defined (MR762)|| defined (MR763)
-#include "MbMapMR76x.h"
-#endif
-#if defined (MR5_700) || defined (MR5_600) || defined (MR5_500)
-#include "MbMapMR5all.h"
-#endif
-#if defined (MR741)
-#include "MbMapMR741.h"
-#endif
-/*
-#if defined (MR5_700)
-#include "MbMapMR5PO70.h"
-#endif
-#if defined (MR5_600)
-#include "MbMapMR5PO60.h"
-#endif
-#if defined (MR5_500)
-#include "MbMapMR5PO50.h"
-#endif
-*/
+
+#include "MbMapOld.h"
+
 #include "versions/version_num.h"
 #include "versions/build_defs.h"
 
@@ -60,28 +47,40 @@
 #define IEC850_STACK_SIZE				( configMINIMAL_STACK_SIZE * 15)	//15
 #define IEC850Task__PRIORITY			osPriorityIdle//osPriorityLow//osPriorityLow				//osPriorityAboveNormal
 
-#define IEC870_STACK_SIZE				( configMINIMAL_STACK_SIZE * 2)
-#define IEC104Con_STACK_SIZE			( configMINIMAL_STACK_SIZE * 4)
+#define IEC870_STACK_SIZE				( configMINIMAL_STACK_SIZE * 2)		//*2
+#define IEC104Con_STACK_SIZE			( configMINIMAL_STACK_SIZE * 4)		//*4
 #define IEC870Task__PRIORITY			osPriorityIdle//osPriorityLow
 
-#define	MODBUSTask_STACK_SIZE			( configMINIMAL_STACK_SIZE * 4 )
+#define	MODBUSTask_STACK_SIZE			( configMINIMAL_STACK_SIZE * 6 )			// 4
 #define MODBUSTask__PRIORITY			osPriorityIdle//osPriorityLow				//osPriorityAboveNormal
+
+#define	NetworkTask_STACK_SIZE			( configMINIMAL_STACK_SIZE * 6 )
+#define NetworkTask__PRIORITY			osPriorityIdle//osPriorityLow				//osPriorityAboveNormal
+
+#define	TCPMODBUSTask_STACK_SIZE		( configMINIMAL_STACK_SIZE * 4 )			// *2
+#define TCPMODBUSTask__PRIORITY			osPriorityIdle//osPriorityLow				//osPriorityAboveNormal
+
+
 
 #define	GooseDropTask_STACK_SIZE		( configMINIMAL_STACK_SIZE * 4 )
 #define	GooseTask_STACK_SIZE			( configMINIMAL_STACK_SIZE * 8 )
 #define GooseTask__PRIORITY				osPriorityIdle//osPriorityLow				//osPriorityAboveNormal
 
+#define	SVTask_STACK_SIZE				( configMINIMAL_STACK_SIZE * 8 )
+#define SVTask__PRIORITY				osPriorityIdle//osPriorityLow				//osPriorityAboveNormal
+
+
 #define	TFTPTask_STACK_SIZE				( configMINIMAL_STACK_SIZE * 2 )
 #define TFTPTask__PRIORITY				osPriorityLow
 
-#define	FTPTask_STACK_SIZE				( configMINIMAL_STACK_SIZE * 30 )		//40
+#define	FTPTask_STACK_SIZE				( configMINIMAL_STACK_SIZE * 4 )		//40
 #define FTPTask__PRIORITY				osPriorityIdle//osPriorityIdle//osPriorityLow
 
 #define	FSTask_STACK_SIZE				( configMINIMAL_STACK_SIZE * 4 )
 #define FSTask__PRIORITY				osPriorityLow
 
-#define	HTTPTask_STACK_SIZE				( configMINIMAL_STACK_SIZE * 4 )
-#define HTTPTask__PRIORITY				osPriorityNormal
+#define	HTTPTask_STACK_SIZE				( configMINIMAL_STACK_SIZE * 30 )		//30
+#define HTTPTask__PRIORITY				osPriorityIdle
 
 #define DEBUG_CONSOLE_STACK_SIZE		( configMINIMAL_STACK_SIZE * 4 )
 #define DEBUG_CONSOLE_TASK_PRIORITY		osPriorityAboveNormal
@@ -92,7 +91,14 @@
 
 // добавлять бутлодер в прошивку
 #define includeBootloader
-#define BootloaderVer 			006
+#if defined (AS6C8008)
+#define BootloaderVer 			(6)
+#define	ExtSDRAMSize			0x600FFFFF
+#endif
+#if defined (AS6C1608)
+#define BootloaderVer 			(10)
+#define	ExtSDRAMSize			0x601FFFFF
+#endif
 /* по включению загрузчик проверяет вектор(размер микросхемы)
  * 005 - базовая версия. netconn.
  * 006 - добавил псевдопрогресс загрузки, спрятал кнопку загрузить после начала прошивки. перевёл с netconn на сокеты с одним клиентом.
@@ -106,6 +112,8 @@
 //#define BUILDDATE __DATE__
 
 /*
+ * ----------------------------------------------------------------------------------------------------------------------
+ *
  * SWRevision 017 - синхронизация времени NTP точность 1с
  * SWRevision 018 - синхронизация времени NTP точность 1мс. Нужна корректировка аппаратных часов.
  * SWRevision 019 - корректировка аппаратных часов.
@@ -121,8 +129,62 @@
  * SWRevision 023.5m - ревизия .5 для могилёва. Тех ключ без IP, в имени SeqV вернул ошибочную SeqU
  * SWRevision 023.6 - МР5ПО50: XCBR1_OpCnt. МР5ПОx0 - перезапросы модбаса. счетчик осциллограмм. Есть возможн. чтения последней осц. чистый дамп.
  * SWRevision 023.7 - созданы 2 пробора MR761T4N4 и MR761T4N5 вместо MR761.
+ * SWRevision 023.8 - (08022019)созданы 4 варианта 901 пробора MR901 TxxNxDxxRxx. Добавил config.cfg. Работает режим свича с MAC фильтром
+ * SWRevision 023.9 - в МР5,MR741 добавлен приём гусов. есть TCP/MB но тестировать никто не хочет. (уникон не готов)
+ * SWRevision 023.10 - изменения затрагивают все приборы. файл конфинурации приёма гусов учитывает confRev. нет обратной совместимости. Старые приборы не поймут.
+ * 						+ исправлена ошибка в атрибуте данных (FC=CO) Oper_ctlVal при добавлении в датасет окирпичивала прибор.
+ *
+ * SWRevision 023.11 - исправлена ошибка в конфиге приёмных гусов. случайным образом подхватывал лишний символ в конце GoCBRef при чтении конфига.
+ * SWRevision 023.12 - Добавлена поддержка HSR (без Supervision) (нужно добавить в загрузчик !!!)
+ * SWRevision 023.13 - исправлена 5,6 команда TCP/MB
+ *
+ * ----------------------------------------------------------------------------------------------------------------------
+ * ответвление:
+ *
+ * SWRevision 024.00 - версия для 2мб оперативной памяти. Добавлена поддержка HSR (без Supervision) 	Появился MR801T12N5D58R51, MR761OBRT0N0D114R59
+ * 						исправлена 5,6 команда TCP/MB(начал полную переделку MB, TCPMB (#def... NewModbusMaster 1) с целью достоверной доставки сообщений к/от DSP)
  * ----------------------------------------------------------------------------------------------------------------------
  */
+
+// размер памяти:
+// HEAPrtos + ucMAnalogInBuf[] + ucMDiscInBuf[] + Modbus_DataRX[] + ucMasterRTUSndBuf[] + ucMasterRTURcvBuf[]
+// configTOTAL_HEAP_SIZE + MB_Size_Analog(слова) + MB_Size_Discreet(слова) + SizeModbusRX(байты) + MB_PDU_SIZE_MAX(байты) + MB_SER_PDU_SIZE_MAX(байты)
+// MR5PO70	 =  65536 + 23*2 + 27*2 + 250 + 253 + 256 = 66395  от прибора к прибору меняется только ucMAnalogInBuf[],ucMDiscInBuf[]
+//
+// --------------------------------------------------------------------------------
+//  контроль ревизий --------------------------------------------------------------
+// --------------------------------------------------------------------------------
+#if defined (AS6C8008)
+#ifndef _SWRevision
+#define _SWRevision     		"Rev. 23.13("__DATE__"-"__TIME__")"
+#endif
+#endif
+#if defined (AS6C1608)
+#ifndef _SWRevision
+#define _SWRevision     		"Rev. 24.00("__DATE__"-"__TIME__")"
+#endif
+#endif
+
+#ifdef _SPCECIALSWRevision
+#define _SWRevision     		"Rev. 023.5m("__DATE__"-"__TIME__")"
+#endif
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+
+
+typedef struct
+{
+	bool	tTCPMBUS;
+	bool	tFTP;
+	bool	tHTTP;
+	bool	tUSBHost;
+	bool	tCONSOLE;
+	bool	tDEBUG;
+	bool	tm61850;
+	bool	tm60870;
+}GlobalConfigTypeDef;
+
 typedef struct
 {
   uint32_t	errAnalog;
@@ -134,13 +196,32 @@ typedef struct
   uint32_t	errTimeOut;
 } errMB_data;
 
-#ifndef _SWRevision
-#define _SWRevision     		"Rev. 023.7("__DATE__"-"__TIME__")"//.6debug
-#endif
 
-#ifdef _SPCECIALSWRevision
-#define _SWRevision     		"Rev. 023.5m("__DATE__"-"__TIME__")"
-#endif
+struct NetworkConfig
+{
+Socket 				NTPSocket;			//Socket
+int 				NTPPort;
+uint64_t 			NTPPeriod;
+
+ServerSocket		HTTPserverSocket;
+int 				HTTPPort;
+
+ServerSocket 		FTPserverSocket;
+int 				FTPPort;
+
+ServerSocket		IEC850serverSocket;
+int 				IEC850Port;
+
+ServerSocket		IEC104Socket;
+int 				IEC104Port;
+
+char* 				localIpAddress;
+char* 				netMask;
+char* 				gateway;
+
+PhyPortsMode		PHYPortsMode;
+PhyPortsForTransmit	PHYTransmitport;
+};
 
 #ifndef _ConfigRevision
 #define _ConfigRevision  		"1"
@@ -159,6 +240,9 @@ typedef struct
 #define _GooseREcfg				"1:/cfg/goosere.cfg"
 #define _GooseTRcfg				"1:/cfg/goosetr.cfg"
 
+#define _xGlobalcfg				"1:/cfg/config.cfg"
+
+
 #define _xRCBcfg				"1:/cfg/xRCB.cfg"
 
 #define _Datasetscfg			"1:/cfg/datasets.cfg"
@@ -175,10 +259,13 @@ typedef struct
 #define _IfNTP_IP				6			// 4 байта IP адрес
 #define _IfNTP_Period			10			// 2 байта период обновления
 #define _IfNTP_TimeZone			12			// 1 байта часовой пояс
+
+#define _IfRedundancyMode		13			// 1 байт резервирование
+
 // !константы во FLASH
 
-static const char EEPROMDEFAULT[] = {0, 192, 168, 0, 201, 0, 192, 168, 0, 122, 60, 00, 3};
-#define	EEPROMDEFAULTSIZE		13
+static const char EEPROMDEFAULT[] = {0, 192, 168, 0, 201, 0, 192, 168, 0, 122, 60, 00, 3, 0};
+#define	EEPROMDEFAULTSIZE		14
 
 #define _NTP_Size				7			// размер блока
 #define _startsoft				0xFF
@@ -295,6 +382,8 @@ print '\033[1;48mHighlighted Crimson like Chianti\033[1;m'
 #define IEC850_Port				102			/* 102 is the port used for IEC 61850 protocol */
 #define NTP_PORT				123			/* 123 NTP порт на сервере, к которому будем коннектится для получения времени.*/
 
+#define MBTCP_Port				502			/* TCP MODBUS порт */
+
 #define	IEC850_SECURE_PORT		3782
 
 //#define NTP_IP       "192.168.0.122"	// адрес NTP сервера
@@ -318,9 +407,9 @@ print '\033[1;48mHighlighted Crimson like Chianti\033[1;m'
 #else
 /*MAC ADDRESS */
 // micrell потому, что используем контроллер
-#define MAC_ADDR0   0x02			// .... ...0 .... .... .... .... = IG bit: Individual address (unicast)
+#define MAC_ADDR0   0x02			//0x02 .... ...0 .... .... .... .... = IG bit: Individual address (unicast)
 									//
-#define MAC_ADDR1   0x02
+#define MAC_ADDR1   0x02			//0x02
 #define MAC_ADDR2   0x8C
 #define MAC_ADDR3   0x00
 #define MAC_ADDR4   0x00
@@ -404,6 +493,7 @@ typedef enum
 	MB_Rd_Revision			= 0,
 	MB_Rd_Discreet			= 1,
 	MB_Rd_Analog			= 2,
+	MB_RdWr_ForTCPMB		= 3,
 
 	MB_Rd_AllUstavki 		= 10,			// общие уставки usConfigOtherUstavkiStart
 	MB_Rd_Get_Time 			= 11,
@@ -428,6 +518,7 @@ typedef enum
 	MB_Rd_ConfigVLSIn		= 32,
 	MB_Rd_ConfigVLSOut		= 33,
 	MB_Rd_ConfigRPN			= 34,
+	MB_Rd_ConfigUROV		= 35,
 
 	MB_Rd_SysNote 			= 40,
 	MB_Rd_ErrorNote 		= 41,
@@ -461,8 +552,8 @@ typedef enum
 
 	MB_Wrt_SG_set_0			= 131,
 	MB_Wrt_SG_set_1			= 132,
-
 	MB_Wrt_SG_set_ManNumb	= 133,
+	MB_Wrt_CMD_set_ManNumb	= 134,
 
 	MB_Wrt_Set_Goose		= 141,
 
@@ -475,6 +566,10 @@ typedef enum
 /* Converts a time in milliseconds to a time in ticks. */
 #define pdMS_TO_TICKS( xTimeInMs ) ( ( TickType_t ) ( ( ( TickType_t ) ( xTimeInMs ) * ( TickType_t ) configTICK_RATE_HZ ) / ( TickType_t ) 1000 ) )
 
+#ifndef NULL
+#define	NULL	0
+#endif
+
 #include "ConfBoard.h"
 
 /* FatFs includes component */
@@ -485,6 +580,32 @@ extern void Port_Init(Port_TypeDef Port,uint32_t mode);
 extern void Port_On(Port_TypeDef Port);
 extern void Port_Off(Port_TypeDef Port);
 extern void Port_Toggle(Port_TypeDef Port);
+
+/***********************************************************************
+ * Get возвращает указатели и размеры баз в памяти
+ ***********************************************************************/
+uint16_t	GetDiscreetAddr(void);
+uint16_t	GetDiscreetSize(void);
+uint16_t*	GetDiscreetBuff(void);
+//-----------------------------
+uint16_t	GetAnalogAddr(void);
+uint16_t	GetAnalogSize(void);
+uint16_t*	GetAnalogBuff(void);
+//-----------------------------
+uint16_t	GetDateAddr(void);
+uint16_t	GetDateSize(void);
+uint16_t*	GetDateBuff(void);
+//-----------------------------
+uint16_t	GetRevAddr(void);
+uint16_t	GetRevSize(void);
+uint16_t*	GetRevBuff(void);
+//-----------------------------
+uint16_t	GetOtherUstavkiAddr(void);
+uint16_t	GetOtherUstavkiSize(void);
+uint16_t*	GetOtherUstavkiBuff(void);
+/***********************************************************************
+ ***********************************************************************/
+
 
 void vOutputDEBUG( char *pcMessage );
 

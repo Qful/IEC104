@@ -34,6 +34,8 @@
 #include "sntpclient.h"
 #include "lwip/sockets.h"
 
+#include "iso_server.h"
+
 #include "modbus.h"
 //int iTimeZone = 3600 * Timezone;
 
@@ -84,6 +86,20 @@ extern	int16_t	lostSNTPPackets;
  * void sntp_client_serve(Socket self)
  *
  *****************************************************************************************************/
+void	sntpSend_tcpip_thread(void *arg)
+{
+
+  IsoServer pSrv = (IsoServer)arg;
+
+//  handleNTPConnectionsThreadless(pSrv);
+
+//  sendto( conn, ( void * )&xNTPPacket, sizeof(xNTPPacket), 0, (struct sockaddr *) &serverAddress, AddressSizeFrom );	// адрес и порт получателя дэйтаграммы.
+
+}
+/*****************************************************************************************************
+ * void sntp_client_serve(Socket self)
+ *
+ *****************************************************************************************************/
 int sntp_client_serve(Socket self, const char* address, int port, int sent){
 
 	struct sockaddr_in serverAddress;
@@ -92,7 +108,6 @@ int sntp_client_serve(Socket self, const char* address, int port, int sent){
 	int 				ret;
 	unsigned char 		recv_buffer[ sizeof( struct SNtpPacket ) + 64 ];
 	int 				buflen = sizeof( struct SNtpPacket ) + 64;
-
 
 	AddressSizeFrom = sizeof(serverAddress);
 
@@ -103,11 +118,13 @@ int sntp_client_serve(Socket self, const char* address, int port, int sent){
 
 		prvNTPPacketInit();
 
-        prepareServerAddress(address, port, &serverAddress);
+        prepareServerAddress(address, port, &serverAddress);	// вызывается из того же таска
 
         if (lostSNTPPackets < 30000)	lostSNTPPackets++;						// подсчет потеряных пакетов
         startSendTimeMs = Hal_getTimeInMs();
 //		uxSendTime = xTaskGetTickCount();		// запоминаем время отправки
+//        ret = tcpip_callback(sntpSend_tcpip_thread, p);	// так будет вызываться функция из таска tcpip_thread()
+
 		ret = sendto( conn, ( void * )&xNTPPacket, sizeof(xNTPPacket), 0, (struct sockaddr *) &serverAddress, AddressSizeFrom );	// адрес и порт получателя дэйтаграммы.
 		if (ret<1) return 1;
 //		USART_0TRACE("SNTP: Отправляем UDP сообщение к %s:%u\n", address, port);

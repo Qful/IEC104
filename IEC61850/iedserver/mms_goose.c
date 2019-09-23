@@ -292,7 +292,20 @@ MmsGooseControlBlock_disable(MmsGooseControlBlock self)
 #endif
     }
 }
-
+/*******************************************************
+ * MmsGooseControlBlock_Simulationenable
+ * функция активации режима симуляции гусов
+ *******************************************************/
+void	MmsGooseControlBlock_Simulationenable(MmsGooseControlBlock self)
+{
+    if (self->publisher != NULL)
+    	GoosePublisher_setSimulation(self->publisher,true);
+}
+void	MmsGooseControlBlock_Simulationdisable(MmsGooseControlBlock self)
+{
+    if (self->publisher != NULL)
+    	GoosePublisher_setSimulation(self->publisher,false);
+}
 /*******************************************************
  * MmsGooseControlBlock_checkAndPublish
  * функция сверки времени для отправки и непосредственной отправки гусов.

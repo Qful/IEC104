@@ -71,7 +71,9 @@ PR_BEGIN_EXTERN_C
 /*! \ingroup modbus
  * \brief Use the default Modbus TCP port (502)
  */
-#define MB_TCP_PORT_USE_DEFAULT 0   
+#define MB_TCP_PORT_USE_DEFAULT 	502
+
+#define MB_TCP_BUF_SIZE     		(256 + 7) 	// Must hold a complete Modbus TCP frame.
 
 /* ----------------------- Type definitions ---------------------------------*/
 
@@ -111,24 +113,34 @@ typedef enum
  */
 typedef enum
 {
-    MB_ENOERR,                  /*!< no error. */
-    MB_ENOREG,                  /*!< illegal register address. */
-    MB_EINVAL,                  /*!< illegal argument. */
-    MB_EPORTERR,                /*!< porting layer error. */
-    MB_ENORES,                  /*!< insufficient resources. */
-    MB_EIO_Tx,                  /*!< I/O error. */
-    MB_EIO_Rx,                  /*!< I/O error. */
-    MB_CRCERR_Rx,               /*!< CRC error. */
-    MB_EILLSTATE,               /*!< protocol stack in illegal state. */
-    MB_ETIMEDOUT,                /*!< timeout error occurred. */
-    MB_ESENT,
-    MB_ERECV,
-    MB_ERECVDATA,				// приняли и обработали данные
-    MB_ERECVDATAERROR,			// Не приняли и обработали данные
-    MB_ERECVDATAWAIT,			// ждём ответа
+    MB_ENOERR,                  /*!<0 no error. */
+    MB_ENOREG,                  /*!<1 illegal register address. */
+    MB_EINVAL,                  /*!<2 illegal argument. */
+    MB_EPORTERR,                /*!<3 porting layer error. */
+    MB_ENORES,                  /*!<4 insufficient resources. */
+    MB_EIO_Tx,                  /*!<5 I/O error. */
+    MB_EIO_Rx,                  /*!<6 I/O error. */
+    MB_CRCERR_Rx,               /*!<7 CRC error. */
+    MB_EILLSTATE,               /*!<8 protocol stack in illegal state. */
+    MB_ETIMEDOUT,               /*!<9 timeout error occurred. */
+    MB_ESENT,					// 10
+    MB_ERECV,					// 11
+    MB_ERECVDATA,				// 12 приняли и обработали данные
+    MB_ERECVDATAERROR,			// 13 Не приняли и обработали данные
+    MB_ERECVDATAWAIT,			// 14 ждём ответа
     MB_NOTASK
 } eMBErrorCode;
 
+// новый метод МБ
+typedef enum
+{
+    MB_MASTER_ENOERR,                 // нет ошибок
+    MB_MASTER_ECMDERR,				// ошибка выполнения команды
+    MB_MASTER_ESENTERR,				// ошибка отправки сообщения
+    MB_MASTER_ECFGERR,				// ошибка конфигурирования интерфейса
+    MB_MASTER_ERECVERR,				// ошибка приёма сообщения
+    MB_MASTER_EEXECERR,				// ошибка вытолнения(рассылки)
+} eMBMasterErrorCode;
 
 /* ----------------------- Function prototypes ------------------------------*/
 /*! \ingroup modbus

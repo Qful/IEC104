@@ -56,6 +56,9 @@ MmsGooseControlBlock_getDataSet(MmsGooseControlBlock self);
 bool
 MmsGooseControlBlock_isEnabled(MmsGooseControlBlock self);
 
+void	MmsGooseControlBlock_Simulationenable(MmsGooseControlBlock self);
+void	MmsGooseControlBlock_Simulationdisable(MmsGooseControlBlock self);
+
 void
 MmsGooseControlBlock_checkAndPublish(MmsGooseControlBlock self, uint64_t currentTime);
 

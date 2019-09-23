@@ -5,46 +5,79 @@
  *      Author: sagok
  */
 #include "main.h"
+#include "string.h"
+#include "cmsis_os.h"
 
 #include "hal_socket.h"
 
+#include "iec61850_server.h"
+
 #include "httpServer.h"
 
-
+#include "ethernetif.h"
 #include "lwip/opt.h"
 #include "lwip/arch.h"
 #include "lwip/api.h"
 #include "lwip/inet.h"
 #include "lwip/sockets.h"
-
-#include "string.h"
+#include "lwip/tcpip.h"
+#include "lwip/tcp.h"
+#include "lwip/init.h"
+#include "lwip/netif.h"
+#include "lwip/sys.h"
+#include "lwip/err.h"
+#include "lwip/prphsr.h"
+//#include "fs.h"
 
 #include "ExtSPImem.h"
 #include "inflash.h"
 
-#include "ethernetif.h"
-
-
-#include "cmsis_os.h"
-
-#include "lwip/err.h"
-
-#include "iec61850_server.h"
+#include "http/httpServer.h"
+#include "http/httpPages.h"
 
 #include "http/time.c"
-//#include "http/index.c"
 #include "http/styles.c"
-//#include "http/uploadboot.c"
-//#include "http/fwupdate.c"
+
+#include "sfifo.h"
+#include "lib_memory.h"
+
+/*************************************************************************
+ * variables
+ *************************************************************************/
+__IO uint32_t LocalTime = 0; /* this variable is used to create a time reference incremented by 10ms */
+
+uint64_t 	lastSynchTimeNTP = 0;
+/*************************************************************************
+ * extern
+ *************************************************************************/
+extern IedServer 	iedServer;
+extern osMutexId 	xFTPStartMutex;				// мьютекс готовности к запуску FTP
+
 
 extern IedServer 	iedServer;
 extern	errMB_data	cntErrorMD;
 
-extern uint32_t	GLOBALMemoryUsedLim;							//максимально использованной памяти
+extern uint32_t		GLOBALMemoryUsedLim;							//максимально использованной памяти
+extern	uint32_t	GLOBALMemoryUsedCurr;							//текущее выделение
 
+extern uint32_t		DataMBPersecond;
 
+extern struct NetworkConfig	NETconf;
+/******************************************************************************************
+ * отладчик
+ ******************************************************************************************/
+extern uint8_t		DebugtoWEB;			// режим вывода отладочной информации на html страницу
+extern char*		DebugtoWEB_buffer;	// буфер будем создавать динамически. если включен DebugtoWEB
+
+/******************************************************************************************
+ *
+ ******************************************************************************************/
+void 	send_response(struct tcp_pcb *pcb, char * text);
 HAL_StatusTypeDef BOOTFLASH_Erase(FLASH_EraseInitTypeDef *pEraseInit, uint32_t *SectorError);
-void	SetNTPconfig(char *inbuff);
+
+/******************************************************************************************
+ *
+ ******************************************************************************************/
 
 static const char Favicon[1150] = {
 	0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x10, 0x10, 0x00, 0x00, 0x01, 0x00,
@@ -144,6 +177,7 @@ static const char Favicon[1150] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
+
 /***************************************************************************
  *
  */
@@ -166,12 +200,13 @@ static char LeftBytesTab[4];
 static uint8_t LeftBytes=0;
 static __IO uint32_t FlashWriteAddress;
 /* -----------------------------------------------------------*/
-
+/*
 struct http_state
 {
   char *file;
   u32_t left;
 };
+*/
 typedef enum
 {
   LoginPage = 0,
@@ -189,9 +224,7 @@ static const char octet_stream[14] = {0x6f, 0x63, 0x74, 0x65, 0x74, 0x2d, 0x73, 
 static const char Content_Length[17] ={0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x2d, 0x4c, 0x65, 0x6e, 0x67,0x74, 0x68, 0x3a, 0x20, };/* Content Length */
 
 
-
-
-extern uint16_t   	ucMRevBuf[MB_NumbWordRev];
+extern uint16_t   	ucMRevBuf[];
 extern uint8_t		IP_ADDR[4];
 extern uint8_t		SNTP_IP_ADDR[4];
 extern uint16_t		SNTP_Period;
@@ -206,12 +239,10 @@ extern RTC_HandleTypeDef 	hrtc;
 /* Private variables ---------------------------------------------------------*/
 #define	httpsize	2048
 
-u32_t nPageHits = 0;
-portCHAR PAGE_BODY[httpsize];
+extern portCHAR PAGE_BODY[];
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
-static int fs_open(char *name, struct fs_file *file);
 static uint32_t Parse_Content_Length(char *data, uint32_t len);
 static void IAP_HTTP_writedata(char * ptr, uint32_t len);
 int8_t FLASH_If_Init(void);
@@ -221,57 +252,29 @@ int8_t FLASH_If_Erase(uint32_t StartSector);
 uint32_t FLASH_If_Write(__IO uint32_t* FlashAddress, uint32_t* Data ,uint16_t DataLength);
 uint32_t BootFLASH_If_Write(__IO uint32_t* FlashAddress, uint32_t* Data ,uint16_t DataLength,uint32_t TypeProgram);
 
-/*************************************************************************
- * TOPBAR
- *************************************************************************/
-void TOPBAR(portCHAR *pagehits, portCHAR *PAGE_BODY,uint8_t	pos)
+/*-----------------------------------------------------------------------------------*/
+/**
+  * @brief  Opens a file defined in fsdata.c ROM filesystem
+  * @param  name : pointer to a file name
+  * @param  file : pointer to a fs_file structure
+  * @retval  1 if success, 0 if fail
+  */
+int fs_open(char *name, struct fs_file *file)
 {
-	  sprintf(pagehits,"<div id=\"top_bar_black\">");strcat(PAGE_BODY, pagehits);
-	  sprintf(pagehits,"<div id=\"logo_header\"><h2>БЭМН. Конфигуратор сервера МЭК-61850</h2></div>");strcat(PAGE_BODY, pagehits);
-	  sprintf(pagehits,"<div id=\"procontainer_blue\">");strcat(PAGE_BODY, pagehits);
-	  sprintf(pagehits,"<div id=\"pronav_blue\">");strcat(PAGE_BODY, pagehits);
-	  sprintf(pagehits,"<ul>");strcat(PAGE_BODY, pagehits);
+  struct fsdata_file_noconst *f;
 
-	  sprintf(pagehits,"<li><a href=\"index.html\" title=\"css menus\"");strcat(PAGE_BODY, pagehits);
-	  if(pos==0)	sprintf(pagehits," class=\"current\"><span>Главная</span></a></li>");
-	  else	  		sprintf(pagehits,"><span>Главная</span></a></li>");
-	  strcat(PAGE_BODY, pagehits);
-
-	  sprintf(pagehits,"<li><a href=\"info.html\" title=\"css menus\"");strcat(PAGE_BODY, pagehits);
-	  if(pos==1)	sprintf(pagehits," class=\"current\"><span>Инфо о защите</span></a></li>");
-	  else			sprintf(pagehits,"><span>Инфо о защите</span></a></li>");
-	  strcat(PAGE_BODY, pagehits);
-
-	  sprintf(pagehits,"<li><a href=\"time.html\" title=\"css menus\"");strcat(PAGE_BODY, pagehits);
-	  if(pos==2)	sprintf(pagehits," class=\"current\"><span>Настройка времени</span></a></li>");
-	  else			sprintf(pagehits,"><span>Настройка времени</span></a></li>");
-	  strcat(PAGE_BODY, pagehits);
-
-	  sprintf(pagehits,"<li><a href=\"system.html\" title=\"css menus\"");strcat(PAGE_BODY, pagehits);
-	  if(pos==3)	sprintf(pagehits," class=\"current\"><span>Системная информация</span></a></li>");
-	  else			sprintf(pagehits,"><span>Системная информация</span></a></li>");
-	  strcat(PAGE_BODY, pagehits);
-
-	  sprintf(pagehits,"<li><a href=\"fwupdate.html\" title=\"css menus\"");strcat(PAGE_BODY, pagehits);
-	  if(pos==4)	sprintf(pagehits," class=\"current\"><span>Обновление прошивки</span></a></li>");
-	  else			sprintf(pagehits,"><span>Обновление прошивки</span></a></li>");
-	  strcat(PAGE_BODY, pagehits);
-
-	  sprintf(pagehits,"</ul>");strcat(PAGE_BODY, pagehits);
-	  sprintf(pagehits,"</div></div></div>");strcat(PAGE_BODY, pagehits);
+  for (f = (struct fsdata_file_noconst *)FS_ROOT; f != NULL; f = (struct fsdata_file_noconst *)f->next)
+  {
+    if (!strcmp(name, f->name))
+    {
+      file->data = f->data;
+      file->len = f->len;
+      return 1;
+    }
+  }
+  return 0;
 }
-/*************************************************************************
- * HEAD
- *************************************************************************/
-void HEAD(portCHAR *pagehits, portCHAR *PAGE_BODY,char *pos)
-{
-// <head>
-	  sprintf(pagehits,"<head>");strcat(PAGE_BODY, pagehits);//UTF-8
-	  sprintf(pagehits,"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=windows-1251\"/>"); strcat(PAGE_BODY, pagehits);
-	  sprintf(pagehits,"<title>%s</title>",pos); strcat(PAGE_BODY, pagehits);
-	  sprintf(pagehits,"<link href=\"styles.css\" rel=\"stylesheet\" type=\"text/css\"/>"); strcat(PAGE_BODY, pagehits);
-	  sprintf(pagehits,"</head>");strcat(PAGE_BODY, pagehits);
-}
+
 /*************************************************************************
  * infoPage
  *************************************************************************/
@@ -415,7 +418,16 @@ void infoPage(struct netconn *conn)
 		  //</div>
 
 		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
-
+		  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
+		  memset(PAGE_BODY, 0,httpsize);
+  //HSR PRP
+		  sprintf(pagehits,"<div>");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<label>Протокол резервирования:");strcat(PAGE_BODY, pagehits);
+		  if (RM_OFF == get_redundancyMode()) { sprintf(pagehits," нет");strcat(PAGE_BODY, pagehits);} else
+		  if (RM_HSR_V0 == get_redundancyMode()) {sprintf(pagehits," HSR");strcat(PAGE_BODY, pagehits);} else
+		  if (RM_HSR_V1 == get_redundancyMode()) {sprintf(pagehits," HSR");strcat(PAGE_BODY, pagehits);} else
+		  if (RM_PRP_V1 == get_redundancyMode()) {sprintf(pagehits," PRP");strcat(PAGE_BODY, pagehits);}
+		  sprintf(pagehits,"</label><br></div><br>");strcat(PAGE_BODY, pagehits);
 		  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
 		  memset(PAGE_BODY, 0,httpsize);
 
@@ -431,16 +443,29 @@ void infoPage(struct netconn *conn)
 		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
 		  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
 		  memset(PAGE_BODY, 0,httpsize);
-
 		  //<div>
 		  sprintf(pagehits,"<div>");strcat(PAGE_BODY, pagehits);
-		  sprintf(pagehits,"<label>Подключены клиенты:</label><hr>");strcat(PAGE_BODY, pagehits);
+		  sprintf(pagehits,"<label>Фильтр портов:</label><hr>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"<label>");strcat(PAGE_BODY, pagehits);
-		  IedServer_getClientconections((uint8_t *)(PAGE_BODY + strlen(PAGE_BODY)), iedServer);
+		  PHY_ReadStaticMACTable((uint8_t *)(PAGE_BODY + strlen(PAGE_BODY)));
 		  sprintf(pagehits,"</label>");strcat(PAGE_BODY, pagehits);
 		  sprintf(pagehits,"</div>");strcat(PAGE_BODY, pagehits);
 		  //</div>
 
+		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
+		  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
+		  memset(PAGE_BODY, 0,httpsize);
+
+		  if (iedServer){
+			  //<div>
+			  sprintf(pagehits,"<div>");strcat(PAGE_BODY, pagehits);
+			  sprintf(pagehits,"<label>Подключены клиенты:</label><hr>");strcat(PAGE_BODY, pagehits);
+			  sprintf(pagehits,"<label>");strcat(PAGE_BODY, pagehits);
+			  IedServer_getClientconections((uint8_t *)(PAGE_BODY + strlen(PAGE_BODY)), iedServer);
+			  sprintf(pagehits,"</label>");strcat(PAGE_BODY, pagehits);
+			  sprintf(pagehits,"</div>");strcat(PAGE_BODY, pagehits);
+			  //</div>
+		  }
 		  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
 		  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
 		  memset(PAGE_BODY, 0,httpsize);
@@ -463,7 +488,7 @@ void infoPage(struct netconn *conn)
 
 }
 /*************************************************************************
- * UploaddonePage
+ * SystemPage
  *************************************************************************/
 void SystemPage(struct netconn *conn){
 
@@ -493,13 +518,14 @@ void SystemPage(struct netconn *conn){
   {
 	  sprintf(pagehits,"<label>Техинфо:</label><hr>");strcat(PAGE_BODY, pagehits);
 
-	  sprintf(pagehits,"<label>Line D:%u A:%u U:%u J:%u CRC:%u Timeout:%u</label><br>",
+	  sprintf(pagehits,"<label>Line D:%u A:%u U:%u J:%u CRC:%u Timeout:%u (%uB/s)</label><br>",
 			  (unsigned int)cntErrorMD.errDiscreet,
 			  (unsigned int)cntErrorMD.errAnalog,
 			  (unsigned int)cntErrorMD.errUstavki,
 			  (unsigned int)cntErrorMD.errJurnal,
 			  (unsigned int)cntErrorMD.errALLCRC,
-			  (unsigned int)cntErrorMD.errTimeOut);
+			  (unsigned int)cntErrorMD.errTimeOut,
+			  (unsigned int)DataMBPersecond);
 	  strcat(PAGE_BODY, pagehits);
 	  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
 
@@ -510,10 +536,30 @@ void SystemPage(struct netconn *conn){
 	  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
 	  memset(PAGE_BODY, 0,httpsize);
 	  sprintf(pagehits,"<br>");strcat(PAGE_BODY, pagehits);
-	  sprintf(pagehits,"<label>свободно памяти:%u </label><br>", xPortGetFreeHeapSize());strcat(PAGE_BODY, pagehits);
-	  sprintf(pagehits,"<label>предел выделения:0x%X </label><br>", GLOBALMemoryUsedLim);strcat(PAGE_BODY, pagehits);
-  }
+	  sprintf(pagehits,"<label>свободно памяти:%u</label><br>", xPortGetFreeHeapSize());strcat(PAGE_BODY, pagehits);
+//	  sprintf(pagehits,"<label>предел выделения:0x%X </label><br>", GLOBALMemoryUsedLim);strcat(PAGE_BODY, pagehits);
 
+
+//	  sprintf(pagehits,"<label>предел выделения:0x%X(0x%X)</label><br>",(uint32_t) GLOBALMemoryUsedLim,(uint32_t)GLOBALMemoryUsedCurr);strcat(PAGE_BODY, pagehits);
+	  sprintf(pagehits,"<label>свободно внешней:%d(%d)байт</label><br>",(uint32_t)ExtSDRAMSize - (uint32_t) GLOBALMemoryUsedLim,(uint32_t)ExtSDRAMSize - (uint32_t)GLOBALMemoryUsedCurr);strcat(PAGE_BODY, pagehits);
+
+	  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
+	  memset(PAGE_BODY, 0,httpsize);
+  }
+/*
+  // приёмные гусы
+  if(1){
+	  sprintf(pagehits,"<label>Goose re:</label><hr>");strcat(PAGE_BODY, pagehits);
+	  write((int)conn, PAGE_BODY, strlen(PAGE_BODY));
+	  memset(PAGE_BODY, 0,httpsize);
+  }
+*/
+  // отладочная инфа
+  if (DebugtoWEB > 0){
+	  if (DebugtoWEB_buffer != NULL)	{
+	  	 write((int)conn, (const unsigned char*)DebugtoWEB_buffer, (size_t)_DebugtoWEB_bufferSize);
+	  }
+  }
 
   sprintf(pagehits,"<div id=\"bottom_bar_black\">");strcat(PAGE_BODY, pagehits);
   sprintf(pagehits,"<div id=\"main_container\">");strcat(PAGE_BODY, pagehits);
@@ -722,50 +768,10 @@ void SSH_Transmit(Socket self, uint8_t *pData, uint16_t Size){
 /*************************************************************************
  *
  *************************************************************************/
-void SSH_server_serve(Socket self)
-{
-  HandleSet handles;
-
-  int buflen = 1500;
-  int ret;
-  int result;
-  unsigned char recv_buffer[1500];
-
-  int conn = GetSocket_num(self);
-
-  handles = Handleset_new();
-  Handleset_addSocket(handles, self);
-
-   result = Handleset_waitReady(handles, 20);			// проверка состояния сокетов ждем таймаут
-  Handleset_destroy(handles);
-
-  if (result < 1){
-	  USART_TRACE_RED("Соединение без данных. Закрываем.\n");
-
-	  Socket_destroy(self);
-      return;
-  }
-  // читаем из сокета запрос от клиента
-  ret = read(conn, recv_buffer, buflen);
-
-  if(ret == 0) {
-	  USART_TRACE_RED("Разорвали соединение со стороны клиента. Закрываем.\n");
-	  Socket_destroy(self);
-	  return;
-  }else
-  if(ret < 0) {
-	  USART_TRACE_RED("Из буфера ничего не прочитали. Закрываем. %i\n",ret);
-	  Socket_destroy(self);
-	  return;
-  }
-}
-/*************************************************************************
- *
- *************************************************************************/
 void http_server_serve(Socket self)
 {
   struct fs_file file = {0, 0};
-  struct http_state *hs;
+//  struct http_state *hs;
   int32_t i,len=0;
   uint32_t DataOffset, FilenameOffset;
   //char *data;
@@ -801,12 +807,12 @@ nextbuf:
   len = ret;//buflen;
 
   if(ret == 0) {
-	  USART_TRACE_RED("Разорвали соединение со стороны клиента. Закрываем.\n");
+//	  USART_TRACE_RED("Разорвали соединение со стороны клиента. Закрываем.\n");
 	  Socket_destroy(self);
 	  return;
   }else
   if(ret < 0) {
-	  USART_TRACE_RED("Из буфера ничего не прочитали. Закрываем. %i\n",ret);
+//	  USART_TRACE_RED("Из буфера ничего не прочитали. Закрываем. %i\n",ret);
 	  Socket_destroy(self);
 	  return;
   }
@@ -832,13 +838,12 @@ nextbuf:
 
     }
 //  else if(strncmp((char *)recv_buffer, "GET /style.css", 14) == 0)
-    else if(strncmp((char *)recv_buffer, "GET /styles.css",15 ) == 0)
+  else if(strncmp((char *)recv_buffer, "GET /styles.css",15 ) == 0)
     {
 	  USART_TRACE("GET /styles.css\n");
       fs_open("/styles.css", &file);
 	   write(conn, (const unsigned char*)file.data, (size_t)file.len);
     }
-
   else if(strncmp((char *)recv_buffer, "GET /restart", 12) == 0)
   {
 	  write(conn, "restarting.\n", strlen("restarting.\n"));
@@ -847,6 +852,23 @@ nextbuf:
      vTaskDelay(500);
 
 	 NVIC_SystemReset();
+  }
+  else if(strncmp((char *)recv_buffer, "GET /debug", 10) == 0)
+  {
+	  if(strncmp((char *)recv_buffer, "GET /debugoff", 13) == 0){
+		  DebugtoWEB = 0;
+		  USART_TRACE("GET /debugoff\n");
+	  }else{
+		  USART_TRACE("GET /debugon\n");
+		if (DebugtoWEB == 0) DebugtoWEB = 1;
+		/*
+		else
+		{
+			if (DebugtoWEB_buffer != NULL)	{
+			  write(conn, (const unsigned char*)DebugtoWEB_buffer, (size_t)_DebugtoWEB_bufferSize);
+			}
+		}*/
+	  }
   }
  /*
   else if(strncmp((char *)recv_buffer, "GET /deleteDD", 13) == 0)
@@ -863,7 +885,7 @@ nextbuf:
 	  write(conn, "upload page.\n", strlen("upload page.\n"));
   }
   else if (strncmp((char *)recv_buffer, "GET /time.html",14) == 0)
- {
+  {
 	  if (strncmp((char *)recv_buffer, "GET /time.html?",15) == 0){
 		  SetNTPconfig((char *)recv_buffer);
 		  fs_open("/time.html", &file);
@@ -874,7 +896,7 @@ nextbuf:
 		  fs_open("/time.html", &file);
 		  write(conn, (const unsigned char*)file.data, (size_t)file.len);
 	  }
- }
+  }
   else if(strncmp((char *)recv_buffer, "GET /", 5) == 0)
   {
 	  if ((strncmp((char *)recv_buffer, "GET /resetmcu.cgi", 17) ==0)&&(htmlpage == UploadDonePage))
@@ -1258,30 +1280,6 @@ extern uint64_t lastSynchTimeNTP;
 	}
 
 }
-
-
-/**
-  * @brief  Opens a file defined in fsdata.c ROM filesystem
-  * @param  name : pointer to a file name
-  * @param  file : pointer to a fs_file structure
-  * @retval  1 if success, 0 if fail
-  */
-static int fs_open(char *name, struct fs_file *file)
-{
-  struct fsdata_file_noconst *f;
-
-  for (f = (struct fsdata_file_noconst *)FS_ROOT; f != NULL; f = (struct fsdata_file_noconst *)f->next)
-  {
-    if (!strcmp(name, f->name))
-    {
-      file->data = f->data;
-      file->len = f->len;
-      return 1;
-    }
-  }
-  return 0;
-}
-
 
 /**
   * @brief  Extract the Content_Length data from HTML data
@@ -1716,3 +1714,534 @@ uint32_t BootFLASH_If_Write(__IO uint32_t* FlashAddress, uint32_t* Data ,uint16_
   return (0);
 }
 */
+/*************************************************************************
+ * StartFTPTask
+ *************************************************************************/
+void StartHTTPTask(void const * argument){
+
+  uint32_t 	SSHTimer = 0;				// таймер отладочного порта
+  IsoServer isoServer = NULL;
+  Socket	connectionSocketHTTP;
+  ServerSocket	tmpHTTP = NULL;
+
+  char*		LocalIP;
+
+
+  /* Http webserver Init */
+//  httpd_init();
+  /* Infinite loop */
+ /*
+  while (1)
+  {
+    // check if any packet received
+    if (ETH_CheckFrameReceived())
+    {
+      // process received ethernet packet
+      LwIP_Pkt_Handle();
+    }
+    // handle periodic timers for LwIP
+    LwIP_Periodic_Handle(LocalTime);
+  }
+ */
+
+//  http_init();
+//  for(;;){}
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+	LocalIP = NETconf.localIpAddress;
+
+	// NTP ---------
+	{
+		if (lastSynchTimeNTP == 0) lastSynchTimeNTP = Hal_getTimeInMs();		// если первый заход, то засинронизируем часы
+		NETconf.NTPPeriod = stNTPPeriod;
+		NETconf.NTPPort = NTP_PORT;
+		NETconf.NTPSocket = (Socket) UDPClientSocket_create (LocalIP, 0);	// открываем порт для приема NTP пакетов от сервера NTP
+	}
+	//---------------
+	// HTTP ---------
+	{
+		NETconf.HTTPPort = HTTP_Port;
+		NETconf.HTTPserverSocket = TcpServerSocket_create(LocalIP, NETconf.HTTPPort, false);
+		USART_TRACE_GREEN("HTTP Ip:%s Port:%u\n", LocalIP,(int)NETconf.HTTPPort);
+		ServerSocket_setBacklog(NETconf.HTTPserverSocket, 0);
+		ServerSocket_listen(NETconf.HTTPserverSocket);
+	}
+	//--------------
+	for(;;)
+	{
+		// NTP ---------
+		handleNTPConnectionsThreadless(NETconf.NTPSocket,NETconf.NTPPort);					// Клиент NTP нужно вынести в отдельный таск
+		// HTTP ---------
+		if ((connectionSocketHTTP = ServerSocket_accept(NETconf.HTTPserverSocket)) != NULL) {
+			USART_TRACE_GREEN("соединение на HTTP порт.\n");
+			http_server_serve(connectionSocketHTTP);
+		}
+		taskYIELD();
+	}
+	vTaskDelete(NULL);
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+
+/*
+  osStatus status = osMutexWait(xFTPStartMutex,TIMEOUT_startServer+1000);		// блокируемся	osWaitForever
+  if (status != osOK) {
+  	// не запустился, всё нам конец.
+		USART_TRACE_RED("не запустился FTP таск\n");
+  }else{
+	  osMutexRelease(xFTPStartMutex);
+  }
+*/
+restartTask:
+  if (iedServer) {
+	  isoServer = (IsoServer)IedServer_getIsoServer(iedServer);
+	  if (isoServer && tmpHTTP == NULL){
+//		  IsoServer_SetFTPPort(isoServer,FTP_Port);
+//		  IsoServer_SetHTTPPort(isoServer,HTTP_Port);
+//		  IsoServer_SetSSHPort(isoServer,SSH_Port);
+//		  IsoServer_ClrSSHConnect(isoServer);
+//		  LocalIP = IsoServer_getLocalIpAddress(isoServer);
+		  NETconf.FTPPort = FTP_Port;
+		  NETconf.HTTPPort = HTTP_Port;
+		  LocalIP = NETconf.localIpAddress;
+
+		  // HTTP ---------
+		  {
+			NETconf.HTTPserverSocket = TcpServerSocket_create(LocalIP, HTTP_Port, false);
+		  	//IsoServer_SetHTTPServerSocket(isoServer,NETconf.HTTPserverSocket);
+		  	USART_TRACE_GREEN("HTTP_SERVER: localIpAddress: %s tcpPort: %u\n", LocalIP,(int)HTTP_Port);
+		  	ServerSocket_setBacklog(NETconf.HTTPserverSocket, 0);
+		  	ServerSocket_listen(NETconf.HTTPserverSocket);
+		  }
+		  //---------
+	  }
+  } else{
+	LocalIP ="192.168.0.254";
+	tmpHTTP = TcpServerSocket_create(LocalIP, HTTP_Port,false);
+	if (tmpHTTP){
+//		USART_TRACE_GREEN("HTTP_SERVER:Временный localIpAddress: %s tcpPort: %u\n", LocalIP,(int)HTTP_Port);
+		ServerSocket_setBacklog(tmpHTTP, 0);
+		ServerSocket_listen(tmpHTTP);
+	} else {
+		goto restartTask;
+	}
+  }
+
+	for(;;)
+	{
+	if (!iedServer){
+		if ((connectionSocketHTTP = ServerSocket_accept(tmpHTTP)) != NULL) {
+			USART_TRACE_GREEN("соединение на HTTP порт.\n");
+			http_server_serve(connectionSocketHTTP);
+		}
+		taskYIELD();
+		continue;
+	}else{
+		if (tmpHTTP){
+			// закрываем и пересоединяем нормальный коннект
+			USART_TRACE_RED("HTTP_SERVER:закрываем временный: tcpPort: %u\n",(int)HTTP_Port);
+			ServerSocket_destroy(tmpHTTP);
+			tmpHTTP = NULL;
+			goto restartTask;
+		}
+	}
+
+	handleNTPConnectionsThreadless(NETconf.NTPSocket,NETconf.NTPPort);					// Клиент NTP нужно вынести в отдельный таск
+
+//	handleNTPConnectionsThreadless(isoServer);					// Клиент NTP
+/***********************************************************************************************************
+ * 80
+ ***********************************************************************************************************/
+	if ((connectionSocketHTTP = ServerSocket_accept((ServerSocket) IsoServer_GetHTTPServerSocket(isoServer))) != NULL) {
+		USART_TRACE_GREEN("соединение на HTTP порт.\n");
+		http_server_serve(connectionSocketHTTP);
+	} else{
+	}
+	taskYIELD();
+/***********************************************************************************************************
+ * 23
+ ***********************************************************************************************************/
+/*	if ((connectionSocketSSH = ServerSocket_accept((ServerSocket) IsoServer_GetSSHServerSocket(isoServer))) != NULL) {
+		USART_TRACE_GREEN("соединение на SSH порт.\n");
+		IsoServer_SetSSHConnect(isoServer);
+		SocketSSH = connectionSocketSSH;
+		SSHTimer = HAL_GetTick();
+	} else{
+		if (SocketSSH){
+			if  (HAL_GetTick() > (SSHTimer + (uint32_t)_60min)){			// откроем на 10 минут
+				USART_TRACE_RED("закрыли SSH по таймауту.\n");
+				Socket_destroy(SocketSSH);
+				SocketSSH = 0;
+				IsoServer_ClrSSHConnect(isoServer);
+			}
+			// тут надо проверить активность соединения. И закрыть если нет ответа от порта
+		}
+	}
+	taskYIELD();
+*/
+/***********************************************************************************************************
+* END
+***********************************************************************************************************/
+	}
+  vTaskDelete(NULL);
+}
+
+/*************************************************************************
+ *************************************************************************
+ *************************************************************************/
+/*************************************************************************
+ * struct
+ *************************************************************************/
+enum httpd_state_e {
+	HTTPD_USER,
+	HTTPD_PASS,
+	HTTPD_IDLE,
+	HTTPD_NLST,
+	HTTPD_LIST,
+	HTTPD_RETR,
+	HTTPD_RNFR,
+	HTTPD_STOR,
+	HTTPD_QUIT,
+	HTTPD_REST
+};
+
+struct ip4_addr {
+  u32_t addr;
+};
+
+struct httpd_datastate {
+	int 					connected;
+	sfifo_t 				fifo;
+	struct tcp_pcb 			*msgpcb;
+	struct httpd_msgstate 	*msgfs;
+};
+
+struct httpd_msgstate {
+	enum httpd_state_e 		state;
+//	sfifo_t 				fifo;
+};
+/*************************************************************************
+ * send_http
+ *************************************************************************/
+void send_http(struct tcp_pcb *pcb, char *msg, int len)
+{
+	err_t err;
+	u16_t lenbf;
+	int i,endLen = len;
+	int readpos=0;
+
+	if (len > 0) {
+
+
+		/* Мы не можем отправить больше данных, чем доступно в буфере отправки. */
+		if (tcp_sndbuf(pcb) < endLen) {
+			lenbf = tcp_sndbuf(pcb);			// если размер данных больше чем буфер
+		} else {
+			lenbf = (u16_t) endLen;
+		}
+
+		while(readpos < endLen)
+		{
+			i = readpos;
+			if ((i + lenbf) > endLen) {
+				err = tcp_write(pcb, msg + i, (u16_t)(endLen - i), 1);
+				if (err != ERR_OK) {
+					USART_TRACE_RED("send_http_data: ошибка отправки!\n");
+					return;
+				}
+				tcp_output(pcb);
+				lenbf -= (endLen - i);
+				readpos = 0;
+				i = 0;
+				return;
+			}
+			else{
+				err = tcp_write(pcb, msg + i, lenbf, 1);
+				if (err != ERR_OK) {
+					USART_TRACE("send_http_data: ошибка отправки!\n");
+					return;
+				}
+				tcp_output(pcb);
+			}
+			readpos += lenbf;
+		}
+	}
+}
+/*************************************************************************
+ * httpd_msgclose
+ *************************************************************************/
+static void httpd_close(struct tcp_pcb *pcb, struct httpd_msgstate *fsm)
+{
+	tcp_arg(pcb, NULL);
+	tcp_sent(pcb, NULL);
+	tcp_recv(pcb, NULL);
+	if(fsm) GLOBAL_FREEMEM(fsm);
+	tcp_arg(pcb, NULL);
+	tcp_close(pcb);
+}
+/*************************************************************************
+ * httpd_msgerr
+ *************************************************************************/
+static void httpd_msgerr(void *arg, err_t err)
+{
+	USART_TRACE_RED("httpd_msgerr: %s\n",lwip_strerr(err));
+}
+/*************************************************************************
+ * httpd_msgpoll
+ *************************************************************************/
+static err_t httpd_msgpoll(void *arg, struct tcp_pcb *pcb)
+{
+	struct httpd_msgstate *fsm = arg;
+
+	if (fsm == NULL)
+		return ERR_OK;
+
+		switch (fsm->state) {
+		case HTTPD_LIST:
+
+			break;
+		case HTTPD_NLST:
+
+			break;
+		case HTTPD_RETR:
+
+			break;
+		default:
+			break;
+		}
+
+	return ERR_OK;
+}
+/*************************************************************************
+ * httpd_msgsent
+ *************************************************************************/
+static err_t httpd_msgsent(void *arg, struct tcp_pcb *pcb, u16_t len)
+{
+	struct httpd_msgstate *fsm = arg;
+
+	if (fsm->state == HTTPD_QUIT) {
+		httpd_close(pcb, fsm);
+		return ERR_OK;
+	}
+
+//	if (pcb->state <= ESTABLISHED) send_http_data(pcb, fsm);
+
+	USART_TRACE_RED("httpd_msgsent len: %u\n",len);
+	return ERR_OK;
+}
+/*************************************************************************
+ * httpd_msgrecv
+ *************************************************************************/
+static err_t httpd_msgrecv(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err)
+{
+	char *text;
+	struct httpd_msgstate *fsm = arg;
+
+	USART_TRACE_GREEN("httpd_msgrecv: %s\n",lwip_strerr(err));
+
+	if (err == ERR_OK && p != NULL) {
+
+		/* Inform TCP that we have taken the data. */
+		tcp_recved(pcb, p->tot_len);
+
+		text = GLOBAL_MALLOC(p->tot_len + 1);
+		if (text) {
+			struct pbuf *q;
+			char *pt = text;
+
+			for (q = p; q != NULL; q = q->next) {
+				bcopy(q->payload, pt, q->len);
+				pt += q->len;
+			}
+			*pt = '\0';
+
+			pt = &text[strlen(text) - 1];
+			while (((*pt == '\r') || (*pt == '\n')) && pt >= text)
+				*pt-- = '\0';
+
+			// -----------------
+			// обработаем запрос и ответим.
+			// -----------------
+			send_response(pcb,text);
+
+			//send_http(pcb,4,"1234");
+			// -----------------
+		    httpd_close(pcb, fsm);
+			GLOBAL_FREEMEM(text);
+		}
+		pbuf_free(p);
+	}else
+	if (err == ERR_OK && p == NULL) {
+	    httpd_close(pcb, fsm);
+		USART_TRACE("httpd_msgrecv без данных, зыкрываем соединение.\n");
+	}
+
+	return ERR_OK;
+}
+//----------------------------------------------------------------------
+static err_t httpd_msgaccept(void *arg, struct tcp_pcb *pcb, err_t err)
+{
+	struct httpd_msgstate *fsm;
+
+	// Выделим память для структуры, которая содержит состояние соединения.
+	fsm = GLOBAL_MALLOC(sizeof(struct httpd_msgstate));
+	if (fsm == NULL) {
+		USART_TRACE(("http_accept: Out of memory\n"));
+		return ERR_MEM;
+	}else{
+		USART_TRACE("httpd_msgaccept\n");
+	}
+	memset(fsm, 0, sizeof(struct httpd_msgstate));
+
+	// инитим структуру
+	fsm->state = HTTPD_IDLE;				// режим HTTP
+
+	// Сообщим TCP, что это структура, которую мы хотим передать для наших обратных вызовов, аргумент для передачи в Callback функции
+//	USART_TRACE("tcp_arg(pcb, hs);\n");
+	tcp_arg(pcb, fsm);
+
+	// Callback функция для получения данных
+//	USART_TRACE("tcp_recv(pcb, httpd_msgrecv);\n");
+	tcp_recv(pcb, httpd_msgrecv);
+
+	// Сообщим TCP, что мы хотим сообщить о данных, которые будем передавать вызовом функции ftpd_sent ().
+//	USART_TRACE("tcp_sent(pcb, httpd_msgsent);\n");
+	tcp_sent(pcb, httpd_msgsent);
+
+	// Callback функция в случае ошибки
+//	USART_TRACE("tcp_err(pcb, httpd_msgerr);\n");
+	tcp_err(pcb, httpd_msgerr);
+
+	// Callback функция для события poll	каждую 0.5с для мониторинга
+//	USART_TRACE("tcp_poll(pcb, httpd_msgpoll, 1);\n");
+	tcp_poll(pcb, httpd_msgpoll, 1);
+
+	return ERR_OK;
+}
+/*************************************************************************
+ * httpd_init
+ * инит и старт
+ *************************************************************************/
+void http_init(void)
+{
+	struct tcp_pcb *pcb;
+
+	pcb = tcp_new();
+	tcp_bind(pcb, IP_ADDR_ANY, HTTP_Port);
+	pcb = tcp_listen(pcb);
+	tcp_accept(pcb, httpd_msgaccept);
+}
+/*************************************************************************
+ * send_response
+ *************************************************************************/
+void send_response(struct tcp_pcb *pcb, char* text)
+{
+struct fs_file file = {0, 0};
+int i;
+char *ptr;
+char filename[13];
+char login[LOGIN_SIZE];
+
+//info.html ---------------------------------------------------------------
+	if(strncmp((char *)text, "GET /info.html", 14) == 0)
+	{
+		http_infoPage(pcb);
+	}
+//system.html -------------------------------------------------------------
+	else if(strncmp((char *)text, "GET /system.html", 16) == 0)
+	{
+		http_systemPage(pcb);
+	}
+//styles.css --------------------------------------------------------------
+	else if(strncmp((char *)text, "GET /styles.css",15 ) == 0)
+	{
+		fs_open("/styles.css", &file);
+	  	send_http(pcb,file.data,file.len);
+	}
+//favicon.ico -------------------------------------------------------------
+	else if(strncmp((char *)text, "GET /favicon.ico", 16) == 0)
+	{
+		send_http(pcb,(char *)Favicon,1150);
+	}
+//restart -----------------------------------------------------------------
+	else if(strncmp((char *)text, "GET /restart", 12) == 0)
+	{
+		send_http(pcb, "restarting.\n", strlen("restarting.\n"));
+		vTaskDelay(500);
+		NVIC_SystemReset();
+	}
+//upload.html --------------------------------------------------------------
+	else if(strncmp((char *)text, "GET /upload.html", 16) == 0)
+	{
+		send_http(pcb, "upload page.\n", strlen("upload page.\n"));
+	}
+//time.html ----------------------------------------------------------------
+	else if (strncmp((char *)text, "GET /time.html",14) == 0)
+	{
+	  if (strncmp((char *)text, "GET /time.html?",15) == 0){
+		  USART_TRACE("GET /time.html?\n");
+		  SetNTPconfig((char *)text);
+		  fs_open("/time.html", &file);
+		  send_http(pcb,file.data,file.len);
+	  } else{
+		  USART_TRACE("GET /time.html\n");
+		  fs_open("/time.html", &file);
+		  send_http(pcb,file.data,file.len);
+	  }
+	}
+//resetmcu.cgi --------------------------------------------------------------
+	else if(strncmp((char *)text, "GET /", 5) == 0)
+	{
+	  if ((strncmp((char *)text, "GET /resetmcu.cgi", 17) ==0)&&(htmlpage == UploadDonePage))
+		 {
+		   htmlpage = ResetDonePage;
+		   fs_open("/reset.html", &file);
+		   send_http(pcb,file.data,file.len);
+		   resetpage = 1;
+		 }
+	  else
+		 if(strncmp((char *)text, "GET /fwupdate.html", 18) == 0)
+		  {
+			 htmlpage = LoginPage;
+			 http_fwUpdatePage(pcb);
+		  }
+		 else
+		  if((strncmp((char *)text, "GET / ", 6) == 0) || (strncmp((char *)text, "GET /index.html", 15) == 0))
+		  {
+			  http_indexPage(pcb);
+		  }
+	}
+//checklogin.cgi -------------------------------------------------------------
+	else if ((strncmp((char *)text, "POST /checklogin.cgi",20)==0)&&(htmlpage== LoginPage))
+	{
+			  for (i=0;i<strlen(text);i++)
+			  {
+				 if (strncmp ((char*)(text+i), "username=", 9)==0)
+				 {
+				   sprintf((char *)login,"username=%s&password=%s",USERID,PASSWORD);
+				   if (strncmp((char*)(text+i), (char *)login ,LOGIN_SIZE)==0)					//проверили логин и пароль
+				   {
+					http_fwUpdatePage(pcb);
+					uint8_t	resetpage = _startboot;										// ставим признак ухода в бутлоадер (0xFF)
+					memory_write_to_mem((uint8_t *)&resetpage,_Ifboot,1);
+					NVIC_SystemReset();
+				   }
+				   sprintf((char *)login,"username=%s&password=%s",USERIDboot,PASSWORDboot);
+				   if (strncmp((char*)(text+i), (char *)login ,LOGIN_SIZE)==0)				// режим перепрошивки загрузчика
+				   {
+					   USART_TRACE_RED("режим перепрошивки загрузчика !!!!! очень опасно.\n");
+					   htmlpage = FileUploadPage;
+					   http_checkloginPage(pcb);
+				   }
+				   else
+				   {
+					 htmlpage = LoginPage;
+					 http_fwUpdatePage(pcb);
+				   }
+				   break;
+				 }
+			  }
+
+	}
+}

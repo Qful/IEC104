@@ -101,6 +101,7 @@ IedDataUpdateHandler IedDataUpdateFuncHandlers[IDU_FUNC_HANDLERS_MAX] = {
     {IDU_FUNC_LSGGIO, 			Set_LSGGIO},
     {IDU_FUNC_NBLKGGIO, 		Set_NBLKGGIO},
     {IDU_FUNC_FLSGGIO, 			Set_FLSGGIO},
+    {IDU_FUNC_RSTGGIO, 			Set_RSTGGIO},
 
     {IDU_FUNC_SPCSO, 			Set_SPCSO},
 

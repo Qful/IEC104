@@ -66,6 +66,8 @@ PR_BEGIN_EXTERN_C
 #define MB_PDU_FUNC_OFF     0   /*!< Offset of function code in PDU. */
 #define MB_PDU_DATA_OFF     1   /*!< Offset for response data in PDU. */
 
+#define MB_PDU_DATA_MAX     (MB_PDU_SIZE_MAX - MB_PDU_SIZE_MIN)
+
 /* ----------------------- Prototypes  0-------------------------------------*/
 typedef void    ( *pvMBFrameStart ) ( void );
 typedef void    ( *pvMBFrameStop ) ( void );

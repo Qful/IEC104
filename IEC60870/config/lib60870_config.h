@@ -70,7 +70,7 @@
 /**
  * Set the maximum number of client connections or 0 for no restriction
  */
-#define CONFIG_CS104_MAX_CLIENT_CONNECTIONS 0
+#define CONFIG_CS104_MAX_CLIENT_CONNECTIONS 		2							// максимум 2 клиента
 
 /* activate TCP keep alive mechanism. 1 -> activate */
 #define CONFIG_ACTIVATE_TCP_KEEPALIVE 1

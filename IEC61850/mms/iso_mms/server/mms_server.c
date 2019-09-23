@@ -162,11 +162,20 @@ MmsValue*
 MmsServer_getValueFromCache(MmsServer self, MmsDomain* domain, char* itemId)
 {
     MmsValueCache cache = (MmsValueCache) Map_getEntry(self->valueCaches, domain);
+//    MmsValue* ret;
 
-    if (cache != NULL)
-        return MmsValueCache_lookupValue(cache, itemId);
+    if (cache != NULL){
+    	return MmsValueCache_lookupValue(cache, itemId);
+    }
+/*
+    if (cache == NULL){
+        printf("Error domain (%s) valueCaches not found!\n", domain->domainName);
 
+        ret = NULL;
+    }
+*/
     return NULL ;
+//    return ret;
 }
 
 void

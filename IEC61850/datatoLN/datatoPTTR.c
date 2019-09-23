@@ -65,9 +65,224 @@ int		Set_BLKPTTR	(uint16_t QTnum, uint64_t currentTime ){return false;}
 
 #endif
 /*******************************************************
- * MRMR801
+ * MR801 OLD
  *******************************************************/
-#if defined	(MR801)
+#if defined	(MR801) && defined (OLD)
+
+#include "static_model_MR801.h"
+/*******************************************************
+ * заглушки
+ *******************************************************/
+int		Set_QPTTR	(uint16_t QTnum, uint64_t currentTime ){return false;}
+int		Set_BLKPTTR	(uint16_t QTnum, uint64_t currentTime ){return false;}
+
+#endif
+/*******************************************************
+ * MR801 T12N5D58R51
+ *******************************************************/
+#if defined	(MR801) && defined (T12N5D58R51)
+#include "static_model_MR801_T12N5D58R51.h"
+
+extern uint16_t   ucMDiscInBuf[MB_Size_Discreet];
+#if defined (AN_PERV)
+extern float   ucMAnalogInBuf[];
+#else
+	#if defined (AN_DUBLEDATA)
+	extern	uint32_t   ucMAnalogInBuf[MB_Size_Analog/2];
+	#else
+	extern	uint16_t   ucMAnalogInBuf[MB_Size_Analog];
+	#endif
+#endif
+extern uint16_t   ucMUstavkiInBuf[MB_Size_Ustavki];
+
+/*******************************************************
+ * Set_QPTTR наполняем оперативными данными
+ *******************************************************/
+int		Set_QPTTR	(uint16_t QTnum, uint64_t currentTime ){
+int	ret = false;
+//Health
+			uint32_t	Health = STVALINT32_OK;
+			if ((ucMDiscInBuf[MB_offset_errorM6] & MB_bOffset_errorM6)>0) 			{Health = STVALINT32_Warning;}
+			if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)>0) {Health = STVALINT32_Warning;}
+
+			if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_QPTTR1_Health_stVal, Health)){
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_QPTTR1_Health_t, currentTime);
+				if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_QPTTR2_Health_stVal, Health))
+					IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_QPTTR2_Health_t, currentTime);
+			}
+
+//  Mod Beh
+			uint32_t	Mod;
+			if (ucMUstavkiInBuf[MB_offset_Qup_1 + MB_offset_Qup_Config] & MB_bOffset_Qup_Config_Stat) {Mod = STVALINT32_ON;} else {Mod = STVALINT32_OFF;}
+			if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_QPTTR1_Mod_stVal, Mod)){
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_QPTTR1_Mod_t, currentTime);
+				if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_QPTTR1_Beh_stVal, Mod))
+					IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_QPTTR1_Beh_t, currentTime);
+			}
+
+			if (ucMUstavkiInBuf[MB_offset_Qup_2 + MB_offset_Qup_Config] & MB_bOffset_Qup_Config_Stat) {Mod = STVALINT32_ON;} else {Mod = STVALINT32_OFF;}
+			if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_QPTTR2_Mod_stVal, Mod)){
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_QPTTR2_Mod_t, currentTime);
+				if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_QPTTR2_Beh_stVal, Mod))
+					IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_QPTTR2_Beh_t, currentTime);
+			}
+
+
+//  Quality (Mod Beh)
+			int	Qual = QUALITY_VALIDITY_GOOD;
+			if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)>0) {Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+
+			if(IedServer_updateQuality(iedServer,&iedModel_PROT_QPTTR1_Mod_q,Qual)){
+				IedServer_updateQuality(iedServer,&iedModel_PROT_QPTTR1_Beh_q,Qual);
+				IedServer_updateQuality(iedServer,&iedModel_PROT_QPTTR2_Mod_q,Qual);
+				IedServer_updateQuality(iedServer,&iedModel_PROT_QPTTR2_Beh_q,Qual);
+
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_QPTTR1_Mod_t, currentTime);
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_QPTTR1_Beh_t, currentTime);
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_QPTTR2_Mod_t, currentTime);
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_QPTTR2_Beh_t, currentTime);
+			}
+
+
+// Str_general
+			bool	Str_general;
+			if (ucMDiscInBuf[MB_offset_IO_Qup_1] & MB_b_IO_Qup_1) Str_general = true; else Str_general = false;
+			if( IedServer_updateBooleanAttributeValue(iedServer, &iedModel_PROT_QPTTR1_Str_general,  Str_general) > 0)
+				IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_QPTTR1_Str_t, currentTime);
+			if (ucMDiscInBuf[MB_offset_IO_Qup_2] & MB_b_IO_Qup_2) Str_general = true; else Str_general = false;
+			if( IedServer_updateBooleanAttributeValue(iedServer, &iedModel_PROT_QPTTR2_Str_general,  Str_general) > 0)
+				IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_QPTTR2_Str_t, currentTime);
+
+// Op_general
+			if( IedServer_updateBooleanAttributeValue(iedServer, &iedModel_PROT_QPTTR1_Op_general,  ucMDiscInBuf[MB_offset_IO_Qup_1] & MB_b_IO_Qup_1) > 0)
+				IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_QPTTR1_Op_t, currentTime);
+			if( IedServer_updateBooleanAttributeValue(iedServer, &iedModel_PROT_QPTTR2_Op_general,  ucMDiscInBuf[MB_offset_IO_Qup_2] & MB_b_IO_Qup_2) > 0)
+				IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_QPTTR2_Op_t, currentTime);
+
+
+			if ( IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_QPTTR1_Str_dirGeneral, 0)){
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_QPTTR1_Str_t, currentTime);
+				if ( IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_QPTTR2_Str_dirGeneral, 0))
+					IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_QPTTR2_Str_t, currentTime);
+			}
+
+// TmpRI
+			float mag = (float)ucMAnalogInBuf[MB_offset_Q_stats] * (float)256/(float)65535;
+
+			ret |= 	Set_Db_zeroDB_float(mag, 256,
+					&iedModel_PROT_QPTTR1_TmpRI_db,
+					&iedModel_PROT_QPTTR1_TmpRI_zeroDb,
+					&iedModel_PROT_QPTTR1_TmpRI_instMag_f,
+					&iedModel_PROT_QPTTR1_TmpRI_mag_f,
+					&iedModel_PROT_QPTTR1_TmpRI_t,
+					currentTime);
+			ret |= 	Set_Db_zeroDB_float(mag, 256,
+					&iedModel_PROT_QPTTR2_TmpRI_db,
+					&iedModel_PROT_QPTTR2_TmpRI_zeroDb,
+					&iedModel_PROT_QPTTR2_TmpRI_instMag_f,
+					&iedModel_PROT_QPTTR2_TmpRI_mag_f,
+					&iedModel_PROT_QPTTR2_TmpRI_t,
+					currentTime);
+
+		Quality quality = QUALITY_VALIDITY_GOOD;
+		if (Health == STVALINT32_Warning)	quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;
+
+		if (IedServer_updateQuality(iedServer,&iedModel_PROT_QPTTR1_Str_q,quality)){
+			IedServer_updateQuality(iedServer,&iedModel_PROT_QPTTR1_Op_q,quality);
+			IedServer_updateQuality(iedServer,&iedModel_PROT_QPTTR1_TmpRI_q,quality);
+
+
+			IedServer_updateQuality(iedServer,&iedModel_PROT_QPTTR2_Str_q,quality);
+			IedServer_updateQuality(iedServer,&iedModel_PROT_QPTTR2_Op_q,quality);
+			IedServer_updateQuality(iedServer,&iedModel_PROT_QPTTR2_TmpRI_q,quality);
+
+			IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_QPTTR1_Str_t, currentTime);
+			IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_QPTTR1_Op_t, currentTime);
+			IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_QPTTR1_TmpRI_t, currentTime);
+
+			IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_QPTTR2_Str_t, currentTime);
+			IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_QPTTR2_Op_t, currentTime);
+			IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_QPTTR2_TmpRI_t, currentTime);
+
+		}
+
+return	ret;
+}
+
+/*******************************************************
+ * Set_BLKPTTR наполняем оперативными данными
+ *******************************************************/
+int		Set_BLKPTTR	(uint16_t QTnum, uint64_t currentTime ){
+	int		ret = false;
+	float	mag,premag,level;
+	float	dbLevel=0;
+	float	zeroDbLevel=0;
+	float	K,K_dbLevel;
+
+//Health
+			uint32_t	Health = STVALINT32_OK;
+			if ((ucMDiscInBuf[MB_offset_errorM6] & MB_bOffset_errorM6)>0)			{Health = STVALINT32_Warning;}
+			if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)>0) {Health = STVALINT32_Warning;}
+
+			if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_BLKPTTR1_Health_stVal, Health))
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_BLKPTTR1_Health_t, currentTime);
+
+
+//  Mod Beh
+			uint32_t	Mod;
+			if (ucMUstavkiInBuf[MB_offset_BlkQ + MB_offset_BlkQ_Config] & MB_bOffset_BlkQ_Config_Stat) {Mod = STVALINT32_ON;} else {Mod = STVALINT32_OFF;}
+			if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_BLKPTTR1_Mod_stVal, Mod)){
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_BLKPTTR1_Mod_t, currentTime);
+				if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_BLKPTTR1_Beh_stVal, Mod))
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_BLKPTTR1_Beh_t, currentTime);
+			}
+
+
+//  Quality (Mod Beh)
+			int	Qual = QUALITY_VALIDITY_GOOD;
+			if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)>0) {Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+
+			if(IedServer_updateQuality(iedServer,&iedModel_PROT_BLKPTTR1_Mod_q,Qual)){
+				IedServer_updateQuality(iedServer,&iedModel_PROT_BLKPTTR1_Beh_q,Qual);
+
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_BLKPTTR1_Beh_t, currentTime);
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_BLKPTTR1_Mod_t, currentTime);
+			}
+
+// Op_general
+			if( IedServer_updateBooleanAttributeValue(iedServer, &iedModel_PROT_BLKPTTR1_Op_general,  ucMDiscInBuf[MB_offset_IO_BlkQ] & MB_b_IO_BlkQ) > 0)
+				IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_BLKPTTR1_Op_t, currentTime);
+
+// TmpRI
+
+			mag = (float)ucMAnalogInBuf[MB_offset_Q_stats] * (float)256/(float)65535;
+			ret |= 	Set_Db_zeroDB_float(mag, 256,
+					&iedModel_PROT_BLKPTTR1_TmpRI_db,
+					&iedModel_PROT_BLKPTTR1_TmpRI_zeroDb,
+					&iedModel_PROT_BLKPTTR1_TmpRI_instMag_f,
+					&iedModel_PROT_BLKPTTR1_TmpRI_mag_f,
+					&iedModel_PROT_BLKPTTR1_TmpRI_t,
+					currentTime);
+
+			Quality quality = QUALITY_VALIDITY_GOOD;
+			if (Health == STVALINT32_Warning)	quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;
+
+			if (IedServer_updateQuality(iedServer,&iedModel_PROT_BLKPTTR1_Op_q,quality)){
+				IedServer_updateQuality(iedServer,&iedModel_PROT_BLKPTTR1_TmpRI_q,quality);
+
+				IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_BLKPTTR1_Op_t, currentTime);
+				IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_BLKPTTR1_TmpRI_t, currentTime);
+
+			}
+
+return ret;
+}
+
+#endif
+/*******************************************************
+ * MR761OBR
+ *******************************************************/
+#if defined (MR761OBR)
 
 /*******************************************************
  * заглушки
@@ -90,9 +305,17 @@ int		Set_BLKPTTR	(uint16_t QTnum, uint64_t currentTime ){return false;}
 #endif
 
 
-extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
-extern uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
-extern uint16_t   ucMUstavkiInBuf[MB_NumbUstavki];
+extern uint16_t   ucMDiscInBuf[MB_Size_Discreet];
+#if defined (AN_PERV)
+extern float   ucMAnalogInBuf[];
+#else
+	#if defined (AN_DUBLEDATA)
+	extern	uint32_t   ucMAnalogInBuf[MB_Size_Analog/2];
+	#else
+	extern	uint16_t   ucMAnalogInBuf[MB_Size_Analog];
+	#endif
+#endif
+extern uint16_t   ucMUstavkiInBuf[MB_Size_Ustavki];
 
 /*******************************************************
  * Set_QPTTR наполняем оперативными данными
@@ -102,8 +325,8 @@ int		Set_QPTTR	(uint16_t QTnum, uint64_t currentTime )
 	int	ret = false;
 	//Health
 				uint32_t	Health = STVALINT32_OK;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule5) {Health = STVALINT32_Warning;}
-				if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffsetUstavki)) {Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM5) {Health = STVALINT32_Warning;}
+				if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)) {Health = STVALINT32_Warning;}
 
 				if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_QPTTR1_Health_stVal, Health)){
 					IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_QPTTR1_Health_t, currentTime);
@@ -130,7 +353,7 @@ int		Set_QPTTR	(uint16_t QTnum, uint64_t currentTime )
 
 	//  Quality (Mod Beh)
 				int	Qual = QUALITY_VALIDITY_GOOD;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) {Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) {Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 
 				IedServer_updateQuality(iedServer,&iedModel_PROT_QPTTR1_Mod_q,Qual);
 				IedServer_updateQuality(iedServer,&iedModel_PROT_QPTTR1_Beh_q,Qual);
@@ -213,8 +436,8 @@ int		Set_BLKPTTR	(uint16_t QTnum, uint64_t currentTime )
 
 	//Health
 				uint32_t	Health = STVALINT32_OK;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule5) {Health = STVALINT32_Warning;}
-				if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffsetUstavki)) {Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM5) {Health = STVALINT32_Warning;}
+				if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)) {Health = STVALINT32_Warning;}
 
 				if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_BLKPTTR1_Health_stVal, Health))
 				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_BLKPTTR1_Health_t, currentTime);
@@ -231,7 +454,7 @@ int		Set_BLKPTTR	(uint16_t QTnum, uint64_t currentTime )
 
 	//  Quality (Mod Beh)
 				int	Qual = QUALITY_VALIDITY_GOOD;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) {Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) {Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 
 				IedServer_updateQuality(iedServer,&iedModel_PROT_BLKPTTR1_Mod_q,Qual);
 				IedServer_updateQuality(iedServer,&iedModel_PROT_BLKPTTR1_Beh_q,Qual);

@@ -43,7 +43,9 @@
 #include "hal_ethernet.h"
 #include "hal_socket.h"
 
-#include "PrpHsr_value.h"
+#include "hsr_prp_main.h"
+
+#include "goose_publisher.h"
 
 #define ETH_ALEN		6		/* Octets in one ethernet addr	 */
 #define ETH_P_ALL		0x0003		/* Every packet (be careful!!!) */
@@ -220,71 +222,20 @@ int		Ethernet_receivePacket(EthernetSocket self, uint8_t* buffer, int bufferSize
  * Ethernet_sendPacket
  * отправка сообщения прямо в netif напрямую
  *************************************************************************/
-void	Ethernet_sendPacket(EthernetSocket ethSocket, GoosePublisher buffer, int packetSize)
+#if (1)
+void Ethernet_sendPacket(EthernetSocket self, uint8_t* buffer, int packetSize)
 {
 
-	uint8_t*	out = Goose_getbufferAddr(buffer);
-
-#if defined (UseHSR)
-	IsoServer IsoServ = IedServer_getIsoServer(iedServer);
-
-	if(IsoServer_getAppendHSR(IsoServ)){
-		 Port_Toggle(LEDtst2);
-		 PHY_Port2TxOff(ReseiveENABLE | LearningENABLE);
-		 out[_Addr_IdNet] =  out[_Addr_IdNet] & 0x0F;
-		 out[_Addr_IdNet] |= LAN_Addr_0;
-		 Goose_output(out, packetSize);
-		 vTaskDelay(1);
-		 Port_Toggle(LEDtst2);
-	     PHY_Port2TxOn(ReseiveENABLE | LearningENABLE);
-		 PHY_Port1TxOff(ReseiveENABLE | LearningENABLE);
-		 out[_Addr_IdNet] =  out[_Addr_IdNet] & 0x0F;
-		 out[_Addr_IdNet] |= LAN_Addr_1;
-		 Goose_output(out, packetSize);
-		 vTaskDelay(1);
-		 Port_Toggle(LEDtst2);
-	     PHY_Port1TxOn(ReseiveENABLE | LearningENABLE);
-
-	}
-#endif
-#if defined (UsePRP)
-	IsoServer IsoServ = IedServer_getIsoServer(iedServer);
-
-	if(IsoServer_getAppendPRP(IsoServ)){
-
-		 int IdNetPRP = packetSize + _Addr_IdNetPRP;
-
-		 Port_Toggle(LEDtst2);
-		 PHY_Port2TxOff(ReseiveDISABLE | LearningENABLE);
-//		 IsoServer_setPHYTransmitport(PHY_PORT_1);
-		 out[IdNetPRP] =  out[IdNetPRP] & 0x0F;
-		 out[IdNetPRP] |= LAN_Addr_0;
-		 Goose_output(out, packetSize);
-		 vTaskDelay(1);
-		 Port_Toggle(LEDtst2);
-	     PHY_Port2TxOn(ReseiveDISABLE | LearningENABLE);
-		 PHY_Port1TxOff(ReseiveDISABLE | LearningENABLE);
-		 out[IdNetPRP] =  out[IdNetPRP] & 0x0F;
-		 out[IdNetPRP] |= LAN_Addr_1;
-		 Goose_output(out, packetSize);
-		 vTaskDelay(1);
-		 Port_Toggle(LEDtst2);
-	     PHY_Port1TxOn(ReseiveDISABLE | LearningENABLE);
-
-    }
-#endif
-#if !defined (UseHSR) && !defined (UsePRP)
-
-		 if (Goose_output(out, packetSize) != ERR_OK){
-			 USART_TRACE_RED("Goose_output Error!!!\n");
-		 }else {
-		     USART_TRACE_GREEN("Send GOOSE message\n");
-		 }
-
-//		sendto(ethSocket->rawSocket, out, packetSize, 0, (struct sockaddr*) &(ethSocket->socketAddress), sizeof(ethSocket->socketAddress));
-#endif
-
 }
+#else
+void Ethernet_sendPacket(EthernetSocket ethSocket, GoosePublisher buffer, int packetSize)
+{
+	uint8_t*	out = Goose_getbufferAddr(buffer);
+	if (Goose_output(out, packetSize) != ERR_OK){
+		 USART_TRACE_RED("Goose_output Error!!!\n");
+	 }
+}
+#endif
 /*************************************************************************
  * HAL_ETH_TxCpltCallback
  * конец передачи в сеть
@@ -294,8 +245,6 @@ void HAL_ETH_TxCpltCallback(ETH_HandleTypeDef *heth){
 	// переключая нужный режим
 #if defined (UseHSR) || defined (UsePRP)
 	IsoServer IsoServ = IedServer_getIsoServer(iedServer);
-
-//	Port_Toggle(LEDtst2);
 
 	switch (IsoServer_getPHYTransmitport(IsoServ)){
 		// была передача только в PORT1, включим порт2

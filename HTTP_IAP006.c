@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-#if defined (includeBootloader) && (BootloaderVer == 006)
+#if defined (includeBootloader) && (BootloaderVer == 6)
 // указание в какой адрес ложить функцию
 __attribute__((__section__(".boot")))
 

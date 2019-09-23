@@ -85,7 +85,7 @@ CS101_ASDU
 CS101_ASDU_create(CS101_AppLayerParameters parameters, bool isSequence, CS101_CauseOfTransmission cot, int oa, int ca, bool isTest, bool isNegative)
 {
     CS101_StaticASDU self = (CS101_StaticASDU) GLOBAL_MALLOC(sizeof(struct sCS101_StaticASDU));
-    //TODO support allocation from static pool
+//TODO: support allocation from static pool
 
     if (self != NULL)
         CS101_ASDU_initializeStatic(self, parameters, isSequence, cot, oa, ca, isTest, isNegative);

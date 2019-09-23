@@ -87,12 +87,13 @@ typedef enum
     STATE_M_TX_XFWR,              /*!< 2 Передатчик закончил передачу и ожидает режима приема. */
 } eMBMasterSndState;
 
+uint16_t SizePreMessage;
 /* ----------------------- Static variables ---------------------------------*/
 volatile eMBMasterSndState eSndState;
 volatile eMBMasterRcvState eRcvState;
 
 static volatile UCHAR  ucMasterRTUSndBuf[MB_PDU_SIZE_MAX]		__attribute__ ((section (".ramint")));			// буфер для передачи в MODBUS
-static volatile UCHAR  ucMasterRTURcvBuf[MB_SER_PDU_SIZE_MAX]	__attribute__ ((section (".ramint")));			// буфер для приёма из MODBUS
+static volatile UCHAR  ucMasterRTURcvBuf[_SizeModbusRX]			__attribute__ ((section (".ramint")));			// буфер для приёма из MODBUS cюда переписываем из ДМА
 static volatile USHORT usMasterSendPDULength;							// длина фрейма готового для передачи
 
 static volatile UCHAR *pucMasterSndBufferCur;
@@ -102,9 +103,15 @@ static volatile USHORT usMasterRcvBufferPos;
 static volatile BOOL   xFrameIsBroadcast = FALSE;						// признак широковешательного пакета
 
 static volatile eMBMasterTimerMode eMasterCurTimerMode;
+//eMBMasterTimerMode eMasterCurTimerMode;
 
-extern 	xQueueHandle 		ModbusResponseQueue;	// очередь для отправки в модбас
-extern 	uint8_t 			Modbus_DataRX[_SizeModbusRX];	// буфер приёмника Modbus
+//extern 	xQueueHandle 		ModbusResponseQueue;						// очередь для ожидания из модбас
+
+extern uint8_t		ModbusBuffActive;
+extern uint8_t 		Modbus_DataRX[_SizeModbusRX];			// буфер приёмника Modbus
+extern uint8_t 		Modbus_DataRXSlave[_SizeModbusRX];		// 2буфер приёмника Modbus
+//extern 	uint8_t 			Modbus_DataTX[_SizeModbusTX];
+
 extern 	UART_HandleTypeDef 	MODBUS;
 extern	errMB_data			cntErrorMD;
 /* ----------------------- Start implementation -----------------------------*/
@@ -114,7 +121,7 @@ eMBMasterRTUInit(UCHAR ucPort, ULONG ulBaudRate, eMBParity eParity )
     eMBErrorCode    eStatus = MB_ENOERR;
     ULONG           usTimerT35;
 
-    ENTER_CRITICAL_SECTION(  );
+//    ENTER_CRITICAL_SECTION(  );
 
     if( xMBMasterPortSerialInit( ucPort, ulBaudRate, 8, eParity ) != TRUE )
     {
@@ -134,7 +141,7 @@ eMBMasterRTUInit(UCHAR ucPort, ULONG ulBaudRate, eMBParity eParity )
         vMBMasterSetCurTimerMode(MB_TMODE_T35);
         xMBMasterPortTimersInit( ( USHORT ) usTimerT35 );
     }
-    EXIT_CRITICAL_SECTION(  );
+//    EXIT_CRITICAL_SECTION(  );
 
     return eStatus;
 }
@@ -148,10 +155,10 @@ eMBMasterRTUInit(UCHAR ucPort, ULONG ulBaudRate, eMBParity eParity )
 void
 eMBMasterRTUStart( void )
 {
-    ENTER_CRITICAL_SECTION(  );
+//    ENTER_CRITICAL_SECTION(  );
 //    eRcvState = STATE_M_RX_INIT;//STATE_M_RX_IDLE;//STATE_M_RX_INIT;
 //    vMBMasterPortSerialEnable( TRUE, FALSE );			// Режим приёма
-    EXIT_CRITICAL_SECTION(  );
+//    EXIT_CRITICAL_SECTION(  );
 }
 /*************************************************************************
  * eMBMasterRTUStop
@@ -160,10 +167,10 @@ eMBMasterRTUStart( void )
 void
 eMBMasterRTUStop( void )
 {
-    ENTER_CRITICAL_SECTION(  );
+//    ENTER_CRITICAL_SECTION(  );
     vMBMasterPortSerialEnable( FALSE, FALSE );
     vMBMasterPortTimersDisable(  );
-    EXIT_CRITICAL_SECTION(  );
+//    EXIT_CRITICAL_SECTION(  );
 }
 /*************************************************************************
  * eMBMasterRTUReceive
@@ -173,13 +180,13 @@ eMBErrorCode		eMBMasterRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USH
 {
     eMBErrorCode    eStatus = MB_ERECV;
 
-    ENTER_CRITICAL_SECTION(  );
-    assert_param( usMasterRcvBufferPos < MB_SER_PDU_SIZE_MAX );
+//    ENTER_CRITICAL_SECTION(  );
+//    assert_param( usMasterRcvBufferPos < MB_SER_PDU_SIZE_MAX );
 
     // Проверка длинны пакета
     if( usMasterRcvBufferPos < MB_SER_PDU_SIZE_MIN ){
         eStatus = MB_ERECVDATAERROR;
-        EXIT_CRITICAL_SECTION(  );
+//        EXIT_CRITICAL_SECTION(  );
         return eStatus;
     }
     // Проверка CRC
@@ -200,22 +207,26 @@ eMBErrorCode		eMBMasterRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USH
         eStatus = MB_CRCERR_Rx;
     }
 
-    EXIT_CRITICAL_SECTION(  );
+//    EXIT_CRITICAL_SECTION(  );
     return eStatus;
 }
 /*************************************************************************
  * eMBMasterRTUSend
  * отправка пакета в MODBUS
+ * нужно переписать буфер т.к. туда может быть отправлен следующий пакет, а предыдущий
+ * нужен бля повторной отправки если была ошибка
+ * доступ к буферу делать нужно через семафор. иначе статусы отправки не синхронны со сменой данных в буфере.
  *************************************************************************/
 eMBErrorCode
 eMBMasterRTUSend( UCHAR ucSlaveAddress, const UCHAR * pucFrame, USHORT usLength )
 {
     eMBErrorCode    eStatus = MB_ESENT;
     USHORT          usCRC16;
+    BOOL 		retPut = FALSE;
 
     if ( ucSlaveAddress > MB_MASTER_TOTAL_SLAVE_NUM ) return MB_EINVAL;
 
-    ENTER_CRITICAL_SECTION(  );
+//    ENTER_CRITICAL_SECTION(  );
        // Первый байт  до PDU это slave address.
         pucMasterSndBufferCur = ( UCHAR * ) pucFrame - 1;
         usMasterSndBufferCount = 1;
@@ -227,14 +238,31 @@ eMBMasterRTUSend( UCHAR ucSlaveAddress, const UCHAR * pucFrame, USHORT usLength 
         ucMasterRTUSndBuf[usMasterSndBufferCount++] = ( UCHAR )( usCRC16 & 0xFF );
         ucMasterRTUSndBuf[usMasterSndBufferCount++] = ( UCHAR )( usCRC16 >> 8 );
 
+/*
+        // перепишем буфер в резерв, если вдруг нужен повтор.
+        memcpy(Modbus_DataTX,(const void*)pucMasterSndBufferCur,usMasterSndBufferCount);
+// попытки отправки ------------------
+        {
+			uint8_t		reSend = 10;	// попыток отправки. ошибка может только из HAL_UART_Transmit_DMA)
+			while(retPut != true){
+				reSend --; if (reSend == 0) break;
+		        retPut = xMBMasterPortSerialPutBUF(( CHAR *)Modbus_DataTX,usMasterSndBufferCount);
+			}
+        }
+// -----------------------------------
+*/
         // Режим предачи.
-        if (xMBMasterPortSerialPutBUF(( CHAR *)pucMasterSndBufferCur,usMasterSndBufferCount) == TRUE){					// передадим в порт весь блок сразу
+        retPut = xMBMasterPortSerialPutBUF(( CHAR *)pucMasterSndBufferCur,usMasterSndBufferCount);
+        if (retPut == TRUE){					// передадим в порт весь блок сразу
         	eSndState = STATE_M_TX_XMIT;
-//            xFrameIsBroadcast = ( ucMasterRTUSndBuf[MB_SER_PDU_ADDR_OFF] == MB_ADDRESS_BROADCAST ) ? TRUE : FALSE;		// определяем широковещательный ли ?
+
+        	xMBMasterPortEventPost( EV_MASTER_FRAME_RECEIVE_WAIT );		// ждём ответ если не выставить сейчас, то до прерывания конца передачи можно не дожить
+
         }else{
+        	// ещё не передались все данные, нужно немного подождать
         	eStatus = MB_EIO_Tx;
         }
-    EXIT_CRITICAL_SECTION(  );
+//    EXIT_CRITICAL_SECTION(  );
     return eStatus;
 }
 /*************************************************************************
@@ -246,17 +274,27 @@ eMBMasterRTUSend( UCHAR ucSlaveAddress, const UCHAR * pucFrame, USHORT usLength 
  *************************************************************************/
 BOOL	xMBMasterRTUReceiveFSM( void )
 {
-    BOOL            xTaskNeedSwitch = FALSE;
+	uint16_t szWait;
 
 	vMBMasterPortTimersDisable( );
-    if (xModbus_Get_SizeAnswer((uint16_t *) &usMasterRcvBufferPos) == 0){		// размера ожидаемого ответа
-        	USART_TRACE_RED("SizeAnswer == 0\n");
+	xModbus_Get_SizeWaitingAnswer(&szWait);
+	xModbus_Get_SizeAnswer((uint16_t *) &usMasterRcvBufferPos);
+
+    if (usMasterRcvBufferPos == 0){						// размера ожидаемого ответа, есть грёбаный нестандарт. >256 байт данных
+    		SizePreMessage = 0;							// приняли обнулим пред. размер принятых
+        	return false;
     }
-	memcpy(ucMasterRTURcvBuf,Modbus_DataRX,usMasterRcvBufferPos);
+
+//    memcpy((void *)ucMasterRTURcvBuf,Modbus_DataRX,usMasterRcvBufferPos);
+	if (ModbusBuffActive == 0)	{memcpy((void *)ucMasterRTURcvBuf,Modbus_DataRX,usMasterRcvBufferPos);}
+	else						{memcpy((void *)ucMasterRTURcvBuf,Modbus_DataRXSlave,usMasterRcvBufferPos);}
+
 
 	xMBMasterPortEventPost(EV_MASTER_FRAME_RECEIVED);
 
-    return xTaskNeedSwitch;
+	SizePreMessage = 0;		// приняли обнулим пред. размер принятых
+
+    return true;
 }
 /*************************************************************************
  * xMBMasterRTUTransmitFSM
@@ -278,7 +316,6 @@ xMBMasterRTUTransmitFSM( void )
 	 eSndState = STATE_M_TX_XFWR;
 	 xMBMasterPortEventPost( EV_MASTER_FRAME_RECEIVE_WAIT );	// ждём ответ
 
-	 Port_On(LEDtst2);
 	 vMBMasterPortTimersRespondTimeoutEnable( );
 
     return xNeedPoll;
@@ -302,7 +339,7 @@ BOOL xMBMasterRTUStartIdle(void)
 
 	case  STATE_M_RX_IDLE:
 
-		xMBMasterRTUReceiveFSM();					// переложим данные из
+		xMBMasterRTUReceiveFSM();					// переложим данные из Modbus_DataRX в приёмный буфер ucMasterRTURcvBuf
 		eSndState = STATE_M_TX_IDLE;
 		break;
 
@@ -329,9 +366,8 @@ xMBMasterRTUTimerExpired(void)
 	eMBMasterTimerMode	TimerMode;
 
 	TimerMode = vMBMasterGetCurTimerMode();
+	// наверное нужно проверить текущий режим таймера, если это посттаймаут то ..... странно что перезапущеный таймер сюда ввалился
 	vMBMasterPortTimersDisable( );
-
-	Port_Off(LEDtst2);
 
 // Прием --------------------------------------------------------------
 	switch (eRcvState)
@@ -371,31 +407,50 @@ xMBMasterRTUTimerExpired(void)
 				xMBMasterPortEventClear(EV_MASTER_FRAME_RECEIVE_WAIT);			// ну и ладно, ждать нечего.
 
 				xNeedPoll = xMBMasterPortEventPost(EV_MASTER_ERROR_PROCESS);
-				vMBMasterSetErrorType(EV_ERROR_RESPOND_TIMEOUT);
+				vMBMasterSetErrorType(EV_ERROR_RESPOND_TIMEOUT);				// странно, но тут таймауты бывают часто, Запрос шлю раньше времени.
 				cntErrorMD.errTimeOut++;
 
-				//Port_Toggle(LEDtst2);
+				//USART_TRACE_BLUE("Таймаут,буфер пуст ... (Tmode:%u)\n",TimerMode);
 
+				eSndState = STATE_M_TX_IDLE;
 		}else{
-				// если чтото есть в буфере подождём
-             	uint16_t SizeMessage  = Hal_get_SizeMessageFromMB((uint8_t*)Modbus_DataRX);	// размер сообщения из самого сообщения.
-             	USART_TRACE_BLUE("Таймаут, но что то есть в буфере ... (%u из %u)\n",Readbuffcurr,SizeMessage);
-             	if (SizeMessage == Readbuffcurr) {
+				// если чтото есть в буфере подождём, но нужно запустить таймер снова. На случай если больше ничего не придёт.
+				// если в течении таймаута ничего не пришло (в буфере число осталось прежним) шлём следующий пакет.
+				uint16_t SizeMessage;
+				//SizeMessage  = Hal_get_SizeMessageFromMB((uint8_t*)Modbus_DataRX);	// размер сообщения из самого сообщения.
+             	if (ModbusBuffActive == 0)	{SizeMessage  = Hal_get_SizeMessageFromMB((uint8_t*)Modbus_DataRX);}
+            	else						{SizeMessage  = Hal_get_SizeMessageFromMB((uint8_t*)Modbus_DataRXSlave);}
 
-             		xMBMasterRTUReceiveFSM();
+             	if (SizeMessage <= Readbuffcurr) {	//если пришло >= ожидаемого колличества
 
-             		xMBMasterPortEventClear(EV_MASTER_FRAME_RECEIVE_WAIT);
+             		//USART_TRACE_BLUE("Есть приём... (%u из %u)\n",Readbuffcurr,SizeMessage);		// вошли по таймауту в момент окончания приёма
+             		//xMBMasterRTUReceiveFSM();
+             		//xMBMasterPortEventClear(EV_MASTER_FRAME_RECEIVE_WAIT);
+        			//eSndState = STATE_M_TX_IDLE;
 
-    				//vMBMasterSetErrorType( 0);
-    				//xMBMasterPortEventClear( EV_MASTER_ERROR_PROCESS );
-
-             		//pxMBMasterPortCBStartIdle();									// приняли и перешли в IDLE
-             		//vMBMasterPortTimersAfterRespondTimeoutEnable();
              	}else{
-             		vMBMasterPortTimersRespondTimeoutEnable( );
+             		if (SizePreMessage != Readbuffcurr){	//если данные в буфере изменились за это время
+                 		// попали в середине пакета
+                      	//USART_TRACE_BLUE("Таймаут:%u, но буфер изменился... (%u и %u)\n",TimerMode,SizePreMessage,Readbuffcurr);
+
+             			SizePreMessage = Readbuffcurr;
+                      	vMBMasterPortTimersRespondTimeoutEnable( );
+
+             		}else{
+             			// а нет больше данных, конец сеанса.
+                 		xMBMasterPortEventClear(EV_MASTER_FRAME_RECEIVE_WAIT);
+        				xNeedPoll = xMBMasterPortEventPost(EV_MASTER_ERROR_PROCESS);
+        				vMBMasterSetErrorType(EV_ERROR_RESPOND_TIMEOUT);				// странно, но тут таймауты бывают часто, Запрос шлю раньше времени.
+        				cntErrorMD.errTimeOut++;
+
+            			eSndState = STATE_M_TX_IDLE;
+                      	//USART_TRACE_BLUE("Таймаут:%u, буфер без изменнения... (%u и %u)\n",TimerMode,SizePreMessage,Readbuffcurr);
+             			SizePreMessage = 0;
+             		}
              	}
 		}
-			eSndState = STATE_M_TX_IDLE;
+		// а вот если ещё не конец пакета то нифига не IDLE
+		//	eSndState = STATE_M_TX_IDLE;
 		break;
 // режим ожидания. сеанс передачи закончился приняли весь пакет
 // TimerMode == MB_TMODE_AFTERRESPOND_TIMEOUT должен быть
@@ -405,9 +460,10 @@ xMBMasterRTUTimerExpired(void)
 
 				xNeedPoll = xMBMasterPortEventPost(EV_MASTER_ERROR_PROCESS);
 				vMBMasterSetErrorType(EV_ERROR_RESPOND_TIMEOUT);
+				//USART_TRACE_BLUE("TX_IDLE Таймаут... (Tmode:%u)\n",TimerMode);
 				cntErrorMD.errTimeOut++;
-
-				//Port_Toggle(LEDtst2);
+			}else{
+//				vMBMasterSetErrorType(EV_ERROR_RESPOND_TIMEOUT);
 			}
 		break;
 
@@ -447,9 +503,7 @@ USHORT usMBMasterGetPDUSndLength( void )
 /* Set Modbus Master current timer mode.*/
 void vMBMasterSetCurTimerMode( eMBMasterTimerMode eMBTimerMode )
 {
-	Port_On(LEDtst1);
 	eMasterCurTimerMode = eMBTimerMode;
-	Port_Off(LEDtst1);
 }
 
 eMBMasterTimerMode 	vMBMasterGetCurTimerMode( void ){

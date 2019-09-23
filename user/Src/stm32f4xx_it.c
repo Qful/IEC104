@@ -164,6 +164,7 @@ void DebugMon_Handler(void) {
 /**
 * @brief This function handles System tick timer. 1 ms
 */
+
 void SysTick_Handler(void)
 {
   HAL_IncTick();
@@ -187,9 +188,9 @@ void SysTick_Handler(void)
 */
 void ETH_IRQHandler(void)
 {
-// Port_On(LEDtst1);
+
   HAL_ETH_IRQHandler(&heth);
-// Port_Off(LEDtst1);
+
 }
 /******************************************************************************
  * EXTI15_10_IRQHandler

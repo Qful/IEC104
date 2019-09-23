@@ -35,13 +35,13 @@ extern uint16_t	GlobalAddrOscNote;
  ***********************************************************************/
 void	ResetAddrSysNote(){
 #if defined (MR5_500) || defined (MR5_600) || defined (MR5_700) || defined (MR741)
-	usSysNoteStart = MB_StartSysNoteaddr;
+	usSysNoteStart = MB_Addr_SysNote;
 	GlobalAddrSysNote = 0;
 #endif
 }
 void	ResetAddrErrorNote(){
 #if defined (MR5_500) || defined (MR5_600) || defined (MR5_700) || defined (MR741)
-	usErrorNoteStart = MB_StartErrorNoteaddr;
+	usErrorNoteStart = MB_Addr_ErrorNote;
 	GlobalAddrErrorNote = 0;
 #endif
 
@@ -76,7 +76,7 @@ codeMessage = (uint16_t)Data[0] | (uint16_t)Data[1]<<8;
 /***********************************************************************************
  * MR771 MR761 MR762 MR763
  ***********************************************************************************/
-#if defined (MR771) || defined (MR761) || defined (MR762) || defined (MR763)
+#if defined (MR771) || defined (MR761) || defined (MR762) || defined (MR763) || defined (MR761OBR)
 
 codeMessage = (uint16_t)Data[MB_OffsetSysNoteMessage*2] | (uint16_t)Data[MB_OffsetSysNoteMessage*2 + 1]<<8;
 

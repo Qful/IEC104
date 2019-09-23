@@ -58,7 +58,7 @@ PR_BEGIN_EXTERN_C
 /*! \brief If Modbus Slave RTU support is enabled. */
 #define MB_SLAVE_RTU_ENABLED                    (  1 )
 /*! \brief If Modbus Slave TCP support is enabled. */
-#define MB_SLAVE_TCP_ENABLED                    (  0 )
+#define MB_SLAVE_TCP_ENABLED                    (  1 )
 /*! \brief The character timeout value for Modbus ASCII.
  *
  * The character timeout value is not fixed for Modbus ASCII and is therefore
@@ -124,10 +124,26 @@ PR_BEGIN_EXTERN_C
 #if defined (MR5_700) || defined (MR5_600) || defined (MR5_500) || defined (MR851) || defined (MR741)
 #define MB_MASTER_TIMEOUT_MS_RESPOND            (70)
 #define MB_MASTER_TIMEOUT_nS_RESPOND            (70000000 )
-#else
+#endif
+#if defined (MR761) || defined (MR762) || defined (MR763) || defined (MR771)
+#define MB_MASTER_TIMEOUT_MS_RESPOND            (25 )		//было 70 до 24102017  Андрей сказал 20мс ставлю 25		18052018 поменяли на 11мс, 26072019 опуспил до 25мс
+#define MB_MASTER_TIMEOUT_nS_RESPOND            (25000000 )	//было 70 до 24102017  Андрей сказал 20мс ставлю 25
+#endif
+#if  defined (MR761OBR)
 #define MB_MASTER_TIMEOUT_MS_RESPOND            (11 )		//было 70 до 24102017  Андрей сказал 20мс ставлю 25		18052018 поменяли на 11мс
-#define MB_MASTER_TIMEOUT_nS_RESPOND            (11000000 )	//было 70 до 24102017  Андрей сказал 20мс ставлю 25
-
+#define MB_MASTER_TIMEOUT_nS_RESPOND            (11000000)	//было 70 до 24102017  Андрей сказал 20мс ставлю 25
+#endif
+#if defined (MR801) && defined (OLD)
+#define MB_MASTER_TIMEOUT_MS_RESPOND            (25 )		//было 70 до 24102017  Андрей сказал 20мс ставлю 25
+#define MB_MASTER_TIMEOUT_nS_RESPOND            (25000000 ) //было 70 до 24102017  Андрей сказал 20мс ставлю 25
+#endif
+#if defined (MR801) && defined (T12N5D58R51)
+#define MB_MASTER_TIMEOUT_MS_RESPOND            (11 )
+#define MB_MASTER_TIMEOUT_nS_RESPOND            (11000000 )
+#endif
+#if ((defined (MR901) || defined (MR902)) && _REVISION_DEVICE<=212)
+#define MB_MASTER_TIMEOUT_MS_RESPOND            (70 )
+#define MB_MASTER_TIMEOUT_nS_RESPOND            (70000000 )
 #endif
 
 /*! \brief The total slaves in Modbus Master system. Default 16.

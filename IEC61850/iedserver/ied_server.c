@@ -42,10 +42,14 @@
 
 #include "dataUpdateFromBase.h"
 
-#include "PrpHsr_value.h"
+#include "hsr_prp_main.h"
 
-#if defined (MR801)
+#if defined	(MR801) && defined (OLD)
 #include "static_model_MR801.h"
+#endif
+
+#if defined	(MR801) && defined (T12N5D58R51)
+#include "static_model_MR801_T12N5D58R51.h"
 #endif
 
 #if defined (MR771)
@@ -55,7 +59,9 @@
 #if defined	(MR761) || defined	(MR762) || defined	(MR763)
 #include "static_model_MR76x.h"
 #endif
-
+#if  defined (MR761OBR)
+#include "static_model_MR761OBR.h"
+#endif
 #if defined (MR901) || defined (MR902)
 #include "static_model_MR901_902.h"
 #endif
@@ -278,9 +284,11 @@ exit_function:
 }
 
 static void
-installDefaultValuesForDataAttribute(IedServer self, DataAttribute* dataAttribute,
-        char* objectReference, int position)
+installDefaultValuesForDataAttribute(IedServer self, DataAttribute* dataAttribute, char* objectReference, int position)
 {
+	MmsValue* cacheValue;
+	DataAttribute* subDataAttribute;
+
     sprintf(objectReference + position, ".%s", dataAttribute->name);
 //    if (DEBUG_IED_SERVER)
 //    	printf("dataAttribute: .%s\n", dataAttribute->name);
@@ -306,16 +314,20 @@ installDefaultValuesForDataAttribute(IedServer self, DataAttribute* dataAttribut
         return;
     }
 
-    MmsValue* cacheValue = MmsServer_getValueFromCache(self->mmsServer, domain, mmsVariableName);
+    cacheValue = MmsServer_getValueFromCache(self->mmsServer, domain, mmsVariableName);
 
     dataAttribute->mmsValue = cacheValue;
 
     if (value != NULL) {						// удаляем еслм
 
         if (cacheValue != NULL)
-            MmsValue_update(cacheValue, value);
+            MmsValue_update(cacheValue, value);	//перекинем из value в cacheValue
         if (cacheValue == NULL) {
-        	USART_TRACE_RED("IED_SERVER: exception:invalid initializer for %s\n", mmsVariableName);
+        	USART_TRACE_RED("IED_SERVER: exception:invalid initializer for %s. value:0x%X cacheValue:0x%X domain:0x%X\n",
+        			mmsVariableName,
+        			value,
+        			cacheValue,
+        			domain);
         }
 
         #if (DEBUG_ISO_SERVER_MY == 1)
@@ -331,7 +343,7 @@ installDefaultValuesForDataAttribute(IedServer self, DataAttribute* dataAttribut
     }
 
     int childPosition = strlen(objectReference);
-    DataAttribute* subDataAttribute = (DataAttribute*) dataAttribute->firstChild;
+    subDataAttribute = (DataAttribute*) dataAttribute->firstChild;
 
     while (subDataAttribute != NULL) {
         installDefaultValuesForDataAttribute(self, subDataAttribute, objectReference, childPosition);
@@ -470,25 +482,7 @@ updateDataSetsWithCachedValues(IedServer self)
 IedServer
 IedServer_create(IedModel* iedModel, uint16_t	numb)
 {
-#ifndef _SPCECIALSWRevision
-	// ------------------------------------------------------------
-	// ------ добавим к имени уникальность
-	{
-		uint8_t	addIPtoName[50];
-		portCHAR pagehits[5];
 
-		memset(addIPtoName,0,50);
-		strcat((char *)addIPtoName,(const char *)iedModel->name);
-		sprintf(pagehits,"N%u",numb);
-		strcat((char *)addIPtoName, pagehits);
-
-		uint8_t	ln = strlen((const char *)addIPtoName);
-		iedModel->name = (char*)GLOBAL_MALLOC(ln);
-		memset(iedModel->name,0,ln);
-		strcat((char *)iedModel->name,(const char *)addIPtoName);
-	}
-	// ------------------------------------------------------------
-#endif
     IedServer self = (IedServer) GLOBAL_CALLOC(1, sizeof(struct sIedServer));
 
     self->model = iedModel;
@@ -519,7 +513,7 @@ IedServer_create(IedModel* iedModel, uint16_t	numb)
     // self->running = false; /* not required due to CALLOC */
 
 	// забирает 200Кб оперативы
-	USART_TRACE("MmsMapping_create start\n");
+	USART_TRACE("MmsMapping_create start. (~200Кб RAM)\n");
     self->mmsMapping = MmsMapping_create(iedModel);							// тут перетянули из IED модели в MMs структуры. Дальше добавление в iedModel бессмысленно
 
     self->mmsDevice = MmsMapping_getMmsDeviceModel(self->mmsMapping);
@@ -545,7 +539,7 @@ IedServer_create(IedModel* iedModel, uint16_t	numb)
 
 	// забирает 35Кб оперативы
 	USART_TRACE("iedModel->initializer start\n");
-    iedModel->initializer();
+	iedModel->initializer();
 	USART_TRACE("iedModel->initializer.. ok\n");
 
 	USART_TRACE("installDefaultValuesInCache start\n");
@@ -577,19 +571,6 @@ IedServer_create(IedModel* iedModel, uint16_t	numb)
 //    uint32_t	IPAddr = (u32_t)0xC0A800FCUL;
     IsoServer_setLocalIpAddress(self->isoServer,"127.0.0.1");
 //      IsoServer_setLocalIpAddress(self->isoServer,"252.0.168.192");
-
-    IsoServer_HSR_off(self->isoServer);
-    IsoServer_PRP_off(self->isoServer);
-
-#if defined (UsePRP)
-    IsoServer_PRP_on(self->isoServer);
-    IsoServer_PRPSeqNum_reset(self->isoServer);
-#endif
-
-#if defined (UseHSR)
-    IsoServer_HSR_on(self->isoServer);
-    IsoServer_HSRSeqNum_reset(self->isoServer);
-#endif
 
     // нужно перед createDataSets
 //    filesystem_Read_NamedVariableListRequest(self->mmsDevice, iedModel);
@@ -1368,6 +1349,8 @@ IedServer_updateUTCTimeAttributeValue(IedServer self, DataAttribute* dataAttribu
     assert(dataAttribute != NULL);
     assert(self != NULL);
 
+    if (self==NULL) return;
+
     uint64_t currentValue = MmsValue_getUtcTimeInMs(dataAttribute->mmsValue);
 
     if (currentValue == value) {
@@ -1398,7 +1381,14 @@ IedServer_updateTimestampAttributeValue(IedServer self, DataAttribute* dataAttri
     }
 }
 
+// ----------------------------------------------------------------------------------------
+Quality	IedServer_GetQuality(DataAttribute* dataAttribute)
+{
+	Quality qual;
+    qual = MmsValue_getBitStringAsInteger(dataAttribute->mmsValue);
 
+return qual;
+}
 // ----------------------------------------------------------------------------------------
 int
 IedServer_updateQuality(IedServer self, DataAttribute* dataAttribute, Quality quality)
@@ -1457,7 +1447,26 @@ void
 IedServer_enableGoosePublishing(IedServer self)
 {
 #if (CONFIG_INCLUDE_GOOSE_SUPPORT == 1)
+	if (self == NULL) return;
     MmsMapping_enableGoosePublishing(self->mmsMapping);
+#endif /* (CONFIG_INCLUDE_GOOSE_SUPPORT == 1) */
+}
+
+void
+IedServer_enableGooseSimulation(IedServer self)
+{
+	if (self == NULL)	return;
+#if (CONFIG_INCLUDE_GOOSE_SUPPORT == 1)
+    MmsMapping_enableGooseSimulation(self->mmsMapping);
+#endif /* (CONFIG_INCLUDE_GOOSE_SUPPORT == 1) */
+}
+
+void
+IedServer_disableGooseSimulation(IedServer self)
+{
+	if (self == NULL)	return;
+#if (CONFIG_INCLUDE_GOOSE_SUPPORT == 1)
+    MmsMapping_disableGooseSimulation(self->mmsMapping);
 #endif /* (CONFIG_INCLUDE_GOOSE_SUPPORT == 1) */
 }
 
@@ -1465,6 +1474,7 @@ void
 IedServer_disableGoosePublishing(IedServer self)
 {
 #if (CONFIG_INCLUDE_GOOSE_SUPPORT == 1)
+	if (self == NULL) return;
     MmsMapping_disableGoosePublishing(self->mmsMapping);
 #endif /* (CONFIG_INCLUDE_GOOSE_SUPPORT == 1) */
 }
@@ -1726,8 +1736,11 @@ int	IedServer_DataUpdateInGoosesDatasets(IedServer self)
             }// !while (dataSetEntry != NULL)
             //-------
         	MmsGooses_RUNMode(self);
-        //для каждого гуса будем решать надо отправка или нет
-       	if (RetifDataUpdated) MmsGooseControlBlock_observedObjectChanged(gcb);
+			//для каждого гуса будем решать надо отправка или нет
+			if (RetifDataUpdated) {
+
+				MmsGooseControlBlock_observedObjectChanged(gcb);
+			}
         }
     }
     return	0;
@@ -1761,7 +1774,10 @@ int	ret = 0;
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_RPN_LLN0_NamPlt_swRev , swrev);
 #else
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_LLN0_NamPlt_swRev , swrev);
+#if		!defined (MR761OBR)
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_MES_LLN0_NamPlt_swRev , swrev);
+#endif
+
 #endif
 
 //PROT
@@ -1831,7 +1847,8 @@ int	ret = 0;
 
 #endif
 
-#if defined (MR801)
+#if defined	(MR801) && defined (OLD)
+
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_LD0_RDRE1_NamPlt_swRev , swrev);
 
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_IDPDIF_NamPlt_swRev , swrev);
@@ -1899,6 +1916,12 @@ int	ret = 0;
 
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_RREC_NamPlt_swRev , swrev);
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_RBRF_NamPlt_swRev , swrev);
+
+#endif
+
+#if defined	(MR801) && defined (T12N5D58R51)
+
+
 
 #endif
 
@@ -1987,26 +2010,8 @@ int	ret = 0;
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_PDIS6_NamPlt_swRev , swrev);
 
 #endif
-/*
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_PDPR2_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_PDPR1_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_RSYN1_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_RBRF1_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_NBLKGGIO1_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_AVRGGIO_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_RREC1_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_RPSB1_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_QPTTR2_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_QPTTR1_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_BLKPTTR1_NamPlt_swRev , swrev);
 
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_PDIS1_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_PDIS2_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_PDIS3_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_PDIS4_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_PDIS5_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_PDIS6_NamPlt_swRev , swrev);
-
+#if defined (MR761OBR)
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_VZGGIO1_NamPlt_swRev , swrev);
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_VZGGIO2_NamPlt_swRev , swrev);
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_VZGGIO3_NamPlt_swRev , swrev);
@@ -2023,59 +2028,205 @@ int	ret = 0;
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_VZGGIO14_NamPlt_swRev , swrev);
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_VZGGIO15_NamPlt_swRev , swrev);
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_VZGGIO16_NamPlt_swRev , swrev);
+#endif
 
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_IARCPTOC_NamPlt_swRev , swrev);
+// MES --------------------------------------------------------------------------------------------------
+// GGIO -------------------------------------------------------------------------------------------------
+// CTRL -------------------------------------------------------------------------------------------------
 
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_PTUF1_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_PTUF2_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_PTUF3_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_PTUF4_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_PTOF1_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_PTOF2_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_PTOF3_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_PTOF4_NamPlt_swRev , swrev);
+#if defined (MR5_500)
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_MES_MSQI1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_MES_MMXU1_NamPlt_swRev , swrev);
 
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_UPTUV1_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_UPTUV2_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_UPTUV3_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_UPTUV4_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_UPTOV1_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_UPTOV2_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_UPTOV3_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_UPTOV4_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_LSGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_VLSGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_SSLGGIO1_NamPlt_swRev , swrev);
 
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_I2I1PTOC1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_LEDGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_OUTGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_INGGIO1_NamPlt_swRev , swrev);
 
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_I20PTOC8_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_I20PTOC1_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_I20PTOC2_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_I20PTOC3_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_I20PTOC4_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_I20PTOC5_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_I20PTOC6_NamPlt_swRev , swrev);
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_I20PTOC7_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_GGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_PTRC_NamPlt_swRev , swrev);
 
-	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_PROT_IPTUC1_NamPlt_swRev , swrev);
-*/
-	    	//MES
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_CSWI1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_XCBR1_NamPlt_swRev , swrev);
+
+#endif
+#if defined (MR5_600)
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_MES_MSQI1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_MES_MMXU1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_LSGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_VLSGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_SSLGGIO1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_LEDGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_OUTGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_INGGIO1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_GGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_PTRC_NamPlt_swRev , swrev);
+
+#endif
+#if defined (MR5_700)
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_MES_MSQI1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_MES_MMXU1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_MES_RFLO1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_LSGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_VLSGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_SSLGGIO1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_LEDGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_OUTGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_INGGIO1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_GGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_PTRC_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_CSWI1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_XCBR1_NamPlt_swRev , swrev);
+
+#endif
+#if defined (MR741)
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_MES_MSQI1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_MES_MMXU1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_MES_RFLO1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_LSGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_VLSGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_SSLGGIO1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_LEDGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_OUTGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_INGGIO1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_GGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_PTRC_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_CSWI1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_XCBR1_NamPlt_swRev , swrev);
+
+#endif
+#if defined (MR761) || defined (MR762) || defined (MR763)
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_MES_MSQI1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_MES_MMXU1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_MES_RFLO1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_LSGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_VLSGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_SSLGGIO1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_LEDGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_OUTGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_INGGIO1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_GGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_PTRC_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_CSWI1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_XCBR1_NamPlt_swRev , swrev);
+
+#endif
+#if defined (MR761OBR)
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_LSGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_VLSGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_SSLGGIO1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_LEDGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_OUTGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_INGGIO1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_GGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_PTRC_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_CSWI1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_XCBR1_NamPlt_swRev , swrev);
+
+#endif
+#if defined (MR801) && defined (OLD)
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_MES_MSQI1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_MES_MMXU1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_LSGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_VLSGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_SSLGGIO1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_LEDGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_OUTGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_INGGIO1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_GGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_PTRC_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_CSWI1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_XCBR1_NamPlt_swRev , swrev);
+
+#endif
+#if defined	(MR801) && defined (T12N5D58R51)
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_MES_S1MMXU1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_MES_S2MMXU1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_MES_S1MSQI1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_LSGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_VLSGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_SSLGGIO1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_LEDGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_OUTGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_INGGIO1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_GGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_PTRC_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_CSWI1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_XCBR1_NamPlt_swRev , swrev);
+
+#endif
+#if defined (MR851)
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_LEDGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_OUTGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_INGGIO1_NamPlt_swRev , swrev);
+
+#endif
+#if defined (MR901) || defined (MR902)
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_LSGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_VLSGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_SSLGGIO1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_LEDGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_OUTGGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_INGGIO1_NamPlt_swRev , swrev);
+
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_GGIO1_NamPlt_swRev , swrev);
+	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_PTRC_NamPlt_swRev , swrev);
+
+#endif
+/*
 #if !defined (MR5_600) && !defined (MR5_500) &&\
 	!defined (MR801) &&\
 	!defined (MR901) && !defined (MR902) &&\
-	!defined (MR851)
+	!defined (MR851) &&\
+	!defined (MR761OBR)
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_MES_RFLO1_NamPlt_swRev , swrev);
 #endif
 
 #if	!defined (MR901) && !defined (MR902) &&\
-	!defined (MR851)
+	!defined (MR851) &&\
+	!defined (MR761OBR)
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_MES_MSQI1_NamPlt_swRev , swrev);
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_MES_MMXU1_NamPlt_swRev , swrev);
 #endif
-	    	//GGIO
+*/
+/*	    	//GGIO
 #if	!defined (MR851)
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_LSGGIO1_NamPlt_swRev , swrev);
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_VLSGGIO1_NamPlt_swRev , swrev);
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_SSLGGIO1_NamPlt_swRev , swrev);
 #endif
+
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_LEDGGIO1_NamPlt_swRev , swrev);
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_OUTGGIO1_NamPlt_swRev , swrev);
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_GGIO_INGGIO1_NamPlt_swRev , swrev);
@@ -2092,6 +2243,7 @@ int	ret = 0;
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_GGIO1_NamPlt_swRev , swrev);
 	    	IedServer_updateVisibleStringAttributeValue(iedServer,&iedModel_CTRL_PTRC_NamPlt_swRev , swrev);
 #endif
+*/
 	    	ret = true;
 	    }
 

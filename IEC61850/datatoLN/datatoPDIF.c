@@ -60,6 +60,20 @@ int		Set_IDMPDIF		(uint16_t QTnum, uint64_t currentTime ){return false;}
 
 #endif
 /*******************************************************
+ * MR761OBR
+ *******************************************************/
+#if defined (MR761OBR)
+/*******************************************************
+ * заглушки
+ *******************************************************/
+int		Set_IDPDIF		(uint16_t QTnum, uint64_t currentTime ){return false;}
+int		Set_ID0PDIF		(uint16_t QTnum, uint64_t currentTime ){return false;}
+int		Set_IDDPDIF		(uint16_t QTnum, uint64_t currentTime ){return false;}
+int		Set_IDDMPDIF	(uint16_t QTnum, uint64_t currentTime ){return false;}
+int		Set_IDMPDIF		(uint16_t QTnum, uint64_t currentTime ){return false;}
+
+#endif
+/*******************************************************
  * MR771 MR761 MR762 MR763
  *******************************************************/
 #if defined	(MR771) || defined	(MR761) || defined	(MR762) || defined	(MR763)
@@ -78,18 +92,389 @@ int		Set_IDDPDIF		(uint16_t QTnum, uint64_t currentTime ){return false;}
 int		Set_IDDMPDIF	(uint16_t QTnum, uint64_t currentTime ){return false;}
 int		Set_IDMPDIF		(uint16_t QTnum, uint64_t currentTime ){return false;}
 #endif
+/*******************************************************
+ * MR801 T12N5D58R51
+ *******************************************************/
+#if defined	(MR801) && defined (T12N5D58R51)
+#include "static_model_MR801_T12N5D58R51.h"
+
+extern uint16_t   ucMDiscInBuf[MB_Size_Discreet];
+#if defined (AN_PERV)
+extern float   ucMAnalogInBuf[];
+#else
+	#if defined (AN_DUBLEDATA)
+	extern	uint32_t   ucMAnalogInBuf[MB_Size_Analog/2];
+	#else
+	extern	uint16_t   ucMAnalogInBuf[MB_Size_Analog];
+	#endif
+#endif
+extern uint16_t   ucMUstavkiInBuf[MB_Size_Ustavki];
+#if (MB_Size_ConfigTRPWR>0)
+extern uint16_t   ucConfigTRPWRBuf[MB_Size_ConfigTRPWR];
+#endif
+/*******************************************************
+ * заглушки
+ *******************************************************/
+int		Set_IDMPDIF		(uint16_t QTnum, uint64_t currentTime ){return false;}
+
+
 
 /*******************************************************
- * MR801
+ * Set_IDPDIF наполняем оперативными данными
  *******************************************************/
-#if defined (MR801)
+int		Set_IDPDIF		(uint16_t QTnum, uint64_t currentTime ){
+	int			ret = false;
+	float		diapazon;
+	float		mag;
+	float		K;
+	Quality 	quality;
+
+	//Health
+				uint32_t	Health = STVALINT32_OK;
+				if ((ucMDiscInBuf[MB_offset_errorHard] & MB_bOffset_errorM5)>0) 		{Health = STVALINT32_Warning;}
+				if ((ucMDiscInBuf[MB_offset_errorHard] & MB_bOffset_errorM6)>0) 		{Health = STVALINT32_Warning;}
+				if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)>0) {Health = STVALINT32_Warning;}
+
+				if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_IDPDIF_Health_stVal, Health))
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_IDPDIF_Health_t, currentTime);
+
+
+	//  Mod Beh
+				uint32_t	Mod;
+				if (ucMUstavkiInBuf[MB_offset_DIFFZ + MB_offset_DIFFZ_Config_Stat] & MB_bOffset_DIFFZ_Config_Stat) {Mod = STVALINT32_ON;} else {Mod = STVALINT32_OFF;}
+				if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_IDPDIF_Mod_stVal, Mod)){
+					IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_IDPDIF_Mod_t, currentTime);
+					if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_IDPDIF_Beh_stVal, Mod))
+					IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_IDPDIF_Beh_t, currentTime);
+				}
+
+
+	//  Quality (Mod Beh)
+				quality = QUALITY_VALIDITY_GOOD;
+				if (ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki) {quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+
+				if (IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF_Mod_q,quality)){
+					IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF_Beh_q,quality);
+				}
+
+	// Str_general
+				if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_PROT_IDPDIF_Str_general,  ucMDiscInBuf[MB_offset_IO_ID1_UP] & MB_b_IO_ID1_UP))			// ИО Iд>
+					IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_IDPDIF_Str_t, currentTime);
+
+	// Op_general
+				if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_PROT_IDPDIF_Op_general,  ucMDiscInBuf[MB_offset_SRAB_ID1_UP] & MB_b_SRAB_ID1_UP))		// СРАБ Iд>
+					IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_IDPDIF_Op_t, currentTime);
+
+// ----------------------
+			K = 1000 * (40 * ucMUstavkiInBuf[MB_offset_ConfigS1 + MB_offset_P_Obmotki]) / ((float)sqrt3 * 65535 * ucMUstavkiInBuf[MB_offset_ConfigS1 + MB_offset_U_Obmotki]);
+			diapazon = K * 65535;
+
+			mag = ucMAnalogInBuf[MB_offset_Ia_Diff] * K;
+			Set_Db_zeroDB_float(mag, diapazon,
+					&iedModel_PROT_IDPDIF_DifACIc_phsA_db,
+					&iedModel_PROT_IDPDIF_DifACIc_phsA_zeroDb,
+					&iedModel_PROT_IDPDIF_DifACIc_phsA_instCVal_mag_f,
+					&iedModel_PROT_IDPDIF_DifACIc_phsA_cVal_mag_f,
+					&iedModel_PROT_IDPDIF_DifACIc_phsA_t,
+					currentTime);
+
+			mag = ucMAnalogInBuf[MB_offset_Ib_Diff] * K;
+			Set_Db_zeroDB_float(mag, diapazon,
+					&iedModel_PROT_IDPDIF_DifACIc_phsB_db,
+					&iedModel_PROT_IDPDIF_DifACIc_phsB_zeroDb,
+					&iedModel_PROT_IDPDIF_DifACIc_phsB_instCVal_mag_f,
+					&iedModel_PROT_IDPDIF_DifACIc_phsB_cVal_mag_f,
+					&iedModel_PROT_IDPDIF_DifACIc_phsB_t,
+					currentTime);
+
+			mag = ucMAnalogInBuf[MB_offset_Ic_Diff] * K;
+			Set_Db_zeroDB_float(mag, diapazon,
+					&iedModel_PROT_IDPDIF_DifACIc_phsC_db,
+					&iedModel_PROT_IDPDIF_DifACIc_phsC_zeroDb,
+					&iedModel_PROT_IDPDIF_DifACIc_phsC_instCVal_mag_f,
+					&iedModel_PROT_IDPDIF_DifACIc_phsC_cVal_mag_f,
+					&iedModel_PROT_IDPDIF_DifACIc_phsC_t,
+					currentTime);
+
+			K = 1000 * (40 * ucMUstavkiInBuf[MB_offset_ConfigS1 + MB_offset_P_Obmotki]) / ((float)sqrt3 * 65535 * ucMUstavkiInBuf[MB_offset_ConfigS1 + MB_offset_U_Obmotki]);
+			diapazon = K * 65535;
+
+			mag = ucMAnalogInBuf[MB_offset_Ita] * K;
+			Set_Db_zeroDB_float(mag, diapazon,
+					&iedModel_PROT_IDPDIF_RstA_phsA_db,
+					&iedModel_PROT_IDPDIF_RstA_phsA_zeroDb,
+					&iedModel_PROT_IDPDIF_RstA_phsA_instCVal_mag_f,
+					&iedModel_PROT_IDPDIF_RstA_phsA_cVal_mag_f,
+					&iedModel_PROT_IDPDIF_RstA_phsA_t,
+					currentTime);
+
+			mag = ucMAnalogInBuf[MB_offset_Itb] * K;
+			Set_Db_zeroDB_float(mag, diapazon,
+					&iedModel_PROT_IDPDIF_RstA_phsB_db,
+					&iedModel_PROT_IDPDIF_RstA_phsB_zeroDb,
+					&iedModel_PROT_IDPDIF_RstA_phsB_instCVal_mag_f,
+					&iedModel_PROT_IDPDIF_RstA_phsB_cVal_mag_f,
+					&iedModel_PROT_IDPDIF_RstA_phsB_t,
+					currentTime);
+
+			mag = ucMAnalogInBuf[MB_offset_Itc] * K;
+			Set_Db_zeroDB_float(mag, diapazon,
+					&iedModel_PROT_IDPDIF_RstA_phsC_db,
+					&iedModel_PROT_IDPDIF_RstA_phsC_zeroDb,
+					&iedModel_PROT_IDPDIF_RstA_phsC_instCVal_mag_f,
+					&iedModel_PROT_IDPDIF_RstA_phsC_cVal_mag_f,
+					&iedModel_PROT_IDPDIF_RstA_phsC_t,
+					currentTime);
+
+			quality = QUALITY_VALIDITY_GOOD;
+			if (Health == STVALINT32_Warning) {quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+
+			if (IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF_DifACIc_phsA_q,quality)){
+				IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF_DifACIc_phsB_q,quality);
+				IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF_DifACIc_phsC_q,quality);
+
+				IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF_RstA_phsA_q,quality);
+				IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF_RstA_phsB_q,quality);
+				IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF_RstA_phsC_q,quality);
+
+				IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF_Op_q,quality);
+				IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF_Str_q,quality);
+			}
+return true;
+}
+/*******************************************************
+ * Set_IDDPDIF наполняем оперативными данными
+ *******************************************************/
+int		Set_IDDPDIF		(uint16_t QTnum, uint64_t currentTime ){
+
+	uint32_t	Mod;
+	uint32_t	Health;
+	Quality 	quality;
+
+	//Health
+				Health = STVALINT32_OK;
+				if ((ucMDiscInBuf[MB_offset_errorM5] & MB_bOffset_errorM5)>0) 				{Health = STVALINT32_Warning;}
+				if ((ucMDiscInBuf[MB_offset_errorM6] & MB_bOffset_errorM6)>0) 				{Health = STVALINT32_Warning;}
+				if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)>0) 	{Health = STVALINT32_Warning;}
+
+				if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_IDDPDIF_Health_stVal, Health))
+					IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_IDDPDIF_Health_t, currentTime);
+//  Mod Beh
+
+				if (ucMUstavkiInBuf[MB_offset_DIFFOts + MB_offset_DIFFOts_Config] & MB_bOffset_DIFFOts_Config_Stat) {Mod = STVALINT32_ON;} else {Mod = STVALINT32_OFF;}
+				if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_IDDPDIF_Mod_stVal, Mod)){
+					IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_IDDPDIF_Mod_t, currentTime);
+					if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_IDDPDIF_Beh_stVal, Mod))
+					IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_IDDPDIF_Beh_t, currentTime);
+				}
+
+//  Quality (Mod Beh)
+				quality = QUALITY_VALIDITY_GOOD;
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) {quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+
+				IedServer_updateQuality(iedServer,&iedModel_PROT_IDDPDIF_Mod_q,quality);
+				IedServer_updateQuality(iedServer,&iedModel_PROT_IDDPDIF_Beh_q,quality);
+				//IedServer_updateQuality(iedServer,&iedModel_PROT_IDDPDIF_Health_q,Qual);
+
+// Str_general
+				if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_PROT_IDDPDIF_Str_general,  ucMDiscInBuf[MB_offset_IO_ID2_UP] & MB_b_IO_ID2_UP))			// И0 Iд>>
+					IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_IDDPDIF_Str_t, currentTime);
+// Op_general
+				if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_PROT_IDDPDIF_Op_general,  ucMDiscInBuf[MB_offset_SRAB_ID2_UP] & MB_b_SRAB_ID2_UP))		// СРАБ Iд>>
+					IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_IDDPDIF_Op_t, currentTime);
+
+				quality = QUALITY_VALIDITY_GOOD;
+				if ((ucMDiscInBuf[MB_offset_errorM5] & MB_bOffset_errorM5)>0) 				{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if ((ucMDiscInBuf[MB_offset_errorM6] & MB_bOffset_errorM6)>0) 				{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)>0) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+
+				if (IedServer_updateQuality(iedServer,&iedModel_PROT_IDDPDIF_Op_q,quality)){
+				IedServer_updateQuality(iedServer,&iedModel_PROT_IDDPDIF_Str_q,quality);
+				}
+return true;
+}
+/*******************************************************
+ * Set_IDDMPDIF наполняем оперативными данными
+ *******************************************************/
+int		Set_IDDMPDIF	(uint16_t QTnum, uint64_t currentTime ){
+	Quality quality;
+//Health
+			uint32_t	Health = STVALINT32_OK;
+			if ((ucMDiscInBuf[MB_offset_errorM5] & MB_bOffset_errorM5)>0) 				{Health = STVALINT32_Warning;}
+			if ((ucMDiscInBuf[MB_offset_errorM6] & MB_bOffset_errorM6)>0) 				{Health = STVALINT32_Warning;}
+			if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)>0) 	{Health = STVALINT32_Warning;}
+
+			if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_IDDMPDIF_Health_stVal, Health))
+			IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_IDDMPDIF_Health_t, currentTime);
+
+//  Mod Beh
+			uint32_t	Mod;
+			if (
+					(ucMUstavkiInBuf[MB_offset_DIFFOts + MB_offset_DIFFOts_Config] & MB_bOffset_DIFFOts_Config_Stat) &&
+					(ucMUstavkiInBuf[MB_offset_DIFFOts + MB_offset_DIFFOts_Config] & MB_bOffset_DIFFOtsMgn_Config_Stat)
+					) {Mod = STVALINT32_ON;}
+			else {Mod = STVALINT32_OFF;}
+
+			if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_IDDMPDIF_Mod_stVal, Mod)){
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_IDDMPDIF_Mod_t, currentTime);
+				if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_IDDMPDIF_Beh_stVal, Mod))
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_IDDMPDIF_Beh_t, currentTime);
+			}
+
+//  Quality (Mod Beh)
+			quality = QUALITY_VALIDITY_GOOD;
+			if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) {quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+
+			IedServer_updateQuality(iedServer,&iedModel_PROT_IDDMPDIF_Mod_q,quality);
+			IedServer_updateQuality(iedServer,&iedModel_PROT_IDDMPDIF_Beh_q,quality);
+			//IedServer_updateQuality(iedServer,&iedModel_PROT_IDDMPDIF_Health_q,Qual);
+
+
+// Str_general
+			if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_PROT_IDDMPDIF_Str_general,  ucMDiscInBuf[MB_offset_SRAB_ID2_UP_IMP] & MB_b_SRAB_ID2_UP_IMP))	// СРАБ Iд>> (по мгновенным значениям)
+				IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_IDDMPDIF_Str_t, currentTime);
+// Op_general
+			if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_PROT_IDDMPDIF_Op_general,  ucMDiscInBuf[MB_offset_SRAB_ID2_UP_IMP] & MB_b_SRAB_ID2_UP_IMP))	// СРАБ Iд>> (по мгновенным значениям)
+				IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_IDDMPDIF_Op_t, currentTime);
+
+
+			quality = QUALITY_VALIDITY_GOOD;
+			if (ucMDiscInBuf[MB_offset_errorM4] & MB_bOffset_errorM4) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+			if (ucMDiscInBuf[MB_offset_errorM5] & MB_bOffset_errorM5) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+			if (ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+
+			if (IedServer_updateQuality(iedServer,&iedModel_PROT_IDDMPDIF_Op_q,quality)){
+				IedServer_updateQuality(iedServer,&iedModel_PROT_IDDMPDIF_Str_q,quality);
+
+				IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_IDDMPDIF_Op_t, currentTime);
+				IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_IDDMPDIF_Str_t, currentTime);
+			}
+
+return true;
+}
+
+/*******************************************************
+ * Set_ID0PDIF наполняем оперативными данными
+ *******************************************************/
+int		Set_ID0PDIF		(uint16_t QTnum, uint64_t currentTime ){
+	Quality 	quality;
+	uint32_t	Mod;
+	uint32_t	Health;
+
+//Health
+			Health = STVALINT32_OK;
+			if ((ucMDiscInBuf[MB_offset_errorM5] & MB_bOffset_errorM5)>0) 				{Health = STVALINT32_Warning;}
+			if ((ucMDiscInBuf[MB_offset_errorM6] & MB_bOffset_errorM6)>0) 				{Health = STVALINT32_Warning;}
+			if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)>0) 	{Health = STVALINT32_Warning;}
+
+			if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_ID0PDIF1_Health_stVal, Health)){
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_ID0PDIF1_Health_t, currentTime);
+				if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_ID0PDIF2_Health_stVal, Health))
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_ID0PDIF2_Health_t, currentTime);
+				if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_ID0PDIF3_Health_stVal, Health))
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_ID0PDIF3_Health_t, currentTime);
+			}
+
+//  Mod Beh
+			if (ucMUstavkiInBuf[MB_offset_DIFF0_1 + MB_offset_DIFF0_Config] & MB_bOffset_DIFF0_Config_Stat) {Mod = STVALINT32_ON;} else {Mod = STVALINT32_OFF;}
+			if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_ID0PDIF1_Mod_stVal, Mod))
+			IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_ID0PDIF1_Mod_t, currentTime);
+			if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_ID0PDIF1_Beh_stVal, Mod))
+			IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_ID0PDIF1_Beh_t, currentTime);
+
+			if (ucMUstavkiInBuf[MB_offset_DIFF0_2 + MB_offset_DIFF0_Config] & MB_bOffset_DIFF0_Config_Stat) {Mod = STVALINT32_ON;} else {Mod = STVALINT32_OFF;}
+			if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_ID0PDIF2_Mod_stVal, Mod))
+			IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_ID0PDIF2_Mod_t, currentTime);
+			if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_ID0PDIF2_Beh_stVal, Mod))
+			IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_ID0PDIF2_Beh_t, currentTime);
+
+			if (ucMUstavkiInBuf[MB_offset_DIFF0_3 + MB_offset_DIFF0_Config] & MB_bOffset_DIFF0_Config_Stat) {Mod = STVALINT32_ON;} else {Mod = STVALINT32_OFF;}
+			if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_ID0PDIF3_Mod_stVal, Mod))
+			IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_ID0PDIF3_Mod_t, currentTime);
+			if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_ID0PDIF3_Beh_stVal, Mod))
+			IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_ID0PDIF3_Beh_t, currentTime);
+
+//  Quality (Mod Beh)
+			quality = QUALITY_VALIDITY_GOOD;
+			if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)>0) {quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+
+			if (IedServer_updateQuality(iedServer,&iedModel_PROT_ID0PDIF1_Mod_q,quality)){
+				IedServer_updateQuality(iedServer,&iedModel_PROT_ID0PDIF1_Beh_q,quality);
+				IedServer_updateQuality(iedServer,&iedModel_PROT_ID0PDIF2_Mod_q,quality);
+				IedServer_updateQuality(iedServer,&iedModel_PROT_ID0PDIF2_Beh_q,quality);
+				IedServer_updateQuality(iedServer,&iedModel_PROT_ID0PDIF3_Mod_q,quality);
+				IedServer_updateQuality(iedServer,&iedModel_PROT_ID0PDIF3_Beh_q,quality);
+
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_ID0PDIF1_Mod_t, currentTime);
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_ID0PDIF1_Beh_t, currentTime);
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_ID0PDIF2_Mod_t, currentTime);
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_ID0PDIF2_Beh_t, currentTime);
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_ID0PDIF3_Mod_t, currentTime);
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_ID0PDIF3_Beh_t, currentTime);
+			}
+
+
+// Str_general
+			if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_PROT_ID0PDIF1_Str_general,  ucMDiscInBuf[MB_offset_IO_ID0_UP1] & MB_b_IO_ID0_UP1))	// И0 Iд0>1
+			IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_ID0PDIF1_Str_t, currentTime);
+			if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_PROT_ID0PDIF2_Str_general,  ucMDiscInBuf[MB_offset_IO_ID0_UP2] & MB_b_IO_ID0_UP2))	// И0 Iд0>2
+			IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_ID0PDIF2_Str_t, currentTime);
+			if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_PROT_ID0PDIF3_Str_general,  ucMDiscInBuf[MB_offset_IO_ID0_UP3] & MB_b_IO_ID0_UP3))	// И0 Iд0>3
+			IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_ID0PDIF3_Str_t, currentTime);
+
+// Op_general
+			if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_PROT_ID0PDIF1_Op_general,  ucMDiscInBuf[MB_offset_SRAB_ID0_UP1] & MB_b_SRAB_ID0_UP1))	// СРАБ Iд0>1
+			IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_ID0PDIF1_Op_t, currentTime);
+			if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_PROT_ID0PDIF2_Op_general,  ucMDiscInBuf[MB_offset_SRAB_ID0_UP2] & MB_b_SRAB_ID0_UP2))	// СРАБ Iд0>2
+			IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_ID0PDIF2_Op_t, currentTime);
+			if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_PROT_ID0PDIF3_Op_general,  ucMDiscInBuf[MB_offset_SRAB_ID0_UP3] & MB_b_SRAB_ID0_UP3))	// СРАБ Iд0>3
+			IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_ID0PDIF3_Op_t, currentTime);
+
+
+			quality = QUALITY_VALIDITY_GOOD;
+			if ((ucMDiscInBuf[MB_offset_errorM5] & MB_bOffset_errorM5)>0) 				{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+			if ((ucMDiscInBuf[MB_offset_errorM6] & MB_bOffset_errorM6)>0) 				{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+			if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)>0) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+
+			if (IedServer_updateQuality(iedServer,&iedModel_PROT_ID0PDIF1_Op_q,quality)){
+				IedServer_updateQuality(iedServer,&iedModel_PROT_ID0PDIF1_Str_q,quality);
+				IedServer_updateQuality(iedServer,&iedModel_PROT_ID0PDIF2_Op_q,quality);
+				IedServer_updateQuality(iedServer,&iedModel_PROT_ID0PDIF2_Str_q,quality);
+				IedServer_updateQuality(iedServer,&iedModel_PROT_ID0PDIF3_Op_q,quality);
+				IedServer_updateQuality(iedServer,&iedModel_PROT_ID0PDIF3_Str_q,quality);
+
+				IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_ID0PDIF1_Str_t, currentTime);
+				IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_ID0PDIF2_Str_t, currentTime);
+				IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_ID0PDIF3_Str_t, currentTime);
+
+				IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_ID0PDIF1_Op_t, currentTime);
+				IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_ID0PDIF2_Op_t, currentTime);
+				IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_ID0PDIF3_Op_t, currentTime);
+			}
+return true;
+}
+#endif
+/*******************************************************
+ * MR801 OLD
+ *******************************************************/
+
+#if defined	(MR801) && defined (OLD)
 #include "static_model_MR801.h"
 
+extern uint16_t   ucMDiscInBuf[MB_Size_Discreet];
+#if defined (AN_PERV)
+extern float   ucMAnalogInBuf[];
+#else
+	#if defined (AN_DUBLEDATA)
+	extern	uint32_t   ucMAnalogInBuf[MB_Size_Analog/2];
+	#else
+	extern	uint16_t   ucMAnalogInBuf[MB_Size_Analog];
+	#endif
+#endif
+extern uint16_t   ucMUstavkiInBuf[MB_Size_Ustavki];
+extern uint16_t   ucConfigTRPWRBuf[MB_Size_ConfigTRPWR];
 
-extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
-extern uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
-extern uint16_t   ucMUstavkiInBuf[MB_NumbUstavki];
-extern uint16_t   ucConfigTRPWRBuf[MB_NumbConfigTRPWR];
+
 
 /*******************************************************
  * заглушки
@@ -110,9 +495,9 @@ int		Set_IDPDIF	(uint16_t QTnum, uint64_t currentTime )
 
 	//Health
 				uint32_t	Health = STVALINT32_OK;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule4) 		{Health = STVALINT32_Warning;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule5) 		{Health = STVALINT32_Warning;}
-				if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffsetUstavki)) {Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM4) 		{Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM5) 		{Health = STVALINT32_Warning;}
+				if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)) {Health = STVALINT32_Warning;}
 
 				if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_IDPDIF_Health_stVal, Health))
 				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_IDPDIF_Health_t, currentTime);
@@ -130,7 +515,7 @@ int		Set_IDPDIF	(uint16_t QTnum, uint64_t currentTime )
 
 	//  Quality (Mod Beh)
 				quality = QUALITY_VALIDITY_GOOD;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) {quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) {quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 
 				if (IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF_Mod_q,quality)){
 					IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF_Beh_q,quality);
@@ -258,9 +643,9 @@ int		Set_IDDPDIF	(uint16_t QTnum, uint64_t currentTime )
 
 	//Health
 				Health = STVALINT32_OK;
-				if (ucMDiscInBuf[MB_offset_errorM4] & MB_bOffsetModule4) 	{Health = STVALINT32_Warning;}
-				if (ucMDiscInBuf[MB_offset_errorM5] & MB_bOffsetModule5) 	{Health = STVALINT32_Warning;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) 	{Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offset_errorM4] & MB_bOffset_errorM4) 	{Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offset_errorM5] & MB_bOffset_errorM5) 	{Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) 	{Health = STVALINT32_Warning;}
 
 				if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_IDDPDIF_Health_stVal, Health))
 					IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_IDDPDIF_Health_t, currentTime);
@@ -275,7 +660,7 @@ int		Set_IDDPDIF	(uint16_t QTnum, uint64_t currentTime )
 
 //  Quality (Mod Beh)
 				quality = QUALITY_VALIDITY_GOOD;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) {quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) {quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 
 				IedServer_updateQuality(iedServer,&iedModel_PROT_IDDPDIF_Mod_q,quality);
 				IedServer_updateQuality(iedServer,&iedModel_PROT_IDDPDIF_Beh_q,quality);
@@ -289,9 +674,9 @@ int		Set_IDDPDIF	(uint16_t QTnum, uint64_t currentTime )
 					IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_IDDPDIF_Op_t, currentTime);
 
 				quality = QUALITY_VALIDITY_GOOD;
-				if (ucMDiscInBuf[MB_offset_errorM4] & MB_bOffsetModule4) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offset_errorM5] & MB_bOffsetModule5) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offset_errorM4] & MB_bOffset_errorM4) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offset_errorM5] & MB_bOffset_errorM5) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 
 				if (IedServer_updateQuality(iedServer,&iedModel_PROT_IDDPDIF_Op_q,quality)){
 				IedServer_updateQuality(iedServer,&iedModel_PROT_IDDPDIF_Str_q,quality);
@@ -306,9 +691,9 @@ int		Set_IDDMPDIF	(uint16_t QTnum, uint64_t currentTime )
 	 Quality quality;
 	//Health
 				uint32_t	Health = STVALINT32_OK;
-				if (ucMDiscInBuf[MB_offset_errorM4] & MB_bOffsetModule4) 		{Health = STVALINT32_Warning;}
-				if (ucMDiscInBuf[MB_offset_errorM5] & MB_bOffsetModule5) 		{Health = STVALINT32_Warning;}
-				if (ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffsetUstavki) 	{Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offset_errorM4] & MB_bOffset_errorM4) 		{Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offset_errorM5] & MB_bOffset_errorM5) 		{Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki) 	{Health = STVALINT32_Warning;}
 
 				if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_IDDMPDIF_Health_stVal, Health))
 				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_IDDMPDIF_Health_t, currentTime);
@@ -330,7 +715,7 @@ int		Set_IDDMPDIF	(uint16_t QTnum, uint64_t currentTime )
 
 	//  Quality (Mod Beh)
 				quality = QUALITY_VALIDITY_GOOD;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) {quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) {quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 
 				IedServer_updateQuality(iedServer,&iedModel_PROT_IDDMPDIF_Mod_q,quality);
 				IedServer_updateQuality(iedServer,&iedModel_PROT_IDDMPDIF_Beh_q,quality);
@@ -346,9 +731,9 @@ int		Set_IDDMPDIF	(uint16_t QTnum, uint64_t currentTime )
 
 
 				quality = QUALITY_VALIDITY_GOOD;
-				if (ucMDiscInBuf[MB_offset_errorM4] & MB_bOffsetModule4) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offset_errorM5] & MB_bOffsetModule5) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffsetUstavki) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offset_errorM4] & MB_bOffset_errorM4) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offset_errorM5] & MB_bOffset_errorM5) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 
 				if (IedServer_updateQuality(iedServer,&iedModel_PROT_IDDMPDIF_Op_q,quality)){
 					IedServer_updateQuality(iedServer,&iedModel_PROT_IDDMPDIF_Str_q,quality);
@@ -369,8 +754,8 @@ uint32_t	Mod;
 uint32_t	Health;
 //Health
 			Health = STVALINT32_OK;
-			if ((ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule4) || (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule5)) {Health = STVALINT32_Warning;}
-			if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) 	{Health = STVALINT32_Warning;}
+			if ((ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM4) || (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM5)) {Health = STVALINT32_Warning;}
+			if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) 	{Health = STVALINT32_Warning;}
 
 			if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_ID0PDIF1_Health_stVal, Health)){
 				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_ID0PDIF1_Health_t, currentTime);
@@ -401,7 +786,7 @@ uint32_t	Health;
 
 //  Quality (Mod Beh)
 			quality = QUALITY_VALIDITY_GOOD;
-			if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) {quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+			if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) {quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 
 			if (IedServer_updateQuality(iedServer,&iedModel_PROT_ID0PDIF1_Mod_q,quality)){
 				IedServer_updateQuality(iedServer,&iedModel_PROT_ID0PDIF1_Beh_q,quality);
@@ -437,9 +822,9 @@ uint32_t	Health;
 
 
 			quality = QUALITY_VALIDITY_GOOD;
-			if (ucMDiscInBuf[MB_offset_errorM4] & MB_bOffsetModule4) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-			if (ucMDiscInBuf[MB_offset_errorM5] & MB_bOffsetModule5) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-			if (ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffsetUstavki) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+			if (ucMDiscInBuf[MB_offset_errorM4] & MB_bOffset_errorM4) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+			if (ucMDiscInBuf[MB_offset_errorM5] & MB_bOffset_errorM5) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+			if (ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 
 			if (IedServer_updateQuality(iedServer,&iedModel_PROT_ID0PDIF1_Op_q,quality)){
 				IedServer_updateQuality(iedServer,&iedModel_PROT_ID0PDIF1_Str_q,quality);
@@ -465,10 +850,18 @@ uint32_t	Health;
 #include "static_model_MR901_902.h"
 
 
-extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
-extern uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
-extern uint16_t   ucMUstavkiInBuf[MB_NumbUstavki];
-extern uint16_t   ucOtherUstavkiInBuf[MB_NumbOtherUstavki];
+extern uint16_t   ucMDiscInBuf[MB_Size_Discreet];
+#if defined (AN_PERV)
+extern float   ucMAnalogInBuf[];
+#else
+	#if defined (AN_DUBLEDATA)
+	extern	uint32_t   ucMAnalogInBuf[MB_Size_Analog/2];
+	#else
+	extern	uint16_t   ucMAnalogInBuf[MB_Size_Analog];
+	#endif
+#endif
+extern uint16_t   ucMUstavkiInBuf[MB_Size_Ustavki];
+extern uint16_t   ucOtherUstavkiInBuf[MB_Size_OtherUstavki];
 
 /*******************************************************
  * заглушки
@@ -494,20 +887,23 @@ int		Set_IDPDIF	(uint16_t QTnum, uint64_t currentTime )
 
 	//Health
 				Health = STVALINT32_OK;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule4) {Health = STVALINT32_Warning;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule5) {Health = STVALINT32_Warning;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) {Health = STVALINT32_Warning;}
-				if (ucMDiscInBuf[MB_offsetHardFaults1] & MB_bOffsetErrorTT1) {Health = STVALINT32_Warning;}
-				if (ucMDiscInBuf[MB_offsetHardFaults1] & MB_bOffsetErrorTT2) {Health = STVALINT32_Warning;}
-				if (ucMDiscInBuf[MB_offsetHardFaults1] & MB_bOffsetErrorTT3) {Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM4) {Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM5) {Health = STVALINT32_Warning;}
+#if  defined (T24N0D24R51) || defined (T24N0D32R43) || defined (T24N0D40R35) || defined (T20N4D40R35)
+				if (ucMDiscInBuf[MB_offset_errorM6] & MB_bOffset_errorM6) {Health = STVALINT32_Warning;}
+#endif
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) {Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offset_errorHard1] & MB_bOffsetErrorTT1) {Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offset_errorHard1] & MB_bOffsetErrorTT2) {Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offset_errorHard1] & MB_bOffsetErrorTT3) {Health = STVALINT32_Warning;}
 
 
 				if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_IDPDIF1_Health_stVal, Health)){
 					IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_IDPDIF1_Health_t, currentTime);
-						if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_IDPDIF2_Health_stVal, Health))
-							IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_IDPDIF2_Health_t, currentTime);
-						if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_IDPDIF3_Health_stVal, Health))
-							IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_IDPDIF3_Health_t, currentTime);
+				if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_IDPDIF2_Health_stVal, Health))
+					IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_IDPDIF2_Health_t, currentTime);
+				if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_IDPDIF3_Health_stVal, Health))
+					IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_IDPDIF3_Health_t, currentTime);
 				}
 
 
@@ -536,7 +932,7 @@ int		Set_IDPDIF	(uint16_t QTnum, uint64_t currentTime )
 
 	//  Quality (Mod Beh)
 				quality = QUALITY_VALIDITY_GOOD;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) {quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) {quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 
 				if (IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF1_Mod_q,quality)){
 					IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF1_Beh_q,quality);
@@ -555,10 +951,13 @@ int		Set_IDPDIF	(uint16_t QTnum, uint64_t currentTime )
 
 	// DifACIc RstA
 				quality = QUALITY_VALIDITY_GOOD;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule4) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule5) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults1] & MB_bOffsetErrorTT1) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if ((ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM4)>0) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if ((ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM5)>0) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+#if  defined (T24N0D24R51) || defined (T24N0D32R43) || defined (T24N0D40R35) || defined (T20N4D40R35)
+				if ((ucMDiscInBuf[MB_offset_errorM6] & MB_bOffset_errorM6)>0) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+#endif
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offset_errorHard1] & MB_bOffsetErrorTT1) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 
 				if (IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF1_DifACIc_phsA_q,quality)){
 					IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF1_RstA_phsA_q,quality);
@@ -574,10 +973,13 @@ int		Set_IDPDIF	(uint16_t QTnum, uint64_t currentTime )
 				}
 
 				quality = QUALITY_VALIDITY_GOOD;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule4) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule5) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults1] & MB_bOffsetErrorTT2) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM4) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM5) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+#if  defined (T24N0D24R51) || defined (T24N0D32R43) || defined (T24N0D40R35) || defined (T20N4D40R35)
+				if ((ucMDiscInBuf[MB_offset_errorM6] & MB_bOffset_errorM6)>0) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+#endif
+			if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offset_errorHard1] & MB_bOffsetErrorTT2) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 
 				if (IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF2_DifACIc_phsA_q,quality)){
 					IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF2_RstA_phsA_q,quality);
@@ -593,10 +995,13 @@ int		Set_IDPDIF	(uint16_t QTnum, uint64_t currentTime )
 				}
 
 				quality = QUALITY_VALIDITY_GOOD;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule4) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule5) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults1] & MB_bOffsetErrorTT3)	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM4) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM5) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+#if  defined (T24N0D24R51) || defined (T24N0D32R43) || defined (T24N0D40R35) || defined (T20N4D40R35)
+				if ((ucMDiscInBuf[MB_offset_errorM6] & MB_bOffset_errorM6)>0) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+#endif
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offset_errorHard1] & MB_bOffsetErrorTT3)	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 
 				if (IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF3_DifACIc_phsA_q,quality)){
 					IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF3_RstA_phsA_q,quality);
@@ -632,11 +1037,34 @@ int		Set_IDPDIF	(uint16_t QTnum, uint64_t currentTime )
 				uint8_t i;
 				// ищем максимум тока. можно после вычитывания уставок
 				Max = ucOtherUstavkiInBuf[MB_offset_Config_Pris1 + MB_offset_KTT];
+#if defined (OLD)
 				for (i=0;i<16;i++){
-					if (ucOtherUstavkiInBuf[MB_offset_Config_Pris1 + MB_offset_KTT + i*6] > Max){
-						Max = ucOtherUstavkiInBuf[MB_offset_Config_Pris1 + MB_offset_KTT + i*6];
+					if (ucOtherUstavkiInBuf[MB_offset_Config_Pris1 + MB_offset_Config_Pris_Stat + i*MB_Prisx_Increment] != 0){
+						if (ucOtherUstavkiInBuf[MB_offset_Config_Pris1 + MB_offset_KTT + i*6] > Max){
+							Max = ucOtherUstavkiInBuf[MB_offset_Config_Pris1 + MB_offset_KTT + i*6];
+						}
 					}
 				}
+#endif
+#if defined (T20N4D40R35)
+				for (i=0;i<20;i++){
+					if (ucOtherUstavkiInBuf[MB_offset_Config_Pris1 + MB_offset_Config_Pris_Stat + i*MB_Prisx_Increment] != 0){
+						if (ucOtherUstavkiInBuf[MB_offset_Config_Pris1 + MB_offset_KTT + i*MB_Prisx_Increment] > Max){
+							Max = ucOtherUstavkiInBuf[MB_offset_Config_Pris1 + MB_offset_KTT + i*MB_Prisx_Increment];
+						}
+					}
+				}
+#endif
+#if  defined (T24N0D24R51) || defined (T24N0D32R43) || defined (T24N0D40R35)
+				for (i=0;i<24;i++){
+					if (ucOtherUstavkiInBuf[MB_offset_Config_Pris1 + MB_offset_Config_Pris_Stat + i*MB_Prisx_Increment] != 0){
+						if (ucOtherUstavkiInBuf[MB_offset_Config_Pris1 + MB_offset_KTT + i*MB_Prisx_Increment] > Max){
+							Max = ucOtherUstavkiInBuf[MB_offset_Config_Pris1 + MB_offset_KTT + i*MB_Prisx_Increment];
+						}
+					}
+				}
+#endif
+
 				K = range_maxPris * Max / 65535;
 				diapazon = (float)range_maxPris * Max;
 // DifACIc
@@ -742,12 +1170,12 @@ int		Set_IDPDIF	(uint16_t QTnum, uint64_t currentTime )
 
 	//Health
 				Health = STVALINT32_OK;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule4) {Health = STVALINT32_Warning;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule5) {Health = STVALINT32_Warning;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) {Health = STVALINT32_Warning;}
-				if (ucMDiscInBuf[MB_offsetHardFaults1] & MB_bOffsetErrorTT1) {Health = STVALINT32_Warning;}
-				if (ucMDiscInBuf[MB_offsetHardFaults1] & MB_bOffsetErrorTT2) {Health = STVALINT32_Warning;}
-				if (ucMDiscInBuf[MB_offsetHardFaults1] & MB_bOffsetErrorTT3) {Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM4) {Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM5) {Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) {Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offset_errorHard1] & MB_bOffsetErrorTT1) {Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offset_errorHard1] & MB_bOffsetErrorTT2) {Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offset_errorHard1] & MB_bOffsetErrorTT3) {Health = STVALINT32_Warning;}
 
 
 				if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_IDPDIF1_Health_stVal, Health)){
@@ -784,7 +1212,7 @@ int		Set_IDPDIF	(uint16_t QTnum, uint64_t currentTime )
 
 	//  Quality (Mod Beh)
 				quality = QUALITY_VALIDITY_GOOD;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) {quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) {quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 
 				if (IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF1_Mod_q,quality)){
 					IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF1_Beh_q,quality);
@@ -803,10 +1231,10 @@ int		Set_IDPDIF	(uint16_t QTnum, uint64_t currentTime )
 
 	// DifACIc RstA
 				quality = QUALITY_VALIDITY_GOOD;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule4) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule5) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults1] & MB_bOffsetErrorTT1) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM4) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM5) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offset_errorHard1] & MB_bOffsetErrorTT1) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 
 				if (IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF1_DifACIc_phsA_q,quality)){
 					IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF1_RstA_phsA_q,quality);
@@ -830,10 +1258,10 @@ int		Set_IDPDIF	(uint16_t QTnum, uint64_t currentTime )
 				}
 
 				quality = QUALITY_VALIDITY_GOOD;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule4) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule5) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults1] & MB_bOffsetErrorTT2) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM4) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM5) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offset_errorHard1] & MB_bOffsetErrorTT2) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 
 				if(IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF2_DifACIc_phsA_q,quality)){
 					IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF2_RstA_phsA_q,quality);
@@ -856,10 +1284,10 @@ int		Set_IDPDIF	(uint16_t QTnum, uint64_t currentTime )
 }
 
 				quality = QUALITY_VALIDITY_GOOD;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule4) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule5) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults1] & MB_bOffsetErrorTT3) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM4) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM5) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offset_errorHard1] & MB_bOffsetErrorTT3) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 
 				if (IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF3_DifACIc_phsA_q,quality)){
 					IedServer_updateQuality(iedServer,&iedModel_PROT_IDPDIF3_RstA_phsA_q,quality);
@@ -1152,12 +1580,15 @@ int		Set_IDMPDIF	(uint16_t QTnum, uint64_t currentTime )
 
 //Health
 				uint32_t	Health = STVALINT32_OK;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule4) 		{Health = STVALINT32_Warning;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule5) 		{Health = STVALINT32_Warning;}
-				if (ucMDiscInBuf[MB_offsetHardFaults1] & MB_bOffsetErrorTT1) 	{Health = STVALINT32_Warning;}
-				if (ucMDiscInBuf[MB_offsetHardFaults1] & MB_bOffsetErrorTT2) 	{Health = STVALINT32_Warning;}
-				if (ucMDiscInBuf[MB_offsetHardFaults1] & MB_bOffsetErrorTT3) 	{Health = STVALINT32_Warning;}
-				if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffsetUstavki)) {Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM4) 		{Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM5) 		{Health = STVALINT32_Warning;}
+#if  defined (T24N0D24R51) || defined (T24N0D32R43) || defined (T24N0D40R35) || defined (T20N4D40R35)
+				if (ucMDiscInBuf[MB_offset_errorM6] & MB_bOffset_errorM6) {Health = STVALINT32_Warning;}
+#endif
+				if (ucMDiscInBuf[MB_offset_errorHard1] & MB_bOffsetErrorTT1) 	{Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offset_errorHard1] & MB_bOffsetErrorTT2) 	{Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offset_errorHard1] & MB_bOffsetErrorTT3) 	{Health = STVALINT32_Warning;}
+				if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)) {Health = STVALINT32_Warning;}
 
 				if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_PROT_IDMPDIF1_Health_stVal, Health)){
 					IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_IDMPDIF1_Health_t, currentTime);
@@ -1192,7 +1623,7 @@ int		Set_IDMPDIF	(uint16_t QTnum, uint64_t currentTime )
 
 	//  Quality (Mod Beh)
 				quality = QUALITY_VALIDITY_GOOD;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 				if (IedServer_updateQuality(iedServer,&iedModel_PROT_IDMPDIF1_Mod_q,quality)){
 					IedServer_updateQuality(iedServer,&iedModel_PROT_IDMPDIF1_Beh_q,quality);
 
@@ -1201,7 +1632,7 @@ int		Set_IDMPDIF	(uint16_t QTnum, uint64_t currentTime )
 				}
 
 				quality = QUALITY_VALIDITY_GOOD;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 				if (IedServer_updateQuality(iedServer,&iedModel_PROT_IDMPDIF2_Mod_q,quality)){
 					IedServer_updateQuality(iedServer,&iedModel_PROT_IDMPDIF2_Beh_q,quality);
 					IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_IDMPDIF2_Mod_t, currentTime);
@@ -1209,7 +1640,7 @@ int		Set_IDMPDIF	(uint16_t QTnum, uint64_t currentTime )
 				}
 
 				quality = QUALITY_VALIDITY_GOOD;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 				if (IedServer_updateQuality(iedServer,&iedModel_PROT_IDMPDIF3_Mod_q,quality)){
 					IedServer_updateQuality(iedServer,&iedModel_PROT_IDMPDIF3_Beh_q,quality);
 					IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_PROT_IDMPDIF3_Mod_t, currentTime);
@@ -1226,28 +1657,37 @@ int		Set_IDMPDIF	(uint16_t QTnum, uint64_t currentTime )
 					IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_IDMPDIF3_Op_t, currentTime);
 
 				quality = QUALITY_VALIDITY_GOOD;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule4) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule5) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults1] & MB_bOffsetErrorTT1) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM4) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM5) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+#if  defined (T24N0D24R51) || defined (T24N0D32R43) || defined (T24N0D40R35) || defined (T20N4D40R35)
+				if ((ucMDiscInBuf[MB_offset_errorM6] & MB_bOffset_errorM6)>0) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+#endif
+				if (ucMDiscInBuf[MB_offset_errorHard1] & MB_bOffsetErrorTT1) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 				if (IedServer_updateQuality(iedServer,&iedModel_PROT_IDMPDIF1_Op_q,quality)){
 					IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_IDMPDIF1_Op_t, currentTime);
 				}
 
 				quality = QUALITY_VALIDITY_GOOD;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule4) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule5) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults1] & MB_bOffsetErrorTT2) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM4) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM5) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+#if  defined (T24N0D24R51) || defined (T24N0D32R43) || defined (T24N0D40R35) || defined (T20N4D40R35)
+				if ((ucMDiscInBuf[MB_offset_errorM6] & MB_bOffset_errorM6)>0) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+#endif
+				if (ucMDiscInBuf[MB_offset_errorHard1] & MB_bOffsetErrorTT2) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 				if (IedServer_updateQuality(iedServer,&iedModel_PROT_IDMPDIF2_Op_q,quality)){
 					IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_IDMPDIF2_Op_t, currentTime);
 				}
 
 				quality = QUALITY_VALIDITY_GOOD;
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule4) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetModule5) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
-				if (ucMDiscInBuf[MB_offsetHardFaults1] & MB_bOffsetErrorTT3) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorUstavki) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM4) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorM5) 		{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+#if  defined (T24N0D24R51) || defined (T24N0D32R43) || defined (T24N0D40R35) || defined (T20N4D40R35)
+				if ((ucMDiscInBuf[MB_offset_errorM6] & MB_bOffset_errorM6)>0) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+#endif
+				if (ucMDiscInBuf[MB_offset_errorHard1] & MB_bOffsetErrorTT3) 	{quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 				if (IedServer_updateQuality(iedServer,&iedModel_PROT_IDMPDIF3_Op_q,quality)){
 					IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_PROT_IDMPDIF3_Op_t, currentTime);
 				}

@@ -28,6 +28,7 @@
 #include "iso_connection_parameters.h"
 
 #include "hal_socket.h"
+#include "net.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,26 +45,6 @@ typedef enum
     ISO_SVR_STATE_STOPPED,
     ISO_SVR_STATE_ERROR
 } IsoServerState;
-
-typedef enum
-{
-	PHY_SWITCH_DEFAULT,
-    PHY_SWITCH_OFF,
-    PHY_SWITCH_FORWARD_ALL,
-    PHY_SWITCH_FORWARD_STORM_PROTECT,
-    PHY_SWITCH_PRP,
-    PHY_SWITCH_HSR,
-    PHY_SWITCH_BLOCKING,
-    PHY_SWITCH_GOOSE_MAC_FILTERING,
-} PhyPortsMode;
-
-typedef enum
-{
-	PHY_PORT_1,
-	PHY_PORT_2,
-	PHY_PORT_1_2,
-} PhyPortsForTransmit;
-
 
 typedef struct sIsoServer* IsoServer;
 
@@ -104,7 +85,8 @@ void*
 IsoConnection_getSecurityToken(IsoConnection self);
 
 
-void		handleNTPConnectionsThreadless(IsoServer self);
+//void		handleNTPConnectionsThreadless(IsoServer self);
+void		handleNTPConnectionsThreadless(Socket NTPSocket, int NTPPort);
 /**
  * \brief send a message over an ISO connection
  *
@@ -165,28 +147,6 @@ IsoServer_getMaskAddress(IsoServer self);
 
 IsoServerState
 IsoServer_getState(IsoServer self);
-
-PhyPortsForTransmit
-IsoServer_getPHYTransmitport(IsoServer self);
-
-
-void		IsoServer_PRP_on(IsoServer self);
-void		IsoServer_PRP_off(IsoServer self);
-void		IsoServer_PRPSeqNum_increase(IsoServer self);
-void		IsoServer_PRPSeqNum_reset(IsoServer self);
-bool		IsoServer_getAppendPRP(IsoServer self);
-uint16_t	IsoServer_getprpSeqNum(IsoServer self);
-
-
-bool		IsoServer_getAppendHSR(IsoServer self);
-uint16_t	IsoServer_gethsrSeqNum(IsoServer self);
-void		IsoServer_HSR_on(IsoServer self);
-void		IsoServer_HSR_off(IsoServer self);
-void		IsoServer_HSRSeqNum_increase(IsoServer self);
-void		IsoServer_HSRSeqNum_reset(IsoServer self);
-
-void
-IsoServer_setPHYTransmitport(IsoServer self, PhyPortsForTransmit ports);
 
 void
 IsoServer_setConnectionHandler(IsoServer self, ConnectionIndicationHandler handler,

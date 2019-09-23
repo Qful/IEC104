@@ -44,6 +44,11 @@ extern "C" {
  * the required memory for the struct sLogStorage data structure and populate the function
  * pointers with provider specific implementation functions.
  *
+ * Ётот интерфейс должен быть реализован поставщиком хранилища журналов. ѕоставщик хранилища журналов
+ * должен предоставить специальный конструктор, который создает экземпл€р LogStorage, выдел€€ необходимую
+ * пам€ть дл€ структуры данных struct sLogStorage и заполн€€ указатели функций функци€ми реализации,
+ * специфичными дл€ поставщика.
+ *
  * @{
  */
 
@@ -79,23 +84,13 @@ typedef bool (*LogEntryDataCallback) (void* parameter, const char* dataRef, uint
 struct sLogStorage {
 
     void* instanceData;
-
     int maxLogEntries;
-
-    uint64_t (*addEntry) (LogStorage self, uint64_t timestamp);
-
-    bool (*addEntryData) (LogStorage self, uint64_t entryID, const char* dataRef, uint8_t* data, int dataSize, uint8_t reasonCode);
-
-    bool (*getEntries) (LogStorage self, uint64_t startingTime, uint64_t endingTime,
-            LogEntryCallback entryCallback, LogEntryDataCallback entryDataCallback, void* parameter);
-
-    bool (*getEntriesAfter) (LogStorage self, uint64_t startingTime, uint64_t entryID,
-            LogEntryCallback entryCallback, LogEntryDataCallback entryDataCallback, void* parameter);
-
-    bool (*getOldestAndNewestEntries) (LogStorage self, uint64_t* newEntry, uint64_t* newEntryTime,
-            uint64_t* oldEntry, uint64_t* oldEntryTime);
-
-    void (*destroy) (LogStorage self);
+    uint64_t (*addEntry) 				(LogStorage self, uint64_t timestamp);
+    bool (*addEntryData) 				(LogStorage self, uint64_t entryID, const char* dataRef, uint8_t* data, int dataSize, uint8_t reasonCode);
+    bool (*getEntries) 					(LogStorage self, uint64_t startingTime, uint64_t endingTime, LogEntryCallback entryCallback, LogEntryDataCallback entryDataCallback, void* parameter);
+    bool (*getEntriesAfter) 			(LogStorage self, uint64_t startingTime, uint64_t entryID, LogEntryCallback entryCallback, LogEntryDataCallback entryDataCallback, void* parameter);
+    bool (*getOldestAndNewestEntries) 	(LogStorage self, uint64_t* newEntry, uint64_t* newEntryTime, uint64_t* oldEntry, uint64_t* oldEntryTime);
+    void (*destroy) 					(LogStorage self);
 };
 
 

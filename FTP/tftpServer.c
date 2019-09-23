@@ -101,7 +101,7 @@ void StartTFTPTask(void const * argument){
 
   IsoServer_SetTFTPort(isoServer,TFTP_Port);
 
-  IsoServer_SetTFTPServerSocket(isoServer,TcpServerSocket_create(IsoServer_getLocalIpAddress(isoServer), TFTP_Port));
+  IsoServer_SetTFTPServerSocket(isoServer,TcpServerSocket_create(IsoServer_getLocalIpAddress(isoServer), TFTP_Port, true));
   USART_TRACE_GREEN("TFTP_SERVER: localIpAddress: %s Port: %u\n", IsoServer_getLocalIpAddress(isoServer),(int)TFTP_Port);
 
   ServerSocket_setBacklog((ServerSocket) IsoServer_GetTFTPServerSocket(isoServer), 1);		// установим очередь ожидающих

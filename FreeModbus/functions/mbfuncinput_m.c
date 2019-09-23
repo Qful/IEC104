@@ -73,30 +73,34 @@ eMBException    prveMBError2Exception( eMBErrorCode eErrorCode );
 eMBMasterReqErrCode
 eMBMasterReqReadInputRegister( UCHAR ucSndAddr, USHORT usRegAddr, USHORT usNRegs, LONG lTimeOut )
 {
-    uint8_t					SizeAnswer;
-    uint8_t					SizeData;
+	uint16_t				SizeAnswer;
+	uint16_t				SizeData = usNRegs << 1;
     UCHAR                 	*ucMBFrame;
     eMBMasterReqErrCode   	eErrStatus = MB_MRE_NO_ERR;
 
-    if ( ucSndAddr > MB_MASTER_TOTAL_SLAVE_NUM ) eErrStatus = MB_MRE_ILL_ARG;
-    else if ( xMBMasterRunResTake( lTimeOut ) == FALSE ) eErrStatus = MB_MRE_MASTER_BUSY;
+	if 		(SizeData > (MaxSizeBlok_3_4*2)) 				eErrStatus = MB_MRE_ILL_ARG;		// недопустимый размер запроса для текущей функции
+	else if ( ucSndAddr > MB_MASTER_TOTAL_SLAVE_NUM ) 		eErrStatus = MB_MRE_ILL_ARG;
+    else if ( xMBMasterRunResTake( lTimeOut ) == FALSE ) 	eErrStatus = MB_MRE_MASTER_BUSY;
     else
     {
-    	SizeData = usNRegs << 1;
+//    	SizeData = usNRegs << 1;
     	SizeAnswer = SizeAddr+SizeFunct+1+SizeCRC+SizeData;
+		xModbus_Set_SizeAnswer(SizeAnswer,usRegAddr);
 
+		vMBMasterSetDestAddress(ucSndAddr);
+		vMBMasterSetPDUSndLength( MB_PDU_SIZE_MIN + MB_PDU_REQ_READ_SIZE );
 
 		vMBMasterGetPDUSndBuf(&ucMBFrame);
-		vMBMasterSetDestAddress(ucSndAddr);
+
 		ucMBFrame[MB_PDU_FUNC_OFF]                = MB_FUNC_READ_INPUT_REGISTER;
 		ucMBFrame[MB_PDU_REQ_READ_ADDR_OFF]       = usRegAddr >> 8;
 		ucMBFrame[MB_PDU_REQ_READ_ADDR_OFF + 1]   = usRegAddr;
 		ucMBFrame[MB_PDU_REQ_READ_REGCNT_OFF]     = usNRegs >> 8;
 		ucMBFrame[MB_PDU_REQ_READ_REGCNT_OFF + 1] = usNRegs;
-		vMBMasterSetPDUSndLength( MB_PDU_SIZE_MIN + MB_PDU_REQ_READ_SIZE );
-		xModbus_Set_SizeAnswer(SizeAnswer,usRegAddr);
+
+
 		( void ) xMBMasterPortEventPost( EV_MASTER_FRAME_SENT );
-		eErrStatus = eMBMasterWaitRequestFinish( );
+//		eErrStatus = eMBMasterWaitRequestFinish( );
     }
     return eErrStatus;
 }
@@ -133,7 +137,7 @@ eMBException		eMBMasterFuncReadInputRegister( UCHAR * pucFrame, USHORT * usLen )
         if( ( usRegCount >= 1 ) && ( 2 * usRegCount == pucFrame[MB_PDU_FUNC_READ_BYTECNT_OFF] ) )
         {
             /* Make callback to fill the buffer. */
-            eRegStatus = eMBMasterRegInputCB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], 1/*usRegAddress-MB_StartAnalogINaddr*/, usRegCount );
+            eRegStatus = eMBMasterRegInputCB( &pucFrame[MB_PDU_FUNC_READ_VALUES_OFF], 1/*usRegAddress-MB_Addr_Analog*/, usRegCount );
             /* If an error occured convert it into a Modbus exception. */
             if( eRegStatus != MB_ENOERR )
             {

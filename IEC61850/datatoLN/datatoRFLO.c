@@ -64,6 +64,17 @@ int		Set_RFLO	(uint16_t QTnum, uint64_t currentTime ){return false;}
 
 #endif
 /*******************************************************
+ * MR761OBR
+ *******************************************************/
+#if defined (MR761OBR)
+
+/*******************************************************
+ * заглушки
+ *******************************************************/
+int		Set_RFLO	(uint16_t QTnum, uint64_t currentTime ){return false;}
+
+#endif
+/*******************************************************
  * MR771 MR761 MR762 MR763
  *******************************************************/
 #if defined	(MR771) || defined	(MR761) || defined	(MR762) || defined	(MR763)
@@ -77,9 +88,17 @@ int		Set_RFLO	(uint16_t QTnum, uint64_t currentTime ){return false;}
 #endif
 
 
-extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
-extern uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
-extern uint16_t   ucMUstavkiInBuf[MB_NumbUstavki];
+extern uint16_t   ucMDiscInBuf[MB_Size_Discreet];
+#if defined (AN_PERV)
+extern float   ucMAnalogInBuf[];
+#else
+	#if defined (AN_DUBLEDATA)
+	extern	uint32_t   ucMAnalogInBuf[MB_Size_Analog/2];
+	#else
+	extern	uint16_t   ucMAnalogInBuf[MB_Size_Analog];
+	#endif
+#endif
+extern uint16_t   ucMUstavkiInBuf[MB_Size_Ustavki];
 
 /*******************************************************
  * Set_RFLO наполняем оперативными данными
@@ -119,15 +138,15 @@ int		Set_RFLO	(uint16_t QTnum, uint64_t currentTime )
 
 			Health = STVALINT32_OK;
 
-				if (ucMDiscInBuf[MB_offset_errorM5] & MB_bOffsetModule5) {Health = STVALINT32_Warning;}
-				if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffsetUstavki)) {Health = STVALINT32_Warning;}
+				if (ucMDiscInBuf[MB_offset_errorM5] & MB_bOffset_errorM5) {Health = STVALINT32_Warning;}
+				if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)) {Health = STVALINT32_Warning;}
 				if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_MES_RFLO1_Health_stVal, Health))
 					IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_MES_RFLO1_Health_t, currentTime);
 
 
 	//  Quality (Mod Beh)
 				Qual = QUALITY_VALIDITY_GOOD;
-				if (ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffsetUstavki) {Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+				if (ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki) {Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 
 				IedServer_updateQuality(iedServer,&iedModel_MES_RFLO1_Mod_q,Qual);
 				IedServer_updateQuality(iedServer,&iedModel_MES_RFLO1_Beh_q,Qual);
@@ -200,8 +219,8 @@ int		Set_RFLO	(uint16_t QTnum, uint64_t currentTime )
 				IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_MES_RFLO1_Fltz_t, currentTime);
 				// качество меняем на момент изменения данных
 				Qual = QUALITY_VALIDITY_GOOD;
-				if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffsetUstavki)) Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;
-				if (ucMDiscInBuf[MB_offset_errorM5] & MB_bOffsetModule5) 		Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;
+				if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)) Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;
+				if (ucMDiscInBuf[MB_offset_errorM5] & MB_bOffset_errorM5) 		Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;
 				IedServer_updateQuality(iedServer,&iedModel_MES_RFLO1_Fltz_q,Qual);
 
 //			USART_TRACE_BLUE("RFLO. K=%f, K_dbLevel=%f, instMag=%f, zeroDbLevel=%f, dbLevel=%f\n", K, K_dbLevel, mag, zeroDbLevel, dbLevel);
@@ -230,8 +249,8 @@ int		Set_RFLO	(uint16_t QTnum, uint64_t currentTime )
 				IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_MES_RFLO1_FltDiskm_t, currentTime);
 				// качество меняем на момент изменения данных
 				Qual = QUALITY_VALIDITY_GOOD;
-				if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffsetUstavki)) Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;
-				if (ucMDiscInBuf[MB_offset_errorM5] & MB_bOffsetModule5) 		Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;
+				if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)) Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;
+				if (ucMDiscInBuf[MB_offset_errorM5] & MB_bOffset_errorM5) 		Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;
 					IedServer_updateQuality(iedServer,&iedModel_MES_RFLO1_FltDiskm_q,Qual);
 			}
 			premag = IedServer_getFloatAttributeValue(iedServer,&iedModel_MES_RFLO1_FltDiskm_mag_f);
@@ -271,14 +290,22 @@ int		Set_RFLO		(uint16_t QTnum, uint64_t currentTime ){return false;}
 
 #include "static_model_MR5_700.h"
 
-extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
-extern uint16_t   ucMAnalogInBuf[MB_NumbAnalog];
-extern uint16_t   ucMUstavkiInBuf[MB_NumbUstavki];
+extern uint16_t   ucMDiscInBuf[MB_Size_Discreet];
+#if defined (AN_PERV)
+extern float   ucMAnalogInBuf[];
+#else
+	#if defined (AN_DUBLEDATA)
+	extern	uint32_t   ucMAnalogInBuf[MB_Size_Analog/2];
+	#else
+	extern	uint16_t   ucMAnalogInBuf[MB_Size_Analog];
+	#endif
+#endif
+extern uint16_t   ucMUstavkiInBuf[MB_Size_Ustavki];
 
-//	MMXU1  MB_bOffsetModule4
-//	MMXU2  MB_bOffsetModule4
-//	MMXU3  MB_bOffsetModule5
-//	MMXU4  MB_bOffsetModule5
+//	MMXU1  MB_bOffset_errorM4
+//	MMXU2  MB_bOffset_errorM4
+//	MMXU3  MB_bOffset_errorM5
+//	MMXU4  MB_bOffset_errorM5
 
 /*******************************************************
  * Set_RFLO наполняем оперативными данными
@@ -302,14 +329,14 @@ int		Set_RFLO	(uint16_t QTnum, uint64_t currentTime )
 
 		Health = STVALINT32_OK;
 		if ((ucMDiscInBuf[MB_offsetError_M1] & MB_bOffsetErrModule1)>0) {Health = STVALINT32_Warning;}
-		if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffsetUstavki)>0) {Health = STVALINT32_Warning;}
+		if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)>0) {Health = STVALINT32_Warning;}
 
 		if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_MES_RFLO1_Health_stVal, Health))
 			IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_MES_RFLO1_Health_t, currentTime);
 
 //  Quality (Mod Beh)
 		int	Qual = QUALITY_VALIDITY_GOOD;
-		if (ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffsetUstavki) {Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+		if (ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki) {Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 
 		IedServer_updateQuality(iedServer,&iedModel_MES_RFLO1_Mod_q,Qual);
 		IedServer_updateQuality(iedServer,&iedModel_MES_RFLO1_Beh_q,Qual);
@@ -343,8 +370,8 @@ int		Set_RFLO	(uint16_t QTnum, uint64_t currentTime )
 			if (rt){
 				// качество меняем на момент изменения данных
 				Qual = QUALITY_VALIDITY_GOOD;
-				if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffsetUstavki)) Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;
-				if (ucMDiscInBuf[MB_offsetError_M1] & MB_bOffsetModule1) 		Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;
+				if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)) Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;
+				if (ucMDiscInBuf[MB_offsetError_M1] & MB_bOffset_errorM1) 		Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;
 				IedServer_updateQuality(iedServer,&iedModel_MES_RFLO1_Fltz_q,Qual);
 	//			USART_TRACE_BLUE("RFLO. K=%f, K_dbLevel=%f, instMag=%f, zeroDbLevel=%f, dbLevel=%f\n", K, K_dbLevel, mag, zeroDbLevel, dbLevel);
 			}
@@ -363,8 +390,8 @@ int		Set_RFLO	(uint16_t QTnum, uint64_t currentTime )
 			if (rt) {
 				// качество меняем на момент изменения данных
 				Qual = QUALITY_VALIDITY_GOOD;
-				if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffsetUstavki)) Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;
-				if (ucMDiscInBuf[MB_offset_errorM1] & MB_bOffsetModule1) 		Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;
+				if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)) Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;
+				if (ucMDiscInBuf[MB_offset_errorM1] & MB_bOffset_errorM1) 		Qual = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;
 					IedServer_updateQuality(iedServer,&iedModel_MES_RFLO1_FltDiskm_q,Qual);
 
 			}

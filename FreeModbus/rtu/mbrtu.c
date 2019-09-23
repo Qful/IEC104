@@ -84,7 +84,7 @@ eMBRTUInit( UCHAR ucSlaveAddress, UCHAR ucPort, ULONG ulBaudRate, eMBParity ePar
     ULONG           usTimerT35_50us;
 
     ( void )ucSlaveAddress;
-    ENTER_CRITICAL_SECTION(  );
+//    ENTER_CRITICAL_SECTION(  );
 
     /* Modbus RTU uses 8 Databits. */
     if( xMBPortSerialInit( ucPort, ulBaudRate, 8, eParity ) != TRUE )
@@ -117,7 +117,7 @@ eMBRTUInit( UCHAR ucSlaveAddress, UCHAR ucPort, ULONG ulBaudRate, eMBParity ePar
             eStatus = MB_EPORTERR;
         }
     }
-    EXIT_CRITICAL_SECTION(  );
+//    EXIT_CRITICAL_SECTION(  );
 
     return eStatus;
 }
@@ -125,7 +125,7 @@ eMBRTUInit( UCHAR ucSlaveAddress, UCHAR ucPort, ULONG ulBaudRate, eMBParity ePar
 void
 eMBRTUStart( void )
 {
-    ENTER_CRITICAL_SECTION(  );
+//    ENTER_CRITICAL_SECTION(  );
     /* Initially the receiver is in the state STATE_RX_INIT. we start
      * the timer and if no character is received within t3.5 we change
      * to STATE_RX_IDLE. This makes sure that we delay startup of the
@@ -135,16 +135,16 @@ eMBRTUStart( void )
     vMBPortSerialEnable( TRUE, FALSE );
     vMBPortTimersEnable(  );
 
-    EXIT_CRITICAL_SECTION(  );
+//    EXIT_CRITICAL_SECTION(  );
 }
 
 void
 eMBRTUStop( void )
 {
-    ENTER_CRITICAL_SECTION(  );
+//    ENTER_CRITICAL_SECTION(  );
     vMBPortSerialEnable( FALSE, FALSE );
     vMBPortTimersDisable(  );
-    EXIT_CRITICAL_SECTION(  );
+//    EXIT_CRITICAL_SECTION(  );
 }
 
 eMBErrorCode
@@ -152,7 +152,7 @@ eMBRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USHORT * pusLength )
 {
     eMBErrorCode    eStatus = MB_ENOERR;
 
-    ENTER_CRITICAL_SECTION(  );
+//    ENTER_CRITICAL_SECTION(  );
     assert_param( usRcvBufferPos < MB_SER_PDU_SIZE_MAX );
 
     /* Length and CRC check */
@@ -177,7 +177,7 @@ eMBRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USHORT * pusLength )
         eStatus = MB_EIO_Rx;
     }
 
-    EXIT_CRITICAL_SECTION(  );
+//    EXIT_CRITICAL_SECTION(  );
     return eStatus;
 }
 
@@ -187,7 +187,7 @@ eMBRTUSend( UCHAR ucSlaveAddress, const UCHAR * pucFrame, USHORT usLength )
     eMBErrorCode    eStatus = MB_ENOERR;
     USHORT          usCRC16;
 
-    ENTER_CRITICAL_SECTION(  );
+//    ENTER_CRITICAL_SECTION(  );
 
     /* Check if the receiver is still in idle state. If not we where to
      * slow with processing the received frame and the master sent another
@@ -216,7 +216,7 @@ eMBRTUSend( UCHAR ucSlaveAddress, const UCHAR * pucFrame, USHORT usLength )
     {
         eStatus = MB_EIO_Tx;
     }
-    EXIT_CRITICAL_SECTION(  );
+//    EXIT_CRITICAL_SECTION(  );
     return eStatus;
 }
 

@@ -43,6 +43,7 @@ GooseSubscriber_create(GooseReceiverGocbRef* goCbRef, MmsValue* dataSetValues)
  //   if (MAC != NULL)
  //   	memcpy(self->destMAC,MAC,6);
 
+    self->confRev 		= goCbRef->confRev;
     self->NumGocbRef 	= goCbRef->numbGocbRef;
     self->goCBRef 		= copyString(goCbRef->gocbRef);
     self->goCBRefLen 	= strlen(goCbRef->gocbRef);

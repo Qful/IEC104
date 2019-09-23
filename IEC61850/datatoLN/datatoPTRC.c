@@ -28,10 +28,16 @@ int		Set_PTRC	(uint16_t QTnum, uint64_t currentTime ){return false;}
  * MR801
  *******************************************************/
 #if defined (MR801)
+
+#if defined	(MR801) && defined (OLD)
 #include "static_model_MR801.h"
+#endif
 
+#if defined	(MR801) && defined (T12N5D58R51)
+#include "static_model_MR801_T12N5D58R51.h"
+#endif
 
-extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   ucMDiscInBuf[MB_Size_Discreet];
 
 
 /*******************************************************
@@ -39,18 +45,52 @@ extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
  *******************************************************/
 int		Set_PTRC	(uint16_t QTnum, uint64_t currentTime )
 {
-	uint32_t	Mod = 0;
+	uint32_t	Mod = STVALINT32_OFF;
+	uint32_t	Op = 0;
+	Quality 	quality = QUALITY_VALIDITY_GOOD;
 
-	// Op
-	if (ucMDiscInBuf[MB_offset_ErrorOFF] & MB_bOffsetErrorOFF)  Mod = STVALINT32_ON;
+//Health
+			uint32_t	Health = STVALINT32_OK;
+			if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)) {Health = STVALINT32_Warning;}
 
-	if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op_general, Mod)){
-		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op_t, currentTime);
-		IedServer_updateQuality(iedServer,&iedModel_CTRL_PTRC_Op_q,QUALITY_VALIDITY_GOOD);
+			if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_CTRL_PTRC_Health_stVal, Health)){
+				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_CTRL_PTRC_Health_t, currentTime);
+			}
+
+
+//  Mod Beh
+	if ( IedServer_updateInt32AttributeValue(iedServer, &iedModel_CTRL_PTRC_Mod_stVal, Mod)){
+		IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_CTRL_PTRC_Mod_t, currentTime);
+		if ( IedServer_updateInt32AttributeValue(iedServer, &iedModel_CTRL_PTRC_Beh_stVal, Mod))
+			IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_CTRL_PTRC_Beh_t, currentTime);
 	}
+
+// Op
+//	if (ucMDiscInBuf[MB_offset_ErrorOFF] & MB_bOffsetErrorOFF)  Op = 1;
+
+	if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op_general, Op)){
+		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op_t, currentTime);
+//		quality = QUALITY_VALIDITY_GOOD;
+	}
+
+	quality = QUALITY_VALIDITY_GOOD;
+	if (Health == STVALINT32_Warning)	quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;
+	IedServer_updateQuality(iedServer,&iedModel_CTRL_PTRC_Op_q,quality);
 
 
 }
+#endif
+/*******************************************************
+ * MR761OBR
+ *******************************************************/
+#if defined (MR761OBR)
+
+/*******************************************************
+ * заглушки
+ *******************************************************/
+
+int		Set_PTRC	(uint16_t QTnum, uint64_t currentTime ){return false;}
+
 #endif
 /*******************************************************
  * MR771 MR761 MR762 MR763
@@ -65,7 +105,7 @@ int		Set_PTRC	(uint16_t QTnum, uint64_t currentTime )
 #include "static_model_MR76x.h"
 #endif
 
-extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   ucMDiscInBuf[MB_Size_Discreet];
 
 
 /*******************************************************
@@ -79,7 +119,7 @@ int		Set_PTRC	(uint16_t QTnum, uint64_t currentTime )
 
 //Health
 			uint32_t	Health = STVALINT32_OK;
-			if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffsetUstavki)) {Health = STVALINT32_Warning;}
+			if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)) {Health = STVALINT32_Warning;}
 
 			if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_CTRL_PTRC_Health_stVal, Health)){
 				IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_CTRL_PTRC_Health_t, currentTime);
@@ -114,9 +154,7 @@ int		Set_PTRC	(uint16_t QTnum, uint64_t currentTime )
 #if defined	(MR901) || defined	(MR902)
 #include "static_model_MR901_902.h"
 
-
-extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
-
+extern uint16_t   ucMDiscInBuf[MB_Size_Discreet];
 
 /*******************************************************
  * Set_PTRC наполняем оперативными данными
@@ -129,14 +167,14 @@ int		Set_PTRC	(uint16_t QTnum, uint64_t currentTime )
 
 //Health
 		Health = STVALINT32_OK;
-		if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffsetUstavki)) 		{Health = STVALINT32_Warning;}
+		if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)) 		{Health = STVALINT32_Warning;}
 
 		if ( IedServer_updateInt32AttributeValue(iedServer, &iedModel_CTRL_PTRC_Health_stVal, Health))
 			IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_CTRL_PTRC_Health_t, currentTime);
 
 
 	quality = QUALITY_VALIDITY_GOOD;
-	if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffsetUstavki)) {quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
+	if ((ucMDiscInBuf[MB_offset_errorUstavki] & MB_bOffset_errorUstavki)) {quality = QUALITY_VALIDITY_INVALID | QUALITY_DETAIL_FAILURE;}
 	if (IedServer_updateQuality(iedServer,&iedModel_CTRL_PTRC_Op1_q,quality)){
 		IedServer_updateQuality(iedServer,&iedModel_CTRL_PTRC_Op2_q,quality);
 		IedServer_updateQuality(iedServer,&iedModel_CTRL_PTRC_Op3_q,quality);
@@ -157,6 +195,19 @@ int		Set_PTRC	(uint16_t QTnum, uint64_t currentTime )
 		IedServer_updateQuality(iedServer,&iedModel_CTRL_PTRC_Op18_q,quality);
 		IedServer_updateQuality(iedServer,&iedModel_CTRL_PTRC_Op19_q,quality);
 		IedServer_updateQuality(iedServer,&iedModel_CTRL_PTRC_Op20_q,quality);
+
+#if  defined (T24N0D24R51) || defined (T24N0D32R43) || defined (T24N0D40R35) || defined (T20N4D40R35)
+		IedServer_updateQuality(iedServer,&iedModel_CTRL_PTRC_Op21_q,quality);
+		IedServer_updateQuality(iedServer,&iedModel_CTRL_PTRC_Op22_q,quality);
+		IedServer_updateQuality(iedServer,&iedModel_CTRL_PTRC_Op23_q,quality);
+		IedServer_updateQuality(iedServer,&iedModel_CTRL_PTRC_Op24_q,quality);
+#endif
+#if  defined (T24N0D24R51) || defined (T24N0D32R43) || defined (T24N0D40R35)
+		IedServer_updateQuality(iedServer,&iedModel_CTRL_PTRC_Op25_q,quality);
+		IedServer_updateQuality(iedServer,&iedModel_CTRL_PTRC_Op26_q,quality);
+		IedServer_updateQuality(iedServer,&iedModel_CTRL_PTRC_Op27_q,quality);
+		IedServer_updateQuality(iedServer,&iedModel_CTRL_PTRC_Op28_q,quality);
+#endif
 
 		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op1_t, currentTime);
 		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op2_t, currentTime);
@@ -179,9 +230,21 @@ int		Set_PTRC	(uint16_t QTnum, uint64_t currentTime )
 		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op19_t, currentTime);
 		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op20_t, currentTime);
 
+#if  defined (T24N0D24R51) || defined (T24N0D32R43) || defined (T24N0D40R35) || defined (T20N4D40R35)
+		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op21_t, currentTime);
+		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op22_t, currentTime);
+		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op23_t, currentTime);
+		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op24_t, currentTime);
+#endif
+#if  defined (T24N0D24R51) || defined (T24N0D32R43) || defined (T24N0D40R35)
+		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op25_t, currentTime);
+		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op26_t, currentTime);
+		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op27_t, currentTime);
+		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op28_t, currentTime);
+#endif
 	}
 
-	// Op
+// Op
 //	if (ucMDiscInBuf[MB_offset_ErrorOFF] & MB_bOffsetErrorOFF)  Mod = true;
 
 	if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op1_general, Mod)){
@@ -264,8 +327,44 @@ int		Set_PTRC	(uint16_t QTnum, uint64_t currentTime )
 	if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op20_general, Mod)){
 		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op20_t, currentTime);
 	}
+
+#if  defined (T24N0D24R51) || defined (T24N0D32R43) || defined (T24N0D40R35) || defined (T20N4D40R35)
+
+	if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op21_general, Mod)){
+		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op21_t, currentTime);
+	}
+
+	if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op22_general, Mod)){
+		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op22_t, currentTime);
+	}
+
+	if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op23_general, Mod)){
+		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op23_t, currentTime);
+	}
+
+	if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op24_general, Mod)){
+		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op24_t, currentTime);
+	}
+#endif
+#if  defined (T24N0D24R51) || defined (T24N0D32R43) || defined (T24N0D40R35)
+	if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op25_general, Mod)){
+		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op25_t, currentTime);
+	}
+
+	if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op26_general, Mod)){
+		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op26_t, currentTime);
+	}
+
+	if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op27_general, Mod)){
+		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op27_t, currentTime);
+	}
+
+	if (IedServer_updateBooleanAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op28_general, Mod)){
+		IedServer_updateUTCTimeAttributeValue(iedServer, &iedModel_CTRL_PTRC_Op28_t, currentTime);
+	}
 #endif
 
+#endif
 
 }
 #endif
@@ -286,7 +385,7 @@ int		Set_PTRC	(uint16_t QTnum, uint64_t currentTime )
 #if defined (MR741)
 #include "static_model_MR741.h"
 #endif
-extern uint16_t   ucMDiscInBuf[MB_NumbDiscreet];
+extern uint16_t   ucMDiscInBuf[MB_Size_Discreet];
 
 
 /*******************************************************
@@ -300,7 +399,7 @@ int		Set_PTRC	(uint16_t QTnum, uint64_t currentTime )
 
 //Health
 	uint32_t	Health = STVALINT32_OK;
-	if ((ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffsetALLFaults)) {Health = STVALINT32_Warning;}
+	if ((ucMDiscInBuf[MB_offsetHardFaults] & MB_bOffset_errorALLModul)) {Health = STVALINT32_Warning;}
 
 	if (IedServer_updateInt32AttributeValue(iedServer, &iedModel_CTRL_PTRC_Health_stVal, Health)){
 		IedServer_updateUTCTimeAttributeValue(iedServer,&iedModel_CTRL_PTRC_Health_t, currentTime);

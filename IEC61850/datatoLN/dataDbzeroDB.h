@@ -47,6 +47,8 @@
 
 #define		DbPercent		100000		// 0,001%
 
+int	Set_Db_zeroDB_Znak_float(float mag, float diapazon, DataAttribute*	modelDb, DataAttribute*	modelzeroDb, DataAttribute*	modelinstMag, DataAttribute*	modelmag, DataAttribute*	modelT, uint64_t currentTime);
 int	Set_Db_zeroDB_float(float mag, float diapazon, DataAttribute*	modelDb, DataAttribute*	modelzeroDb, DataAttribute*	modelinstMag, DataAttribute*	modelmag, DataAttribute*	modelT, uint64_t currentTime);
+int	Set_Db_zeroDB_Freq_float(float mag, float diapazon, DataAttribute*	modelDb, DataAttribute*	modelzeroDb, DataAttribute*	modelinstMag, DataAttribute*	modelmag, DataAttribute*	modelT, uint64_t currentTime);
 
 #endif /* DATADBZERODB_H_ */

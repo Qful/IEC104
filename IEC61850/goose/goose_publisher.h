@@ -26,7 +26,7 @@
 
 #include "linked_list.h"
 #include "mms_value.h"
-#include "PrpHsr_value.h"
+#include "hsr_prp_main.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -90,6 +90,8 @@ bool		Goose_getAppendPRP(GoosePublisher self);
 */
 
 uint8_t*	Goose_getbufferAddr(GoosePublisher self);
+
+uint32_t	Goose_get_sqNum(GoosePublisher self);
 
 #ifdef __cplusplus
 }

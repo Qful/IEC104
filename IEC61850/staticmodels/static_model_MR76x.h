@@ -3654,7 +3654,8 @@ extern DataAttribute iedModel_MES_MMXU1_phV_neut_zeroDb;
 #endif
 
 #if  defined (MR763)  || \
-	(defined (MR761) && defined (T4N5))
+	(defined (MR761) && defined (T4N5)) || \
+	(defined (MR761) && defined (T4N5D42R35))
 extern DataObject iedModel_MES_MMXU1_phV_neut1;
 extern DataAttribute iedModel_MES_MMXU1_phV_neut1_cVal;
 extern DataAttribute iedModel_MES_MMXU1_phV_neut1_cVal_mag;
@@ -4512,6 +4513,166 @@ extern DataAttribute iedModel_GGIO_INGGIO1_Ind42_stVal;
 extern DataAttribute iedModel_GGIO_INGGIO1_Ind42_q;
 extern DataAttribute iedModel_GGIO_INGGIO1_Ind42_t;
 
+extern DataObject    iedModel_GGIO_INGGIO1_Ind43;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind43_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind43_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind43_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind44;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind44_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind44_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind44_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind45;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind45_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind45_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind45_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind46;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind46_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind46_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind46_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind47;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind47_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind47_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind47_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind48;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind48_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind48_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind48_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind49;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind49_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind49_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind49_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind50;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind50_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind50_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind50_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind51;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind51_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind51_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind51_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind52;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind52_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind52_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind52_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind53;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind53_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind53_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind53_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind54;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind54_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind54_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind54_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind55;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind55_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind55_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind55_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind56;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind56_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind56_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind56_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind57;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind57_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind57_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind57_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind58;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind58_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind58_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind58_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind59;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind59_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind59_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind59_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind60;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind60_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind60_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind60_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind61;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind61_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind61_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind61_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind62;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind62_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind62_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind62_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind63;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind63_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind63_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind63_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind64;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind64_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind64_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind64_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind65;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind65_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind65_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind65_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind66;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind66_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind66_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind66_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind67;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind67_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind67_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind67_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind68;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind68_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind68_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind68_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind69;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind69_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind69_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind69_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind70;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind70_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind70_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind70_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind71;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind71_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind71_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind71_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind72;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind72_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind72_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind72_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind73;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind73_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind73_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind73_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind74;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind74_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind74_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind74_t;
+
 //----------------------------------------------------------------------------
 // SSL
 //----------------------------------------------------------------------------
@@ -4701,6 +4862,86 @@ extern DataObject iedModel_GGIO_SSLGGIO1_Ind32;
 extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind32_stVal;
 extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind32_q;
 extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind32_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind33;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind33_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind33_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind33_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind34;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind34_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind34_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind34_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind35;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind35_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind35_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind35_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind36;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind36_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind36_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind36_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind37;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind37_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind37_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind37_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind38;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind38_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind38_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind38_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind39;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind39_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind39_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind39_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind40;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind40_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind40_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind40_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind41;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind41_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind41_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind41_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind42;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind42_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind42_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind42_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind43;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind43_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind43_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind43_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind44;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind44_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind44_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind44_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind45;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind45_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind45_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind45_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind46;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind46_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind46_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind46_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind47;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind47_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind47_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind47_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind48;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind48_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind48_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind48_t;
 
 //----------------------------------------------------------------------------
 // VLS

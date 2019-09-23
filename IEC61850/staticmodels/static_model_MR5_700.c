@@ -2926,8 +2926,8 @@ IedModel iedModel = {
     "MR5PO70",
 	//_swREV,
     &iedModel_Generic_LD0,
-    &iedModelds_LD0_LLN0_dataset0,	// DataSet
-    &iedModel_LD0_LLN0_report0,		// ReportControlBlock
+    NULL,//&iedModelds_LD0_LLN0_dataset0,	// DataSet
+    NULL,//&iedModel_LD0_LLN0_report0,		// ReportControlBlock
     NULL,//&iedModel_LD0_LLN0_gse0,			// GSEControlBlock
     NULL,									// SVControlBlock
     &iedModel_LD0_LLN0_sgcb0,				// SettingGroupControlBlock

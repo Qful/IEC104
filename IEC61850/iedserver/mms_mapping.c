@@ -36,6 +36,9 @@
 
 #include "filesystem.h"
 
+extern osMutexId 	xSendGooseMutex;		// мьютекс готовности SendGoose
+
+
 #ifndef CONFIG_IEC61850_SG_RESVTMS
 #define CONFIG_IEC61850_SG_RESVTMS 100
 #endif
@@ -2641,6 +2644,9 @@ isMemberValueRecursive(MmsValue* container, MmsValue* value)
         {
 
             int compCount = MmsValue_getArraySize(container);
+
+//            if (compCount>200) return false; // тупо заглушка
+
             int i;
             for (i = 0; i < compCount; i++) {
                 if (isMemberValueRecursive(MmsValue_getElement(container, i), value)) {
@@ -2777,8 +2783,16 @@ MmsMapping_triggerLogging(MmsMapping* self, MmsValue* value, LogInclusionFlag fl
 #endif /* (CONFIG_IEC61850_LOG_SERVICE == 1) */
 
 #if (CONFIG_IEC61850_REPORT_SERVICE == 1)
-void
-MmsMapping_triggerReportObservers(MmsMapping* self, MmsValue* value, ReportInclusionFlag flag)
+/********************************************************************************************
+ * MmsMapping_triggerReportObservers
+ * проверяем всеблоки управления отчётами, и ищем в их датасетах наш атрибут для апдейта.
+ *
+ * если блок включен (enabled) или он буферизирован и в нём есть датасет
+ * то листаем список в датасете (включая все элементы структур и массивов) получаем номер записи
+ * и апдейтим атрибут
+ *
+ ********************************************************************************************/
+void	MmsMapping_triggerReportObservers(MmsMapping* self, MmsValue* value, ReportInclusionFlag flag)
 {
     LinkedList element = self->reportControls;
 
@@ -2804,7 +2818,7 @@ MmsMapping_triggerReportObservers(MmsMapping* self, MmsValue* value, ReportInclu
             default:
                 continue;
             }
-
+            // листаем список в датасете (включая все элементы структур и массивов) получаем номер записи (index) и апдейтим атрибут
             if (DataSet_isMemberValue(rc->dataSet, value, &index)) {
                 ReportControl_valueUpdated(rc, index, flag);
             }
@@ -2832,9 +2846,9 @@ void	MmsMapping_triggerGooseObservers(MmsMapping* self, MmsValue* value)
 				DataSet* dataSet = MmsGooseControlBlock_getDataSet(gcb);		// берём датасет из БУ гусом
 
 				if (DataSet_isMemberValue(dataSet, value, NULL)) {				// если есть значение
-	//                Port_Off(LEDtst1);
+
 					MmsGooseControlBlock_observedObjectChanged(gcb);
-	//                Port_On(LEDtst1);
+
 				}
 			}
 		}
@@ -2844,7 +2858,7 @@ void	MmsMapping_triggerGooseObservers(MmsMapping* self, MmsValue* value)
 void
 MmsMapping_enableGoosePublishing(MmsMapping* self)
 {
-
+	if (self == NULL) return;
     LinkedList element = self->gseControls;
 
     while ((element = LinkedList_getNext(element)) != NULL) {
@@ -2852,12 +2866,36 @@ MmsMapping_enableGoosePublishing(MmsMapping* self)
 
         MmsGooseControlBlock_enable(gcb);
     }
+}
 
+void
+MmsMapping_enableGooseSimulation(MmsMapping* self)
+{
+    LinkedList element = self->gseControls;
+
+    while ((element = LinkedList_getNext(element)) != NULL) {
+        MmsGooseControlBlock gcb = (MmsGooseControlBlock) element->data;
+
+        MmsGooseControlBlock_Simulationenable(gcb);
+    }
+}
+
+void
+MmsMapping_disableGooseSimulation(MmsMapping* self)
+{
+    LinkedList element = self->gseControls;
+
+    while ((element = LinkedList_getNext(element)) != NULL) {
+        MmsGooseControlBlock gcb = (MmsGooseControlBlock) element->data;
+
+        MmsGooseControlBlock_Simulationdisable(gcb);
+    }
 }
 
 void
 MmsMapping_disableGoosePublishing(MmsMapping* self)
 {
+	if (self == NULL) return;
     LinkedList element = self->gseControls;
 
     while ((element = LinkedList_getNext(element)) != NULL) {
@@ -3030,6 +3068,8 @@ MmsMapping_createMmsVariableNameFromObjectReference(const char* objectReference,
  *******************************************************/
 static void		GOOSE_processGooseEvents(MmsMapping* self, uint64_t currentTimeInMs)
 {
+	if (osMutexWait(xSendGooseMutex,0) != osOK) return;
+
     LinkedList element = LinkedList_getNext(self->gseControls);
 
     // полистаем все блоки управления гусами
@@ -3043,6 +3083,7 @@ static void		GOOSE_processGooseEvents(MmsMapping* self, uint64_t currentTimeInMs
 
         element = LinkedList_getNext(element);
     }
+    osMutexRelease(xSendGooseMutex);
 }
 #endif /* (CONFIG_INCLUDE_GOOSE_SUPPORT == 1) */
 

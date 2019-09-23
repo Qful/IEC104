@@ -486,6 +486,204 @@ extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO18_q;
 extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO18_t;
 extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO18_stVal;
 
+//SPCSO19
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO19;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO19_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO19_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO19_stVal;
+
+//SPCSO20
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO20;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO20_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO20_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO20_stVal;
+
+//SPCSO21
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO21;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO21_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO21_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO21_stVal;
+
+//SPCSO22
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO22;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO22_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO22_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO22_stVal;
+
+//SPCSO23
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO23;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO23_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO23_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO23_stVal;
+
+//SPCSO24
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO24;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO24_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO24_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO24_stVal;
+
+//SPCSO25
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO25;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO25_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO25_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO25_stVal;
+
+//SPCSO26
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO26;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO26_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO26_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO26_stVal;
+
+//SPCSO27
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO27;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO27_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO27_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO27_stVal;
+
+//SPCSO28
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO28;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO28_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO28_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO28_stVal;
+
+//SPCSO29
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO29;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO29_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO29_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO29_stVal;
+
+//SPCSO30
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO30;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO30_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO30_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO30_stVal;
+
+//SPCSO31
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO31;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO31_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO31_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO31_stVal;
+
+//SPCSO32
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO32;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO32_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO32_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO32_stVal;
+
+//SPCSO33
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO33;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO33_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO33_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO33_stVal;
+
+//SPCSO34
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO34;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO34_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO34_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO34_stVal;
+
+//SPCSO35
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO35;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO35_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO35_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO35_stVal;
+
+//SPCSO36
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO36;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO36_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO36_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO36_stVal;
+
+//SPCSO37
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO37;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO37_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO37_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO37_stVal;
+
+//SPCSO38
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO38;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO38_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO38_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO38_stVal;
+
+//SPCSO39
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO39;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO39_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO39_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO39_stVal;
+
+//SPCSO40
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO40;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO40_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO40_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO40_stVal;
+
+//SPCSO41
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO41;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO41_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO41_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO41_stVal;
+
+//SPCSO42
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO42;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO42_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO42_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO42_stVal;
+
+//SPCSO43
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO43;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO43_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO43_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO43_stVal;
+
+//SPCSO44
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO44;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO44_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO44_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO44_stVal;
+
+//SPCSO45
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO45;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO45_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO45_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO45_stVal;
+
+//SPCSO46
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO46;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO46_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO46_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO46_stVal;
+
+//SPCSO47
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO47;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO47_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO47_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO47_stVal;
+
+//SPCSO48
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO48;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO48_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO48_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO48_stVal;
+
+//SPCSO49
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO49;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO49_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO49_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO49_stVal;
+
+//SPCSO50
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO50;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO50_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO50_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO50_stVal;
+
+//SPCSO51
+extern DataObject iedModel_GGIO_OUTGGIO1_SPCSO51;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO51_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO51_t;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO51_stVal;
+
 // ------------- ƒискретные входы ------------------------------
 // Ind1 см. 61850-7-3 п.7.3.2
 extern DataObject    iedModel_GGIO_OUTGGIO1_Ind1;								// ќЅўјя »Ќƒ» ј÷»я(вход двоичных сигналов)				(не об€зательные данные)
@@ -568,6 +766,175 @@ extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind16_stVal;
 extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind16_q;
 extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind16_t;
 
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind17;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind17_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind17_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind17_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind18;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind18_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind18_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind18_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind19;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind19_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind19_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind19_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind20;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind20_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind20_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind20_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind21;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind21_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind21_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind21_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind22;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind22_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind22_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind22_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind23;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind23_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind23_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind23_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind24;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind24_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind24_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind24_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind25;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind25_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind25_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind25_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind26;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind26_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind26_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind26_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind27;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind27_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind27_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind27_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind28;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind28_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind28_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind28_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind29;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind29_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind29_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind29_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind30;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind30_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind30_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind30_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind31;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind31_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind31_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind31_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind32;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind32_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind32_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind32_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind33;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind33_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind33_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind33_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind34;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind34_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind34_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind34_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind35;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind35_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind35_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind35_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind36;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind36_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind36_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind36_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind37;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind37_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind37_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind37_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind38;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind38_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind38_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind38_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind39;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind39_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind39_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind39_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind40;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind40_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind40_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind40_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind41;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind41_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind41_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind41_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind42;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind42_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind42_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind42_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind43;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind43_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind43_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind43_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind44;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind44_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind44_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind44_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind45;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind45_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind45_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind45_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind46;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind46_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind46_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind46_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind47;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind47_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind47_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind47_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind48;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind48_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind48_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind48_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind49;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind49_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind49_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind49_t;
+
+extern DataObject    iedModel_GGIO_OUTGGIO1_Ind50;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind50_stVal;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind50_q;
+extern DataAttribute iedModel_GGIO_OUTGGIO1_Ind50_t;
 //-----------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------
 
@@ -831,6 +1198,85 @@ extern DataAttribute iedModel_GGIO_INGGIO1_Ind24_stVal;
 extern DataAttribute iedModel_GGIO_INGGIO1_Ind24_q;
 extern DataAttribute iedModel_GGIO_INGGIO1_Ind24_t;
 
+extern DataObject    iedModel_GGIO_INGGIO1_Ind25;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind25_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind25_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind25_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind26;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind26_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind26_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind26_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind27;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind27_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind27_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind27_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind28;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind28_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind28_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind28_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind29;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind29_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind29_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind29_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind30;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind30_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind30_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind30_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind31;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind31_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind31_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind31_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind32;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind32_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind32_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind32_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind33;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind33_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind33_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind33_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind34;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind34_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind34_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind34_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind35;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind35_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind35_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind35_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind36;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind36_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind36_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind36_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind37;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind37_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind37_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind37_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind38;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind38_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind38_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind38_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind39;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind39_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind39_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind39_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind40;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind40_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind40_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind40_t;
 //-SSLGGIO1 -------------------------------------------------------
 extern LogicalNode iedModel_GGIO_SSLGGIO1;
 extern DataObject iedModel_GGIO_SSLGGIO1_Mod;
@@ -1009,6 +1455,87 @@ extern DataObject iedModel_GGIO_SSLGGIO1_Ind32;
 extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind32_stVal;
 extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind32_q;
 extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind32_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind33;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind33_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind33_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind33_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind34;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind34_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind34_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind34_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind35;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind35_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind35_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind35_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind36;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind36_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind36_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind36_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind37;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind37_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind37_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind37_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind38;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind38_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind38_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind38_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind39;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind39_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind39_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind39_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind40;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind40_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind40_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind40_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind41;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind41_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind41_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind41_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind42;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind42_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind42_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind42_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind43;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind43_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind43_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind43_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind44;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind44_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind44_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind44_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind45;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind45_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind45_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind45_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind46;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind46_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind46_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind46_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind47;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind47_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind47_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind47_t;
+
+extern DataObject iedModel_GGIO_SSLGGIO1_Ind48;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind48_stVal;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind48_q;
+extern DataAttribute iedModel_GGIO_SSLGGIO1_Ind48_t;
+
 
 //----------------------------------------------------------------------------
 
@@ -1402,6 +1929,88 @@ extern DataAttribute iedModel_MES_MMXN1_Amp16_q;
 extern DataAttribute iedModel_MES_MMXN1_Amp16_t;
 extern DataAttribute iedModel_MES_MMXN1_Amp16_db;
 extern DataAttribute iedModel_MES_MMXN1_Amp16_zeroDb;
+
+// Amp17
+extern DataObject    iedModel_MES_MMXN1_Amp17;
+extern DataAttribute iedModel_MES_MMXN1_Amp17_mag;
+extern DataAttribute iedModel_MES_MMXN1_Amp17_mag_f;
+extern DataAttribute iedModel_MES_MMXN1_Amp17_instMag;
+extern DataAttribute iedModel_MES_MMXN1_Amp17_instMag_f;
+extern DataAttribute iedModel_MES_MMXN1_Amp17_q;
+extern DataAttribute iedModel_MES_MMXN1_Amp17_t;
+extern DataAttribute iedModel_MES_MMXN1_Amp17_db;
+extern DataAttribute iedModel_MES_MMXN1_Amp17_zeroDb;
+// Amp18
+extern DataObject    iedModel_MES_MMXN1_Amp18;
+extern DataAttribute iedModel_MES_MMXN1_Amp18_mag;
+extern DataAttribute iedModel_MES_MMXN1_Amp18_mag_f;
+extern DataAttribute iedModel_MES_MMXN1_Amp18_instMag;
+extern DataAttribute iedModel_MES_MMXN1_Amp18_instMag_f;
+extern DataAttribute iedModel_MES_MMXN1_Amp18_q;
+extern DataAttribute iedModel_MES_MMXN1_Amp18_t;
+extern DataAttribute iedModel_MES_MMXN1_Amp18_db;
+extern DataAttribute iedModel_MES_MMXN1_Amp18_zeroDb;
+// Amp19
+extern DataObject    iedModel_MES_MMXN1_Amp19;
+extern DataAttribute iedModel_MES_MMXN1_Amp19_mag;
+extern DataAttribute iedModel_MES_MMXN1_Amp19_mag_f;
+extern DataAttribute iedModel_MES_MMXN1_Amp19_instMag;
+extern DataAttribute iedModel_MES_MMXN1_Amp19_instMag_f;
+extern DataAttribute iedModel_MES_MMXN1_Amp19_q;
+extern DataAttribute iedModel_MES_MMXN1_Amp19_t;
+extern DataAttribute iedModel_MES_MMXN1_Amp19_db;
+extern DataAttribute iedModel_MES_MMXN1_Amp19_zeroDb;
+
+// Amp20
+extern DataObject    iedModel_MES_MMXN1_Amp20;
+extern DataAttribute iedModel_MES_MMXN1_Amp20_mag;
+extern DataAttribute iedModel_MES_MMXN1_Amp20_mag_f;
+extern DataAttribute iedModel_MES_MMXN1_Amp20_instMag;
+extern DataAttribute iedModel_MES_MMXN1_Amp20_instMag_f;
+extern DataAttribute iedModel_MES_MMXN1_Amp20_q;
+extern DataAttribute iedModel_MES_MMXN1_Amp20_t;
+extern DataAttribute iedModel_MES_MMXN1_Amp20_db;
+extern DataAttribute iedModel_MES_MMXN1_Amp20_zeroDb;
+// Amp21
+extern DataObject    iedModel_MES_MMXN1_Amp21;
+extern DataAttribute iedModel_MES_MMXN1_Amp21_mag;
+extern DataAttribute iedModel_MES_MMXN1_Amp21_mag_f;
+extern DataAttribute iedModel_MES_MMXN1_Amp21_instMag;
+extern DataAttribute iedModel_MES_MMXN1_Amp21_instMag_f;
+extern DataAttribute iedModel_MES_MMXN1_Amp21_q;
+extern DataAttribute iedModel_MES_MMXN1_Amp21_t;
+extern DataAttribute iedModel_MES_MMXN1_Amp21_db;
+extern DataAttribute iedModel_MES_MMXN1_Amp21_zeroDb;
+// Amp22
+extern DataObject    iedModel_MES_MMXN1_Amp22;
+extern DataAttribute iedModel_MES_MMXN1_Amp22_mag;
+extern DataAttribute iedModel_MES_MMXN1_Amp22_mag_f;
+extern DataAttribute iedModel_MES_MMXN1_Amp22_instMag;
+extern DataAttribute iedModel_MES_MMXN1_Amp22_instMag_f;
+extern DataAttribute iedModel_MES_MMXN1_Amp22_q;
+extern DataAttribute iedModel_MES_MMXN1_Amp22_t;
+extern DataAttribute iedModel_MES_MMXN1_Amp22_db;
+extern DataAttribute iedModel_MES_MMXN1_Amp22_zeroDb;
+// Amp23
+extern DataObject    iedModel_MES_MMXN1_Amp23;
+extern DataAttribute iedModel_MES_MMXN1_Amp23_mag;
+extern DataAttribute iedModel_MES_MMXN1_Amp23_mag_f;
+extern DataAttribute iedModel_MES_MMXN1_Amp23_instMag;
+extern DataAttribute iedModel_MES_MMXN1_Amp23_instMag_f;
+extern DataAttribute iedModel_MES_MMXN1_Amp23_q;
+extern DataAttribute iedModel_MES_MMXN1_Amp23_t;
+extern DataAttribute iedModel_MES_MMXN1_Amp23_db;
+extern DataAttribute iedModel_MES_MMXN1_Amp23_zeroDb;
+// Amp24
+extern DataObject    iedModel_MES_MMXN1_Amp24;
+extern DataAttribute iedModel_MES_MMXN1_Amp24_mag;
+extern DataAttribute iedModel_MES_MMXN1_Amp24_mag_f;
+extern DataAttribute iedModel_MES_MMXN1_Amp24_instMag;
+extern DataAttribute iedModel_MES_MMXN1_Amp24_instMag_f;
+extern DataAttribute iedModel_MES_MMXN1_Amp24_q;
+extern DataAttribute iedModel_MES_MMXN1_Amp24_t;
+extern DataAttribute iedModel_MES_MMXN1_Amp24_db;
+extern DataAttribute iedModel_MES_MMXN1_Amp24_zeroDb;
 #endif
 
 #if defined (MR902)
@@ -1688,6 +2297,180 @@ extern DataAttribute iedModel_MES_MMXU5_A_phsC_t;
 extern DataAttribute iedModel_MES_MMXU5_A_phsC_db;
 extern DataAttribute iedModel_MES_MMXU5_A_phsC_zeroDb;
 
+// -----------------------------------------------------------------------------
+// LN MMXU6
+// -----------------------------------------------------------------------------
+extern LogicalNode   iedModel_MES_MMXU6;
+extern DataObject    iedModel_MES_MMXU6_Mod;
+extern DataAttribute iedModel_MES_MMXU6_Mod_q;
+extern DataAttribute iedModel_MES_MMXU6_Mod_t;
+extern DataAttribute iedModel_MES_MMXU6_Mod_stVal;
+extern DataAttribute iedModel_MES_MMXU6_Mod_ctlModel;
+extern DataObject    iedModel_MES_MMXU6_Beh;
+extern DataAttribute iedModel_MES_MMXU6_Beh_stVal;
+extern DataAttribute iedModel_MES_MMXU6_Beh_q;
+extern DataAttribute iedModel_MES_MMXU6_Beh_t;
+extern DataObject    iedModel_MES_MMXU6_Health;
+extern DataAttribute iedModel_MES_MMXU6_Health_stVal;
+extern DataAttribute iedModel_MES_MMXU6_Health_q;
+extern DataAttribute iedModel_MES_MMXU6_Health_t;
+extern DataObject    iedModel_MES_MMXU6_NamPlt;
+extern DataAttribute iedModel_MES_MMXU6_NamPlt_vendor;
+extern DataAttribute iedModel_MES_MMXU6_NamPlt_swRev;
+extern DataAttribute iedModel_MES_MMXU6_NamPlt_d;
+
+extern DataObject iedModel_MES_MMXU6_A;
+extern DataObject iedModel_MES_MMXU6_A_phsA;
+extern DataAttribute iedModel_MES_MMXU6_A_phsA_cVal;
+extern DataAttribute iedModel_MES_MMXU6_A_phsA_cVal_mag;
+extern DataAttribute iedModel_MES_MMXU6_A_phsA_cVal_mag_f;
+extern DataAttribute iedModel_MES_MMXU6_A_phsA_instCVal;
+extern DataAttribute iedModel_MES_MMXU6_A_phsA_instCVal_mag;
+extern DataAttribute iedModel_MES_MMXU6_A_phsA_instCVal_mag_f;
+extern DataAttribute iedModel_MES_MMXU6_A_phsA_q;
+extern DataAttribute iedModel_MES_MMXU6_A_phsA_t;
+extern DataAttribute iedModel_MES_MMXU6_A_phsA_db;
+extern DataAttribute iedModel_MES_MMXU6_A_phsA_zeroDb;
+extern DataObject iedModel_MES_MMXU6_A_phsB;
+extern DataAttribute iedModel_MES_MMXU6_A_phsB_cVal;
+extern DataAttribute iedModel_MES_MMXU6_A_phsB_cVal_mag;
+extern DataAttribute iedModel_MES_MMXU6_A_phsB_cVal_mag_f;
+extern DataAttribute iedModel_MES_MMXU6_A_phsB_instCVal;
+extern DataAttribute iedModel_MES_MMXU6_A_phsB_instCVal_mag;
+extern DataAttribute iedModel_MES_MMXU6_A_phsB_instCVal_mag_f;
+extern DataAttribute iedModel_MES_MMXU6_A_phsB_q;
+extern DataAttribute iedModel_MES_MMXU6_A_phsB_t;
+extern DataAttribute iedModel_MES_MMXU6_A_phsB_db;
+extern DataAttribute iedModel_MES_MMXU6_A_phsB_zeroDb;
+extern DataObject iedModel_MES_MMXU6_A_phsC;
+extern DataAttribute iedModel_MES_MMXU6_A_phsC_cVal;
+extern DataAttribute iedModel_MES_MMXU6_A_phsC_cVal_mag;
+extern DataAttribute iedModel_MES_MMXU6_A_phsC_cVal_mag_f;
+extern DataAttribute iedModel_MES_MMXU6_A_phsC_instCVal;
+extern DataAttribute iedModel_MES_MMXU6_A_phsC_instCVal_mag;
+extern DataAttribute iedModel_MES_MMXU6_A_phsC_instCVal_mag_f;
+extern DataAttribute iedModel_MES_MMXU6_A_phsC_q;
+extern DataAttribute iedModel_MES_MMXU6_A_phsC_t;
+extern DataAttribute iedModel_MES_MMXU6_A_phsC_db;
+extern DataAttribute iedModel_MES_MMXU6_A_phsC_zeroDb;
+
+// -----------------------------------------------------------------------------
+// LN MMXU7
+// -----------------------------------------------------------------------------
+extern LogicalNode   iedModel_MES_MMXU7;
+extern DataObject    iedModel_MES_MMXU7_Mod;
+extern DataAttribute iedModel_MES_MMXU7_Mod_q;
+extern DataAttribute iedModel_MES_MMXU7_Mod_t;
+extern DataAttribute iedModel_MES_MMXU7_Mod_stVal;
+extern DataAttribute iedModel_MES_MMXU7_Mod_ctlModel;
+extern DataObject    iedModel_MES_MMXU7_Beh;
+extern DataAttribute iedModel_MES_MMXU7_Beh_stVal;
+extern DataAttribute iedModel_MES_MMXU7_Beh_q;
+extern DataAttribute iedModel_MES_MMXU7_Beh_t;
+extern DataObject    iedModel_MES_MMXU7_Health;
+extern DataAttribute iedModel_MES_MMXU7_Health_stVal;
+extern DataAttribute iedModel_MES_MMXU7_Health_q;
+extern DataAttribute iedModel_MES_MMXU7_Health_t;
+extern DataObject    iedModel_MES_MMXU7_NamPlt;
+extern DataAttribute iedModel_MES_MMXU7_NamPlt_vendor;
+extern DataAttribute iedModel_MES_MMXU7_NamPlt_swRev;
+extern DataAttribute iedModel_MES_MMXU7_NamPlt_d;
+
+extern DataObject iedModel_MES_MMXU7_A;
+extern DataObject iedModel_MES_MMXU7_A_phsA;
+extern DataAttribute iedModel_MES_MMXU7_A_phsA_cVal;
+extern DataAttribute iedModel_MES_MMXU7_A_phsA_cVal_mag;
+extern DataAttribute iedModel_MES_MMXU7_A_phsA_cVal_mag_f;
+extern DataAttribute iedModel_MES_MMXU7_A_phsA_instCVal;
+extern DataAttribute iedModel_MES_MMXU7_A_phsA_instCVal_mag;
+extern DataAttribute iedModel_MES_MMXU7_A_phsA_instCVal_mag_f;
+extern DataAttribute iedModel_MES_MMXU7_A_phsA_q;
+extern DataAttribute iedModel_MES_MMXU7_A_phsA_t;
+extern DataAttribute iedModel_MES_MMXU7_A_phsA_db;
+extern DataAttribute iedModel_MES_MMXU7_A_phsA_zeroDb;
+extern DataObject iedModel_MES_MMXU7_A_phsB;
+extern DataAttribute iedModel_MES_MMXU7_A_phsB_cVal;
+extern DataAttribute iedModel_MES_MMXU7_A_phsB_cVal_mag;
+extern DataAttribute iedModel_MES_MMXU7_A_phsB_cVal_mag_f;
+extern DataAttribute iedModel_MES_MMXU7_A_phsB_instCVal;
+extern DataAttribute iedModel_MES_MMXU7_A_phsB_instCVal_mag;
+extern DataAttribute iedModel_MES_MMXU7_A_phsB_instCVal_mag_f;
+extern DataAttribute iedModel_MES_MMXU7_A_phsB_q;
+extern DataAttribute iedModel_MES_MMXU7_A_phsB_t;
+extern DataAttribute iedModel_MES_MMXU7_A_phsB_db;
+extern DataAttribute iedModel_MES_MMXU7_A_phsB_zeroDb;
+extern DataObject iedModel_MES_MMXU7_A_phsC;
+extern DataAttribute iedModel_MES_MMXU7_A_phsC_cVal;
+extern DataAttribute iedModel_MES_MMXU7_A_phsC_cVal_mag;
+extern DataAttribute iedModel_MES_MMXU7_A_phsC_cVal_mag_f;
+extern DataAttribute iedModel_MES_MMXU7_A_phsC_instCVal;
+extern DataAttribute iedModel_MES_MMXU7_A_phsC_instCVal_mag;
+extern DataAttribute iedModel_MES_MMXU7_A_phsC_instCVal_mag_f;
+extern DataAttribute iedModel_MES_MMXU7_A_phsC_q;
+extern DataAttribute iedModel_MES_MMXU7_A_phsC_t;
+extern DataAttribute iedModel_MES_MMXU7_A_phsC_db;
+extern DataAttribute iedModel_MES_MMXU7_A_phsC_zeroDb;
+
+// -----------------------------------------------------------------------------
+// LN MMXU8
+// -----------------------------------------------------------------------------
+extern LogicalNode   iedModel_MES_MMXU8;
+extern DataObject    iedModel_MES_MMXU8_Mod;
+extern DataAttribute iedModel_MES_MMXU8_Mod_q;
+extern DataAttribute iedModel_MES_MMXU8_Mod_t;
+extern DataAttribute iedModel_MES_MMXU8_Mod_stVal;
+extern DataAttribute iedModel_MES_MMXU8_Mod_ctlModel;
+extern DataObject    iedModel_MES_MMXU8_Beh;
+extern DataAttribute iedModel_MES_MMXU8_Beh_stVal;
+extern DataAttribute iedModel_MES_MMXU8_Beh_q;
+extern DataAttribute iedModel_MES_MMXU8_Beh_t;
+extern DataObject    iedModel_MES_MMXU8_Health;
+extern DataAttribute iedModel_MES_MMXU8_Health_stVal;
+extern DataAttribute iedModel_MES_MMXU8_Health_q;
+extern DataAttribute iedModel_MES_MMXU8_Health_t;
+extern DataObject    iedModel_MES_MMXU8_NamPlt;
+extern DataAttribute iedModel_MES_MMXU8_NamPlt_vendor;
+extern DataAttribute iedModel_MES_MMXU8_NamPlt_swRev;
+extern DataAttribute iedModel_MES_MMXU8_NamPlt_d;
+
+extern DataObject iedModel_MES_MMXU8_A;
+extern DataObject iedModel_MES_MMXU8_A_phsA;
+extern DataAttribute iedModel_MES_MMXU8_A_phsA_cVal;
+extern DataAttribute iedModel_MES_MMXU8_A_phsA_cVal_mag;
+extern DataAttribute iedModel_MES_MMXU8_A_phsA_cVal_mag_f;
+extern DataAttribute iedModel_MES_MMXU8_A_phsA_instCVal;
+extern DataAttribute iedModel_MES_MMXU8_A_phsA_instCVal_mag;
+extern DataAttribute iedModel_MES_MMXU8_A_phsA_instCVal_mag_f;
+extern DataAttribute iedModel_MES_MMXU8_A_phsA_q;
+extern DataAttribute iedModel_MES_MMXU8_A_phsA_t;
+extern DataAttribute iedModel_MES_MMXU8_A_phsA_db;
+extern DataAttribute iedModel_MES_MMXU8_A_phsA_zeroDb;
+extern DataObject iedModel_MES_MMXU8_A_phsB;
+extern DataAttribute iedModel_MES_MMXU8_A_phsB_cVal;
+extern DataAttribute iedModel_MES_MMXU8_A_phsB_cVal_mag;
+extern DataAttribute iedModel_MES_MMXU8_A_phsB_cVal_mag_f;
+extern DataAttribute iedModel_MES_MMXU8_A_phsB_instCVal;
+extern DataAttribute iedModel_MES_MMXU8_A_phsB_instCVal_mag;
+extern DataAttribute iedModel_MES_MMXU8_A_phsB_instCVal_mag_f;
+extern DataAttribute iedModel_MES_MMXU8_A_phsB_q;
+extern DataAttribute iedModel_MES_MMXU8_A_phsB_t;
+extern DataAttribute iedModel_MES_MMXU8_A_phsB_db;
+extern DataAttribute iedModel_MES_MMXU8_A_phsB_zeroDb;
+extern DataObject iedModel_MES_MMXU8_A_phsC;
+extern DataAttribute iedModel_MES_MMXU8_A_phsC_cVal;
+extern DataAttribute iedModel_MES_MMXU8_A_phsC_cVal_mag;
+extern DataAttribute iedModel_MES_MMXU8_A_phsC_cVal_mag_f;
+extern DataAttribute iedModel_MES_MMXU8_A_phsC_instCVal;
+extern DataAttribute iedModel_MES_MMXU8_A_phsC_instCVal_mag;
+extern DataAttribute iedModel_MES_MMXU8_A_phsC_instCVal_mag_f;
+extern DataAttribute iedModel_MES_MMXU8_A_phsC_q;
+extern DataAttribute iedModel_MES_MMXU8_A_phsC_t;
+extern DataAttribute iedModel_MES_MMXU8_A_phsC_db;
+extern DataAttribute iedModel_MES_MMXU8_A_phsC_zeroDb;
+
+// -----------------------------------------------------------------------------
+// LN INMMXN1
+// -----------------------------------------------------------------------------
 
 extern LogicalNode iedModel_MES_INMMXN1;
 
@@ -3660,13 +4443,11 @@ extern DataAttribute iedModel_PROT_RBRF1_OpEx9_q;
 extern DataAttribute iedModel_PROT_RBRF1_OpEx9_t;
 extern DataAttribute iedModel_PROT_RBRF1_OpEx9_dU;
 
-#if defined	(MR901)
 extern DataObject    iedModel_PROT_RBRF1_OpEx10;
 extern DataAttribute iedModel_PROT_RBRF1_OpEx10_general;
 extern DataAttribute iedModel_PROT_RBRF1_OpEx10_q;
 extern DataAttribute iedModel_PROT_RBRF1_OpEx10_t;
 extern DataAttribute iedModel_PROT_RBRF1_OpEx10_dU;
-
 
 extern DataObject    iedModel_PROT_RBRF1_OpEx11;
 extern DataAttribute iedModel_PROT_RBRF1_OpEx11_general;
@@ -3674,6 +4455,7 @@ extern DataAttribute iedModel_PROT_RBRF1_OpEx11_q;
 extern DataAttribute iedModel_PROT_RBRF1_OpEx11_t;
 extern DataAttribute iedModel_PROT_RBRF1_OpEx11_dU;
 
+#if defined	(MR901)
 extern DataObject    iedModel_PROT_RBRF1_OpEx12;
 extern DataAttribute iedModel_PROT_RBRF1_OpEx12_general;
 extern DataAttribute iedModel_PROT_RBRF1_OpEx12_q;
@@ -3721,6 +4503,55 @@ extern DataAttribute iedModel_PROT_RBRF1_OpEx19_general;
 extern DataAttribute iedModel_PROT_RBRF1_OpEx19_q;
 extern DataAttribute iedModel_PROT_RBRF1_OpEx19_t;
 extern DataAttribute iedModel_PROT_RBRF1_OpEx19_dU;
+
+extern DataObject    iedModel_PROT_RBRF1_OpEx20;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx20_general;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx20_q;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx20_t;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx20_dU;
+
+
+extern DataObject    iedModel_PROT_RBRF1_OpEx21;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx21_general;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx21_q;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx21_t;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx21_dU;
+
+extern DataObject    iedModel_PROT_RBRF1_OpEx22;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx22_general;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx22_q;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx22_t;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx22_dU;
+
+extern DataObject    iedModel_PROT_RBRF1_OpEx23;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx23_general;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx23_q;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx23_t;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx23_dU;
+
+extern DataObject    iedModel_PROT_RBRF1_OpEx24;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx24_general;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx24_q;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx24_t;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx24_dU;
+
+extern DataObject    iedModel_PROT_RBRF1_OpEx25;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx25_general;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx25_q;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx25_t;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx25_dU;
+
+extern DataObject    iedModel_PROT_RBRF1_OpEx26;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx26_general;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx26_q;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx26_t;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx26_dU;
+
+extern DataObject    iedModel_PROT_RBRF1_OpEx27;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx27_general;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx27_q;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx27_t;
+extern DataAttribute iedModel_PROT_RBRF1_OpEx27_dU;
 #endif
 
 //----------------------------------------------------------------------------
@@ -4222,7 +5053,8 @@ extern DataObject iedModel_PROT_VZGGIO15_Alm;
 extern DataAttribute iedModel_PROT_VZGGIO15_Alm_stVal;
 extern DataAttribute iedModel_PROT_VZGGIO15_Alm_q;
 extern DataAttribute iedModel_PROT_VZGGIO15_Alm_t;
-//----------------------------------------------------------------------------
+
+//VZGGIO16--------------------------------------------------------------------
 extern LogicalNode iedModel_PROT_VZGGIO16;
 
 extern DataObject iedModel_PROT_VZGGIO16_Mod;
@@ -4230,7 +5062,6 @@ extern DataAttribute iedModel_PROT_VZGGIO16_Mod_q;
 extern DataAttribute iedModel_PROT_VZGGIO16_Mod_t;
 extern DataAttribute iedModel_PROT_VZGGIO16_Mod_stVal;
 extern DataAttribute iedModel_PROT_VZGGIO16_Mod_ctlModel;
-
 
 extern DataObject iedModel_PROT_VZGGIO16_Beh;
 extern DataAttribute iedModel_PROT_VZGGIO16_Beh_stVal;
@@ -4252,6 +5083,239 @@ extern DataObject iedModel_PROT_VZGGIO16_Alm;
 extern DataAttribute iedModel_PROT_VZGGIO16_Alm_stVal;
 extern DataAttribute iedModel_PROT_VZGGIO16_Alm_q;
 extern DataAttribute iedModel_PROT_VZGGIO16_Alm_t;
+
+//VZGGIO17--------------------------------------------------------------------
+extern LogicalNode iedModel_PROT_VZGGIO17;
+
+extern DataObject iedModel_PROT_VZGGIO17_Mod;
+extern DataAttribute iedModel_PROT_VZGGIO17_Mod_q;
+extern DataAttribute iedModel_PROT_VZGGIO17_Mod_t;
+extern DataAttribute iedModel_PROT_VZGGIO17_Mod_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO17_Mod_ctlModel;
+
+extern DataObject iedModel_PROT_VZGGIO17_Beh;
+extern DataAttribute iedModel_PROT_VZGGIO17_Beh_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO17_Beh_q;
+extern DataAttribute iedModel_PROT_VZGGIO17_Beh_t;
+
+extern DataObject iedModel_PROT_VZGGIO17_Health;
+extern DataAttribute iedModel_PROT_VZGGIO17_Health_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO17_Health_q;
+extern DataAttribute iedModel_PROT_VZGGIO17_Health_t;
+
+extern DataObject iedModel_PROT_VZGGIO17_NamPlt;
+
+extern DataAttribute iedModel_PROT_VZGGIO17_NamPlt_vendor;
+extern DataAttribute iedModel_PROT_VZGGIO17_NamPlt_swRev;
+extern DataAttribute iedModel_PROT_VZGGIO17_NamPlt_d;
+
+extern DataObject iedModel_PROT_VZGGIO17_Alm;
+extern DataAttribute iedModel_PROT_VZGGIO17_Alm_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO17_Alm_q;
+extern DataAttribute iedModel_PROT_VZGGIO17_Alm_t;
+//VZGGIO18--------------------------------------------------------------------
+extern LogicalNode iedModel_PROT_VZGGIO18;
+
+extern DataObject iedModel_PROT_VZGGIO18_Mod;
+extern DataAttribute iedModel_PROT_VZGGIO18_Mod_q;
+extern DataAttribute iedModel_PROT_VZGGIO18_Mod_t;
+extern DataAttribute iedModel_PROT_VZGGIO18_Mod_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO18_Mod_ctlModel;
+
+extern DataObject iedModel_PROT_VZGGIO18_Beh;
+extern DataAttribute iedModel_PROT_VZGGIO18_Beh_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO18_Beh_q;
+extern DataAttribute iedModel_PROT_VZGGIO18_Beh_t;
+
+extern DataObject iedModel_PROT_VZGGIO18_Health;
+extern DataAttribute iedModel_PROT_VZGGIO18_Health_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO18_Health_q;
+extern DataAttribute iedModel_PROT_VZGGIO18_Health_t;
+
+extern DataObject iedModel_PROT_VZGGIO18_NamPlt;
+
+extern DataAttribute iedModel_PROT_VZGGIO18_NamPlt_vendor;
+extern DataAttribute iedModel_PROT_VZGGIO18_NamPlt_swRev;
+extern DataAttribute iedModel_PROT_VZGGIO18_NamPlt_d;
+
+extern DataObject iedModel_PROT_VZGGIO18_Alm;
+extern DataAttribute iedModel_PROT_VZGGIO18_Alm_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO18_Alm_q;
+extern DataAttribute iedModel_PROT_VZGGIO18_Alm_t;
+//VZGGIO19--------------------------------------------------------------------
+extern LogicalNode iedModel_PROT_VZGGIO19;
+
+extern DataObject iedModel_PROT_VZGGIO19_Mod;
+extern DataAttribute iedModel_PROT_VZGGIO19_Mod_q;
+extern DataAttribute iedModel_PROT_VZGGIO19_Mod_t;
+extern DataAttribute iedModel_PROT_VZGGIO19_Mod_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO19_Mod_ctlModel;
+
+extern DataObject iedModel_PROT_VZGGIO19_Beh;
+extern DataAttribute iedModel_PROT_VZGGIO19_Beh_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO19_Beh_q;
+extern DataAttribute iedModel_PROT_VZGGIO19_Beh_t;
+
+extern DataObject iedModel_PROT_VZGGIO19_Health;
+extern DataAttribute iedModel_PROT_VZGGIO19_Health_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO19_Health_q;
+extern DataAttribute iedModel_PROT_VZGGIO19_Health_t;
+
+extern DataObject iedModel_PROT_VZGGIO19_NamPlt;
+
+extern DataAttribute iedModel_PROT_VZGGIO19_NamPlt_vendor;
+extern DataAttribute iedModel_PROT_VZGGIO19_NamPlt_swRev;
+extern DataAttribute iedModel_PROT_VZGGIO19_NamPlt_d;
+
+extern DataObject iedModel_PROT_VZGGIO19_Alm;
+extern DataAttribute iedModel_PROT_VZGGIO19_Alm_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO19_Alm_q;
+extern DataAttribute iedModel_PROT_VZGGIO19_Alm_t;
+//VZGGIO20--------------------------------------------------------------------
+extern LogicalNode iedModel_PROT_VZGGIO20;
+
+extern DataObject iedModel_PROT_VZGGIO20_Mod;
+extern DataAttribute iedModel_PROT_VZGGIO20_Mod_q;
+extern DataAttribute iedModel_PROT_VZGGIO20_Mod_t;
+extern DataAttribute iedModel_PROT_VZGGIO20_Mod_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO20_Mod_ctlModel;
+
+extern DataObject iedModel_PROT_VZGGIO20_Beh;
+extern DataAttribute iedModel_PROT_VZGGIO20_Beh_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO20_Beh_q;
+extern DataAttribute iedModel_PROT_VZGGIO20_Beh_t;
+
+extern DataObject iedModel_PROT_VZGGIO20_Health;
+extern DataAttribute iedModel_PROT_VZGGIO20_Health_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO20_Health_q;
+extern DataAttribute iedModel_PROT_VZGGIO20_Health_t;
+
+extern DataObject iedModel_PROT_VZGGIO20_NamPlt;
+
+extern DataAttribute iedModel_PROT_VZGGIO20_NamPlt_vendor;
+extern DataAttribute iedModel_PROT_VZGGIO20_NamPlt_swRev;
+extern DataAttribute iedModel_PROT_VZGGIO20_NamPlt_d;
+
+extern DataObject iedModel_PROT_VZGGIO20_Alm;
+extern DataAttribute iedModel_PROT_VZGGIO20_Alm_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO20_Alm_q;
+extern DataAttribute iedModel_PROT_VZGGIO20_Alm_t;
+//VZGGIO21--------------------------------------------------------------------
+extern LogicalNode iedModel_PROT_VZGGIO21;
+
+extern DataObject iedModel_PROT_VZGGIO21_Mod;
+extern DataAttribute iedModel_PROT_VZGGIO21_Mod_q;
+extern DataAttribute iedModel_PROT_VZGGIO21_Mod_t;
+extern DataAttribute iedModel_PROT_VZGGIO21_Mod_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO21_Mod_ctlModel;
+
+extern DataObject iedModel_PROT_VZGGIO21_Beh;
+extern DataAttribute iedModel_PROT_VZGGIO21_Beh_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO21_Beh_q;
+extern DataAttribute iedModel_PROT_VZGGIO21_Beh_t;
+
+extern DataObject iedModel_PROT_VZGGIO21_Health;
+extern DataAttribute iedModel_PROT_VZGGIO21_Health_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO21_Health_q;
+extern DataAttribute iedModel_PROT_VZGGIO21_Health_t;
+
+extern DataObject iedModel_PROT_VZGGIO21_NamPlt;
+
+extern DataAttribute iedModel_PROT_VZGGIO21_NamPlt_vendor;
+extern DataAttribute iedModel_PROT_VZGGIO21_NamPlt_swRev;
+extern DataAttribute iedModel_PROT_VZGGIO21_NamPlt_d;
+
+extern DataObject iedModel_PROT_VZGGIO21_Alm;
+extern DataAttribute iedModel_PROT_VZGGIO21_Alm_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO21_Alm_q;
+extern DataAttribute iedModel_PROT_VZGGIO21_Alm_t;
+//VZGGIO22--------------------------------------------------------------------
+extern LogicalNode iedModel_PROT_VZGGIO22;
+
+extern DataObject iedModel_PROT_VZGGIO22_Mod;
+extern DataAttribute iedModel_PROT_VZGGIO22_Mod_q;
+extern DataAttribute iedModel_PROT_VZGGIO22_Mod_t;
+extern DataAttribute iedModel_PROT_VZGGIO22_Mod_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO22_Mod_ctlModel;
+
+extern DataObject iedModel_PROT_VZGGIO22_Beh;
+extern DataAttribute iedModel_PROT_VZGGIO22_Beh_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO22_Beh_q;
+extern DataAttribute iedModel_PROT_VZGGIO22_Beh_t;
+
+extern DataObject iedModel_PROT_VZGGIO22_Health;
+extern DataAttribute iedModel_PROT_VZGGIO22_Health_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO22_Health_q;
+extern DataAttribute iedModel_PROT_VZGGIO22_Health_t;
+
+extern DataObject iedModel_PROT_VZGGIO22_NamPlt;
+
+extern DataAttribute iedModel_PROT_VZGGIO22_NamPlt_vendor;
+extern DataAttribute iedModel_PROT_VZGGIO22_NamPlt_swRev;
+extern DataAttribute iedModel_PROT_VZGGIO22_NamPlt_d;
+
+extern DataObject iedModel_PROT_VZGGIO22_Alm;
+extern DataAttribute iedModel_PROT_VZGGIO22_Alm_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO22_Alm_q;
+extern DataAttribute iedModel_PROT_VZGGIO22_Alm_t;
+//VZGGIO23--------------------------------------------------------------------
+extern LogicalNode iedModel_PROT_VZGGIO23;
+
+extern DataObject iedModel_PROT_VZGGIO23_Mod;
+extern DataAttribute iedModel_PROT_VZGGIO23_Mod_q;
+extern DataAttribute iedModel_PROT_VZGGIO23_Mod_t;
+extern DataAttribute iedModel_PROT_VZGGIO23_Mod_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO23_Mod_ctlModel;
+
+extern DataObject iedModel_PROT_VZGGIO23_Beh;
+extern DataAttribute iedModel_PROT_VZGGIO23_Beh_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO23_Beh_q;
+extern DataAttribute iedModel_PROT_VZGGIO23_Beh_t;
+
+extern DataObject iedModel_PROT_VZGGIO23_Health;
+extern DataAttribute iedModel_PROT_VZGGIO23_Health_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO23_Health_q;
+extern DataAttribute iedModel_PROT_VZGGIO23_Health_t;
+
+extern DataObject iedModel_PROT_VZGGIO23_NamPlt;
+
+extern DataAttribute iedModel_PROT_VZGGIO23_NamPlt_vendor;
+extern DataAttribute iedModel_PROT_VZGGIO23_NamPlt_swRev;
+extern DataAttribute iedModel_PROT_VZGGIO23_NamPlt_d;
+
+extern DataObject iedModel_PROT_VZGGIO23_Alm;
+extern DataAttribute iedModel_PROT_VZGGIO23_Alm_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO23_Alm_q;
+extern DataAttribute iedModel_PROT_VZGGIO23_Alm_t;
+//VZGGIO24--------------------------------------------------------------------
+extern LogicalNode iedModel_PROT_VZGGIO24;
+
+extern DataObject iedModel_PROT_VZGGIO24_Mod;
+extern DataAttribute iedModel_PROT_VZGGIO24_Mod_q;
+extern DataAttribute iedModel_PROT_VZGGIO24_Mod_t;
+extern DataAttribute iedModel_PROT_VZGGIO24_Mod_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO24_Mod_ctlModel;
+
+extern DataObject iedModel_PROT_VZGGIO24_Beh;
+extern DataAttribute iedModel_PROT_VZGGIO24_Beh_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO24_Beh_q;
+extern DataAttribute iedModel_PROT_VZGGIO24_Beh_t;
+
+extern DataObject iedModel_PROT_VZGGIO24_Health;
+extern DataAttribute iedModel_PROT_VZGGIO24_Health_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO24_Health_q;
+extern DataAttribute iedModel_PROT_VZGGIO24_Health_t;
+
+extern DataObject iedModel_PROT_VZGGIO24_NamPlt;
+
+extern DataAttribute iedModel_PROT_VZGGIO24_NamPlt_vendor;
+extern DataAttribute iedModel_PROT_VZGGIO24_NamPlt_swRev;
+extern DataAttribute iedModel_PROT_VZGGIO24_NamPlt_d;
+
+extern DataObject iedModel_PROT_VZGGIO24_Alm;
+extern DataAttribute iedModel_PROT_VZGGIO24_Alm_stVal;
+extern DataAttribute iedModel_PROT_VZGGIO24_Alm_q;
+extern DataAttribute iedModel_PROT_VZGGIO24_Alm_t;
 
 #if defined (MR902)
 //----------------------------------------------------------------------------
@@ -5149,7 +6213,53 @@ extern DataAttribute iedModel_CTRL_PTRC_Op20_q;
 extern DataAttribute iedModel_CTRL_PTRC_Op20_t;
 extern DataAttribute iedModel_CTRL_PTRC_Op20_dU;
 
+extern DataObject    iedModel_CTRL_PTRC_Op21;
+extern DataAttribute iedModel_CTRL_PTRC_Op21_general;
+extern DataAttribute iedModel_CTRL_PTRC_Op21_q;
+extern DataAttribute iedModel_CTRL_PTRC_Op21_t;
+extern DataAttribute iedModel_CTRL_PTRC_Op21_dU;
 
+extern DataObject    iedModel_CTRL_PTRC_Op22;
+extern DataAttribute iedModel_CTRL_PTRC_Op22_general;
+extern DataAttribute iedModel_CTRL_PTRC_Op22_q;
+extern DataAttribute iedModel_CTRL_PTRC_Op22_t;
+extern DataAttribute iedModel_CTRL_PTRC_Op22_dU;
+
+extern DataObject    iedModel_CTRL_PTRC_Op23;
+extern DataAttribute iedModel_CTRL_PTRC_Op23_general;
+extern DataAttribute iedModel_CTRL_PTRC_Op23_q;
+extern DataAttribute iedModel_CTRL_PTRC_Op23_t;
+extern DataAttribute iedModel_CTRL_PTRC_Op23_dU;
+
+extern DataObject    iedModel_CTRL_PTRC_Op24;
+extern DataAttribute iedModel_CTRL_PTRC_Op24_general;
+extern DataAttribute iedModel_CTRL_PTRC_Op24_q;
+extern DataAttribute iedModel_CTRL_PTRC_Op24_t;
+extern DataAttribute iedModel_CTRL_PTRC_Op24_dU;
+
+extern DataObject    iedModel_CTRL_PTRC_Op25;
+extern DataAttribute iedModel_CTRL_PTRC_Op25_general;
+extern DataAttribute iedModel_CTRL_PTRC_Op25_q;
+extern DataAttribute iedModel_CTRL_PTRC_Op25_t;
+extern DataAttribute iedModel_CTRL_PTRC_Op25_dU;
+
+extern DataObject    iedModel_CTRL_PTRC_Op26;
+extern DataAttribute iedModel_CTRL_PTRC_Op26_general;
+extern DataAttribute iedModel_CTRL_PTRC_Op26_q;
+extern DataAttribute iedModel_CTRL_PTRC_Op26_t;
+extern DataAttribute iedModel_CTRL_PTRC_Op26_dU;
+
+extern DataObject    iedModel_CTRL_PTRC_Op27;
+extern DataAttribute iedModel_CTRL_PTRC_Op27_general;
+extern DataAttribute iedModel_CTRL_PTRC_Op27_q;
+extern DataAttribute iedModel_CTRL_PTRC_Op27_t;
+extern DataAttribute iedModel_CTRL_PTRC_Op27_dU;
+
+extern DataObject    iedModel_CTRL_PTRC_Op28;
+extern DataAttribute iedModel_CTRL_PTRC_Op28_general;
+extern DataAttribute iedModel_CTRL_PTRC_Op28_q;
+extern DataAttribute iedModel_CTRL_PTRC_Op28_t;
+extern DataAttribute iedModel_CTRL_PTRC_Op28_dU;
 //----------------------------------------------------------------------------
 // GGIO1
 //----------------------------------------------------------------------------

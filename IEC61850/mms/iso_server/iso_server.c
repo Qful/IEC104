@@ -69,7 +69,9 @@ uint64_t 			SSHTimer;				// таймер отладочного порта
 #define				_10min			100 * 600 *10
 
 extern 	xQueueHandle 	Rd_SysNoteQueue;		// очередь дл€ запросов журналу системы
-uint64_t 	lastSynchTimeNTP = 0;
+extern xQueueHandle 	Rd_OscNoteQueue;		// очередь дл€ запросов журналу осциллографа
+
+extern  uint64_t 	lastSynchTimeNTP;
 bool 		resynchNTP_ready = true;
 
 struct sIsoServer {
@@ -83,7 +85,7 @@ struct sIsoServer {
 #if (CONFIG_MMS_THREADLESS_STACK != 1)
     Thread serverThread;
 #endif
-
+/*
     PhyPortsMode 			PHYPortsMode;			// режим работы порта
     PhyPortsForTransmit		PHYTransmitport;		// текущие открытые порты дл€ передачи. Ќужны дл€ резервировани€ и фитрации
 
@@ -92,7 +94,7 @@ struct sIsoServer {
 
     bool 					AppendHSR;			// добавл€ть резервирование HSR
     uint16_t 				hsrSeqNum;
-
+*/
 
     Socket 			NTPSocket;
     int 			NTPPort;
@@ -361,7 +363,7 @@ static bool		setupIsoServer(IsoServer self)
 {
     bool success = true;
 
-    self->serverSocket = (ServerSocket) TcpServerSocket_create(self->localIpAddress, self->tcpPort);			// создали TCP сокет назначили IP и открыли порт
+    self->serverSocket = (ServerSocket) TcpServerSocket_create(self->localIpAddress, self->tcpPort, true);			// создали TCP сокет назначили IP и открыли порт
   	USART_TRACE_GREEN("ISO_SERVER: localIpAddress: %s tcpPort: %u\n", self->localIpAddress,(int)self->tcpPort);
     if (self->serverSocket == NULL) {
         self->state = ISO_SVR_STATE_ERROR;
@@ -371,33 +373,8 @@ static bool		setupIsoServer(IsoServer self)
     ServerSocket_setBacklog((ServerSocket) self->serverSocket, BACKLOG);			// установим очередь ожидающих
     ServerSocket_listen((ServerSocket) self->serverSocket);							// Ќачинаем слушать вход€щие подключени€
 
-    //---------
-/*
-    self->HTTPserverSocket = (Socket) TcpServerSocket_create(self->localIpAddress, HTTP_PORT);	//self->SecurePort
-   	USART_TRACE_GREEN("ISO_SERVER: localIpAddress: %s tcpPort: %u\n", self->localIpAddress,(int)HTTP_PORT);
-    ServerSocket_setBacklog((ServerSocket) self->HTTPserverSocket, BACKLOG);		// установим очередь ожидающих
-    ServerSocket_listen((ServerSocket) self->HTTPserverSocket);					// Ќачинаем слушать вход€щие подключени€
-*/
-    //---------
-/*
-    self->SSHserverSocket = (ServerSocket) TcpServerSocket_create(self->localIpAddress, SSH_PORT);	//self->SecurePort
-   	USART_TRACE_GREEN("ISO_SERVER: localIpAddress: %s SSHPort: %u\n", self->localIpAddress,(int)SSH_PORT);
-    ServerSocket_setBacklog((ServerSocket) self->SSHserverSocket, BACKLOG);		// установим очередь ожидающих
-    ServerSocket_listen((ServerSocket) self->SSHserverSocket);					// Ќачинаем слушать вход€щие подключени€
-*/
-    //---------
-
 
     self->state = ISO_SVR_STATE_RUNNING;
-
-
-	if (lastSynchTimeNTP == 0) lastSynchTimeNTP = Hal_getTimeInMs();		// если первый заход, то засинронизируем часы
-
-    self->NTPPeriod = stNTPPeriod;
-    self->NTPPort = NTP_PORT;
-    self->NTPSocket = (Socket) UDPClientSocket_create (self->localIpAddress, 0);	// открываем порт дл€ приема NTP пакетов от сервера NTP
-
-//   	USART_TRACE_GREEN("ISO_SERVER: SNTPServer: %s Port: %u\n", &NTP_IP,(int)NTP_PORT);
 
 #if (CONFIG_MAXIMUM_TCP_CLIENT_CONNECTIONS != -1)
 
@@ -478,7 +455,8 @@ static void		handleIsoConnectionsThreadless(IsoServer self)
  *
  * @param self
  ***********************************************************************************************/
-void		handleNTPConnectionsThreadless(IsoServer self)
+//void		handleNTPConnectionsThreadless(IsoServer self)
+void		handleNTPConnectionsThreadless(Socket NTPSocket, int NTPPort)
 {
     //++ лиент NTP++++++++++++++++++++++++++++++++++++++++++++++
     // делаем запрос с нужной периодичностью.
@@ -488,19 +466,20 @@ void		handleNTPConnectionsThreadless(IsoServer self)
 		sprintf(NTP_IP,"%d.%d.%d.%d",SNTP_IP_ADDR[0],SNTP_IP_ADDR[1],SNTP_IP_ADDR[2],SNTP_IP_ADDR[3]);
 //		if (currentTime > nextSynchTimeNTP) {
 		if (abs(currentTime-lastSynchTimeNTP) > SNTP_Period*60*1000) {
-			int ret = sntp_client_serve(self->NTPSocket,(const char*)&NTP_IP,self->NTPPort,Write);
+			int ret = sntp_client_serve(NTPSocket,(const char*)&NTP_IP,NTPPort,Write);
 			lastSynchTimeNTP = Hal_getTimeInMs();// + SNTP_Period*60*1000;//*60*1000;								// следующа€ пересинхронизаци€ через 5 секунд если не пришел ответ
 			if (ret == 0) resynchNTP_ready = false;
 
-			Print_Sockets();
+//			Print_Sockets();
 
-			AddToQueueMB(Rd_SysNoteQueue, MB_Wrt_OscNoteAdr0		,MB_Slaveaddr);		// ставим задачу сброса записи
-			AddToQueueMB(Rd_SysNoteQueue, MB_Rd_OscNote				,MB_Slaveaddr);		// ставим задачу чтени€ журнала осцилл.
+// не помню зачем € тут это делал
+//			AddToQueueMB(Rd_OscNoteQueue, MB_Wrt_OscNoteAdr0		,MB_Slaveaddr);					// ставим задачу сброса записи
+//			AddToQueueMB(Rd_OscNoteQueue, MB_Rd_OscNote				,MB_Slaveaddr);					// ставим задачу чтени€ журнала осцилл.
 
 
 		}//else{
 			if (resynchNTP_ready == false){
-				resynchNTP_ready = (bool)sntp_client_serve(self->NTPSocket,(const char*)&NTP_IP,self->NTPPort,Read);
+				resynchNTP_ready = (bool)sntp_client_serve(NTPSocket,(const char*)&NTP_IP,NTPPort,Read);
 				if (resynchNTP_ready){
 					lastSynchTimeNTP = Hal_getTimeInMs();// + SNTP_Period*60*1000;//*60*1000;		// следующа€ пересинхронизаци€
 				}
@@ -656,8 +635,6 @@ IsoServer_setEthernetParam(IsoServer self, char* ipAddress, char* mask, char* ga
 	self->localIpAddress = (char *)IPBuffer;
 	self->netMask = (char *)MaskPBuffer;
 	self->gateway = (char *)GWBuffer;
-	self->PHYPortsMode =  PHY_SWITCH_DEFAULT;
-	self->PHYTransmitport = PHY_PORT_1_2;
 }
 
 void
@@ -696,77 +673,6 @@ IsoServerState
 IsoServer_getState(IsoServer self)
 {
     return self->state;
-}
-
-PhyPortsForTransmit
-IsoServer_getPHYTransmitport(IsoServer self)
-{
-    return self->PHYTransmitport;
-}
-/************************************************************************
- */
-
-void	IsoServer_PRP_on(IsoServer self){
-    self->AppendPRP = true;
-}
-void	IsoServer_PRP_off(IsoServer self){
-    self->AppendPRP = false;
-}
-void	IsoServer_PRPSeqNum_increase(IsoServer self){
-     self->prpSeqNum++;
-}
-
-void	IsoServer_PRPSeqNum_reset(IsoServer self){
-    self->prpSeqNum = 0;
-}
-
-
-bool
-IsoServer_getAppendPRP(IsoServer self)
-{
-    return self->AppendPRP;
-}
-
-uint16_t
-IsoServer_getprpSeqNum(IsoServer self)
-{
-    return self->prpSeqNum;
-}
-/************************************************************************
- */
-void	IsoServer_HSR_on(IsoServer self){
-    self->AppendHSR = true;
-}
-void	IsoServer_HSR_off(IsoServer self){
-    self->AppendHSR = false;
-}
-void	IsoServer_HSRSeqNum_increase(IsoServer self){
-     self->hsrSeqNum++;
-}
-
-void	IsoServer_HSRSeqNum_reset(IsoServer self){
-    self->hsrSeqNum = 0;
-}
-
-bool
-IsoServer_getAppendHSR(IsoServer self)
-{
-    return self->AppendHSR;
-}
-uint16_t
-IsoServer_gethsrSeqNum(IsoServer self)
-{
-    return self->hsrSeqNum;
-}
-/************************************************************************
- *
- * @param self
- * @param ports
- */
-void
-IsoServer_setPHYTransmitport(IsoServer self, PhyPortsForTransmit ports)
-{
-	self->PHYTransmitport = ports;
 }
 
 void

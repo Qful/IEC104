@@ -11,6 +11,8 @@
 #include "lwip/mem.h"
 #include "lwip/udp.h"
 
+#define FTP_fifo_Size		2000
+
 #define BACKLOG 			5				// ожидающие подключение.  похоже можно только = 1 в lwIP
 
 #define		_10min			100 * 600 *10	// лимит сеанса SSH

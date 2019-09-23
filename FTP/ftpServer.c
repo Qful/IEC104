@@ -16,7 +16,6 @@
 #include "time.h"
 #include "stdlib.h"
 //#include "stdbool.h"
-#include "string.h"
 #include "stdio.h"
 #include <stdarg.h>
 #include <ctype.h>
@@ -30,20 +29,24 @@
 #include "lwip/api.h"
 #include "lwip/sys.h"
 
+#include "sfifo.h"
 #include "vfs.h"
 
 #include "ftpServer.h"
 #include "httpServer.h"
+#include "sntpclient.h"
+#include "MBTCP_main.h"
 
 //#include "tftputils.h"
 #include "ff.h"
 #include "stm32f4xx_hal.h"
-#include <string.h>
 
 #include "iso_server.h"
 #include "iec61850_server.h"
 
 #include "hal_socket.h"
+
+#include "lib_memory.h"
 
 /*************************************************************************
  * define
@@ -95,7 +98,6 @@
 #define msg552 		"552 Requested file action aborted."
 #define msg553 		"553 Requested action not taken."
 
-#define	SFIFO_MAX_BUFFER_SIZE	0x7fff
 
 /** Copy IP address - faster than ip4_addr_set: no NULL check */
 //#define ip4_addr_copy(dest, src) ((dest).addr = (src).addr)
@@ -132,21 +134,6 @@ static const char *month_table[12] = {
 	"Dez"
 };
 
-typedef int sfifo_atomic_t;
-
-typedef struct sfifo_t
-{
-	char 			*buffer;
-	int 			size;			/* Number of bytes */
-	sfifo_atomic_t 	readpos;		/* Read position */
-	sfifo_atomic_t 	writepos;		/* Write position */
-} sfifo_t;
-
-#define SFIFO_SIZEMASK(x)	((x)->size - 1)
-
-#define sfifo_used(x)	(((x)->writepos - (x)->readpos) & SFIFO_SIZEMASK(x))
-#define sfifo_space(x)	((x)->size - 1 - sfifo_used(x))
-
 struct ip4_addr {
   u32_t addr;
 };
@@ -168,7 +155,7 @@ struct ftpd_msgstate {
 	struct ip4_addr 		dataip;
 	u16_t 					dataport;
 	struct tcp_pcb 			*datapcb;
-	struct ftpd_datastate 	*datafs;
+	struct ftpd_datastate 	*datafs;				// соединение для передачи данных
 	int 					passive;
 	char 					*renamefrom;
 };
@@ -185,6 +172,8 @@ struct ftpd_msgstate {
 extern IedServer 	iedServer;
 extern osMutexId 	xFTPStartMutex;				// мьютекс готовности к запуску FTP
 
+// все используемые сокеты
+extern ServerSocket SocketTCPMB;
 /*************************************************************************
  * functions
  *************************************************************************/
@@ -192,81 +181,6 @@ static void send_msg(struct tcp_pcb *pcb, struct ftpd_msgstate *fsm, char *msg, 
 
 static void ftpd_msgclose(struct tcp_pcb *pcb, struct ftpd_msgstate *fsm);
 
-void ftp_server_serve(Socket self);
-
-/*************************************************************************
- * Alloc buffer, init FIFO etc...
- *************************************************************************/
-static int sfifo_init(sfifo_t *f, int size)
-{
-	memset(f, 0, sizeof(sfifo_t));
-
-	if(size > SFIFO_MAX_BUFFER_SIZE)
-		return -EINVAL;
-
-	/*
-	 * Set sufficient power-of-2 size.
-	 *
-	 * No, there's no bug. If you need
-	 * room for N bytes, the buffer must
-	 * be at least N+1 bytes. (The fifo
-	 * can't tell 'empty' from 'full'
-	 * without unsafe index manipulations
-	 * otherwise.)
-	 */
-	f->size = 1;
-	for(; f->size <= size; f->size <<= 1)
-		;
-
-	/* Get buffer */
-	if( 0 == (f->buffer = (void *)malloc(f->size)) )
-		return -ENOMEM;
-
-	return 0;
-}
-/*************************************************************************
- * Dealloc buffer etc...
- *************************************************************************/
-static void sfifo_close(sfifo_t *f)
-{
-	if(f->buffer)
-		free(f->buffer);
-}
-/*************************************************************************
- * Write bytes to a FIFO
- * Return number of bytes written, or an error code
- *************************************************************************/
-
-static int sfifo_write(sfifo_t *f, const void *_buf, int len)
-{
-	int total;
-	int i;
-	const char *buf = (const char *)_buf;
-
-	if(!f->buffer)
-		return -ENODEV;	/* No buffer! */
-
-	/* total = len = min(space, len) */
-	total = sfifo_space(f);
-//	USART_TRACE("sfifo_space() = %d\n",total);
-	if(len > total)
-		len = total;
-	else
-		total = len;
-
-	i = f->writepos;
-	if(i + len > f->size)
-	{
-		memcpy(f->buffer + i, buf, f->size - i);
-		buf += f->size - i;
-		len -= f->size - i;
-		i = 0;
-	}
-	memcpy(f->buffer + i, buf, len);
-	f->writepos = i + len;
-
-	return total;
-}
 // -----------------------------------------------
 static void ftpd_dataerr(void *arg, err_t err)
 {
@@ -278,7 +192,7 @@ static void ftpd_dataerr(void *arg, err_t err)
 
 	fsd->msgfs->datafs = NULL;
 	fsd->msgfs->state = FTPD_IDLE;
-	free(fsd);
+	GLOBAL_FREEMEM(fsd);
 }
 // -----------------------------------------------
 static void ftpd_dataclose(struct tcp_pcb *pcb, struct ftpd_datastate *fsd)
@@ -288,7 +202,7 @@ static void ftpd_dataclose(struct tcp_pcb *pcb, struct ftpd_datastate *fsd)
 	tcp_recv(pcb, NULL);
 	fsd->msgfs->datafs = NULL;
 	sfifo_close(&fsd->fifo);
-	free(fsd);
+	GLOBAL_FREEMEM(fsd);
 	tcp_arg(pcb, NULL);
 	tcp_close(pcb);
 }
@@ -332,6 +246,7 @@ static void send_data(struct tcp_pcb *pcb, struct ftpd_datastate *fsd)
 }
 /*************************************************************************
  * send_file
+ * buffer[2048] заменить на malloc
  *************************************************************************/
 static void send_file(struct ftpd_datastate *fsd, struct tcp_pcb *pcb)
 {
@@ -339,7 +254,7 @@ static void send_file(struct ftpd_datastate *fsd, struct tcp_pcb *pcb)
 		return;
 
 	if (fsd->vfs_file) {
-		char buffer[2048];
+		char buffer[2048];		// заменить на malloc
 		int len;
 
 		len = sfifo_space(&fsd->fifo);
@@ -591,7 +506,7 @@ static int open_dataconnection(struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
 	if (fsm->passive)	return 0;
 
 	/* Allocate memory for the structure that holds the state of the connection. */
-	fsm->datafs = malloc(sizeof(struct ftpd_datastate));
+	fsm->datafs = GLOBAL_MALLOC(sizeof(struct ftpd_datastate));
 
 	if (fsm->datafs == NULL) {
 		send_msg(pcb, fsm, msg451);
@@ -600,7 +515,7 @@ static int open_dataconnection(struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
 	memset(fsm->datafs, 0, sizeof(struct ftpd_datastate));
 	fsm->datafs->msgfs = fsm;
 	fsm->datafs->msgpcb = pcb;
-	sfifo_init(&fsm->datafs->fifo, 2000);
+	sfifo_init(&fsm->datafs->fifo, FTP_fifo_Size);
 
 	fsm->datapcb = tcp_new();
 	/* Tell TCP that this is the structure we wish to be passed for our callbacks. */
@@ -691,7 +606,7 @@ static void cmd_quit(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 {
 	send_msg(pcb, fsm, msg221);
 	fsm->state = FTPD_QUIT;
-//	ftpd_msgclose(pcb,fsm);
+	ftpd_msgclose(pcb,fsm);
 }
 /*************************************************************************
  * cmd_cwd
@@ -724,7 +639,7 @@ static void cmd_pwd(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate *
 
 	if ((path = vfs_getcwd(fsm->vfs, NULL, 0))) {
 		send_msg(pcb, fsm, msg257PWD, path);
-		free(path);
+		GLOBAL_FREEMEM(path);
 	}
 }
 /*************************************************************************
@@ -741,7 +656,7 @@ static void cmd_list_common(const char *arg, struct tcp_pcb *pcb, struct ftpd_ms
 		return;
 	}
 	vfs_dir = vfs_opendir(fsm->vfs, cwd);
-	free(cwd);
+	GLOBAL_FREEMEM(cwd);
 	if (!vfs_dir) {
 		send_msg(pcb, fsm, msg451);
 		return;
@@ -849,7 +764,7 @@ static void cmd_pasv(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 
 	/* Allocate memory for the structure that holds the state of the
 	   connection. */
-	fsm->datafs = malloc(sizeof(struct ftpd_datastate));
+	fsm->datafs = GLOBAL_MALLOC(sizeof(struct ftpd_datastate));
 
 	if (fsm->datafs == NULL) {
 		send_msg(pcb, fsm, msg451);
@@ -859,12 +774,12 @@ static void cmd_pasv(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 
 	fsm->datapcb = tcp_new();
 	if (!fsm->datapcb) {
-		free(fsm->datafs);
+		GLOBAL_FREEMEM(fsm->datafs);
 		send_msg(pcb, fsm, msg451);
 		return;
 	}
 
-	sfifo_init(&fsm->datafs->fifo, 2000);
+	sfifo_init(&fsm->datafs->fifo, FTP_fifo_Size);
 
 	start_port = port;
 
@@ -930,7 +845,7 @@ static void cmd_abrt(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 		tcp_arg(fsm->datapcb, NULL);
 		tcp_abort(pcb);
 		sfifo_close(&fsm->datafs->fifo);
-		free(fsm->datafs);
+		GLOBAL_FREEMEM(fsm->datafs);
 		fsm->datafs = NULL;
 	}
 	fsm->state = FTPD_IDLE;
@@ -968,7 +883,7 @@ static void cmd_rnfr(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 		return;
 	}
 	if (fsm->renamefrom)
-		free(fsm->renamefrom);
+		GLOBAL_FREEMEM(fsm->renamefrom);
 	fsm->renamefrom = malloc(strlen(arg) + 1);
 	if (fsm->renamefrom == NULL) {
 		send_msg(pcb, fsm, msg451);
@@ -1163,7 +1078,7 @@ static void send_msgdata(struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
 static void send_msg(struct tcp_pcb *pcb, struct ftpd_msgstate *fsm, char *msg, ...)
 {
 	va_list arg;
-	char buffer[1024];
+	char buffer[1024];		// заменить на malloc
 	int len;
 
 	va_start(arg, msg);
@@ -1190,9 +1105,9 @@ static void ftpd_msgerr(void *arg, err_t err)
 	sfifo_close(&fsm->fifo);
 	vfs_close(fsm->vfs);
 	fsm->vfs = NULL;
-	if (fsm->renamefrom)	free(fsm->renamefrom);
+	if (fsm->renamefrom)	GLOBAL_FREEMEM(fsm->renamefrom);
 	fsm->renamefrom = NULL;
-	free(fsm);
+	GLOBAL_FREEMEM(fsm);
 }
 /*************************************************************************
  * ftpd_msgclose
@@ -1206,9 +1121,9 @@ static void ftpd_msgclose(struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
 	sfifo_close(&fsm->fifo);
 	vfs_close(fsm->vfs);
 	fsm->vfs = NULL;
-	if (fsm->renamefrom)		free(fsm->renamefrom);
+	if (fsm->renamefrom)		GLOBAL_FREEMEM(fsm->renamefrom);
 	fsm->renamefrom = NULL;
-	free(fsm);
+	GLOBAL_FREEMEM(fsm);
 	tcp_arg(pcb, NULL);
 	tcp_close(pcb);
 
@@ -1247,7 +1162,7 @@ static err_t ftpd_msgrecv(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t 
 		/* Inform TCP that we have taken the data. */
 		tcp_recved(pcb, p->tot_len);
 
-		text = malloc(p->tot_len + 1);
+		text = GLOBAL_MALLOC(p->tot_len + 1);
 		if (text) {
 			char cmd[5];
 			struct pbuf *q;
@@ -1287,7 +1202,7 @@ static err_t ftpd_msgrecv(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t 
 			else
 				send_msg(pcb, fsm, msg502);
 
-			free(text);
+			GLOBAL_FREEMEM(text);
 		}
 		pbuf_free(p);
 	} else if (err == ERR_OK && p == NULL) {
@@ -1334,46 +1249,55 @@ static err_t ftpd_msgaccept(void *arg, struct tcp_pcb *pcb, err_t err)
 
 	/* Allocate memory for the structure that holds the state of the connection. */
 	// Выделим память для структуры, которая содержит состояние соединения.
-	fsm = malloc(sizeof(struct ftpd_msgstate));
+	fsm = GLOBAL_MALLOC(sizeof(struct ftpd_msgstate));
 
 	if (fsm == NULL) {
 		USART_TRACE("ftpd_msgaccept: Недостаточно памяти.\n");
 		return ERR_MEM;
 	}
+	USART_TRACE("ftpd_msgaccept.\n");
+
 	memset(fsm, 0, sizeof(struct ftpd_msgstate));
 
 	/* Initialize the structure. */
 	// инитим структуру
-	sfifo_init(&fsm->fifo, 2000);			// размер буфера
+//	USART_TRACE("sfifo_init инитим структуру\n");
+	sfifo_init(&fsm->fifo, FTP_fifo_Size);	// размер буфера
 	fsm->state = FTPD_IDLE;					// режим FTP
 	fsm->vfs = vfs_openfs();				//
 
 	if (!fsm->vfs) {
-		free(fsm);
+		GLOBAL_FREEMEM(fsm);
+		USART_TRACE("fsm = free()\n");
 		return ERR_CLSD;
 	}
 
 	/* Tell TCP that this is the structure we wish to be passed for our callbacks. */
 	// Сообщим TCP, что это структура, которую мы хотим передать для наших обратных вызовов.
+//	USART_TRACE("tcp_arg(pcb, fsm);\n");
 	tcp_arg(pcb, fsm);
 
 	/* Tell TCP that we wish to be informed of incoming data by a call to the http_recv() function. */
 	// Сообщм TCP, что мы хотим получать информацию о входящих данных путем вызова функции http_recv()
+//	USART_TRACE("tcp_recv(pcb, ftpd_msgrecv);\n");
 	tcp_recv(pcb, ftpd_msgrecv);
 
 	/* Tell TCP that we wish be to informed of data that has been successfully sent by a call to the ftpd_sent() function. */
 	// Сообщим TCP, что мы хотим сообщить о данных, которые будем передавать вызовом функции ftpd_sent ().
+//	USART_TRACE("tcp_sent(pcb, ftpd_msgsent);\n");
 	tcp_sent(pcb, ftpd_msgsent);
 
+//	USART_TRACE("tcp_err(pcb, ftpd_msgerr);\n");
 	tcp_err(pcb, ftpd_msgerr);
 
+//	USART_TRACE("tcp_poll(pcb, ftpd_msgpoll, 1);\n");
 	tcp_poll(pcb, ftpd_msgpoll, 1);
 
+//	USART_TRACE("send_msg(pcb, fsm, msg220);\n");
 	send_msg(pcb, fsm, msg220);
 
 	return ERR_OK;
 }
-
 /*************************************************************************
  * ftpd_init
  * инит и старт
@@ -1385,192 +1309,18 @@ void ftpd_init(void)
 	vfs_load_plugin(vfs_default_fs);
 
 	pcb = tcp_new();
-	tcp_bind(pcb, IP_ADDR_ANY, 21);
+	tcp_bind(pcb, IP_ADDR_ANY, FTP_Port);
 	pcb = tcp_listen(pcb);
 	tcp_accept(pcb, ftpd_msgaccept);
 }
-
 /*************************************************************************
  * StartFTPTask
  *************************************************************************/
 void StartFTPTask(void const * argument){
 
-  uint32_t 	SSHTimer = 0;				// таймер отладочного порта
-  IsoServer isoServer = NULL;
-  Socket	connectionSocketFTP;
-  Socket	connectionSocketHTTP;
-  Socket	connectionSocketSSH;
+    ftpd_init();			// вот и весь таск FTP
 
-  ServerSocket	tmpHTTP = NULL;
+    vTaskDelete(NULL);
 
-  char*		LocalIP;
-
-  osStatus status = osMutexWait(xFTPStartMutex,TIMEOUT_startServer+1000);		// блокируемся	osWaitForever
-  if (status != osOK) {
-  	// не запустился, всё нам конец.
-		USART_TRACE_RED("не запустился FTP таск\n");
-  }else{
-	  osMutexRelease(xFTPStartMutex);
-  }
-
-restartTask:
-
-  if (iedServer) {
-	  isoServer = (IsoServer)IedServer_getIsoServer(iedServer);
-	  if (isoServer && tmpHTTP == NULL){
-		  IsoServer_SetFTPPort(isoServer,FTP_Port);
-		  IsoServer_SetHTTPPort(isoServer,HTTP_Port);
-		  IsoServer_SetSSHPort(isoServer,SSH_Port);
-		  IsoServer_ClrSSHConnect(isoServer);
-
-		  LocalIP = IsoServer_getLocalIpAddress(isoServer);
-
-		  //---------
-		    ftpd_init();			// вот и весь таск FTP
-/*
-		  	IsoServer_SetFTPServerSocket(isoServer,TcpServerSocket_create(LocalIP, FTP_Port));
-		  	USART_TRACE_GREEN("FTP_SERVER: localIpAddress: %s Port: %u\n", LocalIP,(int)FTP_Port);
-		  	ServerSocket_setBacklog((ServerSocket) IsoServer_GetFTPServerSocket(isoServer), BACKLOG);		// установим очередь ожидающих
-		  	ServerSocket_listen((ServerSocket) IsoServer_GetFTPServerSocket(isoServer));					// Начинаем слушать входящие подключения
-*/
-		  //---------
-		  	IsoServer_SetHTTPServerSocket(isoServer,TcpServerSocket_create(LocalIP, HTTP_Port));
-		  	USART_TRACE_GREEN("HTTP_SERVER: localIpAddress: %s tcpPort: %u\n", LocalIP,(int)HTTP_Port);
-		  	ServerSocket_setBacklog((ServerSocket) IsoServer_GetHTTPServerSocket(isoServer), 0);		//BACKLOG
-		  	ServerSocket_listen((ServerSocket) IsoServer_GetHTTPServerSocket(isoServer));
-		  //---------
-/*
-
-   	  		IsoServer_SetSSHServerSocket(isoServer,TcpServerSocket_create(LocalIP, SSH_Port));
-		    USART_TRACE_GREEN("SSH_SERVER: localIpAddress: %s SSHPort: %u\n", LocalIP,(int)SSH_Port);
-		    ServerSocket_setBacklog((ServerSocket) IsoServer_GetSSHServerSocket(isoServer), 0);		//BACKLOG
-		    ServerSocket_listen((ServerSocket) IsoServer_GetSSHServerSocket(isoServer));
-*/		  //---------
-
-	  }
-  } else{
-// ХЗ как он тут работать будет
-	LocalIP ="192.168.0.254";
-
-	tmpHTTP = TcpServerSocket_create(LocalIP, HTTP_Port);
-	if (tmpHTTP){
-		USART_TRACE_GREEN("HTTP_SERVER:Временный localIpAddress: %s tcpPort: %u\n", LocalIP,(int)HTTP_Port);
-		ServerSocket_setBacklog(tmpHTTP, 0);		//BACKLOG
-		ServerSocket_listen(tmpHTTP);
-	} else {
-		goto restartTask;
-	}
-
-  }
-
-	for(;;)
-	{
-	// не сконфигурился 850 сервер		работаем врененно
-	if (!iedServer){
-
-		if ((connectionSocketHTTP = ServerSocket_accept(tmpHTTP)) != NULL) {
-			USART_TRACE_GREEN("соединение на HTTP порт.\n");
-			http_server_serve(connectionSocketHTTP);
-		}
-		taskYIELD();
-		continue;
-	}else{
-		//наконец сконфигурился 850
-		if (tmpHTTP){
-			// закрываем и пересоединяем нормальный коннект
-			USART_TRACE_RED("HTTP_SERVER:закрываем временный: tcpPort: %u\n",(int)HTTP_Port);
-			ServerSocket_destroy(tmpHTTP);
-			tmpHTTP = NULL;
-			goto restartTask;
-		}
-	}
-
-
-
-	handleNTPConnectionsThreadless(isoServer);					// Клиент NTP
-/***********************************************************************************************************
- * 21
- ***********************************************************************************************************/
-/*
-	if ((connectionSocketFTP = ServerSocket_accept((ServerSocket) IsoServer_GetFTPServerSocket(isoServer))) != NULL) {
-		USART_TRACE_GREEN("соединение на FTP порт.\n");
-	    ftp_server_serve(connectionSocketFTP);
-	} else{
-	}
-	taskYIELD();
-*/
-/***********************************************************************************************************
- * 80
- ***********************************************************************************************************/
-	if ((connectionSocketHTTP = ServerSocket_accept((ServerSocket) IsoServer_GetHTTPServerSocket(isoServer))) != NULL) {
-		USART_TRACE_GREEN("соединение на HTTP порт.\n");
-		http_server_serve(connectionSocketHTTP);
-	} else{
-	}
-	taskYIELD();
-/***********************************************************************************************************
- * 23
- ***********************************************************************************************************/
-/*	if ((connectionSocketSSH = ServerSocket_accept((ServerSocket) IsoServer_GetSSHServerSocket(isoServer))) != NULL) {
-		USART_TRACE_GREEN("соединение на SSH порт.\n");
-		IsoServer_SetSSHConnect(isoServer);
-		SocketSSH = connectionSocketSSH;
-		SSHTimer = HAL_GetTick();
-	} else{
-		if (SocketSSH){
-			if  (HAL_GetTick() > (SSHTimer + (uint32_t)_60min)){			// откроем на 10 минут
-				USART_TRACE_RED("закрыли SSH по таймауту.\n");
-				Socket_destroy(SocketSSH);
-				SocketSSH = 0;
-				IsoServer_ClrSSHConnect(isoServer);
-			}
-			// тут надо проверить активность соединения. И закрыть если нет ответа от порта
-		}
-	}
-	taskYIELD();
-*/
-/***********************************************************************************************************
-* END
-***********************************************************************************************************/
-								// отпустим задачу.
-	}
-  vTaskDelete(NULL);
-}
-
-/***********************************************************************************************************
-* ftp_server_serve
-***********************************************************************************************************/
-void ftp_server_serve(Socket self){
-
-	HandleSet handles = Handleset_new();
-	Handleset_addSocket(handles, self);
-
-	int result = Handleset_waitReady(handles, 1);			// проверка состояния сокетов ждем таймаут 5
-	Handleset_destroy(handles);
-
-	if (result < 1){
-	  USART_TRACE_RED("FTP без данных. Закрываем.\n");
-	  Socket_destroy(self);
-	  return;
-	}
-
-	int conn = GetSocket_num(self);
-
-	  int buflen = 1500;
-	  int ret;
-	  unsigned char recv_buffer[1500];
-
-	  // читаем из сокета запрос от клиента
-	  ret = read(conn, recv_buffer, buflen);
-
-	  if(ret == 0) {
-		  USART_TRACE_RED("Разорвал клиент.\n");
-		  Socket_destroy(self);
-		  return;
-	  }else
-	  if(ret < 0) {
-		  USART_TRACE_RED("ничего не прочитали. Закрываем. %i\n",ret);
-		  Socket_destroy(self);
-		  return;
-	  }
+	for(;;){}
 }

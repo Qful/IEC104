@@ -79,8 +79,8 @@ Ethernet_createSocket(const char* interfaceId, uint8_t* destAddress);
 void
 Ethernet_destroySocket(EthernetSocket ethSocket);
 
-void
-Ethernet_sendPacket(EthernetSocket ethSocket, GoosePublisher buffer, int packetSize);
+void Ethernet_sendPacket(EthernetSocket self, uint8_t* buffer, int packetSize);
+//void Ethernet_sendPacket(EthernetSocket ethSocket, GoosePublisher buffer, int packetSize);
 
 /*
  * \brief set a protocol filter for the specified etherType

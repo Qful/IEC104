@@ -829,6 +829,17 @@ extern DataAttribute iedModel_GGIO_INGGIO1_Ind24_stVal;
 extern DataAttribute iedModel_GGIO_INGGIO1_Ind24_q;
 extern DataAttribute iedModel_GGIO_INGGIO1_Ind24_t;
 
+extern DataObject    iedModel_GGIO_INGGIO1_Ind25;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind25_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind25_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind25_t;
+
+extern DataObject    iedModel_GGIO_INGGIO1_Ind26;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind26_stVal;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind26_q;
+extern DataAttribute iedModel_GGIO_INGGIO1_Ind26_t;
+
+
 //-SSLGGIO1 -------------------------------------------------------
 extern LogicalNode iedModel_GGIO_SSLGGIO1;
 extern DataObject iedModel_GGIO_SSLGGIO1_Mod;

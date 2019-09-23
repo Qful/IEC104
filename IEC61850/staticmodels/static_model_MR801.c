@@ -4,7 +4,7 @@
  * automatically generated from simpleIO_direct_control.scd
  */
 
-#if defined (MR801)
+#if (defined (MR801) && defined (OLD))
 
 #include "stdlib.h"
 #include "model.h"
@@ -4751,8 +4751,8 @@ DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_Check;
 IedModel iedModel = {
     "MR801",
     &iedModel_Generic_LD0,
-    &iedModelds_LD0_LLN0_dataset0,		// DataSet
-    &iedModel_LD0_LLN0_report0,		// ReportControlBlock
+    NULL,//&iedModelds_LD0_LLN0_dataset0,		// DataSet
+    NULL,//&iedModel_LD0_LLN0_report0,		// ReportControlBlock
     NULL,//&iedModel_PROT_LLN0_gse0,			// GSEControlBlock
     NULL,									// SVControlBlock
     &iedModel_LD0_LLN0_sgcb0,			// SettingGroupControlBlock
@@ -4834,7 +4834,7 @@ DataAttribute iedModel_LD0_LLN0_NamPlt_ldNs = {    DataAttributeModelType,    "l
 
 //DataObject iedModel_LD0_LLN0_SGCB = 			{ DataObjectModelType,    "SGCB", (ModelNode*) &iedModel_LD0_LLN0,    NULL,  (ModelNode*) &iedModel_LD0_LLN0_SGCB_ActSG,     0,    0};
 //DataAttribute iedModel_LD0_LLN0_SGCB_ActSG = 	{ DataAttributeModelType, "ActSG",(ModelNode*) &iedModel_LD0_LLN0_SGCB, (ModelNode*) &iedModel_LD0_LLN0_SGCB_q,     NULL,    0,    IEC61850_FC_CF,    IEC61850_INT8U, TRG_OPT_NO, NULL,0};
-//DataAttribute iedModel_LD0_LLN0_SGCB_q = 		{ DataAttributeModelType, "q",    (ModelNode*) &iedModel_LD0_LLN0_SGCB_ActSG, (ModelNode*) &iedModel_LD0_LLN0_SGCB_t,     NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+//DataAttribute iedModel_LD0_LLN0_SGCB_q = 		{ DataAttributeModelType, "q",    (ModelNode*) &iedModel_LD0_LLN0_SGCB_ActSG, (ModelNode*) &iedModel_LD0_LLN0_SGCB_t,     NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 //DataAttribute iedModel_LD0_LLN0_SGCB_t = 		{ DataAttributeModelType, "t",    (ModelNode*) &iedModel_LD0_LLN0_SGCB_ActSG,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -4869,7 +4869,7 @@ DataAttribute iedModel_PROT_LLN0_NamPlt_ldNs = {    DataAttributeModelType,    "
 
 //DataObject iedModel_PROT_LLN0_SGCB = 			{ DataObjectModelType,    "SGCB", (ModelNode*) &iedModel_PROT_LLN0,    NULL,  (ModelNode*) &iedModel_PROT_LLN0_SGCB_ActSG,     0,    0};
 //DataAttribute iedModel_PROT_LLN0_SGCB_ActSG = 	{ DataAttributeModelType, "ActSG",(ModelNode*) &iedModel_PROT_LLN0_SGCB, (ModelNode*) &iedModel_PROT_LLN0_SGCB_q,     NULL,    0,    IEC61850_FC_CF,    IEC61850_INT8U, TRG_OPT_NO, NULL,0};
-//DataAttribute iedModel_PROT_LLN0_SGCB_q = 		{ DataAttributeModelType, "q",    (ModelNode*) &iedModel_PROT_LLN0_SGCB_ActSG, (ModelNode*) &iedModel_PROT_LLN0_SGCB_t,     NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+//DataAttribute iedModel_PROT_LLN0_SGCB_q = 		{ DataAttributeModelType, "q",    (ModelNode*) &iedModel_PROT_LLN0_SGCB_ActSG, (ModelNode*) &iedModel_PROT_LLN0_SGCB_t,     NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 //DataAttribute iedModel_PROT_LLN0_SGCB_t = 		{ DataAttributeModelType, "t",    (ModelNode*) &iedModel_PROT_LLN0_SGCB_ActSG,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 /************************************************************************
@@ -4902,7 +4902,7 @@ DataAttribute iedModel_CTRL_LLN0_NamPlt_ldNs = {    DataAttributeModelType,    "
 
 //DataObject iedModel_CTRL_LLN0_SGCB = 			{ DataObjectModelType,    "SGCB", (ModelNode*) &iedModel_CTRL_LLN0,    NULL,  (ModelNode*) &iedModel_CTRL_LLN0_SGCB_ActSG,     0,    0};
 //DataAttribute iedModel_CTRL_LLN0_SGCB_ActSG = 	{ DataAttributeModelType, "ActSG",(ModelNode*) &iedModel_CTRL_LLN0_SGCB, (ModelNode*) &iedModel_CTRL_LLN0_SGCB_q,     NULL,    0,    IEC61850_FC_CF,    IEC61850_INT8U, TRG_OPT_NO, NULL,0};
-//DataAttribute iedModel_CTRL_LLN0_SGCB_q = 		{ DataAttributeModelType, "q",    (ModelNode*) &iedModel_CTRL_LLN0_SGCB_ActSG, (ModelNode*) &iedModel_CTRL_LLN0_SGCB_t,     NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+//DataAttribute iedModel_CTRL_LLN0_SGCB_q = 		{ DataAttributeModelType, "q",    (ModelNode*) &iedModel_CTRL_LLN0_SGCB_ActSG, (ModelNode*) &iedModel_CTRL_LLN0_SGCB_t,     NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 //DataAttribute iedModel_CTRL_LLN0_SGCB_t = 		{ DataAttributeModelType, "t",    (ModelNode*) &iedModel_CTRL_LLN0_SGCB_ActSG,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 /************************************************************************
  * MES_LLN0
@@ -4934,7 +4934,7 @@ DataAttribute iedModel_MES_LLN0_NamPlt_ldNs = {    DataAttributeModelType,    "l
 
 //DataObject iedModel_MES_LLN0_SGCB = 			{ DataObjectModelType,    "SGCB", (ModelNode*) &iedModel_MES_LLN0,    NULL,  (ModelNode*) &iedModel_MES_LLN0_SGCB_ActSG,     0,    0};
 //DataAttribute iedModel_MES_LLN0_SGCB_ActSG = 	{ DataAttributeModelType, "ActSG",(ModelNode*) &iedModel_MES_LLN0_SGCB, (ModelNode*) &iedModel_MES_LLN0_SGCB_q,     NULL,    0,    IEC61850_FC_CF,    IEC61850_INT8U, TRG_OPT_NO, NULL,0};
-//DataAttribute iedModel_MES_LLN0_SGCB_q = 		{ DataAttributeModelType, "q",    (ModelNode*) &iedModel_MES_LLN0_SGCB_ActSG, (ModelNode*) &iedModel_MES_LLN0_SGCB_t,     NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+//DataAttribute iedModel_MES_LLN0_SGCB_q = 		{ DataAttributeModelType, "q",    (ModelNode*) &iedModel_MES_LLN0_SGCB_ActSG, (ModelNode*) &iedModel_MES_LLN0_SGCB_t,     NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 //DataAttribute iedModel_MES_LLN0_SGCB_t = 		{ DataAttributeModelType, "t",    (ModelNode*) &iedModel_MES_LLN0_SGCB_ActSG,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 /************************************************************************
  * GGIO_LLN0
@@ -4966,7 +4966,7 @@ DataAttribute iedModel_GGIO_LLN0_NamPlt_ldNs = {    DataAttributeModelType,    "
 
 //DataObject iedModel_GGIO_LLN0_SGCB = 			{ DataObjectModelType,    "SGCB", (ModelNode*) &iedModel_GGIO_LLN0,    NULL,  (ModelNode*) &iedModel_GGIO_LLN0_SGCB_ActSG,     0,    0};
 //DataAttribute iedModel_GGIO_LLN0_SGCB_ActSG = 	{ DataAttributeModelType, "ActSG",(ModelNode*) &iedModel_GGIO_LLN0_SGCB, (ModelNode*) &iedModel_GGIO_LLN0_SGCB_q,     NULL,    0,    IEC61850_FC_CF,    IEC61850_INT8U, TRG_OPT_NO, NULL,0};
-//DataAttribute iedModel_GGIO_LLN0_SGCB_q = 		{ DataAttributeModelType, "q",    (ModelNode*) &iedModel_GGIO_LLN0_SGCB_ActSG, (ModelNode*) &iedModel_GGIO_LLN0_SGCB_t,     NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+//DataAttribute iedModel_GGIO_LLN0_SGCB_q = 		{ DataAttributeModelType, "q",    (ModelNode*) &iedModel_GGIO_LLN0_SGCB_ActSG, (ModelNode*) &iedModel_GGIO_LLN0_SGCB_t,     NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 //DataAttribute iedModel_GGIO_LLN0_SGCB_t = 		{ DataAttributeModelType, "t",    (ModelNode*) &iedModel_GGIO_LLN0_SGCB_ActSG,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 /*************************************************************************
@@ -4983,7 +4983,7 @@ DataAttribute iedModel_LD0_LPHD1_PhyHealth_q = 	{    DataAttributeModelType,    
 DataAttribute iedModel_LD0_LPHD1_PhyHealth_t = 	{    DataAttributeModelType,    "t",    (ModelNode*) &iedModel_LD0_LPHD1_PhyHealth,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP,    TRG_OPT_NO,    NULL,    0};
 
 DataObject iedModel_LD0_LPHD1_Proxy = 				{    DataObjectModelType,    "Proxy",    (ModelNode*) &iedModel_LD0_LPHD1,    NULL,    (ModelNode*) &iedModel_LD0_LPHD1_Proxy_stVal,    0};
-DataAttribute iedModel_LD0_LPHD1_Proxy_stVal = 	{ 	DataAttributeModelType, "stVal", (ModelNode*) &iedModel_LD0_LPHD1_Proxy, (ModelNode*) &iedModel_LD0_LPHD1_Proxy_q, NULL, 0, IEC61850_FC_ST, IEC61850_BOOLEAN, TRG_OPT_NO, NULL };
+DataAttribute iedModel_LD0_LPHD1_Proxy_stVal = 	{ 	DataAttributeModelType, "stVal", (ModelNode*) &iedModel_LD0_LPHD1_Proxy, (ModelNode*) &iedModel_LD0_LPHD1_Proxy_q, NULL, 0, IEC61850_FC_ST, IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL };
 DataAttribute iedModel_LD0_LPHD1_Proxy_q = 		{    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_LD0_LPHD1_Proxy,    (ModelNode*) &iedModel_LD0_LPHD1_Proxy_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY,    TRG_OPT_NO,    NULL,    0};
 DataAttribute iedModel_LD0_LPHD1_Proxy_t = 		{    DataAttributeModelType,    "t",    (ModelNode*) &iedModel_LD0_LPHD1_Proxy,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP,    TRG_OPT_NO,    NULL,    0};
 
@@ -5001,7 +5001,7 @@ DataAttribute iedModel_PROT_LPHD1_PhyHealth_q = 	{    DataAttributeModelType,   
 DataAttribute iedModel_PROT_LPHD1_PhyHealth_t = 	{    DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_LPHD1_PhyHealth,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP,    TRG_OPT_NO,    NULL,    0};
 
 DataObject iedModel_PROT_LPHD1_Proxy = 				{    DataObjectModelType,    "Proxy",    (ModelNode*) &iedModel_PROT_LPHD1,    NULL,    (ModelNode*) &iedModel_PROT_LPHD1_Proxy_stVal,    0};
-DataAttribute iedModel_PROT_LPHD1_Proxy_stVal = 	{ 	DataAttributeModelType, "stVal", (ModelNode*) &iedModel_PROT_LPHD1_Proxy, (ModelNode*) &iedModel_PROT_LPHD1_Proxy_q, NULL, 0, IEC61850_FC_ST, IEC61850_BOOLEAN, TRG_OPT_NO, NULL };
+DataAttribute iedModel_PROT_LPHD1_Proxy_stVal = 	{ 	DataAttributeModelType, "stVal", (ModelNode*) &iedModel_PROT_LPHD1_Proxy, (ModelNode*) &iedModel_PROT_LPHD1_Proxy_q, NULL, 0, IEC61850_FC_ST, IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL };
 DataAttribute iedModel_PROT_LPHD1_Proxy_q = 		{    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_LPHD1_Proxy,    (ModelNode*) &iedModel_PROT_LPHD1_Proxy_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY,    TRG_OPT_NO,    NULL,    0};
 DataAttribute iedModel_PROT_LPHD1_Proxy_t = 		{    DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_LPHD1_Proxy,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP,    TRG_OPT_NO,    NULL,    0};
 /*************************************************************************
@@ -5018,7 +5018,7 @@ DataAttribute iedModel_CTRL_LPHD1_PhyHealth_q = 	{    DataAttributeModelType,   
 DataAttribute iedModel_CTRL_LPHD1_PhyHealth_t = 	{    DataAttributeModelType,    "t",    (ModelNode*) &iedModel_CTRL_LPHD1_PhyHealth,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP,    TRG_OPT_NO,    NULL,    0};
 
 DataObject iedModel_CTRL_LPHD1_Proxy = 				{    DataObjectModelType,    "Proxy",    (ModelNode*) &iedModel_CTRL_LPHD1,    NULL,    (ModelNode*) &iedModel_CTRL_LPHD1_Proxy_stVal,    0};
-DataAttribute iedModel_CTRL_LPHD1_Proxy_stVal = 	{ 	DataAttributeModelType, "stVal", (ModelNode*) &iedModel_CTRL_LPHD1_Proxy, (ModelNode*) &iedModel_CTRL_LPHD1_Proxy_q, NULL, 0, IEC61850_FC_ST, IEC61850_BOOLEAN, TRG_OPT_NO, NULL };
+DataAttribute iedModel_CTRL_LPHD1_Proxy_stVal = 	{ 	DataAttributeModelType, "stVal", (ModelNode*) &iedModel_CTRL_LPHD1_Proxy, (ModelNode*) &iedModel_CTRL_LPHD1_Proxy_q, NULL, 0, IEC61850_FC_ST, IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL };
 DataAttribute iedModel_CTRL_LPHD1_Proxy_q = 		{    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_CTRL_LPHD1_Proxy,    (ModelNode*) &iedModel_CTRL_LPHD1_Proxy_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY,    TRG_OPT_NO,    NULL,    0};
 DataAttribute iedModel_CTRL_LPHD1_Proxy_t = 		{    DataAttributeModelType,    "t",    (ModelNode*) &iedModel_CTRL_LPHD1_Proxy,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP,    TRG_OPT_NO,    NULL,    0};
 /*************************************************************************
@@ -5035,7 +5035,7 @@ DataAttribute iedModel_MES_LPHD1_PhyHealth_q = 	{    DataAttributeModelType,    
 DataAttribute iedModel_MES_LPHD1_PhyHealth_t = 	{    DataAttributeModelType,    "t",    (ModelNode*) &iedModel_MES_LPHD1_PhyHealth,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP,    TRG_OPT_NO,    NULL,    0};
 
 DataObject iedModel_MES_LPHD1_Proxy = 				{    DataObjectModelType,    "Proxy",    (ModelNode*) &iedModel_MES_LPHD1,    NULL,    (ModelNode*) &iedModel_MES_LPHD1_Proxy_stVal,    0};
-DataAttribute iedModel_MES_LPHD1_Proxy_stVal = 	{ 	DataAttributeModelType, "stVal", (ModelNode*) &iedModel_MES_LPHD1_Proxy, (ModelNode*) &iedModel_MES_LPHD1_Proxy_q, NULL, 0, IEC61850_FC_ST, IEC61850_BOOLEAN, TRG_OPT_NO, NULL };
+DataAttribute iedModel_MES_LPHD1_Proxy_stVal = 	{ 	DataAttributeModelType, "stVal", (ModelNode*) &iedModel_MES_LPHD1_Proxy, (ModelNode*) &iedModel_MES_LPHD1_Proxy_q, NULL, 0, IEC61850_FC_ST, IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL };
 DataAttribute iedModel_MES_LPHD1_Proxy_q = 		{    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_MES_LPHD1_Proxy,    (ModelNode*) &iedModel_MES_LPHD1_Proxy_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY,    TRG_OPT_NO,    NULL,    0};
 DataAttribute iedModel_MES_LPHD1_Proxy_t = 		{    DataAttributeModelType,    "t",    (ModelNode*) &iedModel_MES_LPHD1_Proxy,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP,    TRG_OPT_NO,    NULL,    0};
 /*************************************************************************
@@ -5052,7 +5052,7 @@ DataAttribute iedModel_GGIO_LPHD1_PhyHealth_q = 	{    DataAttributeModelType,   
 DataAttribute iedModel_GGIO_LPHD1_PhyHealth_t = 	{    DataAttributeModelType,    "t",    (ModelNode*) &iedModel_GGIO_LPHD1_PhyHealth,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP,    TRG_OPT_NO,    NULL,    0};
 
 DataObject iedModel_GGIO_LPHD1_Proxy = 				{    DataObjectModelType,    "Proxy",    (ModelNode*) &iedModel_GGIO_LPHD1,    NULL,    (ModelNode*) &iedModel_GGIO_LPHD1_Proxy_stVal,    0};
-DataAttribute iedModel_GGIO_LPHD1_Proxy_stVal = 	{ 	DataAttributeModelType, "stVal", (ModelNode*) &iedModel_GGIO_LPHD1_Proxy, (ModelNode*) &iedModel_GGIO_LPHD1_Proxy_q, NULL, 0, IEC61850_FC_ST, IEC61850_BOOLEAN, TRG_OPT_NO, NULL };
+DataAttribute iedModel_GGIO_LPHD1_Proxy_stVal = 	{ 	DataAttributeModelType, "stVal", (ModelNode*) &iedModel_GGIO_LPHD1_Proxy, (ModelNode*) &iedModel_GGIO_LPHD1_Proxy_q, NULL, 0, IEC61850_FC_ST, IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL };
 DataAttribute iedModel_GGIO_LPHD1_Proxy_q = 		{    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_LPHD1_Proxy,    (ModelNode*) &iedModel_GGIO_LPHD1_Proxy_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY,    TRG_OPT_NO,    NULL,    0};
 DataAttribute iedModel_GGIO_LPHD1_Proxy_t = 		{    DataAttributeModelType,    "t",    (ModelNode*) &iedModel_GGIO_LPHD1_Proxy,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP,    TRG_OPT_NO,    NULL,    0};
 
@@ -5105,22 +5105,22 @@ DataAttribute iedModel_LD0_RDRE1_FltNum_t 			= {DataAttributeModelType,	"t",			(
  * могут быть использованы для соответствующих приложений логического узла GGIO.
  *
  *************************************************************************/
-LogicalNode iedModel_GGIO_INGGIO1 			= { LogicalNodeModelType,   "IN24GGIO1",    (ModelNode*)&iedModel_Generic_GGIO,    (ModelNode*) &iedModel_GGIO_OUTGGIO1,    (ModelNode*) &iedModel_GGIO_INGGIO1_Mod};
+LogicalNode iedModel_GGIO_INGGIO1 			= { LogicalNodeModelType,   "IN26GGIO1",    (ModelNode*)&iedModel_Generic_GGIO,    (ModelNode*) &iedModel_GGIO_OUTGGIO1,    (ModelNode*) &iedModel_GGIO_INGGIO1_Mod};
 
 DataObject iedModel_GGIO_INGGIO1_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_GGIO_INGGIO1,    (ModelNode*) &iedModel_GGIO_INGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_INGGIO1_Mod_q,0};
-DataAttribute iedModel_GGIO_INGGIO1_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_INGGIO1_Mod,(ModelNode*) &iedModel_GGIO_INGGIO1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_INGGIO1_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_INGGIO1_Mod,(ModelNode*) &iedModel_GGIO_INGGIO1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_INGGIO1_Mod_t 	= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_GGIO_INGGIO1_Mod,(ModelNode*) &iedModel_GGIO_INGGIO1_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_GGIO_INGGIO1_Mod_stVal = { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_GGIO_INGGIO1_Mod,(ModelNode*) &iedModel_GGIO_INGGIO1_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_GGIO_INGGIO1_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_GGIO_INGGIO1_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_GGIO_INGGIO1_Beh = {    DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_GGIO_INGGIO1,    (ModelNode*) &iedModel_GGIO_INGGIO1_Health,    (ModelNode*) &iedModel_GGIO_INGGIO1_Beh_stVal,0};
 DataAttribute iedModel_GGIO_INGGIO1_Beh_stVal = {    DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_GGIO_INGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_INGGIO1_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_INGGIO1_Beh_q = {    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_INGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_INGGIO1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_INGGIO1_Beh_q = {    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_INGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_INGGIO1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_INGGIO1_Beh_t = {    DataAttributeModelType,    "t",    (ModelNode*) &iedModel_GGIO_INGGIO1_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_GGIO_INGGIO1_Health = {    DataObjectModelType,    "Health",    (ModelNode*) &iedModel_GGIO_INGGIO1,    (ModelNode*) &iedModel_GGIO_INGGIO1_NamPlt,    (ModelNode*) &iedModel_GGIO_INGGIO1_Health_stVal,0};
 DataAttribute iedModel_GGIO_INGGIO1_Health_stVal = {    DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_GGIO_INGGIO1_Health,    (ModelNode*) &iedModel_GGIO_INGGIO1_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_INGGIO1_Health_q = {    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_INGGIO1_Health,    (ModelNode*) &iedModel_GGIO_INGGIO1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_INGGIO1_Health_q = {    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_INGGIO1_Health,    (ModelNode*) &iedModel_GGIO_INGGIO1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_INGGIO1_Health_t = {    DataAttributeModelType,    "t",    (ModelNode*) &iedModel_GGIO_INGGIO1_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_GGIO_INGGIO1_NamPlt = {    DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_GGIO_INGGIO1,    (ModelNode*)&iedModel_GGIO_INGGIO1_Ind1 /* &iedModel_GGIO_INGGIO1_SPCSO1*/,															// следующий !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -5254,22 +5254,29 @@ DataAttribute iedModel_GGIO_INGGIO1_Ind23_stVal = { DataAttributeModelType, "stV
 DataAttribute iedModel_GGIO_INGGIO1_Ind23_q = { DataAttributeModelType, "q", (ModelNode*) &iedModel_GGIO_INGGIO1_Ind23, (ModelNode*) &iedModel_GGIO_INGGIO1_Ind23_t, NULL, 0, IEC61850_FC_ST, IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_INGGIO1_Ind23_t = { DataAttributeModelType, "t", (ModelNode*) &iedModel_GGIO_INGGIO1_Ind23, NULL, NULL, 0, IEC61850_FC_ST, IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 // --------------------------------------------------------
+#if (_REVISION_DEVICE>=	208)
+DataObject iedModel_GGIO_INGGIO1_Ind24 = { DataObjectModelType, "Ind24", (ModelNode*) &iedModel_GGIO_INGGIO1, (ModelNode*)&iedModel_GGIO_INGGIO1_Ind25, (ModelNode*) &iedModel_GGIO_INGGIO1_Ind24_stVal, 0};
+#endif
+#if (_REVISION_DEVICE<208)
 DataObject iedModel_GGIO_INGGIO1_Ind24 = { DataObjectModelType, "Ind24", (ModelNode*) &iedModel_GGIO_INGGIO1, (ModelNode*)NULL, (ModelNode*) &iedModel_GGIO_INGGIO1_Ind24_stVal, 0};
+#endif
 DataAttribute iedModel_GGIO_INGGIO1_Ind24_stVal = { DataAttributeModelType, "stVal", (ModelNode*) &iedModel_GGIO_INGGIO1_Ind24, (ModelNode*) &iedModel_GGIO_INGGIO1_Ind24_q, NULL, 0, IEC61850_FC_ST, IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED | TRG_OPT_GI, NULL,0};
 DataAttribute iedModel_GGIO_INGGIO1_Ind24_q = { DataAttributeModelType, "q", (ModelNode*) &iedModel_GGIO_INGGIO1_Ind24, (ModelNode*) &iedModel_GGIO_INGGIO1_Ind24_t, NULL, 0, IEC61850_FC_ST, IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_INGGIO1_Ind24_t = { DataAttributeModelType, "t", (ModelNode*) &iedModel_GGIO_INGGIO1_Ind24, NULL, NULL, 0, IEC61850_FC_ST, IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
+#if (_REVISION_DEVICE>=	208)
 // --------------------------------------------------------
-/*
 DataObject iedModel_GGIO_INGGIO1_Ind25 = { DataObjectModelType, "Ind25", (ModelNode*) &iedModel_GGIO_INGGIO1,(ModelNode*)&iedModel_GGIO_INGGIO1_Ind26, (ModelNode*) &iedModel_GGIO_INGGIO1_Ind25_stVal, 0};
 DataAttribute iedModel_GGIO_INGGIO1_Ind25_stVal = { DataAttributeModelType, "stVal", (ModelNode*) &iedModel_GGIO_INGGIO1_Ind25, (ModelNode*) &iedModel_GGIO_INGGIO1_Ind25_q, NULL, 0, IEC61850_FC_ST, IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED | TRG_OPT_GI, NULL,0};
 DataAttribute iedModel_GGIO_INGGIO1_Ind25_q = { DataAttributeModelType, "q", (ModelNode*) &iedModel_GGIO_INGGIO1_Ind25, (ModelNode*) &iedModel_GGIO_INGGIO1_Ind25_t, NULL, 0, IEC61850_FC_ST, IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_INGGIO1_Ind25_t = { DataAttributeModelType, "t", (ModelNode*) &iedModel_GGIO_INGGIO1_Ind25, NULL, NULL, 0, IEC61850_FC_ST, IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 // --------------------------------------------------------
-DataObject iedModel_GGIO_INGGIO1_Ind26 = { DataObjectModelType, "Ind26", (ModelNode*) &iedModel_GGIO_INGGIO1, (ModelNode*)&iedModel_GGIO_INGGIO1_Ind27, (ModelNode*) &iedModel_GGIO_INGGIO1_Ind26_stVal, 0};
+DataObject iedModel_GGIO_INGGIO1_Ind26 = { DataObjectModelType, "Ind26", (ModelNode*) &iedModel_GGIO_INGGIO1, (ModelNode*)NULL, (ModelNode*) &iedModel_GGIO_INGGIO1_Ind26_stVal, 0};
 DataAttribute iedModel_GGIO_INGGIO1_Ind26_stVal = { DataAttributeModelType, "stVal", (ModelNode*) &iedModel_GGIO_INGGIO1_Ind26, (ModelNode*) &iedModel_GGIO_INGGIO1_Ind26_q, NULL, 0, IEC61850_FC_ST, IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED | TRG_OPT_GI, NULL,0};
 DataAttribute iedModel_GGIO_INGGIO1_Ind26_q = { DataAttributeModelType, "q", (ModelNode*) &iedModel_GGIO_INGGIO1_Ind26, (ModelNode*) &iedModel_GGIO_INGGIO1_Ind26_t, NULL, 0, IEC61850_FC_ST, IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_INGGIO1_Ind26_t = { DataAttributeModelType, "t", (ModelNode*) &iedModel_GGIO_INGGIO1_Ind26, NULL, NULL, 0, IEC61850_FC_ST, IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 // --------------------------------------------------------
+#endif
+/*
 DataObject iedModel_GGIO_INGGIO1_Ind27 = { DataObjectModelType, "Ind27", (ModelNode*) &iedModel_GGIO_INGGIO1, (ModelNode*)&iedModel_GGIO_INGGIO1_Ind28, (ModelNode*) &iedModel_GGIO_INGGIO1_Ind27_stVal, 0};
 DataAttribute iedModel_GGIO_INGGIO1_Ind27_stVal = { DataAttributeModelType, "stVal", (ModelNode*) &iedModel_GGIO_INGGIO1_Ind27, (ModelNode*) &iedModel_GGIO_INGGIO1_Ind27_q, NULL, 0, IEC61850_FC_ST, IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED | TRG_OPT_GI, NULL,0};
 DataAttribute iedModel_GGIO_INGGIO1_Ind27_q = { DataAttributeModelType, "q", (ModelNode*) &iedModel_GGIO_INGGIO1_Ind27, (ModelNode*) &iedModel_GGIO_INGGIO1_Ind27_t, NULL, 0, IEC61850_FC_ST, IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
@@ -5347,7 +5354,7 @@ DataAttribute iedModel_GGIO_INGGIO1_Ind40_t = { DataAttributeModelType, "t", (Mo
 LogicalNode iedModel_GGIO_OUTGGIO1 						= { LogicalNodeModelType,   	"OUT18GGIO1",   (ModelNode*) &iedModel_Generic_GGIO,   (ModelNode*) &iedModel_GGIO_LEDGGIO1,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Mod};
 
 DataObject iedModel_GGIO_OUTGGIO1_Mod 					= { DataObjectModelType,     	"Mod",    (ModelNode*) &iedModel_GGIO_OUTGGIO1,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Mod_q,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_Mod_q 				= { DataAttributeModelType,    	"q",    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Mod,(ModelNode*) &iedModel_GGIO_OUTGGIO1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_Mod_q 				= { DataAttributeModelType,    	"q",    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Mod,(ModelNode*) &iedModel_GGIO_OUTGGIO1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_Mod_t 				= { DataAttributeModelType,    	"t",    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Mod,(ModelNode*) &iedModel_GGIO_OUTGGIO1_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_Mod_stVal 			= { DataAttributeModelType,		"stVal",   (ModelNode*) &iedModel_GGIO_OUTGGIO1_Mod,(ModelNode*) &iedModel_GGIO_OUTGGIO1_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_Mod_ctlModel 		= {   DataAttributeModelType,   "ctlModel",    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Mod, (ModelNode*) NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
@@ -5365,12 +5372,12 @@ DataAttribute iedModel_GGIO_OUTGGIO1_Mod_Oper_Check 			= {    DataAttributeModel
 //Beh
 DataObject iedModel_GGIO_OUTGGIO1_Beh 					= {    DataObjectModelType,    	"Beh",    (ModelNode*) &iedModel_GGIO_OUTGGIO1,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Health,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Beh_stVal,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_Beh_stVal 			= {    DataAttributeModelType,  "stVal",    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_Beh_q 				= {    DataAttributeModelType,  "q",    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_Beh_q 				= {    DataAttributeModelType,  "q",    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_Beh_t 				= {    DataAttributeModelType,  "t",    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 //Health
 DataObject iedModel_GGIO_OUTGGIO1_Health 					= {    DataObjectModelType,    	"Health",    (ModelNode*) &iedModel_GGIO_OUTGGIO1,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_NamPlt,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Health_stVal,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_Health_stVal 		= {    DataAttributeModelType,  "stVal",    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Health,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_Health_q 			= {    DataAttributeModelType,  "q",    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Health,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_Health_q 			= {    DataAttributeModelType,  "q",    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Health,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_Health_t 			= {    DataAttributeModelType,  "t",    (ModelNode*) &iedModel_GGIO_OUTGGIO1_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 //NamPlt
 DataObject iedModel_GGIO_OUTGGIO1_NamPlt 					= {    DataObjectModelType,    	"NamPlt",    (ModelNode*) &iedModel_GGIO_OUTGGIO1,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO1,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_NamPlt_vendor,0};
@@ -5382,190 +5389,190 @@ DataAttribute iedModel_GGIO_OUTGGIO1_NamPlt_d 			= {    DataAttributeModelType, 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO1 						= {    DataObjectModelType,     "SPCSO1",     	(ModelNode*) &iedModel_GGIO_OUTGGIO1,     		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO2,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO1_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO1_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO1, 		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO1_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO1_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO1, 		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO1_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO1_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO1, 		(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO1_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO1, 		(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO2 						= {    DataObjectModelType,     "SPCSO2",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*)  &iedModel_GGIO_OUTGGIO1_SPCSO3,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO2_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO2_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO2, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO2_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO2_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO2, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO2_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO2_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO2, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO2_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO2, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO3 						= {    DataObjectModelType,     "SPCSO3",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO4,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO3_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO3_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO3, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO3_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO3_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO3, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO3_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO3_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO3, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO3_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO3, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO4 						= {    DataObjectModelType,     "SPCSO4",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO5,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO4_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO4_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO4, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO4_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO4_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO4, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO4_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO4_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO4, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO4_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO4, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO5 						= {    DataObjectModelType,     "SPCSO5",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO6,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO5_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO5_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO5, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO5_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO5_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO5, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO5_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO5_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO5, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO5_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO5, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO6 						= {    DataObjectModelType,     "SPCSO6",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO7,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO6_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO6_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO6, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO6_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO6_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO6, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO6_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO6_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO6, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO6_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO6, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO7 						= {    DataObjectModelType,     "SPCSO7",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO8,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO7_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO7_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO7, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO7_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO7_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO7, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO7_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO7_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO7, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO7_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO7, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO8 						= {    DataObjectModelType,     "SPCSO8",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO9,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO8_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO8_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO8, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO8_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO8_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO8, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO8_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO8_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO8, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO8_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO8, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO9 						= {    DataObjectModelType,     "SPCSO9",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO10,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO9_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO9_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO9, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO9_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO9_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO9, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO9_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO9_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO9, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO9_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO9, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO10 						= {    DataObjectModelType,     "SPCSO10",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO11,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO10_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO10_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO10, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO10_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO10_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO10, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO10_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO10_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO10, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO10_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO10, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO11 						= {    DataObjectModelType,     "SPCSO11",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO12,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO11_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO11_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO11, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO11_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO11_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO11, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO11_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO11_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO11, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO11_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO11, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO12 						= {    DataObjectModelType,     "SPCSO12",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO13,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO12_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO12_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO12, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO12_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO12_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO12, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO12_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO12_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO12, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO12_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO12, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO13 						= {    DataObjectModelType,     "SPCSO13",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO14,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO13_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO13_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO13, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO13_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO13_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO13, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO13_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO13_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO13, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO13_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO13, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO14 						= {    DataObjectModelType,     "SPCSO14",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO15,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO14_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO14_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO14, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO14_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO14_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO14, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO14_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO14_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO14, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO14_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO14, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO15 						= {    DataObjectModelType,     "SPCSO15",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO16,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO15_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO15_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO15, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO15_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO15_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO15, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO15_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO15_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO15, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO15_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO15, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO16 						= {    DataObjectModelType,     "SPCSO16",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO17,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO16_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO16_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO16, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO16_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO16_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO16, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO16_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO16_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO16, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO16_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO16, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO17 						= {    DataObjectModelType,     "SPCSO17",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO18,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO17_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO17_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO17, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO17_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO17_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO17, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO17_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO17_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO17, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO17_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO17, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO18 						= {    DataObjectModelType,     "SPCSO18",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) NULL,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO18_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO18_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO18, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO18_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO18_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO18, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO18_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO18_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO18, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO18_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO18, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 /*
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO19 						= {    DataObjectModelType,     "SPCSO19",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO20,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO19_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO19_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO19, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO19_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO19_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO19, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO19_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO19_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO19, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO19_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO19, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO20 						= {    DataObjectModelType,     "SPCSO20",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO21,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO20_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO20_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO20, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO20_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO20_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO20, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO20_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO20_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO20, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO20_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO20, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO21 						= {    DataObjectModelType,     "SPCSO21",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO22,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO21_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO21_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO21, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO21_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO21_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO21, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO21_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO21_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO21, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO21_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO21, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO22 						= {    DataObjectModelType,     "SPCSO22",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO23,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO22_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO22_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO22, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO22_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO22_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO22, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO22_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO22_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO22, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO22_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO22, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO23 						= {    DataObjectModelType,     "SPCSO23",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO24,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO23_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO23_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO23, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO23_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO23_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO23, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO23_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO23_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO23, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO23_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO23, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO24 						= {    DataObjectModelType,     "SPCSO24",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO25,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO24_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO24_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO24, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO24_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO24_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO24, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO24_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO24_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO24, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO24_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO24, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO25 						= {    DataObjectModelType,     "SPCSO25",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO26,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO25_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO25_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO25, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO25_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO25_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO25, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO25_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO25_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO25, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO25_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO25, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO26 						= {    DataObjectModelType,     "SPCSO26",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO27,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO26_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO26_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO26, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO26_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO26_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO26, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO26_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO26_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO26, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO26_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO26, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO27 						= {    DataObjectModelType,     "SPCSO27",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO28,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO27_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO27_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO27, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO27_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO27_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO27, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO27_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO27_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO27, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO27_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO27, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO28 						= {    DataObjectModelType,     "SPCSO28",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO29,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO28_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO28_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO28, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO28_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO28_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO28, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO28_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO28_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO28, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO28_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO28, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO29 						= {    DataObjectModelType,     "SPCSO29",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO30,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO29_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO29_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO29, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO29_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO29_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO29, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO29_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO29_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO29, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO29_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO29, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO30 						= {    DataObjectModelType,     "SPCSO30",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO31,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO30_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO30_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO30, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO30_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO30_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO30, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO30_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO30_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO30, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO30_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO30, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO31 						= {    DataObjectModelType,     "SPCSO31",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO32,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO31_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO31_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO31, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO31_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO31_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO31, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO31_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO31_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO31, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO31_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO31, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO32 						= {    DataObjectModelType,     "SPCSO32",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO33,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO32_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO32_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO32, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO32_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO32_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO32, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO32_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO32_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO32, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO32_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO32, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO33 						= {    DataObjectModelType,     "SPCSO33",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO34,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO33_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO33_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO33, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO33_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO33_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO33, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO33_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO33_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO33, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO33_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO33, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 
 DataObject iedModel_GGIO_OUTGGIO1_SPCSO34 						= {    DataObjectModelType,     "SPCSO34",     		(ModelNode*) &iedModel_GGIO_OUTGGIO1,     			(ModelNode*) NULL,    (ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO34_q,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO34_q 				= {    DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO34, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO34_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO34_t 				= {    DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO34, 			(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO34_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO34_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO34, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_OUTGGIO1_SPCSO34_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_GGIO_OUTGGIO1_SPCSO34, 			(ModelNode*) NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 */
 //----------------------------------------------------------------------------
 LogicalNode iedModel_GGIO_LEDGGIO1 			= { LogicalNodeModelType,   "LED16GGIO1",    (ModelNode*)&iedModel_Generic_GGIO,   (ModelNode*)&iedModel_GGIO_SSLGGIO1,    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Mod};
 
 DataObject iedModel_GGIO_LEDGGIO1_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_GGIO_LEDGGIO1,    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Mod_q,0};
-DataAttribute iedModel_GGIO_LEDGGIO1_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Mod,(ModelNode*) &iedModel_GGIO_LEDGGIO1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_LEDGGIO1_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Mod,(ModelNode*) &iedModel_GGIO_LEDGGIO1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_LEDGGIO1_Mod_t 	= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Mod,(ModelNode*) &iedModel_GGIO_LEDGGIO1_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_GGIO_LEDGGIO1_Mod_stVal = { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_GGIO_LEDGGIO1_Mod,(ModelNode*) &iedModel_GGIO_LEDGGIO1_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_GGIO_LEDGGIO1_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_GGIO_LEDGGIO1_Beh = {    DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_GGIO_LEDGGIO1,    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Health,    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Beh_stVal,0};
 DataAttribute iedModel_GGIO_LEDGGIO1_Beh_stVal = {    DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_LEDGGIO1_Beh_q = {    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_LEDGGIO1_Beh_q = {    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_LEDGGIO1_Beh_t = {    DataAttributeModelType,    "t",    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_GGIO_LEDGGIO1_Health = {    DataObjectModelType,    "Health",    (ModelNode*) &iedModel_GGIO_LEDGGIO1,    (ModelNode*) &iedModel_GGIO_LEDGGIO1_NamPlt,    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Health_stVal,0};
 DataAttribute iedModel_GGIO_LEDGGIO1_Health_stVal = {    DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Health,    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_LEDGGIO1_Health_q = {    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Health,    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_LEDGGIO1_Health_q = {    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Health,    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_LEDGGIO1_Health_t = {    DataAttributeModelType,    "t",    (ModelNode*) &iedModel_GGIO_LEDGGIO1_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_GGIO_LEDGGIO1_NamPlt = {    DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_GGIO_LEDGGIO1,    (ModelNode*)&iedModel_GGIO_LEDGGIO1_Ind1 /* &iedModel_GGIO_LEDGGIO1_SPCSO1*/,															// следующий !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -5675,19 +5682,19 @@ DataAttribute iedModel_GGIO_LEDGGIO1_Ind16_dU 		= { DataAttributeModelType, "dU"
 LogicalNode iedModel_GGIO_SSLGGIO1 			= { LogicalNodeModelType,   "SSL32GGIO1",    (ModelNode*)&iedModel_Generic_GGIO,   (ModelNode*)&iedModel_GGIO_VLSGGIO1,    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Mod};
 
 DataObject iedModel_GGIO_SSLGGIO1_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_GGIO_SSLGGIO1,    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Mod_q,0};
-DataAttribute iedModel_GGIO_SSLGGIO1_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Mod,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Mod,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_SSLGGIO1_Mod_t 	= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Mod,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_GGIO_SSLGGIO1_Mod_stVal = { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_GGIO_SSLGGIO1_Mod,(ModelNode*) &iedModel_GGIO_SSLGGIO1_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_GGIO_SSLGGIO1_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_GGIO_SSLGGIO1_Beh = {    DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_GGIO_SSLGGIO1,    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Health,    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Beh_stVal,0};
 DataAttribute iedModel_GGIO_SSLGGIO1_Beh_stVal = {    DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_SSLGGIO1_Beh_q = {    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Beh_q = {    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_SSLGGIO1_Beh_t = {    DataAttributeModelType,    "t",    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_GGIO_SSLGGIO1_Health = {    DataObjectModelType,    "Health",    (ModelNode*) &iedModel_GGIO_SSLGGIO1,    (ModelNode*) &iedModel_GGIO_SSLGGIO1_NamPlt,    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Health_stVal,0};
 DataAttribute iedModel_GGIO_SSLGGIO1_Health_stVal = {    DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Health,    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_SSLGGIO1_Health_q = {    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Health,    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_SSLGGIO1_Health_q = {    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Health,    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_SSLGGIO1_Health_t = {    DataAttributeModelType,    "t",    (ModelNode*) &iedModel_GGIO_SSLGGIO1_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_GGIO_SSLGGIO1_NamPlt = {    DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_GGIO_SSLGGIO1,    (ModelNode*)&iedModel_GGIO_SSLGGIO1_Ind1 , (ModelNode*) &iedModel_GGIO_SSLGGIO1_NamPlt_vendor,0};
@@ -5861,19 +5868,19 @@ DataAttribute iedModel_GGIO_SSLGGIO1_Ind32_t = {DataAttributeModelType,"t",(Mode
 LogicalNode iedModel_GGIO_VLSGGIO1 			= { LogicalNodeModelType,   "VLS16GGIO1",    (ModelNode*)&iedModel_Generic_GGIO,   (ModelNode*)&iedModel_GGIO_LSGGIO1,    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Mod};
 
 DataObject iedModel_GGIO_VLSGGIO1_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_GGIO_VLSGGIO1,    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Mod_q,0};
-DataAttribute iedModel_GGIO_VLSGGIO1_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Mod,(ModelNode*) &iedModel_GGIO_VLSGGIO1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_VLSGGIO1_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Mod,(ModelNode*) &iedModel_GGIO_VLSGGIO1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_VLSGGIO1_Mod_t 	= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Mod,(ModelNode*) &iedModel_GGIO_VLSGGIO1_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_GGIO_VLSGGIO1_Mod_stVal = { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_GGIO_VLSGGIO1_Mod,(ModelNode*) &iedModel_GGIO_VLSGGIO1_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_GGIO_VLSGGIO1_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_GGIO_VLSGGIO1_Beh = {    DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_GGIO_VLSGGIO1,    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Health,    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Beh_stVal,0};
 DataAttribute iedModel_GGIO_VLSGGIO1_Beh_stVal = {    DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_VLSGGIO1_Beh_q = {    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_VLSGGIO1_Beh_q = {    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_VLSGGIO1_Beh_t = {    DataAttributeModelType,    "t",    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_GGIO_VLSGGIO1_Health = {    DataObjectModelType,    "Health",    (ModelNode*) &iedModel_GGIO_VLSGGIO1,    (ModelNode*) &iedModel_GGIO_VLSGGIO1_NamPlt,    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Health_stVal,0};
 DataAttribute iedModel_GGIO_VLSGGIO1_Health_stVal = {    DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Health,    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_VLSGGIO1_Health_q = {    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Health,    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_VLSGGIO1_Health_q = {    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Health,    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_VLSGGIO1_Health_t = {    DataAttributeModelType,    "t",    (ModelNode*) &iedModel_GGIO_VLSGGIO1_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_GGIO_VLSGGIO1_NamPlt = {    DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_GGIO_VLSGGIO1,    (ModelNode*)&iedModel_GGIO_VLSGGIO1_Ind1 , (ModelNode*) &iedModel_GGIO_VLSGGIO1_NamPlt_vendor,0};
@@ -5968,19 +5975,19 @@ DataAttribute iedModel_GGIO_VLSGGIO1_Ind16_t = {DataAttributeModelType,"t",(Mode
 LogicalNode iedModel_GGIO_LSGGIO1 			= { LogicalNodeModelType,   "LS16GGIO1",    (ModelNode*)&iedModel_Generic_GGIO,   NULL,    (ModelNode*) &iedModel_GGIO_LSGGIO1_Mod};
 
 DataObject iedModel_GGIO_LSGGIO1_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_GGIO_LSGGIO1,    (ModelNode*) &iedModel_GGIO_LSGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_LSGGIO1_Mod_q,0};
-DataAttribute iedModel_GGIO_LSGGIO1_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_LSGGIO1_Mod,(ModelNode*) &iedModel_GGIO_LSGGIO1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_LSGGIO1_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_LSGGIO1_Mod,(ModelNode*) &iedModel_GGIO_LSGGIO1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_LSGGIO1_Mod_t 	= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_GGIO_LSGGIO1_Mod,(ModelNode*) &iedModel_GGIO_LSGGIO1_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_GGIO_LSGGIO1_Mod_stVal = { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_GGIO_LSGGIO1_Mod,(ModelNode*) &iedModel_GGIO_LSGGIO1_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_GGIO_LSGGIO1_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_GGIO_LSGGIO1_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_GGIO_LSGGIO1_Beh = {    DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_GGIO_LSGGIO1,    (ModelNode*) &iedModel_GGIO_LSGGIO1_Health,    (ModelNode*) &iedModel_GGIO_LSGGIO1_Beh_stVal,0};
 DataAttribute iedModel_GGIO_LSGGIO1_Beh_stVal = {    DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_GGIO_LSGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_LSGGIO1_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_LSGGIO1_Beh_q = {    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_LSGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_LSGGIO1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_LSGGIO1_Beh_q = {    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_LSGGIO1_Beh,    (ModelNode*) &iedModel_GGIO_LSGGIO1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_LSGGIO1_Beh_t = {    DataAttributeModelType,    "t",    (ModelNode*) &iedModel_GGIO_LSGGIO1_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_GGIO_LSGGIO1_Health = {    DataObjectModelType,    "Health",    (ModelNode*) &iedModel_GGIO_LSGGIO1,    (ModelNode*) &iedModel_GGIO_LSGGIO1_NamPlt,    (ModelNode*) &iedModel_GGIO_LSGGIO1_Health_stVal,0};
 DataAttribute iedModel_GGIO_LSGGIO1_Health_stVal = {    DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_GGIO_LSGGIO1_Health,    (ModelNode*) &iedModel_GGIO_LSGGIO1_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_GGIO_LSGGIO1_Health_q = {    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_LSGGIO1_Health,    (ModelNode*) &iedModel_GGIO_LSGGIO1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_GGIO_LSGGIO1_Health_q = {    DataAttributeModelType,    "q",    (ModelNode*) &iedModel_GGIO_LSGGIO1_Health,    (ModelNode*) &iedModel_GGIO_LSGGIO1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_GGIO_LSGGIO1_Health_t = {    DataAttributeModelType,    "t",    (ModelNode*) &iedModel_GGIO_LSGGIO1_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_GGIO_LSGGIO1_NamPlt = {    DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_GGIO_LSGGIO1,    (ModelNode*)&iedModel_GGIO_LSGGIO1_Ind1 , (ModelNode*) &iedModel_GGIO_LSGGIO1_NamPlt_vendor,0};
@@ -6077,19 +6084,19 @@ DataAttribute iedModel_GGIO_LSGGIO1_Ind16_t = {DataAttributeModelType,"t",(Model
 LogicalNode iedModel_MES_MMXU1 							= { LogicalNodeModelType,   "MMXU1",    (ModelNode*)&iedModel_Generic_MES,   (ModelNode*)&iedModel_MES_MMXU2,    (ModelNode*) &iedModel_MES_MMXU1_Mod};
 
 DataObject iedModel_MES_MMXU1_Mod 						= { DataObjectModelType,    "Mod",    	(ModelNode*) &iedModel_MES_MMXU1,    (ModelNode*) &iedModel_MES_MMXU1_Beh,    (ModelNode*) &iedModel_MES_MMXU1_Mod_q,0};
-DataAttribute iedModel_MES_MMXU1_Mod_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU1_Mod,    (ModelNode*) &iedModel_MES_MMXU1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,   NULL,0};
+DataAttribute iedModel_MES_MMXU1_Mod_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU1_Mod,    (ModelNode*) &iedModel_MES_MMXU1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,   NULL,0};
 DataAttribute iedModel_MES_MMXU1_Mod_t 					= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MMXU1_Mod,    (ModelNode*) &iedModel_MES_MMXU1_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO,   NULL,0};
 DataAttribute iedModel_MES_MMXU1_Mod_stVal 				= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_MES_MMXU1_Mod,    (ModelNode*) &iedModel_MES_MMXU1_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_MES_MMXU1_Mod_ctlModel 			= { DataAttributeModelType, "ctlModel", (ModelNode*) &iedModel_MES_MMXU1_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_MES_MMXU1_Beh 						= { DataObjectModelType,    "Beh",    	(ModelNode*) &iedModel_MES_MMXU1,    (ModelNode*) &iedModel_MES_MMXU1_Health,    (ModelNode*) &iedModel_MES_MMXU1_Beh_stVal,0};
 DataAttribute iedModel_MES_MMXU1_Beh_stVal		 		= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_MES_MMXU1_Beh,    (ModelNode*) &iedModel_MES_MMXU1_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_MES_MMXU1_Beh_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU1_Beh,    (ModelNode*) &iedModel_MES_MMXU1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_MES_MMXU1_Beh_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU1_Beh,    (ModelNode*) &iedModel_MES_MMXU1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_MES_MMXU1_Beh_t 					= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MMXU1_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_MES_MMXU1_Health 					= { DataObjectModelType,    "Health",   (ModelNode*) &iedModel_MES_MMXU1,    (ModelNode*) &iedModel_MES_MMXU1_NamPlt,    (ModelNode*) &iedModel_MES_MMXU1_Health_stVal,0};
 DataAttribute iedModel_MES_MMXU1_Health_stVal 			= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_MES_MMXU1_Health,    (ModelNode*) &iedModel_MES_MMXU1_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO,    NULL,0};
-DataAttribute iedModel_MES_MMXU1_Health_q 				= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU1_Health,    (ModelNode*) &iedModel_MES_MMXU1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,    NULL,0};
+DataAttribute iedModel_MES_MMXU1_Health_q 				= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU1_Health,    (ModelNode*) &iedModel_MES_MMXU1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,    NULL,0};
 DataAttribute iedModel_MES_MMXU1_Health_t 				= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MMXU1_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_MES_MMXU1_NamPlt 					= { DataObjectModelType,    "NamPlt",   (ModelNode*) &iedModel_MES_MMXU1,    (ModelNode*) &iedModel_MES_MMXU1_A, (ModelNode*) &iedModel_MES_MMXU1_NamPlt_vendor,0};
@@ -6155,17 +6162,17 @@ DataAttribute iedModel_MES_MMXU1_A_neut_zeroDb 			= { DataAttributeModelType, "z
 LogicalNode iedModel_MES_MMXU2 							= { LogicalNodeModelType,   "MMXU2",    (ModelNode*)&iedModel_Generic_MES,   	(ModelNode*)&iedModel_MES_MMXU3,    (ModelNode*) &iedModel_MES_MMXU2_Mod};
 
 DataObject iedModel_MES_MMXU2_Mod 						= { DataObjectModelType,    "Mod",    	(ModelNode*) &iedModel_MES_MMXU2,    	(ModelNode*) &iedModel_MES_MMXU2_Beh,    (ModelNode*) &iedModel_MES_MMXU2_Mod_q,0};
-DataAttribute iedModel_MES_MMXU2_Mod_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU2_Mod,   (ModelNode*) &iedModel_MES_MMXU2_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,   NULL,0};
+DataAttribute iedModel_MES_MMXU2_Mod_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU2_Mod,   (ModelNode*) &iedModel_MES_MMXU2_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,   NULL,0};
 DataAttribute iedModel_MES_MMXU2_Mod_t 					= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MMXU2_Mod,   (ModelNode*) &iedModel_MES_MMXU2_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO,   NULL,0};
 DataAttribute iedModel_MES_MMXU2_Mod_stVal 				= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_MES_MMXU2_Mod,   (ModelNode*) &iedModel_MES_MMXU2_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_MES_MMXU2_Mod_ctlModel 			= { DataAttributeModelType, "ctlModel", (ModelNode*) &iedModel_MES_MMXU2_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 DataObject iedModel_MES_MMXU2_Beh 						= { DataObjectModelType,    "Beh",    	(ModelNode*) &iedModel_MES_MMXU2,    	(ModelNode*) &iedModel_MES_MMXU2_Health,    (ModelNode*) &iedModel_MES_MMXU2_Beh_stVal,0};
 DataAttribute iedModel_MES_MMXU2_Beh_stVal 				= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_MES_MMXU2_Beh,   (ModelNode*) &iedModel_MES_MMXU2_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_MES_MMXU2_Beh_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU2_Beh,   (ModelNode*) &iedModel_MES_MMXU2_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_MES_MMXU2_Beh_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU2_Beh,   (ModelNode*) &iedModel_MES_MMXU2_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_MES_MMXU2_Beh_t 					= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MMXU2_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataObject iedModel_MES_MMXU2_Health 					= { DataObjectModelType,    "Health",   (ModelNode*) &iedModel_MES_MMXU2,    	(ModelNode*) &iedModel_MES_MMXU2_NamPlt,    (ModelNode*) &iedModel_MES_MMXU2_Health_stVal,0};
 DataAttribute iedModel_MES_MMXU2_Health_stVal 			= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_MES_MMXU2_Health,(ModelNode*) &iedModel_MES_MMXU2_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO,    NULL,0};
-DataAttribute iedModel_MES_MMXU2_Health_q 				= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU2_Health,(ModelNode*) &iedModel_MES_MMXU2_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,    NULL,0};
+DataAttribute iedModel_MES_MMXU2_Health_q 				= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU2_Health,(ModelNode*) &iedModel_MES_MMXU2_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,    NULL,0};
 DataAttribute iedModel_MES_MMXU2_Health_t 				= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MMXU2_Health,NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataObject iedModel_MES_MMXU2_NamPlt 					= { DataObjectModelType,    "NamPlt",   (ModelNode*) &iedModel_MES_MMXU2,    	(ModelNode*) &iedModel_MES_MMXU2_A, (ModelNode*) &iedModel_MES_MMXU2_NamPlt_vendor,0};
 DataAttribute iedModel_MES_MMXU2_NamPlt_vendor 			= { DataAttributeModelType, "vendor",   (ModelNode*) &iedModel_MES_MMXU2_NamPlt,(ModelNode*) &iedModel_MES_MMXU2_NamPlt_swRev,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO,    NULL,0};
@@ -6229,19 +6236,19 @@ DataAttribute iedModel_MES_MMXU2_A_neut_zeroDb 			= { DataAttributeModelType, "z
 LogicalNode iedModel_MES_MMXU3 							= { LogicalNodeModelType,   "MMXU3",    (ModelNode*)&iedModel_Generic_MES,   	(ModelNode*)&iedModel_MES_MMXU4,    (ModelNode*) &iedModel_MES_MMXU3_Mod};
 
 DataObject iedModel_MES_MMXU3_Mod 						= { DataObjectModelType,    "Mod",    	(ModelNode*) &iedModel_MES_MMXU3,    	(ModelNode*) &iedModel_MES_MMXU3_Beh,    (ModelNode*) &iedModel_MES_MMXU3_Mod_q,0};
-DataAttribute iedModel_MES_MMXU3_Mod_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU3_Mod,   (ModelNode*) &iedModel_MES_MMXU3_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,   NULL,0};
+DataAttribute iedModel_MES_MMXU3_Mod_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU3_Mod,   (ModelNode*) &iedModel_MES_MMXU3_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,   NULL,0};
 DataAttribute iedModel_MES_MMXU3_Mod_t 					= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MMXU3_Mod,   (ModelNode*) &iedModel_MES_MMXU3_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO,   NULL,0};
 DataAttribute iedModel_MES_MMXU3_Mod_stVal 				= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_MES_MMXU3_Mod,   (ModelNode*) &iedModel_MES_MMXU3_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_MES_MMXU3_Mod_ctlModel 			= { DataAttributeModelType, "ctlModel",	(ModelNode*) &iedModel_MES_MMXU3_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_MES_MMXU3_Beh 						= { DataObjectModelType,    "Beh",    	(ModelNode*) &iedModel_MES_MMXU3,    	(ModelNode*) &iedModel_MES_MMXU3_Health,    (ModelNode*) &iedModel_MES_MMXU3_Beh_stVal,0};
 DataAttribute iedModel_MES_MMXU3_Beh_stVal 				= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_MES_MMXU3_Beh,   (ModelNode*) &iedModel_MES_MMXU3_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_MES_MMXU3_Beh_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU3_Beh,   (ModelNode*) &iedModel_MES_MMXU3_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_MES_MMXU3_Beh_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU3_Beh,   (ModelNode*) &iedModel_MES_MMXU3_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_MES_MMXU3_Beh_t 					= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MMXU3_Beh,   NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_MES_MMXU3_Health 					= { DataObjectModelType,    "Health",   (ModelNode*) &iedModel_MES_MMXU3,    	(ModelNode*) &iedModel_MES_MMXU3_NamPlt,    (ModelNode*) &iedModel_MES_MMXU3_Health_stVal,0};
 DataAttribute iedModel_MES_MMXU3_Health_stVal 			= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_MES_MMXU3_Health,(ModelNode*) &iedModel_MES_MMXU3_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO,    NULL,0};
-DataAttribute iedModel_MES_MMXU3_Health_q 				= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU3_Health,(ModelNode*) &iedModel_MES_MMXU3_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,    NULL,0};
+DataAttribute iedModel_MES_MMXU3_Health_q 				= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU3_Health,(ModelNode*) &iedModel_MES_MMXU3_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,    NULL,0};
 DataAttribute iedModel_MES_MMXU3_Health_t 				= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MMXU3_Health,NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_MES_MMXU3_NamPlt 					= { DataObjectModelType,    "NamPlt",   (ModelNode*) &iedModel_MES_MMXU3,    	(ModelNode*) &iedModel_MES_MMXU3_A, (ModelNode*) &iedModel_MES_MMXU3_NamPlt_vendor,0};
@@ -6306,19 +6313,19 @@ DataAttribute iedModel_MES_MMXU3_A_neut_zeroDb 			= { DataAttributeModelType, "z
 LogicalNode iedModel_MES_MMXU4 							= { LogicalNodeModelType,   "MMXU4",    (ModelNode*)&iedModel_Generic_MES,   (ModelNode*)&iedModel_MES_MSQI1,    (ModelNode*) &iedModel_MES_MMXU4_Mod};
 
 DataObject iedModel_MES_MMXU4_Mod 						= { DataObjectModelType,    "Mod",    	(ModelNode*) &iedModel_MES_MMXU4,    (ModelNode*) &iedModel_MES_MMXU4_Beh,    (ModelNode*) &iedModel_MES_MMXU4_Mod_q,0};
-DataAttribute iedModel_MES_MMXU4_Mod_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU4_Mod,    (ModelNode*) &iedModel_MES_MMXU4_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,   NULL,0};
+DataAttribute iedModel_MES_MMXU4_Mod_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU4_Mod,    (ModelNode*) &iedModel_MES_MMXU4_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,   NULL,0};
 DataAttribute iedModel_MES_MMXU4_Mod_t 					= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MMXU4_Mod,    (ModelNode*) &iedModel_MES_MMXU4_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO,   NULL,0};
 DataAttribute iedModel_MES_MMXU4_Mod_stVal 				= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_MES_MMXU4_Mod,    (ModelNode*) &iedModel_MES_MMXU4_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_MES_MMXU4_Mod_ctlModel 			= { DataAttributeModelType, "ctlModel", (ModelNode*) &iedModel_MES_MMXU4_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_MES_MMXU4_Beh 						= { DataObjectModelType,    "Beh",    	(ModelNode*) &iedModel_MES_MMXU4,    (ModelNode*) &iedModel_MES_MMXU4_Health,    (ModelNode*) &iedModel_MES_MMXU4_Beh_stVal,0};
 DataAttribute iedModel_MES_MMXU4_Beh_stVal 				= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_MES_MMXU4_Beh,    (ModelNode*) &iedModel_MES_MMXU4_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_MES_MMXU4_Beh_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU4_Beh,    (ModelNode*) &iedModel_MES_MMXU4_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_MES_MMXU4_Beh_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU4_Beh,    (ModelNode*) &iedModel_MES_MMXU4_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_MES_MMXU4_Beh_t 					= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MMXU4_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_MES_MMXU4_Health 					= { DataObjectModelType,    "Health",   (ModelNode*) &iedModel_MES_MMXU4,    (ModelNode*) &iedModel_MES_MMXU4_NamPlt,    (ModelNode*) &iedModel_MES_MMXU4_Health_stVal,0};
 DataAttribute iedModel_MES_MMXU4_Health_stVal 			= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_MES_MMXU4_Health,    (ModelNode*) &iedModel_MES_MMXU4_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO,    NULL,0};
-DataAttribute iedModel_MES_MMXU4_Health_q 				= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU4_Health,    (ModelNode*) &iedModel_MES_MMXU4_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,    NULL,0};
+DataAttribute iedModel_MES_MMXU4_Health_q 				= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MMXU4_Health,    (ModelNode*) &iedModel_MES_MMXU4_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,    NULL,0};
 DataAttribute iedModel_MES_MMXU4_Health_t 				= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MMXU4_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_MES_MMXU4_NamPlt 					= { DataObjectModelType,    "NamPlt",   (ModelNode*) &iedModel_MES_MMXU4,    (ModelNode*) &iedModel_MES_MMXU4_phV, (ModelNode*) &iedModel_MES_MMXU4_NamPlt_vendor,0};
@@ -6601,19 +6608,19 @@ DataAttribute iedModel_MES_MMXU4_AL3_res_zeroDb 		= { DataAttributeModelType, "z
 LogicalNode iedModel_MES_MSQI1 							= { LogicalNodeModelType,   "MSQI1",  	(ModelNode*)&iedModel_Generic_MES,   	(ModelNode*)&iedModel_MES_MSQI2,    (ModelNode*) &iedModel_MES_MSQI1_Mod};
 
 DataObject iedModel_MES_MSQI1_Mod 						= { DataObjectModelType,    "Mod",    	(ModelNode*) &iedModel_MES_MSQI1,    	(ModelNode*) &iedModel_MES_MSQI1_Beh,    (ModelNode*) &iedModel_MES_MSQI1_Mod_q,0};
-DataAttribute iedModel_MES_MSQI1_Mod_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI1_Mod,   (ModelNode*) &iedModel_MES_MSQI1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,   NULL,0};
+DataAttribute iedModel_MES_MSQI1_Mod_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI1_Mod,   (ModelNode*) &iedModel_MES_MSQI1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,   NULL,0};
 DataAttribute iedModel_MES_MSQI1_Mod_t 					= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MSQI1_Mod,   (ModelNode*) &iedModel_MES_MSQI1_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO,   NULL,0};
 DataAttribute iedModel_MES_MSQI1_Mod_stVal 				= { DataAttributeModelType,	"stVal",    (ModelNode*) &iedModel_MES_MSQI1_Mod,   (ModelNode*) &iedModel_MES_MSQI1_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_MES_MSQI1_Mod_ctlModel 			= { DataAttributeModelType, "ctlModel", (ModelNode*) &iedModel_MES_MSQI1_Mod,   NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_MES_MSQI1_Beh 						= { DataObjectModelType,    "Beh",    	(ModelNode*) &iedModel_MES_MSQI1,    	(ModelNode*) &iedModel_MES_MSQI1_Health,    (ModelNode*) &iedModel_MES_MSQI1_Beh_stVal,0};
 DataAttribute iedModel_MES_MSQI1_Beh_stVal 				= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_MES_MSQI1_Beh,   (ModelNode*) &iedModel_MES_MSQI1_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_MES_MSQI1_Beh_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI1_Beh,   (ModelNode*) &iedModel_MES_MSQI1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_MES_MSQI1_Beh_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI1_Beh,   (ModelNode*) &iedModel_MES_MSQI1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_MES_MSQI1_Beh_t 					= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MSQI1_Beh,   NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_MES_MSQI1_Health 					= { DataObjectModelType,    "Health",   (ModelNode*) &iedModel_MES_MSQI1,    	(ModelNode*) &iedModel_MES_MSQI1_NamPlt,    (ModelNode*) &iedModel_MES_MSQI1_Health_stVal,0};
 DataAttribute iedModel_MES_MSQI1_Health_stVal 			= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_MES_MSQI1_Health,(ModelNode*) &iedModel_MES_MSQI1_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO,    NULL,0};
-DataAttribute iedModel_MES_MSQI1_Health_q		 		= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI1_Health,(ModelNode*) &iedModel_MES_MSQI1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,    NULL,0};
+DataAttribute iedModel_MES_MSQI1_Health_q		 		= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI1_Health,(ModelNode*) &iedModel_MES_MSQI1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,    NULL,0};
 DataAttribute iedModel_MES_MSQI1_Health_t 				= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MSQI1_Health,NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_MES_MSQI1_NamPlt 					= { DataObjectModelType,    "NamPlt",   (ModelNode*) &iedModel_MES_MSQI1,    	(ModelNode*) &iedModel_MES_MSQI1_SeqA, (ModelNode*) &iedModel_MES_MSQI1_NamPlt_vendor,0};
@@ -6654,19 +6661,19 @@ DataAttribute iedModel_MES_MSQI1_SeqA_SeqT 				= { DataAttributeModelType, "seqT
 LogicalNode iedModel_MES_MSQI2 						= { LogicalNodeModelType,   "MSQI2",    (ModelNode*)&iedModel_Generic_MES,   (ModelNode*)&iedModel_MES_MSQI3,    (ModelNode*) &iedModel_MES_MSQI2_Mod};
 
 DataObject iedModel_MES_MSQI2_Mod 					= { DataObjectModelType,    "Mod",    	(ModelNode*) &iedModel_MES_MSQI2,    (ModelNode*) &iedModel_MES_MSQI2_Beh,    (ModelNode*) &iedModel_MES_MSQI2_Mod_q,0};
-DataAttribute iedModel_MES_MSQI2_Mod_q 				= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI2_Mod,    (ModelNode*) &iedModel_MES_MSQI2_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,   NULL,0};
+DataAttribute iedModel_MES_MSQI2_Mod_q 				= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI2_Mod,    (ModelNode*) &iedModel_MES_MSQI2_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,   NULL,0};
 DataAttribute iedModel_MES_MSQI2_Mod_t 				= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MSQI2_Mod,    (ModelNode*) &iedModel_MES_MSQI2_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO,   NULL,0};
 DataAttribute iedModel_MES_MSQI2_Mod_stVal 			= { DataAttributeModelType,	"stVal",    (ModelNode*) &iedModel_MES_MSQI2_Mod,    (ModelNode*) &iedModel_MES_MSQI2_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_MES_MSQI2_Mod_ctlModel 		= { DataAttributeModelType, "ctlModel", (ModelNode*) &iedModel_MES_MSQI2_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_MES_MSQI2_Beh 					= { DataObjectModelType,    "Beh",    	(ModelNode*) &iedModel_MES_MSQI2,    (ModelNode*) &iedModel_MES_MSQI2_Health,    (ModelNode*) &iedModel_MES_MSQI2_Beh_stVal,0};
 DataAttribute iedModel_MES_MSQI2_Beh_stVal 			= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_MES_MSQI2_Beh,    (ModelNode*) &iedModel_MES_MSQI2_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_MES_MSQI2_Beh_q 				= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI2_Beh,    (ModelNode*) &iedModel_MES_MSQI2_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_MES_MSQI2_Beh_q 				= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI2_Beh,    (ModelNode*) &iedModel_MES_MSQI2_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_MES_MSQI2_Beh_t 				= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MSQI2_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_MES_MSQI2_Health 				= { DataObjectModelType,    "Health",   (ModelNode*) &iedModel_MES_MSQI2,    (ModelNode*) &iedModel_MES_MSQI2_NamPlt,    (ModelNode*) &iedModel_MES_MSQI2_Health_stVal,0};
 DataAttribute iedModel_MES_MSQI2_Health_stVal 		= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_MES_MSQI2_Health,    (ModelNode*) &iedModel_MES_MSQI2_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO,    NULL,0};
-DataAttribute iedModel_MES_MSQI2_Health_q		 	= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI2_Health,    (ModelNode*) &iedModel_MES_MSQI2_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,    NULL,0};
+DataAttribute iedModel_MES_MSQI2_Health_q		 	= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI2_Health,    (ModelNode*) &iedModel_MES_MSQI2_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,    NULL,0};
 DataAttribute iedModel_MES_MSQI2_Health_t 			= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MSQI2_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_MES_MSQI2_NamPlt 				= { DataObjectModelType,    "NamPlt",   (ModelNode*) &iedModel_MES_MSQI2,    (ModelNode*) &iedModel_MES_MSQI2_SeqA, (ModelNode*) &iedModel_MES_MSQI2_NamPlt_vendor,0};
@@ -6706,19 +6713,19 @@ DataAttribute iedModel_MES_MSQI2_SeqA_SeqT 				= { DataAttributeModelType, "seqT
 LogicalNode iedModel_MES_MSQI3 						= { LogicalNodeModelType,   "MSQI3",    (ModelNode*)&iedModel_Generic_MES,   (ModelNode*)&iedModel_MES_MSQI4,    (ModelNode*) &iedModel_MES_MSQI3_Mod};
 
 DataObject iedModel_MES_MSQI3_Mod 					= { DataObjectModelType,    "Mod",    	(ModelNode*) &iedModel_MES_MSQI3,    (ModelNode*) &iedModel_MES_MSQI3_Beh,    (ModelNode*) &iedModel_MES_MSQI3_Mod_q,0};
-DataAttribute iedModel_MES_MSQI3_Mod_q 				= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI3_Mod,    (ModelNode*) &iedModel_MES_MSQI3_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,   NULL,0};
+DataAttribute iedModel_MES_MSQI3_Mod_q 				= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI3_Mod,    (ModelNode*) &iedModel_MES_MSQI3_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,   NULL,0};
 DataAttribute iedModel_MES_MSQI3_Mod_t 				= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MSQI3_Mod,    (ModelNode*) &iedModel_MES_MSQI3_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO,   NULL,0};
 DataAttribute iedModel_MES_MSQI3_Mod_stVal 			= { DataAttributeModelType,	"stVal",    (ModelNode*) &iedModel_MES_MSQI3_Mod,    (ModelNode*) &iedModel_MES_MSQI3_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_MES_MSQI3_Mod_ctlModel 		= { DataAttributeModelType, "ctlModel", (ModelNode*) &iedModel_MES_MSQI3_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_MES_MSQI3_Beh 					= { DataObjectModelType,    "Beh",    	(ModelNode*) &iedModel_MES_MSQI3,    (ModelNode*) &iedModel_MES_MSQI3_Health,    (ModelNode*) &iedModel_MES_MSQI3_Beh_stVal,0};
 DataAttribute iedModel_MES_MSQI3_Beh_stVal 			= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_MES_MSQI3_Beh,    (ModelNode*) &iedModel_MES_MSQI3_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_MES_MSQI3_Beh_q 				= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI3_Beh,    (ModelNode*) &iedModel_MES_MSQI3_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_MES_MSQI3_Beh_q 				= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI3_Beh,    (ModelNode*) &iedModel_MES_MSQI3_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_MES_MSQI3_Beh_t 				= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MSQI3_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_MES_MSQI3_Health 				= { DataObjectModelType,    "Health",   (ModelNode*) &iedModel_MES_MSQI3,    (ModelNode*) &iedModel_MES_MSQI3_NamPlt,    (ModelNode*) &iedModel_MES_MSQI3_Health_stVal,0};
 DataAttribute iedModel_MES_MSQI3_Health_stVal 		= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_MES_MSQI3_Health,    (ModelNode*) &iedModel_MES_MSQI3_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO,    NULL,0};
-DataAttribute iedModel_MES_MSQI3_Health_q		 	= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI3_Health,    (ModelNode*) &iedModel_MES_MSQI3_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,    NULL,0};
+DataAttribute iedModel_MES_MSQI3_Health_q		 	= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI3_Health,    (ModelNode*) &iedModel_MES_MSQI3_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,    NULL,0};
 DataAttribute iedModel_MES_MSQI3_Health_t 			= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MSQI3_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_MES_MSQI3_NamPlt 				= { DataObjectModelType,    "NamPlt",   (ModelNode*) &iedModel_MES_MSQI3,    (ModelNode*) &iedModel_MES_MSQI3_SeqA, (ModelNode*) &iedModel_MES_MSQI3_NamPlt_vendor,0};
@@ -6758,19 +6765,19 @@ DataAttribute iedModel_MES_MSQI3_SeqA_SeqT 				= { DataAttributeModelType, "seqT
 LogicalNode iedModel_MES_MSQI4 						= { LogicalNodeModelType,   "MSQI4",    (ModelNode*)&iedModel_Generic_MES,   (ModelNode*)NULL,    (ModelNode*) &iedModel_MES_MSQI4_Mod};
 
 DataObject iedModel_MES_MSQI4_Mod 					= { DataObjectModelType,    "Mod",    	(ModelNode*) &iedModel_MES_MSQI4,    (ModelNode*) &iedModel_MES_MSQI4_Beh,    (ModelNode*) &iedModel_MES_MSQI4_Mod_q,0};
-DataAttribute iedModel_MES_MSQI4_Mod_q 				= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI4_Mod,    (ModelNode*) &iedModel_MES_MSQI4_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,   NULL,0};
+DataAttribute iedModel_MES_MSQI4_Mod_q 				= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI4_Mod,    (ModelNode*) &iedModel_MES_MSQI4_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,   NULL,0};
 DataAttribute iedModel_MES_MSQI4_Mod_t 				= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MSQI4_Mod,    (ModelNode*) &iedModel_MES_MSQI4_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO,   NULL,0};
 DataAttribute iedModel_MES_MSQI4_Mod_stVal 			= { DataAttributeModelType,	"stVal",    (ModelNode*) &iedModel_MES_MSQI4_Mod,    (ModelNode*) &iedModel_MES_MSQI4_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_MES_MSQI4_Mod_ctlModel 		= { DataAttributeModelType, "ctlModel", (ModelNode*) &iedModel_MES_MSQI4_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_MES_MSQI4_Beh 					= { DataObjectModelType,    "Beh",    	(ModelNode*) &iedModel_MES_MSQI4,    (ModelNode*) &iedModel_MES_MSQI4_Health,    (ModelNode*) &iedModel_MES_MSQI4_Beh_stVal,0};
 DataAttribute iedModel_MES_MSQI4_Beh_stVal 			= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_MES_MSQI4_Beh,    (ModelNode*) &iedModel_MES_MSQI4_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_MES_MSQI4_Beh_q 				= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI4_Beh,    (ModelNode*) &iedModel_MES_MSQI4_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_MES_MSQI4_Beh_q 				= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI4_Beh,    (ModelNode*) &iedModel_MES_MSQI4_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_MES_MSQI4_Beh_t 				= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MSQI4_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_MES_MSQI4_Health 				= { DataObjectModelType,    "Health",   (ModelNode*) &iedModel_MES_MSQI4,    (ModelNode*) &iedModel_MES_MSQI4_NamPlt,    (ModelNode*) &iedModel_MES_MSQI4_Health_stVal,0};
 DataAttribute iedModel_MES_MSQI4_Health_stVal 		= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_MES_MSQI4_Health,    (ModelNode*) &iedModel_MES_MSQI4_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO,    NULL,0};
-DataAttribute iedModel_MES_MSQI4_Health_q		 	= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI4_Health,    (ModelNode*) &iedModel_MES_MSQI4_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,    NULL,0};
+DataAttribute iedModel_MES_MSQI4_Health_q		 	= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_MES_MSQI4_Health,    (ModelNode*) &iedModel_MES_MSQI4_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,    NULL,0};
 DataAttribute iedModel_MES_MSQI4_Health_t 			= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_MES_MSQI4_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_MES_MSQI4_NamPlt 				= { DataObjectModelType,    "NamPlt",   (ModelNode*) &iedModel_MES_MSQI4,    (ModelNode*) &iedModel_MES_MSQI4_SeqU, (ModelNode*) &iedModel_MES_MSQI4_NamPlt_vendor,0};
@@ -6823,19 +6830,19 @@ DataAttribute iedModel_MES_MSQI4_SeqU_SeqT 				= { DataAttributeModelType, "seqT
 LogicalNode iedModel_PROT_IDPDIF 					= { LogicalNodeModelType,   	"IDPDIF1",    (ModelNode*)&iedModel_Generic_PROT,   (ModelNode*)&iedModel_PROT_IDDPDIF,    (ModelNode*) &iedModel_PROT_IDPDIF_Mod};
 
 DataObject iedModel_PROT_IDPDIF_Mod 				= { DataObjectModelType,    	"Mod",    (ModelNode*) &iedModel_PROT_IDPDIF,    (ModelNode*) &iedModel_PROT_IDPDIF_Beh,    (ModelNode*) &iedModel_PROT_IDPDIF_Mod_q,0};
-DataAttribute iedModel_PROT_IDPDIF_Mod_q 			= { DataAttributeModelType, 	"q",    (ModelNode*) &iedModel_PROT_IDPDIF_Mod,    (ModelNode*) &iedModel_PROT_IDPDIF_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,   NULL,0};
+DataAttribute iedModel_PROT_IDPDIF_Mod_q 			= { DataAttributeModelType, 	"q",    (ModelNode*) &iedModel_PROT_IDPDIF_Mod,    (ModelNode*) &iedModel_PROT_IDPDIF_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,   NULL,0};
 DataAttribute iedModel_PROT_IDPDIF_Mod_t 			= { DataAttributeModelType, 	"t",    (ModelNode*) &iedModel_PROT_IDPDIF_Mod,    (ModelNode*) &iedModel_PROT_IDPDIF_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO,   NULL,0};
 DataAttribute iedModel_PROT_IDPDIF_Mod_stVal 		= { DataAttributeModelType,		"stVal",    (ModelNode*) &iedModel_PROT_IDPDIF_Mod,    (ModelNode*) &iedModel_PROT_IDPDIF_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_IDPDIF_Mod_ctlModel 	= {   DataAttributeModelType,   "ctlModel",    (ModelNode*) &iedModel_PROT_IDPDIF_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IDPDIF_Beh 				= { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_IDPDIF,    (ModelNode*) &iedModel_PROT_IDPDIF_Health,    (ModelNode*) &iedModel_PROT_IDPDIF_Beh_stVal,0};
 DataAttribute iedModel_PROT_IDPDIF_Beh_stVal 		= { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_IDPDIF_Beh,    (ModelNode*) &iedModel_PROT_IDPDIF_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IDPDIF_Beh_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IDPDIF_Beh,    (ModelNode*) &iedModel_PROT_IDPDIF_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IDPDIF_Beh_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IDPDIF_Beh,    (ModelNode*) &iedModel_PROT_IDPDIF_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IDPDIF_Beh_t 			= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IDPDIF_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IDPDIF_Health 				= { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_IDPDIF,    (ModelNode*) &iedModel_PROT_IDPDIF_NamPlt,    (ModelNode*) &iedModel_PROT_IDPDIF_Health_stVal,0};
 DataAttribute iedModel_PROT_IDPDIF_Health_stVal 	= { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_IDPDIF_Health,    (ModelNode*) &iedModel_PROT_IDPDIF_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO,    NULL,0};
-DataAttribute iedModel_PROT_IDPDIF_Health_q 		= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IDPDIF_Health,    (ModelNode*) &iedModel_PROT_IDPDIF_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,    NULL,0};
+DataAttribute iedModel_PROT_IDPDIF_Health_q 		= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IDPDIF_Health,    (ModelNode*) &iedModel_PROT_IDPDIF_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,    NULL,0};
 DataAttribute iedModel_PROT_IDPDIF_Health_t 		= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IDPDIF_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IDPDIF_NamPlt 				= { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_IDPDIF,    (ModelNode*) &iedModel_PROT_IDPDIF_Op, (ModelNode*) &iedModel_PROT_IDPDIF_NamPlt_vendor,0};
@@ -6844,14 +6851,14 @@ DataAttribute iedModel_PROT_IDPDIF_NamPlt_swRev 	= { DataAttributeModelType,    
 DataAttribute iedModel_PROT_IDPDIF_NamPlt_d 		= { DataAttributeModelType,    "d",    (ModelNode*) &iedModel_PROT_IDPDIF_NamPlt,    NULL,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IDPDIF_Op 	 				= { DataObjectModelType,    "Op",  (ModelNode*) &iedModel_PROT_IDPDIF,  	(ModelNode*)&iedModel_PROT_IDPDIF_Str, (ModelNode*) &iedModel_PROT_IDPDIF_Op_general,0};
-DataAttribute iedModel_PROT_IDPDIF_Op_general 		= { DataAttributeModelType, "general", (ModelNode*) &iedModel_PROT_IDPDIF_Op,  (ModelNode*) &iedModel_PROT_IDPDIF_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IDPDIF_Op_q 			= { DataAttributeModelType, "q",    (ModelNode*) &iedModel_PROT_IDPDIF_Op,  (ModelNode*) &iedModel_PROT_IDPDIF_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IDPDIF_Op_general 		= { DataAttributeModelType, "general", (ModelNode*) &iedModel_PROT_IDPDIF_Op,  (ModelNode*) &iedModel_PROT_IDPDIF_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IDPDIF_Op_q 			= { DataAttributeModelType, "q",    (ModelNode*) &iedModel_PROT_IDPDIF_Op,  (ModelNode*) &iedModel_PROT_IDPDIF_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IDPDIF_Op_t 			= { DataAttributeModelType, "t",    (ModelNode*) &iedModel_PROT_IDPDIF_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IDPDIF_Str 	 			= { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_IDPDIF,  (ModelNode*)&iedModel_PROT_IDPDIF_RstA, (ModelNode*) &iedModel_PROT_IDPDIF_Str_general,0};
-DataAttribute iedModel_PROT_IDPDIF_Str_general 		= { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IDPDIF_Str,  (ModelNode*) &iedModel_PROT_IDPDIF_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IDPDIF_Str_general 		= { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IDPDIF_Str,  (ModelNode*) &iedModel_PROT_IDPDIF_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IDPDIF_Str_dirGeneral 	= { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_IDPDIF_Str,  (ModelNode*) &iedModel_PROT_IDPDIF_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IDPDIF_Str_q 			= { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IDPDIF_Str,  (ModelNode*) &iedModel_PROT_IDPDIF_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IDPDIF_Str_q 			= { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IDPDIF_Str,  (ModelNode*) &iedModel_PROT_IDPDIF_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IDPDIF_Str_t 			= { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_IDPDIF_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -6935,19 +6942,19 @@ DataAttribute iedModel_PROT_IDPDIF_DifACIc_phsC_zeroDb 			= { DataAttributeModel
 LogicalNode iedModel_PROT_IDDPDIF 							= { LogicalNodeModelType,   "IDDPDIF1",	(ModelNode*)&iedModel_Generic_PROT,   (ModelNode*)&iedModel_PROT_IDDMPDIF,    (ModelNode*) &iedModel_PROT_IDDPDIF_Mod};
 
 DataObject iedModel_PROT_IDDPDIF_Mod 						= { DataObjectModelType,    "Mod",    	(ModelNode*) &iedModel_PROT_IDDPDIF,    (ModelNode*) &iedModel_PROT_IDDPDIF_Beh,    (ModelNode*) &iedModel_PROT_IDDPDIF_Mod_q,0};
-DataAttribute iedModel_PROT_IDDPDIF_Mod_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_PROT_IDDPDIF_Mod,    (ModelNode*) &iedModel_PROT_IDDPDIF_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,   NULL,0};
+DataAttribute iedModel_PROT_IDDPDIF_Mod_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_PROT_IDDPDIF_Mod,    (ModelNode*) &iedModel_PROT_IDDPDIF_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,   NULL,0};
 DataAttribute iedModel_PROT_IDDPDIF_Mod_t 					= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_PROT_IDDPDIF_Mod,    (ModelNode*) &iedModel_PROT_IDDPDIF_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO,   NULL,0};
 DataAttribute iedModel_PROT_IDDPDIF_Mod_stVal 				= { DataAttributeModelType, "stVal",   	(ModelNode*) &iedModel_PROT_IDDPDIF_Mod,    (ModelNode*) &iedModel_PROT_IDDPDIF_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_IDDPDIF_Mod_ctlModel 			= { DataAttributeModelType, "ctlModel", (ModelNode*) &iedModel_PROT_IDDPDIF_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IDDPDIF_Beh 						= { DataObjectModelType,    "Beh",    	(ModelNode*) &iedModel_PROT_IDDPDIF,    (ModelNode*) &iedModel_PROT_IDDPDIF_Health,    (ModelNode*) &iedModel_PROT_IDDPDIF_Beh_stVal,0};
 DataAttribute iedModel_PROT_IDDPDIF_Beh_stVal 				= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_PROT_IDDPDIF_Beh,    (ModelNode*) &iedModel_PROT_IDDPDIF_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IDDPDIF_Beh_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_PROT_IDDPDIF_Beh,    (ModelNode*) &iedModel_PROT_IDDPDIF_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IDDPDIF_Beh_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_PROT_IDDPDIF_Beh,    (ModelNode*) &iedModel_PROT_IDDPDIF_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IDDPDIF_Beh_t 					= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_PROT_IDDPDIF_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IDDPDIF_Health 					= { DataObjectModelType,    "Health",   (ModelNode*) &iedModel_PROT_IDDPDIF,    (ModelNode*) &iedModel_PROT_IDDPDIF_NamPlt,    (ModelNode*) &iedModel_PROT_IDDPDIF_Health_stVal,0};
 DataAttribute iedModel_PROT_IDDPDIF_Health_stVal 			= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_PROT_IDDPDIF_Health,    (ModelNode*) &iedModel_PROT_IDDPDIF_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO,    NULL,0};
-DataAttribute iedModel_PROT_IDDPDIF_Health_q 				= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_PROT_IDDPDIF_Health,    (ModelNode*) &iedModel_PROT_IDDPDIF_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,    NULL,0};
+DataAttribute iedModel_PROT_IDDPDIF_Health_q 				= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_PROT_IDDPDIF_Health,    (ModelNode*) &iedModel_PROT_IDDPDIF_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,    NULL,0};
 DataAttribute iedModel_PROT_IDDPDIF_Health_t 				= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_PROT_IDDPDIF_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IDDPDIF_NamPlt 					= { DataObjectModelType,    "NamPlt",   (ModelNode*) &iedModel_PROT_IDDPDIF,    (ModelNode*) &iedModel_PROT_IDDPDIF_Op, (ModelNode*) &iedModel_PROT_IDDPDIF_NamPlt_vendor,0};
@@ -6956,33 +6963,33 @@ DataAttribute iedModel_PROT_IDDPDIF_NamPlt_swRev 			= { DataAttributeModelType, 
 DataAttribute iedModel_PROT_IDDPDIF_NamPlt_d 				= { DataAttributeModelType, "d",    	(ModelNode*) &iedModel_PROT_IDDPDIF_NamPlt,    NULL,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IDDPDIF_Op 	 					= { DataObjectModelType,    "Op",  		(ModelNode*) &iedModel_PROT_IDDPDIF,  	(ModelNode*)&iedModel_PROT_IDDPDIF_Str, (ModelNode*) &iedModel_PROT_IDDPDIF_Op_general,0};
-DataAttribute iedModel_PROT_IDDPDIF_Op_general 				= { DataAttributeModelType, "general", 	(ModelNode*) &iedModel_PROT_IDDPDIF_Op,  (ModelNode*) &iedModel_PROT_IDDPDIF_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IDDPDIF_Op_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_PROT_IDDPDIF_Op,  (ModelNode*) &iedModel_PROT_IDDPDIF_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IDDPDIF_Op_general 				= { DataAttributeModelType, "general", 	(ModelNode*) &iedModel_PROT_IDDPDIF_Op,  (ModelNode*) &iedModel_PROT_IDDPDIF_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IDDPDIF_Op_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_PROT_IDDPDIF_Op,  (ModelNode*) &iedModel_PROT_IDDPDIF_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IDDPDIF_Op_t 					= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_PROT_IDDPDIF_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IDDPDIF_Str 	 					= { DataObjectModelType,    "Str",  	(ModelNode*) &iedModel_PROT_IDDPDIF,  NULL, (ModelNode*) &iedModel_PROT_IDDPDIF_Str_general,0};
-DataAttribute iedModel_PROT_IDDPDIF_Str_general 			= { DataAttributeModelType,	"general", 	(ModelNode*) &iedModel_PROT_IDDPDIF_Str,  (ModelNode*) &iedModel_PROT_IDDPDIF_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IDDPDIF_Str_general 			= { DataAttributeModelType,	"general", 	(ModelNode*) &iedModel_PROT_IDDPDIF_Str,  (ModelNode*) &iedModel_PROT_IDDPDIF_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IDDPDIF_Str_dirGeneral 			= { DataAttributeModelType,	"dirGeneral", (ModelNode*) &iedModel_PROT_IDDPDIF_Str,  (ModelNode*) &iedModel_PROT_IDDPDIF_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IDDPDIF_Str_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_PROT_IDDPDIF_Str,  (ModelNode*) &iedModel_PROT_IDDPDIF_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IDDPDIF_Str_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_PROT_IDDPDIF_Str,  (ModelNode*) &iedModel_PROT_IDDPDIF_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IDDPDIF_Str_t 					= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_PROT_IDDPDIF_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 //-IDDMPDIF--------------------------------------------------------------------------
 LogicalNode iedModel_PROT_IDDMPDIF 							= {    LogicalNodeModelType,    "IDDMPDIF1",    (ModelNode*)&iedModel_Generic_PROT,  (ModelNode*)&iedModel_PROT_IPTOC1,    (ModelNode*) &iedModel_PROT_IDDMPDIF_Mod};
 
 DataObject iedModel_PROT_IDDMPDIF_Mod 						= { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_IDDMPDIF,    (ModelNode*) &iedModel_PROT_IDDMPDIF_Beh,    (ModelNode*) &iedModel_PROT_IDDMPDIF_Mod_q,0};
-DataAttribute iedModel_PROT_IDDMPDIF_Mod_q 					= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IDDMPDIF_Mod,    (ModelNode*) &iedModel_PROT_IDDMPDIF_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,   NULL,0};
+DataAttribute iedModel_PROT_IDDMPDIF_Mod_q 					= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IDDMPDIF_Mod,    (ModelNode*) &iedModel_PROT_IDDMPDIF_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,   NULL,0};
 DataAttribute iedModel_PROT_IDDMPDIF_Mod_t 					= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IDDMPDIF_Mod,    (ModelNode*) &iedModel_PROT_IDDMPDIF_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO,   NULL,0};
 DataAttribute iedModel_PROT_IDDMPDIF_Mod_stVal 				= { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_IDDMPDIF_Mod,    (ModelNode*) &iedModel_PROT_IDDMPDIF_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_IDDMPDIF_Mod_ctlModel 		= {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_IDDMPDIF_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IDDMPDIF_Beh 						= { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_IDDMPDIF,    (ModelNode*) &iedModel_PROT_IDDMPDIF_Health,    (ModelNode*) &iedModel_PROT_IDDMPDIF_Beh_stVal,0};
 DataAttribute iedModel_PROT_IDDMPDIF_Beh_stVal 				= { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_IDDMPDIF_Beh,    (ModelNode*) &iedModel_PROT_IDDMPDIF_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IDDMPDIF_Beh_q 					= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IDDMPDIF_Beh,    (ModelNode*) &iedModel_PROT_IDDMPDIF_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IDDMPDIF_Beh_q 					= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IDDMPDIF_Beh,    (ModelNode*) &iedModel_PROT_IDDMPDIF_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IDDMPDIF_Beh_t 					= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IDDMPDIF_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IDDMPDIF_Health 					= { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_IDDMPDIF,    (ModelNode*) &iedModel_PROT_IDDMPDIF_NamPlt,    (ModelNode*) &iedModel_PROT_IDDMPDIF_Health_stVal,0};
 DataAttribute iedModel_PROT_IDDMPDIF_Health_stVal 			= { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_IDDMPDIF_Health,    (ModelNode*) &iedModel_PROT_IDDMPDIF_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO,    NULL,0};
-DataAttribute iedModel_PROT_IDDMPDIF_Health_q 				= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IDDMPDIF_Health,    (ModelNode*) &iedModel_PROT_IDDMPDIF_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,    NULL,0};
+DataAttribute iedModel_PROT_IDDMPDIF_Health_q 				= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IDDMPDIF_Health,    (ModelNode*) &iedModel_PROT_IDDMPDIF_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,    NULL,0};
 DataAttribute iedModel_PROT_IDDMPDIF_Health_t 				= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IDDMPDIF_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IDDMPDIF_NamPlt 					= { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_IDDMPDIF,    (ModelNode*) &iedModel_PROT_IDDMPDIF_Op, (ModelNode*) &iedModel_PROT_IDDMPDIF_NamPlt_vendor,0};
@@ -6991,33 +6998,33 @@ DataAttribute iedModel_PROT_IDDMPDIF_NamPlt_swRev 			= { DataAttributeModelType,
 DataAttribute iedModel_PROT_IDDMPDIF_NamPlt_d 				= { DataAttributeModelType,    "d",    (ModelNode*) &iedModel_PROT_IDDMPDIF_NamPlt,    NULL,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IDDMPDIF_Op 	 					= { DataObjectModelType,    "Op",  (ModelNode*) &iedModel_PROT_IDDMPDIF,  	(ModelNode*)&iedModel_PROT_IDDMPDIF_Str, (ModelNode*) &iedModel_PROT_IDDMPDIF_Op_general,0};
-DataAttribute iedModel_PROT_IDDMPDIF_Op_general 			= { DataAttributeModelType, "general", (ModelNode*) &iedModel_PROT_IDDMPDIF_Op,  (ModelNode*) &iedModel_PROT_IDDMPDIF_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IDDMPDIF_Op_q 					= { DataAttributeModelType, "q",    (ModelNode*) &iedModel_PROT_IDDMPDIF_Op,  (ModelNode*) &iedModel_PROT_IDDMPDIF_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IDDMPDIF_Op_general 			= { DataAttributeModelType, "general", (ModelNode*) &iedModel_PROT_IDDMPDIF_Op,  (ModelNode*) &iedModel_PROT_IDDMPDIF_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IDDMPDIF_Op_q 					= { DataAttributeModelType, "q",    (ModelNode*) &iedModel_PROT_IDDMPDIF_Op,  (ModelNode*) &iedModel_PROT_IDDMPDIF_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IDDMPDIF_Op_t 					= { DataAttributeModelType, "t",    (ModelNode*) &iedModel_PROT_IDDMPDIF_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IDDMPDIF_Str 	 					= { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_IDDMPDIF,  NULL, (ModelNode*) &iedModel_PROT_IDDMPDIF_Str_general,0};
-DataAttribute iedModel_PROT_IDDMPDIF_Str_general 			= { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IDDMPDIF_Str,  (ModelNode*) &iedModel_PROT_IDDMPDIF_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IDDMPDIF_Str_general 			= { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IDDMPDIF_Str,  (ModelNode*) &iedModel_PROT_IDDMPDIF_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IDDMPDIF_Str_dirGeneral 		= { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_IDDMPDIF_Str,  (ModelNode*) &iedModel_PROT_IDDMPDIF_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IDDMPDIF_Str_q 					= { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IDDMPDIF_Str,  (ModelNode*) &iedModel_PROT_IDDMPDIF_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IDDMPDIF_Str_q 					= { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IDDMPDIF_Str,  (ModelNode*) &iedModel_PROT_IDDMPDIF_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IDDMPDIF_Str_t 					= { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_IDDMPDIF_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
 LogicalNode iedModel_PROT_IPTOC1 							= { LogicalNodeModelType,   "IPTOC1",    (ModelNode*)&iedModel_Generic_PROT,  (ModelNode*)&iedModel_PROT_IPTOC2,    (ModelNode*) &iedModel_PROT_IPTOC1_Mod};
 
 DataObject iedModel_PROT_IPTOC1_Mod 						= { DataObjectModelType,    "Mod",    	(ModelNode*) &iedModel_PROT_IPTOC1,    (ModelNode*) &iedModel_PROT_IPTOC1_Beh,    (ModelNode*) &iedModel_PROT_IPTOC1_Mod_q,0};
-DataAttribute iedModel_PROT_IPTOC1_Mod_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_PROT_IPTOC1_Mod,    (ModelNode*) &iedModel_PROT_IPTOC1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC1_Mod_q 					= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_PROT_IPTOC1_Mod,    (ModelNode*) &iedModel_PROT_IPTOC1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC1_Mod_t 					= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_PROT_IPTOC1_Mod,    (ModelNode*) &iedModel_PROT_IPTOC1_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_IPTOC1_Mod_stVal 				= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_PROT_IPTOC1_Mod,    (ModelNode*) &iedModel_PROT_IPTOC1_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_IPTOC1_Mod_ctlModel 			= { DataAttributeModelType, "ctlModel", (ModelNode*) &iedModel_PROT_IPTOC1_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC1_Beh 				= { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_IPTOC1,    (ModelNode*) &iedModel_PROT_IPTOC1_Health,    (ModelNode*) &iedModel_PROT_IPTOC1_Beh_stVal,0};
 DataAttribute iedModel_PROT_IPTOC1_Beh_stVal 		= { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_IPTOC1_Beh,    (ModelNode*) &iedModel_PROT_IPTOC1_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC1_Beh_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC1_Beh,    (ModelNode*) &iedModel_PROT_IPTOC1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC1_Beh_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC1_Beh,    (ModelNode*) &iedModel_PROT_IPTOC1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC1_Beh_t 			= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IPTOC1_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC1_Health 				= { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_IPTOC1,    (ModelNode*) &iedModel_PROT_IPTOC1_NamPlt,    (ModelNode*) &iedModel_PROT_IPTOC1_Health_stVal,0};
 DataAttribute iedModel_PROT_IPTOC1_Health_stVal 	= { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_IPTOC1_Health,    (ModelNode*) &iedModel_PROT_IPTOC1_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC1_Health_q 		= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC1_Health,    (ModelNode*) &iedModel_PROT_IPTOC1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC1_Health_q 		= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC1_Health,    (ModelNode*) &iedModel_PROT_IPTOC1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC1_Health_t 		= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IPTOC1_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC1_NamPlt 				= { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_IPTOC1,    (ModelNode*) &iedModel_PROT_IPTOC1_Str, (ModelNode*) &iedModel_PROT_IPTOC1_NamPlt_vendor,0};
@@ -7027,33 +7034,33 @@ DataAttribute iedModel_PROT_IPTOC1_NamPlt_d 		= { DataAttributeModelType,    "d"
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_IPTOC1_Str 	 			= { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_IPTOC1,  	(ModelNode*)&iedModel_PROT_IPTOC1_Op, (ModelNode*) &iedModel_PROT_IPTOC1_Str_general,0};
-DataAttribute iedModel_PROT_IPTOC1_Str_general 		= { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC1_Str,  (ModelNode*) &iedModel_PROT_IPTOC1_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC1_Str_dirGeneral 	= { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_IPTOC1_Str,  (ModelNode*) &iedModel_PROT_IPTOC1_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC1_Str_q 			= { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC1_Str,  (ModelNode*) &iedModel_PROT_IPTOC1_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC1_Str_general 		= { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC1_Str,  (ModelNode*) &iedModel_PROT_IPTOC1_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC1_Str_dirGeneral 	= { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_IPTOC1_Str,  (ModelNode*) &iedModel_PROT_IPTOC1_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC1_Str_q 			= { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC1_Str,  (ModelNode*) &iedModel_PROT_IPTOC1_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC1_Str_t 			= { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_IPTOC1_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_IPTOC1_Op 	 				= { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_IPTOC1,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_IPTOC1_Op_general,0};
-DataAttribute iedModel_PROT_IPTOC1_Op_general 		= { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC1_Op,  (ModelNode*) &iedModel_PROT_IPTOC1_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC1_Op_q 			= { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC1_Op,  (ModelNode*) &iedModel_PROT_IPTOC1_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC1_Op_general 		= { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC1_Op,  (ModelNode*) &iedModel_PROT_IPTOC1_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC1_Op_q 			= { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC1_Op,  (ModelNode*) &iedModel_PROT_IPTOC1_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC1_Op_t 			= { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_IPTOC1_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 LogicalNode iedModel_PROT_IPTOC2 				= { LogicalNodeModelType,    "IPTOC2",    (ModelNode*)&iedModel_Generic_PROT,  (ModelNode*)&iedModel_PROT_IPTOC3,    (ModelNode*) &iedModel_PROT_IPTOC2_Mod};
 
 DataObject iedModel_PROT_IPTOC2_Mod 			= { DataObjectModelType,    "Mod",    	(ModelNode*) &iedModel_PROT_IPTOC2,    (ModelNode*) &iedModel_PROT_IPTOC2_Beh,    (ModelNode*) &iedModel_PROT_IPTOC2_Mod_q,0};
-DataAttribute iedModel_PROT_IPTOC2_Mod_q 		= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_PROT_IPTOC2_Mod,    (ModelNode*) &iedModel_PROT_IPTOC2_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC2_Mod_q 		= { DataAttributeModelType, "q",    	(ModelNode*) &iedModel_PROT_IPTOC2_Mod,    (ModelNode*) &iedModel_PROT_IPTOC2_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC2_Mod_t 		= { DataAttributeModelType, "t",    	(ModelNode*) &iedModel_PROT_IPTOC2_Mod,    (ModelNode*) &iedModel_PROT_IPTOC2_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_IPTOC2_Mod_stVal 	= { DataAttributeModelType, "stVal",    (ModelNode*) &iedModel_PROT_IPTOC2_Mod,    (ModelNode*) &iedModel_PROT_IPTOC2_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_IPTOC2_Mod_ctlModel = { DataAttributeModelType, "ctlModel", (ModelNode*) &iedModel_PROT_IPTOC2_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC2_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_IPTOC2,    (ModelNode*) &iedModel_PROT_IPTOC2_Health,    (ModelNode*) &iedModel_PROT_IPTOC2_Beh_stVal,0};
 DataAttribute iedModel_PROT_IPTOC2_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_IPTOC2_Beh,    (ModelNode*) &iedModel_PROT_IPTOC2_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC2_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC2_Beh,    (ModelNode*) &iedModel_PROT_IPTOC2_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC2_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC2_Beh,    (ModelNode*) &iedModel_PROT_IPTOC2_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC2_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IPTOC2_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC2_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_IPTOC2,    (ModelNode*) &iedModel_PROT_IPTOC2_NamPlt,    (ModelNode*) &iedModel_PROT_IPTOC2_Health_stVal,0};
 DataAttribute iedModel_PROT_IPTOC2_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_IPTOC2_Health,    (ModelNode*) &iedModel_PROT_IPTOC2_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC2_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC2_Health,    (ModelNode*) &iedModel_PROT_IPTOC2_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC2_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC2_Health,    (ModelNode*) &iedModel_PROT_IPTOC2_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC2_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IPTOC2_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC2_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_IPTOC2,    (ModelNode*) &iedModel_PROT_IPTOC2_Str, (ModelNode*) &iedModel_PROT_IPTOC2_NamPlt_vendor,0};
@@ -7063,33 +7070,33 @@ DataAttribute iedModel_PROT_IPTOC2_NamPlt_d = { DataAttributeModelType,    "d", 
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_IPTOC2_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_IPTOC2,  	(ModelNode*)&iedModel_PROT_IPTOC2_Op, (ModelNode*) &iedModel_PROT_IPTOC2_Str_general,0};
-DataAttribute iedModel_PROT_IPTOC2_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC2_Str,  (ModelNode*) &iedModel_PROT_IPTOC2_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC2_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_IPTOC2_Str,  (ModelNode*) &iedModel_PROT_IPTOC2_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC2_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC2_Str,  (ModelNode*) &iedModel_PROT_IPTOC2_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC2_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC2_Str,  (ModelNode*) &iedModel_PROT_IPTOC2_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC2_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_IPTOC2_Str,  (ModelNode*) &iedModel_PROT_IPTOC2_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC2_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC2_Str,  (ModelNode*) &iedModel_PROT_IPTOC2_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC2_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_IPTOC2_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_IPTOC2_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_IPTOC2,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_IPTOC2_Op_general,0};
-DataAttribute iedModel_PROT_IPTOC2_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC2_Op,  (ModelNode*) &iedModel_PROT_IPTOC2_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC2_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC2_Op,  (ModelNode*) &iedModel_PROT_IPTOC2_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC2_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC2_Op,  (ModelNode*) &iedModel_PROT_IPTOC2_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC2_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC2_Op,  (ModelNode*) &iedModel_PROT_IPTOC2_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC2_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_IPTOC2_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 LogicalNode iedModel_PROT_IPTOC3 = {    LogicalNodeModelType,    "IPTOC3",    (ModelNode*)&iedModel_Generic_PROT,  (ModelNode*)&iedModel_PROT_IPTOC4,    (ModelNode*) &iedModel_PROT_IPTOC3_Mod};
 
 DataObject iedModel_PROT_IPTOC3_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_IPTOC3,    (ModelNode*) &iedModel_PROT_IPTOC3_Beh,    (ModelNode*) &iedModel_PROT_IPTOC3_Mod_q,0};
-DataAttribute iedModel_PROT_IPTOC3_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC3_Mod,    (ModelNode*) &iedModel_PROT_IPTOC3_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC3_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC3_Mod,    (ModelNode*) &iedModel_PROT_IPTOC3_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC3_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IPTOC3_Mod,    (ModelNode*) &iedModel_PROT_IPTOC3_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_IPTOC3_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_IPTOC3_Mod,    (ModelNode*) &iedModel_PROT_IPTOC3_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_IPTOC3_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_IPTOC3_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC3_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_IPTOC3,    (ModelNode*) &iedModel_PROT_IPTOC3_Health,    (ModelNode*) &iedModel_PROT_IPTOC3_Beh_stVal,0};
 DataAttribute iedModel_PROT_IPTOC3_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_IPTOC3_Beh,    (ModelNode*) &iedModel_PROT_IPTOC3_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC3_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC3_Beh,    (ModelNode*) &iedModel_PROT_IPTOC3_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC3_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC3_Beh,    (ModelNode*) &iedModel_PROT_IPTOC3_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC3_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IPTOC3_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC3_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_IPTOC3,    (ModelNode*) &iedModel_PROT_IPTOC3_NamPlt,    (ModelNode*) &iedModel_PROT_IPTOC3_Health_stVal,0};
 DataAttribute iedModel_PROT_IPTOC3_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_IPTOC3_Health,    (ModelNode*) &iedModel_PROT_IPTOC3_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC3_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC3_Health,    (ModelNode*) &iedModel_PROT_IPTOC3_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC3_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC3_Health,    (ModelNode*) &iedModel_PROT_IPTOC3_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC3_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IPTOC3_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC3_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_IPTOC3,    (ModelNode*) &iedModel_PROT_IPTOC3_Str, (ModelNode*) &iedModel_PROT_IPTOC3_NamPlt_vendor,0};
@@ -7099,34 +7106,34 @@ DataAttribute iedModel_PROT_IPTOC3_NamPlt_d = { DataAttributeModelType,    "d", 
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_IPTOC3_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_IPTOC3,  	(ModelNode*)&iedModel_PROT_IPTOC3_Op, (ModelNode*) &iedModel_PROT_IPTOC3_Str_general,0};
-DataAttribute iedModel_PROT_IPTOC3_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC3_Str,  (ModelNode*) &iedModel_PROT_IPTOC3_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC3_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_IPTOC3_Str,  (ModelNode*) &iedModel_PROT_IPTOC3_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC3_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC3_Str,  (ModelNode*) &iedModel_PROT_IPTOC3_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC3_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC3_Str,  (ModelNode*) &iedModel_PROT_IPTOC3_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC3_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_IPTOC3_Str,  (ModelNode*) &iedModel_PROT_IPTOC3_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC3_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC3_Str,  (ModelNode*) &iedModel_PROT_IPTOC3_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC3_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_IPTOC3_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_IPTOC3_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_IPTOC3,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_IPTOC3_Op_general,0};
-DataAttribute iedModel_PROT_IPTOC3_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC3_Op,  (ModelNode*) &iedModel_PROT_IPTOC3_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC3_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC3_Op,  (ModelNode*) &iedModel_PROT_IPTOC3_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC3_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC3_Op,  (ModelNode*) &iedModel_PROT_IPTOC3_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC3_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC3_Op,  (ModelNode*) &iedModel_PROT_IPTOC3_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC3_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_IPTOC3_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // ------- IPTOC4 -------------------
 LogicalNode iedModel_PROT_IPTOC4 = {    LogicalNodeModelType,    "IPTOC4",    (ModelNode*)&iedModel_Generic_PROT,  (ModelNode*)&iedModel_PROT_IPTOC5,    (ModelNode*) &iedModel_PROT_IPTOC4_Mod};
 
 DataObject iedModel_PROT_IPTOC4_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_IPTOC4,    (ModelNode*) &iedModel_PROT_IPTOC4_Beh,    (ModelNode*) &iedModel_PROT_IPTOC4_Mod_q,0};
-DataAttribute iedModel_PROT_IPTOC4_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC4_Mod,    (ModelNode*) &iedModel_PROT_IPTOC4_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC4_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC4_Mod,    (ModelNode*) &iedModel_PROT_IPTOC4_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC4_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IPTOC4_Mod,    (ModelNode*) &iedModel_PROT_IPTOC4_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_IPTOC4_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_IPTOC4_Mod,    (ModelNode*) &iedModel_PROT_IPTOC4_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_IPTOC4_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_IPTOC4_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC4_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_IPTOC4,    (ModelNode*) &iedModel_PROT_IPTOC4_Health,    (ModelNode*) &iedModel_PROT_IPTOC4_Beh_stVal,0};
 DataAttribute iedModel_PROT_IPTOC4_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_IPTOC4_Beh,    (ModelNode*) &iedModel_PROT_IPTOC4_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC4_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC4_Beh,    (ModelNode*) &iedModel_PROT_IPTOC4_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC4_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC4_Beh,    (ModelNode*) &iedModel_PROT_IPTOC4_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC4_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IPTOC4_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC4_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_IPTOC4,    (ModelNode*) &iedModel_PROT_IPTOC4_NamPlt,    (ModelNode*) &iedModel_PROT_IPTOC4_Health_stVal,0};
 DataAttribute iedModel_PROT_IPTOC4_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_IPTOC4_Health,    (ModelNode*) &iedModel_PROT_IPTOC4_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC4_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC4_Health,    (ModelNode*) &iedModel_PROT_IPTOC4_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC4_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC4_Health,    (ModelNode*) &iedModel_PROT_IPTOC4_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC4_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IPTOC4_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC4_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_IPTOC4,    (ModelNode*) &iedModel_PROT_IPTOC4_Str, (ModelNode*) &iedModel_PROT_IPTOC4_NamPlt_vendor,0};
@@ -7136,34 +7143,34 @@ DataAttribute iedModel_PROT_IPTOC4_NamPlt_d = { DataAttributeModelType,    "d", 
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_IPTOC4_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_IPTOC4,  	(ModelNode*)&iedModel_PROT_IPTOC4_Op, (ModelNode*) &iedModel_PROT_IPTOC4_Str_general,0};
-DataAttribute iedModel_PROT_IPTOC4_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC4_Str,  (ModelNode*) &iedModel_PROT_IPTOC4_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC4_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_IPTOC4_Str,  (ModelNode*) &iedModel_PROT_IPTOC4_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC4_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC4_Str,  (ModelNode*) &iedModel_PROT_IPTOC4_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC4_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC4_Str,  (ModelNode*) &iedModel_PROT_IPTOC4_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC4_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_IPTOC4_Str,  (ModelNode*) &iedModel_PROT_IPTOC4_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC4_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC4_Str,  (ModelNode*) &iedModel_PROT_IPTOC4_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC4_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_IPTOC4_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_IPTOC4_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_IPTOC4,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_IPTOC4_Op_general,0};
-DataAttribute iedModel_PROT_IPTOC4_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC4_Op,  (ModelNode*) &iedModel_PROT_IPTOC4_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC4_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC4_Op,  (ModelNode*) &iedModel_PROT_IPTOC4_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC4_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC4_Op,  (ModelNode*) &iedModel_PROT_IPTOC4_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC4_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC4_Op,  (ModelNode*) &iedModel_PROT_IPTOC4_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC4_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_IPTOC4_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // ------- IPTOC5 -------------------
 LogicalNode iedModel_PROT_IPTOC5 = {    LogicalNodeModelType,    "IPTOC5",    (ModelNode*)&iedModel_Generic_PROT,  (ModelNode*)&iedModel_PROT_IPTOC6,    (ModelNode*) &iedModel_PROT_IPTOC5_Mod};
 
 DataObject iedModel_PROT_IPTOC5_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_IPTOC5,    (ModelNode*) &iedModel_PROT_IPTOC5_Beh,    (ModelNode*) &iedModel_PROT_IPTOC5_Mod_q,0};
-DataAttribute iedModel_PROT_IPTOC5_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC5_Mod,    (ModelNode*) &iedModel_PROT_IPTOC5_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC5_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC5_Mod,    (ModelNode*) &iedModel_PROT_IPTOC5_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC5_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IPTOC5_Mod,    (ModelNode*) &iedModel_PROT_IPTOC5_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_IPTOC5_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_IPTOC5_Mod,    (ModelNode*) &iedModel_PROT_IPTOC5_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_IPTOC5_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_IPTOC5_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC5_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_IPTOC5,    (ModelNode*) &iedModel_PROT_IPTOC5_Health,    (ModelNode*) &iedModel_PROT_IPTOC5_Beh_stVal,0};
 DataAttribute iedModel_PROT_IPTOC5_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_IPTOC5_Beh,    (ModelNode*) &iedModel_PROT_IPTOC5_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC5_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC5_Beh,    (ModelNode*) &iedModel_PROT_IPTOC5_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC5_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC5_Beh,    (ModelNode*) &iedModel_PROT_IPTOC5_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC5_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IPTOC5_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC5_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_IPTOC5,    (ModelNode*) &iedModel_PROT_IPTOC5_NamPlt,    (ModelNode*) &iedModel_PROT_IPTOC5_Health_stVal,0};
 DataAttribute iedModel_PROT_IPTOC5_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_IPTOC5_Health,    (ModelNode*) &iedModel_PROT_IPTOC5_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC5_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC5_Health,    (ModelNode*) &iedModel_PROT_IPTOC5_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC5_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC5_Health,    (ModelNode*) &iedModel_PROT_IPTOC5_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC5_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IPTOC5_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC5_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_IPTOC5,    (ModelNode*) &iedModel_PROT_IPTOC5_Str, (ModelNode*) &iedModel_PROT_IPTOC5_NamPlt_vendor,0};
@@ -7173,34 +7180,34 @@ DataAttribute iedModel_PROT_IPTOC5_NamPlt_d = { DataAttributeModelType,    "d", 
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_IPTOC5_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_IPTOC5,  	(ModelNode*)&iedModel_PROT_IPTOC5_Op, (ModelNode*) &iedModel_PROT_IPTOC5_Str_general,0};
-DataAttribute iedModel_PROT_IPTOC5_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC5_Str,  (ModelNode*) &iedModel_PROT_IPTOC5_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC5_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_IPTOC5_Str,  (ModelNode*) &iedModel_PROT_IPTOC5_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC5_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC5_Str,  (ModelNode*) &iedModel_PROT_IPTOC5_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC5_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC5_Str,  (ModelNode*) &iedModel_PROT_IPTOC5_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC5_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_IPTOC5_Str,  (ModelNode*) &iedModel_PROT_IPTOC5_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC5_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC5_Str,  (ModelNode*) &iedModel_PROT_IPTOC5_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC5_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_IPTOC5_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_IPTOC5_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_IPTOC5,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_IPTOC5_Op_general,0};
-DataAttribute iedModel_PROT_IPTOC5_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC5_Op,  (ModelNode*) &iedModel_PROT_IPTOC5_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC5_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC5_Op,  (ModelNode*) &iedModel_PROT_IPTOC5_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC5_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC5_Op,  (ModelNode*) &iedModel_PROT_IPTOC5_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC5_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC5_Op,  (ModelNode*) &iedModel_PROT_IPTOC5_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC5_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_IPTOC5_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // ------- IPTOC6 -------------------
 LogicalNode iedModel_PROT_IPTOC6 = {    LogicalNodeModelType,    "IPTOC6",    (ModelNode*)&iedModel_Generic_PROT,  (ModelNode*)&iedModel_PROT_IPTOC7,    (ModelNode*) &iedModel_PROT_IPTOC6_Mod};
 
 DataObject iedModel_PROT_IPTOC6_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_IPTOC6,    (ModelNode*) &iedModel_PROT_IPTOC6_Beh,    (ModelNode*) &iedModel_PROT_IPTOC6_Mod_q,0};
-DataAttribute iedModel_PROT_IPTOC6_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC6_Mod,    (ModelNode*) &iedModel_PROT_IPTOC6_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC6_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC6_Mod,    (ModelNode*) &iedModel_PROT_IPTOC6_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC6_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IPTOC6_Mod,    (ModelNode*) &iedModel_PROT_IPTOC6_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_IPTOC6_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_IPTOC6_Mod,    (ModelNode*) &iedModel_PROT_IPTOC6_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_IPTOC6_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_IPTOC6_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC6_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_IPTOC6,    (ModelNode*) &iedModel_PROT_IPTOC6_Health,    (ModelNode*) &iedModel_PROT_IPTOC6_Beh_stVal,0};
 DataAttribute iedModel_PROT_IPTOC6_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_IPTOC6_Beh,    (ModelNode*) &iedModel_PROT_IPTOC6_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC6_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC6_Beh,    (ModelNode*) &iedModel_PROT_IPTOC6_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC6_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC6_Beh,    (ModelNode*) &iedModel_PROT_IPTOC6_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC6_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IPTOC6_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC6_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_IPTOC6,    (ModelNode*) &iedModel_PROT_IPTOC6_NamPlt,    (ModelNode*) &iedModel_PROT_IPTOC6_Health_stVal,0};
 DataAttribute iedModel_PROT_IPTOC6_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_IPTOC6_Health,    (ModelNode*) &iedModel_PROT_IPTOC6_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC6_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC6_Health,    (ModelNode*) &iedModel_PROT_IPTOC6_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC6_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC6_Health,    (ModelNode*) &iedModel_PROT_IPTOC6_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC6_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IPTOC6_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC6_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_IPTOC6,    (ModelNode*) &iedModel_PROT_IPTOC6_Str, (ModelNode*) &iedModel_PROT_IPTOC6_NamPlt_vendor,0};
@@ -7210,15 +7217,15 @@ DataAttribute iedModel_PROT_IPTOC6_NamPlt_d = { DataAttributeModelType,    "d", 
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_IPTOC6_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_IPTOC6,  	(ModelNode*)&iedModel_PROT_IPTOC6_Op, (ModelNode*) &iedModel_PROT_IPTOC6_Str_general,0};
-DataAttribute iedModel_PROT_IPTOC6_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC6_Str,  (ModelNode*) &iedModel_PROT_IPTOC6_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC6_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_IPTOC6_Str,  (ModelNode*) &iedModel_PROT_IPTOC6_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC6_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC6_Str,  (ModelNode*) &iedModel_PROT_IPTOC6_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC6_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC6_Str,  (ModelNode*) &iedModel_PROT_IPTOC6_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC6_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_IPTOC6_Str,  (ModelNode*) &iedModel_PROT_IPTOC6_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC6_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC6_Str,  (ModelNode*) &iedModel_PROT_IPTOC6_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC6_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_IPTOC6_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_IPTOC6_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_IPTOC6,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_IPTOC6_Op_general,0};
-DataAttribute iedModel_PROT_IPTOC6_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC6_Op,  (ModelNode*) &iedModel_PROT_IPTOC6_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC6_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC6_Op,  (ModelNode*) &iedModel_PROT_IPTOC6_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC6_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC6_Op,  (ModelNode*) &iedModel_PROT_IPTOC6_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC6_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC6_Op,  (ModelNode*) &iedModel_PROT_IPTOC6_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC6_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_IPTOC6_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -7226,19 +7233,19 @@ DataAttribute iedModel_PROT_IPTOC6_Op_t = { DataAttributeModelType,    		"t",   
 LogicalNode iedModel_PROT_IPTOC7 = {    LogicalNodeModelType,    "IPTOC7",    (ModelNode*)&iedModel_Generic_PROT,  (ModelNode*)&iedModel_PROT_IPTOC8,    (ModelNode*) &iedModel_PROT_IPTOC7_Mod};
 
 DataObject iedModel_PROT_IPTOC7_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_IPTOC7,    (ModelNode*) &iedModel_PROT_IPTOC7_Beh,    (ModelNode*) &iedModel_PROT_IPTOC7_Mod_q,0};
-DataAttribute iedModel_PROT_IPTOC7_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC7_Mod,    (ModelNode*) &iedModel_PROT_IPTOC7_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC7_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC7_Mod,    (ModelNode*) &iedModel_PROT_IPTOC7_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC7_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IPTOC7_Mod,    (ModelNode*) &iedModel_PROT_IPTOC7_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_IPTOC7_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_IPTOC7_Mod,    (ModelNode*) &iedModel_PROT_IPTOC7_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_IPTOC7_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_IPTOC7_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC7_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_IPTOC7,    (ModelNode*) &iedModel_PROT_IPTOC7_Health,    (ModelNode*) &iedModel_PROT_IPTOC7_Beh_stVal,0};
 DataAttribute iedModel_PROT_IPTOC7_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_IPTOC7_Beh,    (ModelNode*) &iedModel_PROT_IPTOC7_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC7_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC7_Beh,    (ModelNode*) &iedModel_PROT_IPTOC7_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC7_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC7_Beh,    (ModelNode*) &iedModel_PROT_IPTOC7_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC7_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IPTOC7_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC7_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_IPTOC7,    (ModelNode*) &iedModel_PROT_IPTOC7_NamPlt,    (ModelNode*) &iedModel_PROT_IPTOC7_Health_stVal,0};
 DataAttribute iedModel_PROT_IPTOC7_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_IPTOC7_Health,    (ModelNode*) &iedModel_PROT_IPTOC7_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC7_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC7_Health,    (ModelNode*) &iedModel_PROT_IPTOC7_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC7_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC7_Health,    (ModelNode*) &iedModel_PROT_IPTOC7_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC7_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IPTOC7_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC7_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_IPTOC7,    (ModelNode*) &iedModel_PROT_IPTOC7_Str, (ModelNode*) &iedModel_PROT_IPTOC7_NamPlt_vendor,0};
@@ -7248,15 +7255,15 @@ DataAttribute iedModel_PROT_IPTOC7_NamPlt_d = { DataAttributeModelType,    "d", 
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_IPTOC7_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_IPTOC7,  	(ModelNode*)&iedModel_PROT_IPTOC7_Op, (ModelNode*) &iedModel_PROT_IPTOC7_Str_general,0};
-DataAttribute iedModel_PROT_IPTOC7_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC7_Str,  (ModelNode*) &iedModel_PROT_IPTOC7_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC7_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_IPTOC7_Str,  (ModelNode*) &iedModel_PROT_IPTOC7_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC7_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC7_Str,  (ModelNode*) &iedModel_PROT_IPTOC7_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC7_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC7_Str,  (ModelNode*) &iedModel_PROT_IPTOC7_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC7_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_IPTOC7_Str,  (ModelNode*) &iedModel_PROT_IPTOC7_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC7_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC7_Str,  (ModelNode*) &iedModel_PROT_IPTOC7_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC7_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_IPTOC7_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_IPTOC7_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_IPTOC7,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_IPTOC7_Op_general,0};
-DataAttribute iedModel_PROT_IPTOC7_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC7_Op,  (ModelNode*) &iedModel_PROT_IPTOC7_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC7_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC7_Op,  (ModelNode*) &iedModel_PROT_IPTOC7_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC7_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC7_Op,  (ModelNode*) &iedModel_PROT_IPTOC7_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC7_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC7_Op,  (ModelNode*) &iedModel_PROT_IPTOC7_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC7_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_IPTOC7_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -7264,19 +7271,19 @@ DataAttribute iedModel_PROT_IPTOC7_Op_t = { DataAttributeModelType,    		"t",   
 LogicalNode iedModel_PROT_IPTOC8 = {    LogicalNodeModelType,    "IPTOC8",    (ModelNode*)&iedModel_Generic_PROT,  (ModelNode*)&iedModel_PROT_I20PTOC1,    (ModelNode*) &iedModel_PROT_IPTOC8_Mod};
 
 DataObject iedModel_PROT_IPTOC8_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_IPTOC8,    (ModelNode*) &iedModel_PROT_IPTOC8_Beh,    (ModelNode*) &iedModel_PROT_IPTOC8_Mod_q,0};
-DataAttribute iedModel_PROT_IPTOC8_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC8_Mod,    (ModelNode*) &iedModel_PROT_IPTOC8_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC8_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC8_Mod,    (ModelNode*) &iedModel_PROT_IPTOC8_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC8_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IPTOC8_Mod,    (ModelNode*) &iedModel_PROT_IPTOC8_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_IPTOC8_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_IPTOC8_Mod,    (ModelNode*) &iedModel_PROT_IPTOC8_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_IPTOC8_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_IPTOC8_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC8_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_IPTOC8,    (ModelNode*) &iedModel_PROT_IPTOC8_Health,    (ModelNode*) &iedModel_PROT_IPTOC8_Beh_stVal,0};
 DataAttribute iedModel_PROT_IPTOC8_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_IPTOC8_Beh,    (ModelNode*) &iedModel_PROT_IPTOC8_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC8_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC8_Beh,    (ModelNode*) &iedModel_PROT_IPTOC8_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC8_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC8_Beh,    (ModelNode*) &iedModel_PROT_IPTOC8_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC8_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IPTOC8_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC8_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_IPTOC8,    (ModelNode*) &iedModel_PROT_IPTOC8_NamPlt,    (ModelNode*) &iedModel_PROT_IPTOC8_Health_stVal,0};
 DataAttribute iedModel_PROT_IPTOC8_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_IPTOC8_Health,    (ModelNode*) &iedModel_PROT_IPTOC8_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC8_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC8_Health,    (ModelNode*) &iedModel_PROT_IPTOC8_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC8_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_IPTOC8_Health,    (ModelNode*) &iedModel_PROT_IPTOC8_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC8_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_IPTOC8_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_IPTOC8_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_IPTOC8,    (ModelNode*) &iedModel_PROT_IPTOC8_Str, (ModelNode*) &iedModel_PROT_IPTOC8_NamPlt_vendor,0};
@@ -7286,15 +7293,15 @@ DataAttribute iedModel_PROT_IPTOC8_NamPlt_d = { DataAttributeModelType,    "d", 
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_IPTOC8_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_IPTOC8,  	(ModelNode*)&iedModel_PROT_IPTOC8_Op, (ModelNode*) &iedModel_PROT_IPTOC8_Str_general,0};
-DataAttribute iedModel_PROT_IPTOC8_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC8_Str,  (ModelNode*) &iedModel_PROT_IPTOC8_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC8_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_IPTOC8_Str,  (ModelNode*) &iedModel_PROT_IPTOC8_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC8_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC8_Str,  (ModelNode*) &iedModel_PROT_IPTOC8_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC8_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC8_Str,  (ModelNode*) &iedModel_PROT_IPTOC8_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC8_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_IPTOC8_Str,  (ModelNode*) &iedModel_PROT_IPTOC8_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC8_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC8_Str,  (ModelNode*) &iedModel_PROT_IPTOC8_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC8_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_IPTOC8_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_IPTOC8_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_IPTOC8,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_IPTOC8_Op_general,0};
-DataAttribute iedModel_PROT_IPTOC8_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC8_Op,  (ModelNode*) &iedModel_PROT_IPTOC8_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_IPTOC8_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC8_Op,  (ModelNode*) &iedModel_PROT_IPTOC8_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_IPTOC8_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_IPTOC8_Op,  (ModelNode*) &iedModel_PROT_IPTOC8_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_IPTOC8_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_IPTOC8_Op,  (ModelNode*) &iedModel_PROT_IPTOC8_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_IPTOC8_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_IPTOC8_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -7302,19 +7309,19 @@ DataAttribute iedModel_PROT_IPTOC8_Op_t = { DataAttributeModelType,    		"t",   
 LogicalNode iedModel_PROT_I20PTOC1 = {    LogicalNodeModelType,    "I20PTOC1",    (ModelNode*)&iedModel_Generic_PROT, (ModelNode*)&iedModel_PROT_I20PTOC2,    (ModelNode*) &iedModel_PROT_I20PTOC1_Mod};
 
 DataObject iedModel_PROT_I20PTOC1_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_I20PTOC1,    (ModelNode*) &iedModel_PROT_I20PTOC1_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC1_Mod_q,0};
-DataAttribute iedModel_PROT_I20PTOC1_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC1_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC1_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC1_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC1_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_I20PTOC1_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC1_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC1_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_I20PTOC1_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC1_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC1_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_I20PTOC1_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_I20PTOC1_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_I20PTOC1,    (ModelNode*) &iedModel_PROT_I20PTOC1_Health,    (ModelNode*) &iedModel_PROT_I20PTOC1_Beh_stVal,0};
 DataAttribute iedModel_PROT_I20PTOC1_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_I20PTOC1_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC1_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC1_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC1_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC1_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC1_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC1_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_I20PTOC1_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_I20PTOC1_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_I20PTOC1,    (ModelNode*) &iedModel_PROT_I20PTOC1_NamPlt,    (ModelNode*) &iedModel_PROT_I20PTOC1_Health_stVal,0};
 DataAttribute iedModel_PROT_I20PTOC1_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_I20PTOC1_Health,    (ModelNode*) &iedModel_PROT_I20PTOC1_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC1_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC1_Health,    (ModelNode*) &iedModel_PROT_I20PTOC1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC1_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC1_Health,    (ModelNode*) &iedModel_PROT_I20PTOC1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC1_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_I20PTOC1_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_I20PTOC1_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_I20PTOC1,    (ModelNode*) &iedModel_PROT_I20PTOC1_Str, (ModelNode*) &iedModel_PROT_I20PTOC1_NamPlt_vendor,0};
@@ -7324,34 +7331,34 @@ DataAttribute iedModel_PROT_I20PTOC1_NamPlt_d = { DataAttributeModelType,    "d"
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_I20PTOC1_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_I20PTOC1,  	(ModelNode*)&iedModel_PROT_I20PTOC1_Op, (ModelNode*) &iedModel_PROT_I20PTOC1_Str_general,0};
-DataAttribute iedModel_PROT_I20PTOC1_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC1_Str,  (ModelNode*) &iedModel_PROT_I20PTOC1_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC1_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_I20PTOC1_Str,  (ModelNode*) &iedModel_PROT_I20PTOC1_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC1_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC1_Str,  (ModelNode*) &iedModel_PROT_I20PTOC1_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC1_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC1_Str,  (ModelNode*) &iedModel_PROT_I20PTOC1_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC1_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_I20PTOC1_Str,  (ModelNode*) &iedModel_PROT_I20PTOC1_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC1_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC1_Str,  (ModelNode*) &iedModel_PROT_I20PTOC1_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC1_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_I20PTOC1_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_I20PTOC1_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_I20PTOC1,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_I20PTOC1_Op_general,0};
-DataAttribute iedModel_PROT_I20PTOC1_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC1_Op,  (ModelNode*) &iedModel_PROT_I20PTOC1_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC1_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC1_Op,  (ModelNode*) &iedModel_PROT_I20PTOC1_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC1_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC1_Op,  (ModelNode*) &iedModel_PROT_I20PTOC1_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC1_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC1_Op,  (ModelNode*) &iedModel_PROT_I20PTOC1_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC1_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_I20PTOC1_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // -------------------
 LogicalNode iedModel_PROT_I20PTOC2 = {    LogicalNodeModelType,    "I20PTOC2",    (ModelNode*)&iedModel_Generic_PROT, (ModelNode*)&iedModel_PROT_I20PTOC3,    (ModelNode*) &iedModel_PROT_I20PTOC2_Mod};
 
 DataObject iedModel_PROT_I20PTOC2_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_I20PTOC2,    (ModelNode*) &iedModel_PROT_I20PTOC2_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC2_Mod_q,0};
-DataAttribute iedModel_PROT_I20PTOC2_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC2_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC2_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC2_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC2_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC2_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC2_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_I20PTOC2_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC2_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC2_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_I20PTOC2_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC2_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC2_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_I20PTOC2_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_I20PTOC2_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_I20PTOC2,    (ModelNode*) &iedModel_PROT_I20PTOC2_Health,    (ModelNode*) &iedModel_PROT_I20PTOC2_Beh_stVal,0};
 DataAttribute iedModel_PROT_I20PTOC2_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_I20PTOC2_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC2_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC2_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC2_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC2_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC2_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC2_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC2_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC2_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_I20PTOC2_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_I20PTOC2_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_I20PTOC2,    (ModelNode*) &iedModel_PROT_I20PTOC2_NamPlt,    (ModelNode*) &iedModel_PROT_I20PTOC2_Health_stVal,0};
 DataAttribute iedModel_PROT_I20PTOC2_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_I20PTOC2_Health,    (ModelNode*) &iedModel_PROT_I20PTOC2_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC2_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC2_Health,    (ModelNode*) &iedModel_PROT_I20PTOC2_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC2_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC2_Health,    (ModelNode*) &iedModel_PROT_I20PTOC2_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC2_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_I20PTOC2_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_I20PTOC2_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_I20PTOC2,    (ModelNode*) &iedModel_PROT_I20PTOC2_Str, (ModelNode*) &iedModel_PROT_I20PTOC2_NamPlt_vendor,0};
@@ -7361,15 +7368,15 @@ DataAttribute iedModel_PROT_I20PTOC2_NamPlt_d = { DataAttributeModelType,    "d"
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_I20PTOC2_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_I20PTOC2,  	(ModelNode*)&iedModel_PROT_I20PTOC2_Op, (ModelNode*) &iedModel_PROT_I20PTOC2_Str_general,0};
-DataAttribute iedModel_PROT_I20PTOC2_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC2_Str,  (ModelNode*) &iedModel_PROT_I20PTOC2_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC2_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_I20PTOC2_Str,  (ModelNode*) &iedModel_PROT_I20PTOC2_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC2_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC2_Str,  (ModelNode*) &iedModel_PROT_I20PTOC2_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC2_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC2_Str,  (ModelNode*) &iedModel_PROT_I20PTOC2_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC2_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_I20PTOC2_Str,  (ModelNode*) &iedModel_PROT_I20PTOC2_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC2_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC2_Str,  (ModelNode*) &iedModel_PROT_I20PTOC2_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC2_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_I20PTOC2_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_I20PTOC2_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_I20PTOC2,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_I20PTOC2_Op_general,0};
-DataAttribute iedModel_PROT_I20PTOC2_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC2_Op,  (ModelNode*) &iedModel_PROT_I20PTOC2_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC2_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC2_Op,  (ModelNode*) &iedModel_PROT_I20PTOC2_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC2_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC2_Op,  (ModelNode*) &iedModel_PROT_I20PTOC2_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC2_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC2_Op,  (ModelNode*) &iedModel_PROT_I20PTOC2_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC2_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_I20PTOC2_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -7377,19 +7384,19 @@ DataAttribute iedModel_PROT_I20PTOC2_Op_t = { DataAttributeModelType,    		"t", 
 LogicalNode iedModel_PROT_I20PTOC3 = {    LogicalNodeModelType,    "I20PTOC3",    (ModelNode*)&iedModel_Generic_PROT, (ModelNode*)&iedModel_PROT_I20PTOC4,    (ModelNode*) &iedModel_PROT_I20PTOC3_Mod};
 
 DataObject iedModel_PROT_I20PTOC3_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_I20PTOC3,    (ModelNode*) &iedModel_PROT_I20PTOC3_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC3_Mod_q,0};
-DataAttribute iedModel_PROT_I20PTOC3_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC3_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC3_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC3_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC3_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC3_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC3_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_I20PTOC3_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC3_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC3_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_I20PTOC3_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC3_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC3_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_I20PTOC3_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_I20PTOC3_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_I20PTOC3,    (ModelNode*) &iedModel_PROT_I20PTOC3_Health,    (ModelNode*) &iedModel_PROT_I20PTOC3_Beh_stVal,0};
 DataAttribute iedModel_PROT_I20PTOC3_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_I20PTOC3_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC3_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC3_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC3_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC3_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC3_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC3_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC3_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC3_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_I20PTOC3_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_I20PTOC3_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_I20PTOC3,    (ModelNode*) &iedModel_PROT_I20PTOC3_NamPlt,    (ModelNode*) &iedModel_PROT_I20PTOC3_Health_stVal,0};
 DataAttribute iedModel_PROT_I20PTOC3_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_I20PTOC3_Health,    (ModelNode*) &iedModel_PROT_I20PTOC3_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC3_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC3_Health,    (ModelNode*) &iedModel_PROT_I20PTOC3_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC3_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC3_Health,    (ModelNode*) &iedModel_PROT_I20PTOC3_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC3_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_I20PTOC3_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_I20PTOC3_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_I20PTOC3,    (ModelNode*) &iedModel_PROT_I20PTOC3_Str, (ModelNode*) &iedModel_PROT_I20PTOC3_NamPlt_vendor,0};
@@ -7399,34 +7406,34 @@ DataAttribute iedModel_PROT_I20PTOC3_NamPlt_d = { DataAttributeModelType,    "d"
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_I20PTOC3_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_I20PTOC3,  	(ModelNode*)&iedModel_PROT_I20PTOC3_Op, (ModelNode*) &iedModel_PROT_I20PTOC3_Str_general,0};
-DataAttribute iedModel_PROT_I20PTOC3_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC3_Str,  (ModelNode*) &iedModel_PROT_I20PTOC3_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC3_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_I20PTOC3_Str,  (ModelNode*) &iedModel_PROT_I20PTOC3_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC3_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC3_Str,  (ModelNode*) &iedModel_PROT_I20PTOC3_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC3_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC3_Str,  (ModelNode*) &iedModel_PROT_I20PTOC3_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC3_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_I20PTOC3_Str,  (ModelNode*) &iedModel_PROT_I20PTOC3_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC3_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC3_Str,  (ModelNode*) &iedModel_PROT_I20PTOC3_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC3_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_I20PTOC3_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_I20PTOC3_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_I20PTOC3,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_I20PTOC3_Op_general,0};
-DataAttribute iedModel_PROT_I20PTOC3_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC3_Op,  (ModelNode*) &iedModel_PROT_I20PTOC3_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC3_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC3_Op,  (ModelNode*) &iedModel_PROT_I20PTOC3_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC3_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC3_Op,  (ModelNode*) &iedModel_PROT_I20PTOC3_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC3_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC3_Op,  (ModelNode*) &iedModel_PROT_I20PTOC3_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC3_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_I20PTOC3_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // -------------------
 LogicalNode iedModel_PROT_I20PTOC4 = {    LogicalNodeModelType,    "I20PTOC4",    (ModelNode*)&iedModel_Generic_PROT, (ModelNode*)&iedModel_PROT_I20PTOC5,    (ModelNode*) &iedModel_PROT_I20PTOC4_Mod};
 
 DataObject iedModel_PROT_I20PTOC4_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_I20PTOC4,    (ModelNode*) &iedModel_PROT_I20PTOC4_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC4_Mod_q,0};
-DataAttribute iedModel_PROT_I20PTOC4_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC4_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC4_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC4_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC4_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC4_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC4_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_I20PTOC4_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC4_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC4_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_I20PTOC4_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC4_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC4_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_I20PTOC4_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_I20PTOC4_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_I20PTOC4,    (ModelNode*) &iedModel_PROT_I20PTOC4_Health,    (ModelNode*) &iedModel_PROT_I20PTOC4_Beh_stVal,0};
 DataAttribute iedModel_PROT_I20PTOC4_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_I20PTOC4_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC4_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC4_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC4_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC4_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC4_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC4_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC4_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC4_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_I20PTOC4_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_I20PTOC4_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_I20PTOC4,    (ModelNode*) &iedModel_PROT_I20PTOC4_NamPlt,    (ModelNode*) &iedModel_PROT_I20PTOC4_Health_stVal,0};
 DataAttribute iedModel_PROT_I20PTOC4_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_I20PTOC4_Health,    (ModelNode*) &iedModel_PROT_I20PTOC4_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC4_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC4_Health,    (ModelNode*) &iedModel_PROT_I20PTOC4_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC4_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC4_Health,    (ModelNode*) &iedModel_PROT_I20PTOC4_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC4_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_I20PTOC4_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_I20PTOC4_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_I20PTOC4,    (ModelNode*) &iedModel_PROT_I20PTOC4_Str, (ModelNode*) &iedModel_PROT_I20PTOC4_NamPlt_vendor,0};
@@ -7436,15 +7443,15 @@ DataAttribute iedModel_PROT_I20PTOC4_NamPlt_d = { DataAttributeModelType,    "d"
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_I20PTOC4_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_I20PTOC4,  	(ModelNode*)&iedModel_PROT_I20PTOC4_Op, (ModelNode*) &iedModel_PROT_I20PTOC4_Str_general,0};
-DataAttribute iedModel_PROT_I20PTOC4_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC4_Str,  (ModelNode*) &iedModel_PROT_I20PTOC4_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC4_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_I20PTOC4_Str,  (ModelNode*) &iedModel_PROT_I20PTOC4_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC4_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC4_Str,  (ModelNode*) &iedModel_PROT_I20PTOC4_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC4_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC4_Str,  (ModelNode*) &iedModel_PROT_I20PTOC4_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC4_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_I20PTOC4_Str,  (ModelNode*) &iedModel_PROT_I20PTOC4_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC4_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC4_Str,  (ModelNode*) &iedModel_PROT_I20PTOC4_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC4_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_I20PTOC4_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_I20PTOC4_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_I20PTOC4,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_I20PTOC4_Op_general,0};
-DataAttribute iedModel_PROT_I20PTOC4_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC4_Op,  (ModelNode*) &iedModel_PROT_I20PTOC4_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC4_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC4_Op,  (ModelNode*) &iedModel_PROT_I20PTOC4_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC4_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC4_Op,  (ModelNode*) &iedModel_PROT_I20PTOC4_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC4_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC4_Op,  (ModelNode*) &iedModel_PROT_I20PTOC4_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC4_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_I20PTOC4_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -7453,19 +7460,19 @@ DataAttribute iedModel_PROT_I20PTOC4_Op_t = { DataAttributeModelType,    		"t", 
 LogicalNode iedModel_PROT_I20PTOC5 = {    LogicalNodeModelType,    "I20PTOC5",    (ModelNode*)&iedModel_Generic_PROT, (ModelNode*)&iedModel_PROT_I20PTOC6,    (ModelNode*) &iedModel_PROT_I20PTOC5_Mod};
 
 DataObject iedModel_PROT_I20PTOC5_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_I20PTOC5,    (ModelNode*) &iedModel_PROT_I20PTOC5_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC5_Mod_q,0};
-DataAttribute iedModel_PROT_I20PTOC5_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC5_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC5_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC5_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC5_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC5_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC5_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_I20PTOC5_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC5_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC5_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_I20PTOC5_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC5_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC5_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_I20PTOC5_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_I20PTOC5_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_I20PTOC5,    (ModelNode*) &iedModel_PROT_I20PTOC5_Health,    (ModelNode*) &iedModel_PROT_I20PTOC5_Beh_stVal,0};
 DataAttribute iedModel_PROT_I20PTOC5_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_I20PTOC5_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC5_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC5_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC5_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC5_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC5_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC5_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC5_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC5_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_I20PTOC5_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_I20PTOC5_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_I20PTOC5,    (ModelNode*) &iedModel_PROT_I20PTOC5_NamPlt,    (ModelNode*) &iedModel_PROT_I20PTOC5_Health_stVal,0};
 DataAttribute iedModel_PROT_I20PTOC5_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_I20PTOC5_Health,    (ModelNode*) &iedModel_PROT_I20PTOC5_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC5_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC5_Health,    (ModelNode*) &iedModel_PROT_I20PTOC5_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC5_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC5_Health,    (ModelNode*) &iedModel_PROT_I20PTOC5_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC5_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_I20PTOC5_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_I20PTOC5_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_I20PTOC5,    (ModelNode*) &iedModel_PROT_I20PTOC5_Str, (ModelNode*) &iedModel_PROT_I20PTOC5_NamPlt_vendor,0};
@@ -7475,15 +7482,15 @@ DataAttribute iedModel_PROT_I20PTOC5_NamPlt_d = { DataAttributeModelType,    "d"
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_I20PTOC5_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_I20PTOC5,  	(ModelNode*)&iedModel_PROT_I20PTOC5_Op, (ModelNode*) &iedModel_PROT_I20PTOC5_Str_general,0};
-DataAttribute iedModel_PROT_I20PTOC5_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC5_Str,  (ModelNode*) &iedModel_PROT_I20PTOC5_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC5_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_I20PTOC5_Str,  (ModelNode*) &iedModel_PROT_I20PTOC5_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC5_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC5_Str,  (ModelNode*) &iedModel_PROT_I20PTOC5_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC5_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC5_Str,  (ModelNode*) &iedModel_PROT_I20PTOC5_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC5_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_I20PTOC5_Str,  (ModelNode*) &iedModel_PROT_I20PTOC5_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC5_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC5_Str,  (ModelNode*) &iedModel_PROT_I20PTOC5_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC5_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_I20PTOC5_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_I20PTOC5_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_I20PTOC5,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_I20PTOC5_Op_general,0};
-DataAttribute iedModel_PROT_I20PTOC5_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC5_Op,  (ModelNode*) &iedModel_PROT_I20PTOC5_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC5_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC5_Op,  (ModelNode*) &iedModel_PROT_I20PTOC5_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC5_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC5_Op,  (ModelNode*) &iedModel_PROT_I20PTOC5_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC5_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC5_Op,  (ModelNode*) &iedModel_PROT_I20PTOC5_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC5_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_I20PTOC5_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -7492,19 +7499,19 @@ DataAttribute iedModel_PROT_I20PTOC5_Op_t = { DataAttributeModelType,    		"t", 
 LogicalNode iedModel_PROT_I20PTOC6 = {    LogicalNodeModelType,    "I20PTOC6",    (ModelNode*)&iedModel_Generic_PROT, (ModelNode*)&iedModel_PROT_VZGGIO1,    (ModelNode*) &iedModel_PROT_I20PTOC6_Mod};
 
 DataObject iedModel_PROT_I20PTOC6_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_I20PTOC6,    (ModelNode*) &iedModel_PROT_I20PTOC6_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC6_Mod_q,0};
-DataAttribute iedModel_PROT_I20PTOC6_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC6_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC6_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC6_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC6_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC6_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC6_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_I20PTOC6_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC6_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC6_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_I20PTOC6_Mod,    (ModelNode*) &iedModel_PROT_I20PTOC6_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC6_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_I20PTOC6_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_I20PTOC6_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_I20PTOC6,    (ModelNode*) &iedModel_PROT_I20PTOC6_Health,    (ModelNode*) &iedModel_PROT_I20PTOC6_Beh_stVal,0};
 DataAttribute iedModel_PROT_I20PTOC6_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_I20PTOC6_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC6_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC6_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC6_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC6_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC6_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC6_Beh,    (ModelNode*) &iedModel_PROT_I20PTOC6_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC6_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_I20PTOC6_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_I20PTOC6_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_I20PTOC6,    (ModelNode*) &iedModel_PROT_I20PTOC6_NamPlt,    (ModelNode*) &iedModel_PROT_I20PTOC6_Health_stVal,0};
 DataAttribute iedModel_PROT_I20PTOC6_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_I20PTOC6_Health,    (ModelNode*) &iedModel_PROT_I20PTOC6_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC6_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC6_Health,    (ModelNode*) &iedModel_PROT_I20PTOC6_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC6_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_I20PTOC6_Health,    (ModelNode*) &iedModel_PROT_I20PTOC6_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC6_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_I20PTOC6_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_I20PTOC6_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_I20PTOC6,    (ModelNode*) &iedModel_PROT_I20PTOC6_Str, (ModelNode*) &iedModel_PROT_I20PTOC6_NamPlt_vendor,0};
@@ -7514,15 +7521,15 @@ DataAttribute iedModel_PROT_I20PTOC6_NamPlt_d = { DataAttributeModelType,    "d"
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_I20PTOC6_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_I20PTOC6,  	(ModelNode*)&iedModel_PROT_I20PTOC6_Op, (ModelNode*) &iedModel_PROT_I20PTOC6_Str_general,0};
-DataAttribute iedModel_PROT_I20PTOC6_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC6_Str,  (ModelNode*) &iedModel_PROT_I20PTOC6_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC6_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_I20PTOC6_Str,  (ModelNode*) &iedModel_PROT_I20PTOC6_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC6_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC6_Str,  (ModelNode*) &iedModel_PROT_I20PTOC6_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC6_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC6_Str,  (ModelNode*) &iedModel_PROT_I20PTOC6_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC6_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_I20PTOC6_Str,  (ModelNode*) &iedModel_PROT_I20PTOC6_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC6_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC6_Str,  (ModelNode*) &iedModel_PROT_I20PTOC6_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC6_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_I20PTOC6_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_I20PTOC6_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_I20PTOC6,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_I20PTOC6_Op_general,0};
-DataAttribute iedModel_PROT_I20PTOC6_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC6_Op,  (ModelNode*) &iedModel_PROT_I20PTOC6_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_I20PTOC6_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC6_Op,  (ModelNode*) &iedModel_PROT_I20PTOC6_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC6_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_I20PTOC6_Op,  (ModelNode*) &iedModel_PROT_I20PTOC6_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_I20PTOC6_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_I20PTOC6_Op,  (ModelNode*) &iedModel_PROT_I20PTOC6_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_I20PTOC6_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_I20PTOC6_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -7532,19 +7539,19 @@ DataAttribute iedModel_PROT_I20PTOC6_Op_t = { DataAttributeModelType,    		"t", 
 LogicalNode iedModel_PROT_VZGGIO1 			= { LogicalNodeModelType,   "VZGGIO1",    (ModelNode*)&iedModel_Generic_PROT,    (ModelNode*)&iedModel_PROT_VZGGIO2,    (ModelNode*) &iedModel_PROT_VZGGIO1_Mod};
 
 DataObject iedModel_PROT_VZGGIO1_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_PROT_VZGGIO1,    (ModelNode*) &iedModel_PROT_VZGGIO1_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO1_Mod_q,0};
-DataAttribute iedModel_PROT_VZGGIO1_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO1_Mod,(ModelNode*) &iedModel_PROT_VZGGIO1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO1_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO1_Mod,(ModelNode*) &iedModel_PROT_VZGGIO1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO1_Mod_t 	= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO1_Mod,(ModelNode*) &iedModel_PROT_VZGGIO1_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO1_Mod_stVal = { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_PROT_VZGGIO1_Mod,(ModelNode*) &iedModel_PROT_VZGGIO1_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO1_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_VZGGIO1_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO1_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_VZGGIO1,    (ModelNode*) &iedModel_PROT_VZGGIO1_Health,    (ModelNode*) &iedModel_PROT_VZGGIO1_Beh_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO1_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO1_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO1_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO1_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO1_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO1_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO1_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO1_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO1_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO1_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_VZGGIO1,    (ModelNode*) &iedModel_PROT_VZGGIO1_NamPlt,    (ModelNode*) &iedModel_PROT_VZGGIO1_Health_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO1_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO1_Health,    (ModelNode*) &iedModel_PROT_VZGGIO1_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO1_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO1_Health,    (ModelNode*) &iedModel_PROT_VZGGIO1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO1_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO1_Health,    (ModelNode*) &iedModel_PROT_VZGGIO1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO1_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO1_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO1_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_VZGGIO1,    (ModelNode*)&iedModel_PROT_VZGGIO1_Alm , (ModelNode*) &iedModel_PROT_VZGGIO1_NamPlt_vendor,0};
@@ -7563,19 +7570,19 @@ DataAttribute iedModel_PROT_VZGGIO1_Alm_t = {DataAttributeModelType,"t",(ModelNo
 LogicalNode iedModel_PROT_VZGGIO2 			= { LogicalNodeModelType,   "VZGGIO2",    (ModelNode*)&iedModel_Generic_PROT,    (ModelNode*)&iedModel_PROT_VZGGIO3,    (ModelNode*) &iedModel_PROT_VZGGIO2_Mod};
 
 DataObject iedModel_PROT_VZGGIO2_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_PROT_VZGGIO2,    (ModelNode*) &iedModel_PROT_VZGGIO2_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO2_Mod_q,0};
-DataAttribute iedModel_PROT_VZGGIO2_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO2_Mod,(ModelNode*) &iedModel_PROT_VZGGIO2_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO2_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO2_Mod,(ModelNode*) &iedModel_PROT_VZGGIO2_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO2_Mod_t 	= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO2_Mod,(ModelNode*) &iedModel_PROT_VZGGIO2_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO2_Mod_stVal = { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_PROT_VZGGIO2_Mod,(ModelNode*) &iedModel_PROT_VZGGIO2_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO2_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_VZGGIO2_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO2_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_VZGGIO2,    (ModelNode*) &iedModel_PROT_VZGGIO2_Health,    (ModelNode*) &iedModel_PROT_VZGGIO2_Beh_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO2_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO2_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO2_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO2_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO2_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO2_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO2_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO2_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO2_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO2_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO2_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO2_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_VZGGIO2,    (ModelNode*) &iedModel_PROT_VZGGIO2_NamPlt,    (ModelNode*) &iedModel_PROT_VZGGIO2_Health_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO2_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO2_Health,    (ModelNode*) &iedModel_PROT_VZGGIO2_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO2_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO2_Health,    (ModelNode*) &iedModel_PROT_VZGGIO2_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO2_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO2_Health,    (ModelNode*) &iedModel_PROT_VZGGIO2_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO2_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO2_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO2_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_VZGGIO2,    (ModelNode*)&iedModel_PROT_VZGGIO2_Alm , (ModelNode*) &iedModel_PROT_VZGGIO2_NamPlt_vendor,0};
@@ -7594,19 +7601,19 @@ DataAttribute iedModel_PROT_VZGGIO2_Alm_t = {DataAttributeModelType,"t",(ModelNo
 LogicalNode iedModel_PROT_VZGGIO3 			= { LogicalNodeModelType,   "VZGGIO3",    (ModelNode*)&iedModel_Generic_PROT,    (ModelNode*)&iedModel_PROT_VZGGIO4,    (ModelNode*) &iedModel_PROT_VZGGIO3_Mod};
 
 DataObject iedModel_PROT_VZGGIO3_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_PROT_VZGGIO3,    (ModelNode*) &iedModel_PROT_VZGGIO3_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO3_Mod_q,0};
-DataAttribute iedModel_PROT_VZGGIO3_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO3_Mod,(ModelNode*) &iedModel_PROT_VZGGIO3_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO3_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO3_Mod,(ModelNode*) &iedModel_PROT_VZGGIO3_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO3_Mod_t 	= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO3_Mod,(ModelNode*) &iedModel_PROT_VZGGIO3_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO3_Mod_stVal = { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_PROT_VZGGIO3_Mod,(ModelNode*) &iedModel_PROT_VZGGIO3_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO3_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_VZGGIO3_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO3_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_VZGGIO3,    (ModelNode*) &iedModel_PROT_VZGGIO3_Health,    (ModelNode*) &iedModel_PROT_VZGGIO3_Beh_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO3_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO3_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO3_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO3_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO3_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO3_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO3_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO3_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO3_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO3_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO3_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO3_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_VZGGIO3,    (ModelNode*) &iedModel_PROT_VZGGIO3_NamPlt,    (ModelNode*) &iedModel_PROT_VZGGIO3_Health_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO3_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO3_Health,    (ModelNode*) &iedModel_PROT_VZGGIO3_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO3_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO3_Health,    (ModelNode*) &iedModel_PROT_VZGGIO3_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO3_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO3_Health,    (ModelNode*) &iedModel_PROT_VZGGIO3_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO3_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO3_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO3_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_VZGGIO3,    (ModelNode*)&iedModel_PROT_VZGGIO3_Alm , (ModelNode*) &iedModel_PROT_VZGGIO3_NamPlt_vendor,0};
@@ -7625,19 +7632,19 @@ DataAttribute iedModel_PROT_VZGGIO3_Alm_t = {DataAttributeModelType,"t",(ModelNo
 LogicalNode iedModel_PROT_VZGGIO4 			= { LogicalNodeModelType,   "VZGGIO4",    (ModelNode*)&iedModel_Generic_PROT,    (ModelNode*)&iedModel_PROT_VZGGIO5,    (ModelNode*) &iedModel_PROT_VZGGIO4_Mod};
 
 DataObject iedModel_PROT_VZGGIO4_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_PROT_VZGGIO4,    (ModelNode*) &iedModel_PROT_VZGGIO4_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO4_Mod_q,0};
-DataAttribute iedModel_PROT_VZGGIO4_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO4_Mod,(ModelNode*) &iedModel_PROT_VZGGIO4_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO4_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO4_Mod,(ModelNode*) &iedModel_PROT_VZGGIO4_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO4_Mod_t 	= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO4_Mod,(ModelNode*) &iedModel_PROT_VZGGIO4_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO4_Mod_stVal = { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_PROT_VZGGIO4_Mod,(ModelNode*) &iedModel_PROT_VZGGIO4_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO4_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_VZGGIO4_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO4_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_VZGGIO4,    (ModelNode*) &iedModel_PROT_VZGGIO4_Health,    (ModelNode*) &iedModel_PROT_VZGGIO4_Beh_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO4_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO4_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO4_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO4_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO4_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO4_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO4_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO4_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO4_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO4_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO4_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO4_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_VZGGIO4,    (ModelNode*) &iedModel_PROT_VZGGIO4_NamPlt,    (ModelNode*) &iedModel_PROT_VZGGIO4_Health_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO4_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO4_Health,    (ModelNode*) &iedModel_PROT_VZGGIO4_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO4_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO4_Health,    (ModelNode*) &iedModel_PROT_VZGGIO4_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO4_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO4_Health,    (ModelNode*) &iedModel_PROT_VZGGIO4_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO4_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO4_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO4_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_VZGGIO4,    (ModelNode*)&iedModel_PROT_VZGGIO4_Alm , (ModelNode*) &iedModel_PROT_VZGGIO4_NamPlt_vendor,0};
@@ -7656,19 +7663,19 @@ DataAttribute iedModel_PROT_VZGGIO4_Alm_t = {DataAttributeModelType,"t",(ModelNo
 LogicalNode iedModel_PROT_VZGGIO5 			= { LogicalNodeModelType,   "VZGGIO5",    (ModelNode*)&iedModel_Generic_PROT,    (ModelNode*)&iedModel_PROT_VZGGIO6,    (ModelNode*) &iedModel_PROT_VZGGIO5_Mod};
 
 DataObject iedModel_PROT_VZGGIO5_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_PROT_VZGGIO5,    (ModelNode*) &iedModel_PROT_VZGGIO5_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO5_Mod_q,0};
-DataAttribute iedModel_PROT_VZGGIO5_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO5_Mod,(ModelNode*) &iedModel_PROT_VZGGIO5_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO5_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO5_Mod,(ModelNode*) &iedModel_PROT_VZGGIO5_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO5_Mod_t 	= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO5_Mod,(ModelNode*) &iedModel_PROT_VZGGIO5_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO5_Mod_stVal = { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_PROT_VZGGIO5_Mod,(ModelNode*) &iedModel_PROT_VZGGIO5_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO5_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_VZGGIO5_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO5_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_VZGGIO5,    (ModelNode*) &iedModel_PROT_VZGGIO5_Health,    (ModelNode*) &iedModel_PROT_VZGGIO5_Beh_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO5_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO5_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO5_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO5_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO5_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO5_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO5_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO5_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO5_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO5_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO5_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO5_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_VZGGIO5,    (ModelNode*) &iedModel_PROT_VZGGIO5_NamPlt,    (ModelNode*) &iedModel_PROT_VZGGIO5_Health_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO5_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO5_Health,    (ModelNode*) &iedModel_PROT_VZGGIO5_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO5_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO5_Health,    (ModelNode*) &iedModel_PROT_VZGGIO5_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO5_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO5_Health,    (ModelNode*) &iedModel_PROT_VZGGIO5_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO5_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO5_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO5_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_VZGGIO5,    (ModelNode*)&iedModel_PROT_VZGGIO5_Alm , (ModelNode*) &iedModel_PROT_VZGGIO5_NamPlt_vendor,0};
@@ -7687,19 +7694,19 @@ DataAttribute iedModel_PROT_VZGGIO5_Alm_t = {DataAttributeModelType,"t",(ModelNo
 LogicalNode iedModel_PROT_VZGGIO6 			= { LogicalNodeModelType,   "VZGGIO6",    (ModelNode*)&iedModel_Generic_PROT,    (ModelNode*)&iedModel_PROT_VZGGIO7,    (ModelNode*) &iedModel_PROT_VZGGIO6_Mod};
 
 DataObject iedModel_PROT_VZGGIO6_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_PROT_VZGGIO6,    (ModelNode*) &iedModel_PROT_VZGGIO6_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO6_Mod_q,0};
-DataAttribute iedModel_PROT_VZGGIO6_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO6_Mod,(ModelNode*) &iedModel_PROT_VZGGIO6_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO6_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO6_Mod,(ModelNode*) &iedModel_PROT_VZGGIO6_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO6_Mod_t 	= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO6_Mod,(ModelNode*) &iedModel_PROT_VZGGIO6_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO6_Mod_stVal = { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_PROT_VZGGIO6_Mod,(ModelNode*) &iedModel_PROT_VZGGIO6_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO6_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_VZGGIO6_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO6_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_VZGGIO6,    (ModelNode*) &iedModel_PROT_VZGGIO6_Health,    (ModelNode*) &iedModel_PROT_VZGGIO6_Beh_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO6_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO6_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO6_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO6_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO6_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO6_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO6_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO6_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO6_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO6_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO6_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO6_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_VZGGIO6,    (ModelNode*) &iedModel_PROT_VZGGIO6_NamPlt,    (ModelNode*) &iedModel_PROT_VZGGIO6_Health_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO6_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO6_Health,    (ModelNode*) &iedModel_PROT_VZGGIO6_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO6_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO6_Health,    (ModelNode*) &iedModel_PROT_VZGGIO6_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO6_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO6_Health,    (ModelNode*) &iedModel_PROT_VZGGIO6_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO6_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO6_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO6_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_VZGGIO6,    (ModelNode*)&iedModel_PROT_VZGGIO6_Alm , (ModelNode*) &iedModel_PROT_VZGGIO6_NamPlt_vendor,0};
@@ -7718,19 +7725,19 @@ DataAttribute iedModel_PROT_VZGGIO6_Alm_t = {DataAttributeModelType,"t",(ModelNo
 LogicalNode iedModel_PROT_VZGGIO7 			= { LogicalNodeModelType,   "VZGGIO7",    (ModelNode*)&iedModel_Generic_PROT,    (ModelNode*)&iedModel_PROT_VZGGIO8,    (ModelNode*) &iedModel_PROT_VZGGIO7_Mod};
 
 DataObject iedModel_PROT_VZGGIO7_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_PROT_VZGGIO7,    (ModelNode*) &iedModel_PROT_VZGGIO7_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO7_Mod_q,0};
-DataAttribute iedModel_PROT_VZGGIO7_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO7_Mod,(ModelNode*) &iedModel_PROT_VZGGIO7_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO7_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO7_Mod,(ModelNode*) &iedModel_PROT_VZGGIO7_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO7_Mod_t 	= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO7_Mod,(ModelNode*) &iedModel_PROT_VZGGIO7_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO7_Mod_stVal = { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_PROT_VZGGIO7_Mod,(ModelNode*) &iedModel_PROT_VZGGIO7_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO7_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_VZGGIO7_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO7_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_VZGGIO7,    (ModelNode*) &iedModel_PROT_VZGGIO7_Health,    (ModelNode*) &iedModel_PROT_VZGGIO7_Beh_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO7_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO7_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO7_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO7_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO7_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO7_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO7_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO7_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO7_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO7_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO7_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO7_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_VZGGIO7,    (ModelNode*) &iedModel_PROT_VZGGIO7_NamPlt,    (ModelNode*) &iedModel_PROT_VZGGIO7_Health_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO7_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO7_Health,    (ModelNode*) &iedModel_PROT_VZGGIO7_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO7_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO7_Health,    (ModelNode*) &iedModel_PROT_VZGGIO7_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO7_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO7_Health,    (ModelNode*) &iedModel_PROT_VZGGIO7_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO7_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO7_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO7_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_VZGGIO7,    (ModelNode*)&iedModel_PROT_VZGGIO7_Alm , (ModelNode*) &iedModel_PROT_VZGGIO7_NamPlt_vendor,0};
@@ -7749,19 +7756,19 @@ DataAttribute iedModel_PROT_VZGGIO7_Alm_t = {DataAttributeModelType,"t",(ModelNo
 LogicalNode iedModel_PROT_VZGGIO8 			= { LogicalNodeModelType,   "VZGGIO8",    (ModelNode*)&iedModel_Generic_PROT,   (ModelNode*)&iedModel_PROT_VZGGIO9,    (ModelNode*) &iedModel_PROT_VZGGIO8_Mod};
 
 DataObject iedModel_PROT_VZGGIO8_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_PROT_VZGGIO8,    (ModelNode*) &iedModel_PROT_VZGGIO8_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO8_Mod_q,0};
-DataAttribute iedModel_PROT_VZGGIO8_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO8_Mod,(ModelNode*) &iedModel_PROT_VZGGIO8_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO8_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO8_Mod,(ModelNode*) &iedModel_PROT_VZGGIO8_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO8_Mod_t 	= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO8_Mod,(ModelNode*) &iedModel_PROT_VZGGIO8_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO8_Mod_stVal = { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_PROT_VZGGIO8_Mod,(ModelNode*) &iedModel_PROT_VZGGIO8_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO8_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_VZGGIO8_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO8_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_VZGGIO8,    (ModelNode*) &iedModel_PROT_VZGGIO8_Health,    (ModelNode*) &iedModel_PROT_VZGGIO8_Beh_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO8_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO8_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO8_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO8_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO8_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO8_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO8_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO8_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO8_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO8_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO8_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO8_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_VZGGIO8,    (ModelNode*) &iedModel_PROT_VZGGIO8_NamPlt,    (ModelNode*) &iedModel_PROT_VZGGIO8_Health_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO8_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO8_Health,    (ModelNode*) &iedModel_PROT_VZGGIO8_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO8_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO8_Health,    (ModelNode*) &iedModel_PROT_VZGGIO8_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO8_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO8_Health,    (ModelNode*) &iedModel_PROT_VZGGIO8_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO8_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO8_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO8_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_VZGGIO8,    (ModelNode*)&iedModel_PROT_VZGGIO8_Alm , (ModelNode*) &iedModel_PROT_VZGGIO8_NamPlt_vendor,0};
@@ -7780,19 +7787,19 @@ DataAttribute iedModel_PROT_VZGGIO8_Alm_t = {DataAttributeModelType,"t",(ModelNo
 LogicalNode iedModel_PROT_VZGGIO9 			= { LogicalNodeModelType,   "VZGGIO9",    (ModelNode*)&iedModel_Generic_PROT,   (ModelNode*)&iedModel_PROT_VZGGIO10,    (ModelNode*) &iedModel_PROT_VZGGIO9_Mod};
 
 DataObject iedModel_PROT_VZGGIO9_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_PROT_VZGGIO9,    (ModelNode*) &iedModel_PROT_VZGGIO9_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO9_Mod_q,0};
-DataAttribute iedModel_PROT_VZGGIO9_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO9_Mod,(ModelNode*) &iedModel_PROT_VZGGIO9_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO9_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO9_Mod,(ModelNode*) &iedModel_PROT_VZGGIO9_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO9_Mod_t 	= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO9_Mod,(ModelNode*) &iedModel_PROT_VZGGIO9_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO9_Mod_stVal = { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_PROT_VZGGIO9_Mod,(ModelNode*) &iedModel_PROT_VZGGIO9_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO9_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_VZGGIO9_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO9_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_VZGGIO9,    (ModelNode*) &iedModel_PROT_VZGGIO9_Health,    (ModelNode*) &iedModel_PROT_VZGGIO9_Beh_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO9_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO9_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO9_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO9_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO9_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO9_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO9_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO9_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO9_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO9_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO9_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO9_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_VZGGIO9,    (ModelNode*) &iedModel_PROT_VZGGIO9_NamPlt,    (ModelNode*) &iedModel_PROT_VZGGIO9_Health_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO9_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO9_Health,    (ModelNode*) &iedModel_PROT_VZGGIO9_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO9_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO9_Health,    (ModelNode*) &iedModel_PROT_VZGGIO9_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO9_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO9_Health,    (ModelNode*) &iedModel_PROT_VZGGIO9_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO9_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO9_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO9_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_VZGGIO9,    (ModelNode*)&iedModel_PROT_VZGGIO9_Alm , (ModelNode*) &iedModel_PROT_VZGGIO9_NamPlt_vendor,0};
@@ -7811,19 +7818,19 @@ DataAttribute iedModel_PROT_VZGGIO9_Alm_t = {DataAttributeModelType,"t",(ModelNo
 LogicalNode iedModel_PROT_VZGGIO10 			= { LogicalNodeModelType,   "VZGGIO10",    (ModelNode*)&iedModel_Generic_PROT,   (ModelNode*)&iedModel_PROT_VZGGIO11,    (ModelNode*) &iedModel_PROT_VZGGIO10_Mod};
 
 DataObject iedModel_PROT_VZGGIO10_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_PROT_VZGGIO10,    (ModelNode*) &iedModel_PROT_VZGGIO10_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO10_Mod_q,0};
-DataAttribute iedModel_PROT_VZGGIO10_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO10_Mod,(ModelNode*) &iedModel_PROT_VZGGIO10_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO10_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO10_Mod,(ModelNode*) &iedModel_PROT_VZGGIO10_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO10_Mod_t 	= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO10_Mod,(ModelNode*) &iedModel_PROT_VZGGIO10_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO10_Mod_stVal = { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_PROT_VZGGIO10_Mod,(ModelNode*) &iedModel_PROT_VZGGIO10_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO10_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_VZGGIO10_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO10_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_VZGGIO10,    (ModelNode*) &iedModel_PROT_VZGGIO10_Health,    (ModelNode*) &iedModel_PROT_VZGGIO10_Beh_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO10_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO10_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO10_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO10_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO10_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO10_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO10_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO10_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO10_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO10_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO10_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO10_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_VZGGIO10,    (ModelNode*) &iedModel_PROT_VZGGIO10_NamPlt,    (ModelNode*) &iedModel_PROT_VZGGIO10_Health_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO10_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO10_Health,    (ModelNode*) &iedModel_PROT_VZGGIO10_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO10_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO10_Health,    (ModelNode*) &iedModel_PROT_VZGGIO10_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO10_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO10_Health,    (ModelNode*) &iedModel_PROT_VZGGIO10_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO10_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO10_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO10_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_VZGGIO10,    (ModelNode*)&iedModel_PROT_VZGGIO10_Alm , (ModelNode*) &iedModel_PROT_VZGGIO10_NamPlt_vendor,0};
@@ -7842,19 +7849,19 @@ DataAttribute iedModel_PROT_VZGGIO10_Alm_t = {DataAttributeModelType,"t",(ModelN
 LogicalNode iedModel_PROT_VZGGIO11 			= { LogicalNodeModelType,   "VZGGIO11",    (ModelNode*)&iedModel_Generic_PROT,   (ModelNode*)&iedModel_PROT_VZGGIO12,    (ModelNode*) &iedModel_PROT_VZGGIO11_Mod};
 
 DataObject iedModel_PROT_VZGGIO11_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_PROT_VZGGIO11,    (ModelNode*) &iedModel_PROT_VZGGIO11_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO11_Mod_q,0};
-DataAttribute iedModel_PROT_VZGGIO11_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO11_Mod,(ModelNode*) &iedModel_PROT_VZGGIO11_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO11_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO11_Mod,(ModelNode*) &iedModel_PROT_VZGGIO11_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO11_Mod_t 	= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO11_Mod,(ModelNode*) &iedModel_PROT_VZGGIO11_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO11_Mod_stVal = { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_PROT_VZGGIO11_Mod,(ModelNode*) &iedModel_PROT_VZGGIO11_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO11_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_VZGGIO11_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO11_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_VZGGIO11,    (ModelNode*) &iedModel_PROT_VZGGIO11_Health,    (ModelNode*) &iedModel_PROT_VZGGIO11_Beh_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO11_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO11_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO11_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO11_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO11_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO11_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO11_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO11_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO11_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO11_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO11_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO11_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_VZGGIO11,    (ModelNode*) &iedModel_PROT_VZGGIO11_NamPlt,    (ModelNode*) &iedModel_PROT_VZGGIO11_Health_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO11_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO11_Health,    (ModelNode*) &iedModel_PROT_VZGGIO11_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO11_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO11_Health,    (ModelNode*) &iedModel_PROT_VZGGIO11_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO11_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO11_Health,    (ModelNode*) &iedModel_PROT_VZGGIO11_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO11_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO11_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO11_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_VZGGIO11,    (ModelNode*)&iedModel_PROT_VZGGIO11_Alm , (ModelNode*) &iedModel_PROT_VZGGIO11_NamPlt_vendor,0};
@@ -7873,19 +7880,19 @@ DataAttribute iedModel_PROT_VZGGIO11_Alm_t = {DataAttributeModelType,"t",(ModelN
 LogicalNode iedModel_PROT_VZGGIO12 			= { LogicalNodeModelType,   "VZGGIO12",    (ModelNode*)&iedModel_Generic_PROT,   (ModelNode*)&iedModel_PROT_VZGGIO13,    (ModelNode*) &iedModel_PROT_VZGGIO12_Mod};
 
 DataObject iedModel_PROT_VZGGIO12_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_PROT_VZGGIO12,    (ModelNode*) &iedModel_PROT_VZGGIO12_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO12_Mod_q,0};
-DataAttribute iedModel_PROT_VZGGIO12_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO12_Mod,(ModelNode*) &iedModel_PROT_VZGGIO12_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO12_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO12_Mod,(ModelNode*) &iedModel_PROT_VZGGIO12_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO12_Mod_t 	= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO12_Mod,(ModelNode*) &iedModel_PROT_VZGGIO12_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO12_Mod_stVal = { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_PROT_VZGGIO12_Mod,(ModelNode*) &iedModel_PROT_VZGGIO12_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO12_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_VZGGIO12_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO12_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_VZGGIO12,    (ModelNode*) &iedModel_PROT_VZGGIO12_Health,    (ModelNode*) &iedModel_PROT_VZGGIO12_Beh_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO12_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO12_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO12_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO12_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO12_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO12_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO12_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO12_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO12_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO12_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO12_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO12_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_VZGGIO12,    (ModelNode*) &iedModel_PROT_VZGGIO12_NamPlt,    (ModelNode*) &iedModel_PROT_VZGGIO12_Health_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO12_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO12_Health,    (ModelNode*) &iedModel_PROT_VZGGIO12_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO12_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO12_Health,    (ModelNode*) &iedModel_PROT_VZGGIO12_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO12_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO12_Health,    (ModelNode*) &iedModel_PROT_VZGGIO12_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO12_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO12_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO12_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_VZGGIO12,    (ModelNode*)&iedModel_PROT_VZGGIO12_Alm , (ModelNode*) &iedModel_PROT_VZGGIO12_NamPlt_vendor,0};
@@ -7904,19 +7911,19 @@ DataAttribute iedModel_PROT_VZGGIO12_Alm_t = {DataAttributeModelType,"t",(ModelN
 LogicalNode iedModel_PROT_VZGGIO13 			= { LogicalNodeModelType,   "VZGGIO13",    (ModelNode*)&iedModel_Generic_PROT,   (ModelNode*)&iedModel_PROT_VZGGIO14,    (ModelNode*) &iedModel_PROT_VZGGIO13_Mod};
 
 DataObject iedModel_PROT_VZGGIO13_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_PROT_VZGGIO13,    (ModelNode*) &iedModel_PROT_VZGGIO13_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO13_Mod_q,0};
-DataAttribute iedModel_PROT_VZGGIO13_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO13_Mod,(ModelNode*) &iedModel_PROT_VZGGIO13_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO13_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO13_Mod,(ModelNode*) &iedModel_PROT_VZGGIO13_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO13_Mod_t 	= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO13_Mod,(ModelNode*) &iedModel_PROT_VZGGIO13_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO13_Mod_stVal = { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_PROT_VZGGIO13_Mod,(ModelNode*) &iedModel_PROT_VZGGIO13_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO13_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_VZGGIO13_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO13_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_VZGGIO13,    (ModelNode*) &iedModel_PROT_VZGGIO13_Health,    (ModelNode*) &iedModel_PROT_VZGGIO13_Beh_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO13_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO13_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO13_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO13_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO13_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO13_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO13_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO13_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO13_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO13_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO13_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO13_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_VZGGIO13,    (ModelNode*) &iedModel_PROT_VZGGIO13_NamPlt,    (ModelNode*) &iedModel_PROT_VZGGIO13_Health_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO13_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO13_Health,    (ModelNode*) &iedModel_PROT_VZGGIO13_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO13_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO13_Health,    (ModelNode*) &iedModel_PROT_VZGGIO13_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO13_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO13_Health,    (ModelNode*) &iedModel_PROT_VZGGIO13_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO13_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO13_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO13_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_VZGGIO13,    (ModelNode*)&iedModel_PROT_VZGGIO13_Alm , (ModelNode*) &iedModel_PROT_VZGGIO13_NamPlt_vendor,0};
@@ -7935,19 +7942,19 @@ DataAttribute iedModel_PROT_VZGGIO13_Alm_t = {DataAttributeModelType,"t",(ModelN
 LogicalNode iedModel_PROT_VZGGIO14 			= { LogicalNodeModelType,   "VZGGIO14",    (ModelNode*)&iedModel_Generic_PROT,   (ModelNode*)&iedModel_PROT_VZGGIO15,    (ModelNode*) &iedModel_PROT_VZGGIO14_Mod};
 
 DataObject iedModel_PROT_VZGGIO14_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_PROT_VZGGIO14,    (ModelNode*) &iedModel_PROT_VZGGIO14_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO14_Mod_q,0};
-DataAttribute iedModel_PROT_VZGGIO14_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO14_Mod,(ModelNode*) &iedModel_PROT_VZGGIO14_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO14_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO14_Mod,(ModelNode*) &iedModel_PROT_VZGGIO14_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO14_Mod_t 	= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO14_Mod,(ModelNode*) &iedModel_PROT_VZGGIO14_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO14_Mod_stVal = { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_PROT_VZGGIO14_Mod,(ModelNode*) &iedModel_PROT_VZGGIO14_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO14_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_VZGGIO14_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO14_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_VZGGIO14,    (ModelNode*) &iedModel_PROT_VZGGIO14_Health,    (ModelNode*) &iedModel_PROT_VZGGIO14_Beh_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO14_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO14_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO14_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO14_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO14_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO14_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO14_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO14_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO14_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO14_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO14_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO14_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_VZGGIO14,    (ModelNode*) &iedModel_PROT_VZGGIO14_NamPlt,    (ModelNode*) &iedModel_PROT_VZGGIO14_Health_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO14_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO14_Health,    (ModelNode*) &iedModel_PROT_VZGGIO14_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO14_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO14_Health,    (ModelNode*) &iedModel_PROT_VZGGIO14_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO14_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO14_Health,    (ModelNode*) &iedModel_PROT_VZGGIO14_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO14_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO14_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO14_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_VZGGIO14,    (ModelNode*)&iedModel_PROT_VZGGIO14_Alm , (ModelNode*) &iedModel_PROT_VZGGIO14_NamPlt_vendor,0};
@@ -7966,19 +7973,19 @@ DataAttribute iedModel_PROT_VZGGIO14_Alm_t = {DataAttributeModelType,"t",(ModelN
 LogicalNode iedModel_PROT_VZGGIO15 			= { LogicalNodeModelType,   "VZGGIO15",    (ModelNode*)&iedModel_Generic_PROT,  (ModelNode*)&iedModel_PROT_VZGGIO16,    (ModelNode*) &iedModel_PROT_VZGGIO15_Mod};
 
 DataObject iedModel_PROT_VZGGIO15_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_PROT_VZGGIO15,    (ModelNode*) &iedModel_PROT_VZGGIO15_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO15_Mod_q,0};
-DataAttribute iedModel_PROT_VZGGIO15_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO15_Mod,(ModelNode*) &iedModel_PROT_VZGGIO15_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO15_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO15_Mod,(ModelNode*) &iedModel_PROT_VZGGIO15_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO15_Mod_t 	= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO15_Mod,(ModelNode*) &iedModel_PROT_VZGGIO15_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO15_Mod_stVal = { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_PROT_VZGGIO15_Mod,(ModelNode*) &iedModel_PROT_VZGGIO15_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO15_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_VZGGIO15_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO15_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_VZGGIO15,    (ModelNode*) &iedModel_PROT_VZGGIO15_Health,    (ModelNode*) &iedModel_PROT_VZGGIO15_Beh_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO15_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO15_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO15_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO15_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO15_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO15_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO15_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO15_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO15_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO15_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO15_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO15_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_VZGGIO15,    (ModelNode*) &iedModel_PROT_VZGGIO15_NamPlt,    (ModelNode*) &iedModel_PROT_VZGGIO15_Health_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO15_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO15_Health,    (ModelNode*) &iedModel_PROT_VZGGIO15_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO15_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO15_Health,    (ModelNode*) &iedModel_PROT_VZGGIO15_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO15_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO15_Health,    (ModelNode*) &iedModel_PROT_VZGGIO15_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO15_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO15_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO15_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_VZGGIO15,    (ModelNode*)&iedModel_PROT_VZGGIO15_Alm , (ModelNode*) &iedModel_PROT_VZGGIO15_NamPlt_vendor,0};
@@ -7997,19 +8004,19 @@ DataAttribute iedModel_PROT_VZGGIO15_Alm_t = {DataAttributeModelType,"t",(ModelN
 LogicalNode iedModel_PROT_VZGGIO16 			= { LogicalNodeModelType,   "VZGGIO16",    (ModelNode*)&iedModel_Generic_PROT,   (ModelNode*)&iedModel_PROT_UPTOV1,    (ModelNode*) &iedModel_PROT_VZGGIO16_Mod};
 
 DataObject iedModel_PROT_VZGGIO16_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_PROT_VZGGIO16,    (ModelNode*) &iedModel_PROT_VZGGIO16_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO16_Mod_q,0};
-DataAttribute iedModel_PROT_VZGGIO16_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO16_Mod,(ModelNode*) &iedModel_PROT_VZGGIO16_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO16_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO16_Mod,(ModelNode*) &iedModel_PROT_VZGGIO16_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO16_Mod_t 	= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO16_Mod,(ModelNode*) &iedModel_PROT_VZGGIO16_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO16_Mod_stVal = { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_PROT_VZGGIO16_Mod,(ModelNode*) &iedModel_PROT_VZGGIO16_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO16_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_VZGGIO16_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO16_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_VZGGIO16,    (ModelNode*) &iedModel_PROT_VZGGIO16_Health,    (ModelNode*) &iedModel_PROT_VZGGIO16_Beh_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO16_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO16_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO16_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO16_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO16_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO16_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO16_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO16_Beh,    (ModelNode*) &iedModel_PROT_VZGGIO16_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO16_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO16_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO16_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_VZGGIO16,    (ModelNode*) &iedModel_PROT_VZGGIO16_NamPlt,    (ModelNode*) &iedModel_PROT_VZGGIO16_Health_stVal,0};
 DataAttribute iedModel_PROT_VZGGIO16_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_VZGGIO16_Health,    (ModelNode*) &iedModel_PROT_VZGGIO16_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_VZGGIO16_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO16_Health,    (ModelNode*) &iedModel_PROT_VZGGIO16_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_VZGGIO16_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_VZGGIO16_Health,    (ModelNode*) &iedModel_PROT_VZGGIO16_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_VZGGIO16_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_VZGGIO16_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_VZGGIO16_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_VZGGIO16,    (ModelNode*)&iedModel_PROT_VZGGIO16_Alm , (ModelNode*) &iedModel_PROT_VZGGIO16_NamPlt_vendor,0};
@@ -8029,19 +8036,19 @@ DataAttribute iedModel_PROT_VZGGIO16_Alm_t = {DataAttributeModelType,"t",(ModelN
 LogicalNode iedModel_PROT_UPTOV1 = {    LogicalNodeModelType,    "UPTOV1",    (ModelNode*)&iedModel_Generic_PROT, (ModelNode*)&iedModel_PROT_UPTOV2,    (ModelNode*) &iedModel_PROT_UPTOV1_Mod};
 
 DataObject iedModel_PROT_UPTOV1_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_UPTOV1,    (ModelNode*) &iedModel_PROT_UPTOV1_Beh,    (ModelNode*) &iedModel_PROT_UPTOV1_Mod_q,0};
-DataAttribute iedModel_PROT_UPTOV1_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV1_Mod,    (ModelNode*) &iedModel_PROT_UPTOV1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV1_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV1_Mod,    (ModelNode*) &iedModel_PROT_UPTOV1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV1_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTOV1_Mod,    (ModelNode*) &iedModel_PROT_UPTOV1_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_UPTOV1_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_UPTOV1_Mod,    (ModelNode*) &iedModel_PROT_UPTOV1_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_UPTOV1_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_UPTOV1_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTOV1_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_UPTOV1,    (ModelNode*) &iedModel_PROT_UPTOV1_Health,    (ModelNode*) &iedModel_PROT_UPTOV1_Beh_stVal,0};
 DataAttribute iedModel_PROT_UPTOV1_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_UPTOV1_Beh,    (ModelNode*) &iedModel_PROT_UPTOV1_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTOV1_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV1_Beh,    (ModelNode*) &iedModel_PROT_UPTOV1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV1_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV1_Beh,    (ModelNode*) &iedModel_PROT_UPTOV1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV1_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTOV1_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTOV1_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_UPTOV1,    (ModelNode*) &iedModel_PROT_UPTOV1_NamPlt,    (ModelNode*) &iedModel_PROT_UPTOV1_Health_stVal,0};
 DataAttribute iedModel_PROT_UPTOV1_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_UPTOV1_Health,    (ModelNode*) &iedModel_PROT_UPTOV1_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTOV1_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV1_Health,    (ModelNode*) &iedModel_PROT_UPTOV1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV1_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV1_Health,    (ModelNode*) &iedModel_PROT_UPTOV1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV1_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTOV1_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTOV1_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_UPTOV1,    (ModelNode*) &iedModel_PROT_UPTOV1_Str, (ModelNode*) &iedModel_PROT_UPTOV1_NamPlt_vendor,0};
@@ -8051,15 +8058,15 @@ DataAttribute iedModel_PROT_UPTOV1_NamPlt_d = { DataAttributeModelType,    "d", 
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_UPTOV1_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_UPTOV1,  	(ModelNode*)&iedModel_PROT_UPTOV1_Op, (ModelNode*) &iedModel_PROT_UPTOV1_Str_general,0};
-DataAttribute iedModel_PROT_UPTOV1_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTOV1_Str,  (ModelNode*) &iedModel_PROT_UPTOV1_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV1_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTOV1_Str,  (ModelNode*) &iedModel_PROT_UPTOV1_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV1_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_UPTOV1_Str,  (ModelNode*) &iedModel_PROT_UPTOV1_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTOV1_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTOV1_Str,  (ModelNode*) &iedModel_PROT_UPTOV1_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV1_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTOV1_Str,  (ModelNode*) &iedModel_PROT_UPTOV1_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV1_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_UPTOV1_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_UPTOV1_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_UPTOV1,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_UPTOV1_Op_general,0};
-DataAttribute iedModel_PROT_UPTOV1_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTOV1_Op,  (ModelNode*) &iedModel_PROT_UPTOV1_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTOV1_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTOV1_Op,  (ModelNode*) &iedModel_PROT_UPTOV1_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV1_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTOV1_Op,  (ModelNode*) &iedModel_PROT_UPTOV1_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_UPTOV1_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTOV1_Op,  (ModelNode*) &iedModel_PROT_UPTOV1_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV1_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_UPTOV1_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -8067,19 +8074,19 @@ DataAttribute iedModel_PROT_UPTOV1_Op_t = { DataAttributeModelType,    		"t",   
 LogicalNode iedModel_PROT_UPTOV2 = {    LogicalNodeModelType,    "UPTOV2",    (ModelNode*)&iedModel_Generic_PROT, (ModelNode*)&iedModel_PROT_UPTOV3,    (ModelNode*) &iedModel_PROT_UPTOV2_Mod};
 
 DataObject iedModel_PROT_UPTOV2_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_UPTOV2,    (ModelNode*) &iedModel_PROT_UPTOV2_Beh,    (ModelNode*) &iedModel_PROT_UPTOV2_Mod_q,0};
-DataAttribute iedModel_PROT_UPTOV2_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV2_Mod,    (ModelNode*) &iedModel_PROT_UPTOV2_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV2_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV2_Mod,    (ModelNode*) &iedModel_PROT_UPTOV2_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV2_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTOV2_Mod,    (ModelNode*) &iedModel_PROT_UPTOV2_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_UPTOV2_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_UPTOV2_Mod,    (ModelNode*) &iedModel_PROT_UPTOV2_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_UPTOV2_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_UPTOV2_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTOV2_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_UPTOV2,    (ModelNode*) &iedModel_PROT_UPTOV2_Health,    (ModelNode*) &iedModel_PROT_UPTOV2_Beh_stVal,0};
 DataAttribute iedModel_PROT_UPTOV2_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_UPTOV2_Beh,    (ModelNode*) &iedModel_PROT_UPTOV2_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTOV2_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV2_Beh,    (ModelNode*) &iedModel_PROT_UPTOV2_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV2_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV2_Beh,    (ModelNode*) &iedModel_PROT_UPTOV2_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV2_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTOV2_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTOV2_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_UPTOV2,    (ModelNode*) &iedModel_PROT_UPTOV2_NamPlt,    (ModelNode*) &iedModel_PROT_UPTOV2_Health_stVal,0};
 DataAttribute iedModel_PROT_UPTOV2_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_UPTOV2_Health,    (ModelNode*) &iedModel_PROT_UPTOV2_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTOV2_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV2_Health,    (ModelNode*) &iedModel_PROT_UPTOV2_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV2_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV2_Health,    (ModelNode*) &iedModel_PROT_UPTOV2_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV2_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTOV2_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTOV2_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_UPTOV2,    (ModelNode*) &iedModel_PROT_UPTOV2_Str, (ModelNode*) &iedModel_PROT_UPTOV2_NamPlt_vendor,0};
@@ -8089,15 +8096,15 @@ DataAttribute iedModel_PROT_UPTOV2_NamPlt_d = { DataAttributeModelType,    "d", 
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_UPTOV2_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_UPTOV2,  	(ModelNode*)&iedModel_PROT_UPTOV2_Op, (ModelNode*) &iedModel_PROT_UPTOV2_Str_general,0};
-DataAttribute iedModel_PROT_UPTOV2_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTOV2_Str,  (ModelNode*) &iedModel_PROT_UPTOV2_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV2_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTOV2_Str,  (ModelNode*) &iedModel_PROT_UPTOV2_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV2_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_UPTOV2_Str,  (ModelNode*) &iedModel_PROT_UPTOV2_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTOV2_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTOV2_Str,  (ModelNode*) &iedModel_PROT_UPTOV2_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV2_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTOV2_Str,  (ModelNode*) &iedModel_PROT_UPTOV2_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV2_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_UPTOV2_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_UPTOV2_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_UPTOV2,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_UPTOV2_Op_general,0};
-DataAttribute iedModel_PROT_UPTOV2_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTOV2_Op,  (ModelNode*) &iedModel_PROT_UPTOV2_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTOV2_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTOV2_Op,  (ModelNode*) &iedModel_PROT_UPTOV2_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV2_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTOV2_Op,  (ModelNode*) &iedModel_PROT_UPTOV2_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_UPTOV2_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTOV2_Op,  (ModelNode*) &iedModel_PROT_UPTOV2_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV2_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_UPTOV2_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -8105,19 +8112,19 @@ DataAttribute iedModel_PROT_UPTOV2_Op_t = { DataAttributeModelType,    		"t",   
 LogicalNode iedModel_PROT_UPTOV3 = {    LogicalNodeModelType,    "UPTOV3",    (ModelNode*)&iedModel_Generic_PROT, (ModelNode*)&iedModel_PROT_UPTOV4,    (ModelNode*) &iedModel_PROT_UPTOV3_Mod};
 
 DataObject iedModel_PROT_UPTOV3_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_UPTOV3,    (ModelNode*) &iedModel_PROT_UPTOV3_Beh,    (ModelNode*) &iedModel_PROT_UPTOV3_Mod_q,0};
-DataAttribute iedModel_PROT_UPTOV3_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV3_Mod,    (ModelNode*) &iedModel_PROT_UPTOV3_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV3_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV3_Mod,    (ModelNode*) &iedModel_PROT_UPTOV3_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV3_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTOV3_Mod,    (ModelNode*) &iedModel_PROT_UPTOV3_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_UPTOV3_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_UPTOV3_Mod,    (ModelNode*) &iedModel_PROT_UPTOV3_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_UPTOV3_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_UPTOV3_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTOV3_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_UPTOV3,    (ModelNode*) &iedModel_PROT_UPTOV3_Health,    (ModelNode*) &iedModel_PROT_UPTOV3_Beh_stVal,0};
 DataAttribute iedModel_PROT_UPTOV3_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_UPTOV3_Beh,    (ModelNode*) &iedModel_PROT_UPTOV3_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTOV3_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV3_Beh,    (ModelNode*) &iedModel_PROT_UPTOV3_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV3_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV3_Beh,    (ModelNode*) &iedModel_PROT_UPTOV3_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV3_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTOV3_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTOV3_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_UPTOV3,    (ModelNode*) &iedModel_PROT_UPTOV3_NamPlt,    (ModelNode*) &iedModel_PROT_UPTOV3_Health_stVal,0};
 DataAttribute iedModel_PROT_UPTOV3_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_UPTOV3_Health,    (ModelNode*) &iedModel_PROT_UPTOV3_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTOV3_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV3_Health,    (ModelNode*) &iedModel_PROT_UPTOV3_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV3_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV3_Health,    (ModelNode*) &iedModel_PROT_UPTOV3_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV3_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTOV3_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTOV3_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_UPTOV3,    (ModelNode*) &iedModel_PROT_UPTOV3_Str, (ModelNode*) &iedModel_PROT_UPTOV3_NamPlt_vendor,0};
@@ -8127,15 +8134,15 @@ DataAttribute iedModel_PROT_UPTOV3_NamPlt_d = { DataAttributeModelType,    "d", 
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_UPTOV3_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_UPTOV3,  	(ModelNode*)&iedModel_PROT_UPTOV3_Op, (ModelNode*) &iedModel_PROT_UPTOV3_Str_general,0};
-DataAttribute iedModel_PROT_UPTOV3_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTOV3_Str,  (ModelNode*) &iedModel_PROT_UPTOV3_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV3_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTOV3_Str,  (ModelNode*) &iedModel_PROT_UPTOV3_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV3_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_UPTOV3_Str,  (ModelNode*) &iedModel_PROT_UPTOV3_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTOV3_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTOV3_Str,  (ModelNode*) &iedModel_PROT_UPTOV3_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV3_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTOV3_Str,  (ModelNode*) &iedModel_PROT_UPTOV3_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV3_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_UPTOV3_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_UPTOV3_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_UPTOV3,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_UPTOV3_Op_general,0};
-DataAttribute iedModel_PROT_UPTOV3_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTOV3_Op,  (ModelNode*) &iedModel_PROT_UPTOV3_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTOV3_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTOV3_Op,  (ModelNode*) &iedModel_PROT_UPTOV3_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV3_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTOV3_Op,  (ModelNode*) &iedModel_PROT_UPTOV3_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_UPTOV3_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTOV3_Op,  (ModelNode*) &iedModel_PROT_UPTOV3_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV3_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_UPTOV3_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -8143,19 +8150,19 @@ DataAttribute iedModel_PROT_UPTOV3_Op_t = { DataAttributeModelType,    		"t",   
 LogicalNode iedModel_PROT_UPTOV4 = {    LogicalNodeModelType,    "UPTOV4",    (ModelNode*)&iedModel_Generic_PROT, (ModelNode*)&iedModel_PROT_UPTUV1,    (ModelNode*) &iedModel_PROT_UPTOV4_Mod};
 
 DataObject iedModel_PROT_UPTOV4_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_UPTOV4,    (ModelNode*) &iedModel_PROT_UPTOV4_Beh,    (ModelNode*) &iedModel_PROT_UPTOV4_Mod_q,0};
-DataAttribute iedModel_PROT_UPTOV4_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV4_Mod,    (ModelNode*) &iedModel_PROT_UPTOV4_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV4_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV4_Mod,    (ModelNode*) &iedModel_PROT_UPTOV4_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV4_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTOV4_Mod,    (ModelNode*) &iedModel_PROT_UPTOV4_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_UPTOV4_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_UPTOV4_Mod,    (ModelNode*) &iedModel_PROT_UPTOV4_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_UPTOV4_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_UPTOV4_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTOV4_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_UPTOV4,    (ModelNode*) &iedModel_PROT_UPTOV4_Health,    (ModelNode*) &iedModel_PROT_UPTOV4_Beh_stVal,0};
 DataAttribute iedModel_PROT_UPTOV4_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_UPTOV4_Beh,    (ModelNode*) &iedModel_PROT_UPTOV4_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTOV4_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV4_Beh,    (ModelNode*) &iedModel_PROT_UPTOV4_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV4_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV4_Beh,    (ModelNode*) &iedModel_PROT_UPTOV4_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV4_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTOV4_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTOV4_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_UPTOV4,    (ModelNode*) &iedModel_PROT_UPTOV4_NamPlt,    (ModelNode*) &iedModel_PROT_UPTOV4_Health_stVal,0};
 DataAttribute iedModel_PROT_UPTOV4_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_UPTOV4_Health,    (ModelNode*) &iedModel_PROT_UPTOV4_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTOV4_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV4_Health,    (ModelNode*) &iedModel_PROT_UPTOV4_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV4_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTOV4_Health,    (ModelNode*) &iedModel_PROT_UPTOV4_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV4_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTOV4_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTOV4_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_UPTOV4,    (ModelNode*) &iedModel_PROT_UPTOV4_Str, (ModelNode*) &iedModel_PROT_UPTOV4_NamPlt_vendor,0};
@@ -8165,34 +8172,34 @@ DataAttribute iedModel_PROT_UPTOV4_NamPlt_d = { DataAttributeModelType,    "d", 
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_UPTOV4_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_UPTOV4,  	(ModelNode*)&iedModel_PROT_UPTOV4_Op, (ModelNode*) &iedModel_PROT_UPTOV4_Str_general,0};
-DataAttribute iedModel_PROT_UPTOV4_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTOV4_Str,  (ModelNode*) &iedModel_PROT_UPTOV4_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV4_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTOV4_Str,  (ModelNode*) &iedModel_PROT_UPTOV4_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV4_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_UPTOV4_Str,  (ModelNode*) &iedModel_PROT_UPTOV4_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTOV4_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTOV4_Str,  (ModelNode*) &iedModel_PROT_UPTOV4_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV4_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTOV4_Str,  (ModelNode*) &iedModel_PROT_UPTOV4_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV4_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_UPTOV4_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_UPTOV4_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_UPTOV4,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_UPTOV4_Op_general,0};
-DataAttribute iedModel_PROT_UPTOV4_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTOV4_Op,  (ModelNode*) &iedModel_PROT_UPTOV4_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTOV4_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTOV4_Op,  (ModelNode*) &iedModel_PROT_UPTOV4_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTOV4_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTOV4_Op,  (ModelNode*) &iedModel_PROT_UPTOV4_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_UPTOV4_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTOV4_Op,  (ModelNode*) &iedModel_PROT_UPTOV4_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTOV4_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_UPTOV4_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // -------------------
 LogicalNode iedModel_PROT_UPTUV1 = {    LogicalNodeModelType,    "UPTUV1",    (ModelNode*)&iedModel_Generic_PROT, (ModelNode*)&iedModel_PROT_UPTUV2,    (ModelNode*) &iedModel_PROT_UPTUV1_Mod};
 
 DataObject iedModel_PROT_UPTUV1_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_UPTUV1,    (ModelNode*) &iedModel_PROT_UPTUV1_Beh,    (ModelNode*) &iedModel_PROT_UPTUV1_Mod_q,0};
-DataAttribute iedModel_PROT_UPTUV1_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV1_Mod,    (ModelNode*) &iedModel_PROT_UPTUV1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV1_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV1_Mod,    (ModelNode*) &iedModel_PROT_UPTUV1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV1_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTUV1_Mod,    (ModelNode*) &iedModel_PROT_UPTUV1_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_UPTUV1_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_UPTUV1_Mod,    (ModelNode*) &iedModel_PROT_UPTUV1_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_UPTUV1_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_UPTUV1_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTUV1_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_UPTUV1,    (ModelNode*) &iedModel_PROT_UPTUV1_Health,    (ModelNode*) &iedModel_PROT_UPTUV1_Beh_stVal,0};
 DataAttribute iedModel_PROT_UPTUV1_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_UPTUV1_Beh,    (ModelNode*) &iedModel_PROT_UPTUV1_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTUV1_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV1_Beh,    (ModelNode*) &iedModel_PROT_UPTUV1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV1_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV1_Beh,    (ModelNode*) &iedModel_PROT_UPTUV1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV1_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTUV1_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTUV1_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_UPTUV1,    (ModelNode*) &iedModel_PROT_UPTUV1_NamPlt,    (ModelNode*) &iedModel_PROT_UPTUV1_Health_stVal,0};
 DataAttribute iedModel_PROT_UPTUV1_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_UPTUV1_Health,    (ModelNode*) &iedModel_PROT_UPTUV1_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTUV1_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV1_Health,    (ModelNode*) &iedModel_PROT_UPTUV1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV1_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV1_Health,    (ModelNode*) &iedModel_PROT_UPTUV1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV1_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTUV1_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTUV1_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_UPTUV1,    (ModelNode*) &iedModel_PROT_UPTUV1_Str, (ModelNode*) &iedModel_PROT_UPTUV1_NamPlt_vendor,0};
@@ -8202,15 +8209,15 @@ DataAttribute iedModel_PROT_UPTUV1_NamPlt_d = { DataAttributeModelType,    "d", 
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_UPTUV1_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_UPTUV1,  	(ModelNode*)&iedModel_PROT_UPTUV1_Op, (ModelNode*) &iedModel_PROT_UPTUV1_Str_general,0};
-DataAttribute iedModel_PROT_UPTUV1_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTUV1_Str,  (ModelNode*) &iedModel_PROT_UPTUV1_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV1_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTUV1_Str,  (ModelNode*) &iedModel_PROT_UPTUV1_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV1_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_UPTUV1_Str,  (ModelNode*) &iedModel_PROT_UPTUV1_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTUV1_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTUV1_Str,  (ModelNode*) &iedModel_PROT_UPTUV1_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV1_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTUV1_Str,  (ModelNode*) &iedModel_PROT_UPTUV1_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV1_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_UPTUV1_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_UPTUV1_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_UPTUV1,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_UPTUV1_Op_general,0};
-DataAttribute iedModel_PROT_UPTUV1_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTUV1_Op,  (ModelNode*) &iedModel_PROT_UPTUV1_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTUV1_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTUV1_Op,  (ModelNode*) &iedModel_PROT_UPTUV1_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV1_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTUV1_Op,  (ModelNode*) &iedModel_PROT_UPTUV1_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_UPTUV1_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTUV1_Op,  (ModelNode*) &iedModel_PROT_UPTUV1_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV1_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_UPTUV1_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -8218,19 +8225,19 @@ DataAttribute iedModel_PROT_UPTUV1_Op_t = { DataAttributeModelType,    		"t",   
 LogicalNode iedModel_PROT_UPTUV2 = {    LogicalNodeModelType,    "UPTUV2",    (ModelNode*)&iedModel_Generic_PROT,  (ModelNode*)&iedModel_PROT_UPTUV3,    (ModelNode*) &iedModel_PROT_UPTUV2_Mod};
 
 DataObject iedModel_PROT_UPTUV2_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_UPTUV2,    (ModelNode*) &iedModel_PROT_UPTUV2_Beh,    (ModelNode*) &iedModel_PROT_UPTUV2_Mod_q,0};
-DataAttribute iedModel_PROT_UPTUV2_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV2_Mod,    (ModelNode*) &iedModel_PROT_UPTUV2_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV2_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV2_Mod,    (ModelNode*) &iedModel_PROT_UPTUV2_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV2_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTUV2_Mod,    (ModelNode*) &iedModel_PROT_UPTUV2_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_UPTUV2_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_UPTUV2_Mod,    (ModelNode*) &iedModel_PROT_UPTUV2_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_UPTUV2_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_UPTUV2_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTUV2_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_UPTUV2,    (ModelNode*) &iedModel_PROT_UPTUV2_Health,    (ModelNode*) &iedModel_PROT_UPTUV2_Beh_stVal,0};
 DataAttribute iedModel_PROT_UPTUV2_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_UPTUV2_Beh,    (ModelNode*) &iedModel_PROT_UPTUV2_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTUV2_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV2_Beh,    (ModelNode*) &iedModel_PROT_UPTUV2_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV2_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV2_Beh,    (ModelNode*) &iedModel_PROT_UPTUV2_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV2_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTUV2_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTUV2_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_UPTUV2,    (ModelNode*) &iedModel_PROT_UPTUV2_NamPlt,    (ModelNode*) &iedModel_PROT_UPTUV2_Health_stVal,0};
 DataAttribute iedModel_PROT_UPTUV2_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_UPTUV2_Health,    (ModelNode*) &iedModel_PROT_UPTUV2_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTUV2_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV2_Health,    (ModelNode*) &iedModel_PROT_UPTUV2_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV2_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV2_Health,    (ModelNode*) &iedModel_PROT_UPTUV2_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV2_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTUV2_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTUV2_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_UPTUV2,    (ModelNode*) &iedModel_PROT_UPTUV2_Str, (ModelNode*) &iedModel_PROT_UPTUV2_NamPlt_vendor,0};
@@ -8240,15 +8247,15 @@ DataAttribute iedModel_PROT_UPTUV2_NamPlt_d = { DataAttributeModelType,    "d", 
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_UPTUV2_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_UPTUV2,  	(ModelNode*)&iedModel_PROT_UPTUV2_Op, (ModelNode*) &iedModel_PROT_UPTUV2_Str_general,0};
-DataAttribute iedModel_PROT_UPTUV2_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTUV2_Str,  (ModelNode*) &iedModel_PROT_UPTUV2_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV2_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTUV2_Str,  (ModelNode*) &iedModel_PROT_UPTUV2_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV2_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_UPTUV2_Str,  (ModelNode*) &iedModel_PROT_UPTUV2_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTUV2_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTUV2_Str,  (ModelNode*) &iedModel_PROT_UPTUV2_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV2_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTUV2_Str,  (ModelNode*) &iedModel_PROT_UPTUV2_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV2_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_UPTUV2_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_UPTUV2_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_UPTUV2,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_UPTUV2_Op_general,0};
-DataAttribute iedModel_PROT_UPTUV2_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTUV2_Op,  (ModelNode*) &iedModel_PROT_UPTUV2_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTUV2_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTUV2_Op,  (ModelNode*) &iedModel_PROT_UPTUV2_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV2_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTUV2_Op,  (ModelNode*) &iedModel_PROT_UPTUV2_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_UPTUV2_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTUV2_Op,  (ModelNode*) &iedModel_PROT_UPTUV2_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV2_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_UPTUV2_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -8256,19 +8263,19 @@ DataAttribute iedModel_PROT_UPTUV2_Op_t = { DataAttributeModelType,    		"t",   
 LogicalNode iedModel_PROT_UPTUV3 = {    LogicalNodeModelType,    "UPTUV3",    (ModelNode*)&iedModel_Generic_PROT,  (ModelNode*)&iedModel_PROT_UPTUV4,    (ModelNode*) &iedModel_PROT_UPTUV3_Mod};
 
 DataObject iedModel_PROT_UPTUV3_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_UPTUV3,    (ModelNode*) &iedModel_PROT_UPTUV3_Beh,    (ModelNode*) &iedModel_PROT_UPTUV3_Mod_q,0};
-DataAttribute iedModel_PROT_UPTUV3_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV3_Mod,    (ModelNode*) &iedModel_PROT_UPTUV3_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV3_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV3_Mod,    (ModelNode*) &iedModel_PROT_UPTUV3_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV3_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTUV3_Mod,    (ModelNode*) &iedModel_PROT_UPTUV3_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_UPTUV3_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_UPTUV3_Mod,    (ModelNode*) &iedModel_PROT_UPTUV3_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_UPTUV3_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_UPTUV3_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTUV3_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_UPTUV3,    (ModelNode*) &iedModel_PROT_UPTUV3_Health,    (ModelNode*) &iedModel_PROT_UPTUV3_Beh_stVal,0};
 DataAttribute iedModel_PROT_UPTUV3_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_UPTUV3_Beh,    (ModelNode*) &iedModel_PROT_UPTUV3_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTUV3_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV3_Beh,    (ModelNode*) &iedModel_PROT_UPTUV3_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV3_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV3_Beh,    (ModelNode*) &iedModel_PROT_UPTUV3_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV3_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTUV3_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTUV3_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_UPTUV3,    (ModelNode*) &iedModel_PROT_UPTUV3_NamPlt,    (ModelNode*) &iedModel_PROT_UPTUV3_Health_stVal,0};
 DataAttribute iedModel_PROT_UPTUV3_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_UPTUV3_Health,    (ModelNode*) &iedModel_PROT_UPTUV3_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTUV3_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV3_Health,    (ModelNode*) &iedModel_PROT_UPTUV3_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV3_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV3_Health,    (ModelNode*) &iedModel_PROT_UPTUV3_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV3_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTUV3_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTUV3_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_UPTUV3,    (ModelNode*) &iedModel_PROT_UPTUV3_Str, (ModelNode*) &iedModel_PROT_UPTUV3_NamPlt_vendor,0};
@@ -8278,15 +8285,15 @@ DataAttribute iedModel_PROT_UPTUV3_NamPlt_d = { DataAttributeModelType,    "d", 
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_UPTUV3_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_UPTUV3,  	(ModelNode*)&iedModel_PROT_UPTUV3_Op, (ModelNode*) &iedModel_PROT_UPTUV3_Str_general,0};
-DataAttribute iedModel_PROT_UPTUV3_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTUV3_Str,  (ModelNode*) &iedModel_PROT_UPTUV3_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV3_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTUV3_Str,  (ModelNode*) &iedModel_PROT_UPTUV3_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV3_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_UPTUV3_Str,  (ModelNode*) &iedModel_PROT_UPTUV3_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTUV3_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTUV3_Str,  (ModelNode*) &iedModel_PROT_UPTUV3_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV3_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTUV3_Str,  (ModelNode*) &iedModel_PROT_UPTUV3_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV3_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_UPTUV3_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_UPTUV3_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_UPTUV3,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_UPTUV3_Op_general,0};
-DataAttribute iedModel_PROT_UPTUV3_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTUV3_Op,  (ModelNode*) &iedModel_PROT_UPTUV3_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTUV3_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTUV3_Op,  (ModelNode*) &iedModel_PROT_UPTUV3_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV3_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTUV3_Op,  (ModelNode*) &iedModel_PROT_UPTUV3_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_UPTUV3_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTUV3_Op,  (ModelNode*) &iedModel_PROT_UPTUV3_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV3_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_UPTUV3_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -8294,19 +8301,19 @@ DataAttribute iedModel_PROT_UPTUV3_Op_t = { DataAttributeModelType,    		"t",   
 LogicalNode iedModel_PROT_UPTUV4 = {    LogicalNodeModelType,    "UPTUV4",    (ModelNode*)&iedModel_Generic_PROT,  (ModelNode*)&iedModel_PROT_PTOF1,    (ModelNode*) &iedModel_PROT_UPTUV4_Mod};
 
 DataObject iedModel_PROT_UPTUV4_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_UPTUV4,    (ModelNode*) &iedModel_PROT_UPTUV4_Beh,    (ModelNode*) &iedModel_PROT_UPTUV4_Mod_q,0};
-DataAttribute iedModel_PROT_UPTUV4_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV4_Mod,    (ModelNode*) &iedModel_PROT_UPTUV4_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV4_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV4_Mod,    (ModelNode*) &iedModel_PROT_UPTUV4_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV4_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTUV4_Mod,    (ModelNode*) &iedModel_PROT_UPTUV4_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_UPTUV4_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_UPTUV4_Mod,    (ModelNode*) &iedModel_PROT_UPTUV4_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_UPTUV4_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_UPTUV4_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTUV4_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_UPTUV4,    (ModelNode*) &iedModel_PROT_UPTUV4_Health,    (ModelNode*) &iedModel_PROT_UPTUV4_Beh_stVal,0};
 DataAttribute iedModel_PROT_UPTUV4_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_UPTUV4_Beh,    (ModelNode*) &iedModel_PROT_UPTUV4_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTUV4_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV4_Beh,    (ModelNode*) &iedModel_PROT_UPTUV4_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV4_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV4_Beh,    (ModelNode*) &iedModel_PROT_UPTUV4_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV4_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTUV4_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTUV4_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_UPTUV4,    (ModelNode*) &iedModel_PROT_UPTUV4_NamPlt,    (ModelNode*) &iedModel_PROT_UPTUV4_Health_stVal,0};
 DataAttribute iedModel_PROT_UPTUV4_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_UPTUV4_Health,    (ModelNode*) &iedModel_PROT_UPTUV4_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTUV4_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV4_Health,    (ModelNode*) &iedModel_PROT_UPTUV4_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV4_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_UPTUV4_Health,    (ModelNode*) &iedModel_PROT_UPTUV4_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV4_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_UPTUV4_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_UPTUV4_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_UPTUV4,    (ModelNode*) &iedModel_PROT_UPTUV4_Str, (ModelNode*) &iedModel_PROT_UPTUV4_NamPlt_vendor,0};
@@ -8316,34 +8323,34 @@ DataAttribute iedModel_PROT_UPTUV4_NamPlt_d = { DataAttributeModelType,    "d", 
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_UPTUV4_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_UPTUV4,  	(ModelNode*)&iedModel_PROT_UPTUV4_Op, (ModelNode*) &iedModel_PROT_UPTUV4_Str_general,0};
-DataAttribute iedModel_PROT_UPTUV4_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTUV4_Str,  (ModelNode*) &iedModel_PROT_UPTUV4_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV4_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTUV4_Str,  (ModelNode*) &iedModel_PROT_UPTUV4_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV4_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_UPTUV4_Str,  (ModelNode*) &iedModel_PROT_UPTUV4_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTUV4_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTUV4_Str,  (ModelNode*) &iedModel_PROT_UPTUV4_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV4_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTUV4_Str,  (ModelNode*) &iedModel_PROT_UPTUV4_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV4_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_UPTUV4_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_UPTUV4_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_UPTUV4,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_UPTUV4_Op_general,0};
-DataAttribute iedModel_PROT_UPTUV4_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTUV4_Op,  (ModelNode*) &iedModel_PROT_UPTUV4_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_UPTUV4_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTUV4_Op,  (ModelNode*) &iedModel_PROT_UPTUV4_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_UPTUV4_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_UPTUV4_Op,  (ModelNode*) &iedModel_PROT_UPTUV4_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_UPTUV4_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_UPTUV4_Op,  (ModelNode*) &iedModel_PROT_UPTUV4_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_UPTUV4_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_UPTUV4_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // -------------------
 LogicalNode iedModel_PROT_PTOF1 = {    LogicalNodeModelType,    "PTOF1",    (ModelNode*)&iedModel_Generic_PROT,  (ModelNode*)&iedModel_PROT_PTOF2,    (ModelNode*) &iedModel_PROT_PTOF1_Mod};
 
 DataObject iedModel_PROT_PTOF1_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_PTOF1,    (ModelNode*) &iedModel_PROT_PTOF1_Beh,    (ModelNode*) &iedModel_PROT_PTOF1_Mod_q,0};
-DataAttribute iedModel_PROT_PTOF1_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF1_Mod,    (ModelNode*) &iedModel_PROT_PTOF1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF1_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF1_Mod,    (ModelNode*) &iedModel_PROT_PTOF1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF1_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTOF1_Mod,    (ModelNode*) &iedModel_PROT_PTOF1_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_PTOF1_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_PTOF1_Mod,    (ModelNode*) &iedModel_PROT_PTOF1_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_PTOF1_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_PTOF1_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTOF1_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_PTOF1,    (ModelNode*) &iedModel_PROT_PTOF1_Health,    (ModelNode*) &iedModel_PROT_PTOF1_Beh_stVal,0};
 DataAttribute iedModel_PROT_PTOF1_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_PTOF1_Beh,    (ModelNode*) &iedModel_PROT_PTOF1_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTOF1_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF1_Beh,    (ModelNode*) &iedModel_PROT_PTOF1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF1_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF1_Beh,    (ModelNode*) &iedModel_PROT_PTOF1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF1_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTOF1_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTOF1_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_PTOF1,    (ModelNode*) &iedModel_PROT_PTOF1_NamPlt,    (ModelNode*) &iedModel_PROT_PTOF1_Health_stVal,0};
 DataAttribute iedModel_PROT_PTOF1_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_PTOF1_Health,    (ModelNode*) &iedModel_PROT_PTOF1_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTOF1_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF1_Health,    (ModelNode*) &iedModel_PROT_PTOF1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF1_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF1_Health,    (ModelNode*) &iedModel_PROT_PTOF1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF1_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTOF1_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTOF1_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_PTOF1,    (ModelNode*) &iedModel_PROT_PTOF1_Str, (ModelNode*) &iedModel_PROT_PTOF1_NamPlt_vendor,0};
@@ -8353,15 +8360,15 @@ DataAttribute iedModel_PROT_PTOF1_NamPlt_d = { DataAttributeModelType,    "d",  
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_PTOF1_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_PTOF1,  	(ModelNode*)&iedModel_PROT_PTOF1_Op, (ModelNode*) &iedModel_PROT_PTOF1_Str_general,0};
-DataAttribute iedModel_PROT_PTOF1_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTOF1_Str,  (ModelNode*) &iedModel_PROT_PTOF1_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF1_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTOF1_Str,  (ModelNode*) &iedModel_PROT_PTOF1_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF1_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_PTOF1_Str,  (ModelNode*) &iedModel_PROT_PTOF1_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTOF1_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTOF1_Str,  (ModelNode*) &iedModel_PROT_PTOF1_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF1_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTOF1_Str,  (ModelNode*) &iedModel_PROT_PTOF1_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF1_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_PTOF1_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_PTOF1_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_PTOF1,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_PTOF1_Op_general,0};
-DataAttribute iedModel_PROT_PTOF1_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTOF1_Op,  (ModelNode*) &iedModel_PROT_PTOF1_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTOF1_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTOF1_Op,  (ModelNode*) &iedModel_PROT_PTOF1_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF1_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTOF1_Op,  (ModelNode*) &iedModel_PROT_PTOF1_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_PTOF1_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTOF1_Op,  (ModelNode*) &iedModel_PROT_PTOF1_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF1_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_PTOF1_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -8369,19 +8376,19 @@ DataAttribute iedModel_PROT_PTOF1_Op_t = { DataAttributeModelType,    		"t",    
 LogicalNode iedModel_PROT_PTOF2 = {    LogicalNodeModelType,    "PTOF2",    (ModelNode*)&iedModel_Generic_PROT,  (ModelNode*)&iedModel_PROT_PTOF3,    (ModelNode*) &iedModel_PROT_PTOF2_Mod};
 
 DataObject iedModel_PROT_PTOF2_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_PTOF2,    (ModelNode*) &iedModel_PROT_PTOF2_Beh,    (ModelNode*) &iedModel_PROT_PTOF2_Mod_q,0};
-DataAttribute iedModel_PROT_PTOF2_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF2_Mod,    (ModelNode*) &iedModel_PROT_PTOF2_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF2_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF2_Mod,    (ModelNode*) &iedModel_PROT_PTOF2_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF2_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTOF2_Mod,    (ModelNode*) &iedModel_PROT_PTOF2_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_PTOF2_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_PTOF2_Mod,    (ModelNode*) &iedModel_PROT_PTOF2_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_PTOF2_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_PTOF2_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTOF2_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_PTOF2,    (ModelNode*) &iedModel_PROT_PTOF2_Health,    (ModelNode*) &iedModel_PROT_PTOF2_Beh_stVal,0};
 DataAttribute iedModel_PROT_PTOF2_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_PTOF2_Beh,    (ModelNode*) &iedModel_PROT_PTOF2_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTOF2_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF2_Beh,    (ModelNode*) &iedModel_PROT_PTOF2_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF2_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF2_Beh,    (ModelNode*) &iedModel_PROT_PTOF2_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF2_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTOF2_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTOF2_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_PTOF2,    (ModelNode*) &iedModel_PROT_PTOF2_NamPlt,    (ModelNode*) &iedModel_PROT_PTOF2_Health_stVal,0};
 DataAttribute iedModel_PROT_PTOF2_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_PTOF2_Health,    (ModelNode*) &iedModel_PROT_PTOF2_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTOF2_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF2_Health,    (ModelNode*) &iedModel_PROT_PTOF2_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF2_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF2_Health,    (ModelNode*) &iedModel_PROT_PTOF2_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF2_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTOF2_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTOF2_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_PTOF2,    (ModelNode*) &iedModel_PROT_PTOF2_Str, (ModelNode*) &iedModel_PROT_PTOF2_NamPlt_vendor,0};
@@ -8391,15 +8398,15 @@ DataAttribute iedModel_PROT_PTOF2_NamPlt_d = { DataAttributeModelType,    "d",  
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_PTOF2_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_PTOF2,  	(ModelNode*)&iedModel_PROT_PTOF2_Op, (ModelNode*) &iedModel_PROT_PTOF2_Str_general,0};
-DataAttribute iedModel_PROT_PTOF2_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTOF2_Str,  (ModelNode*) &iedModel_PROT_PTOF2_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF2_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTOF2_Str,  (ModelNode*) &iedModel_PROT_PTOF2_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF2_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_PTOF2_Str,  (ModelNode*) &iedModel_PROT_PTOF2_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTOF2_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTOF2_Str,  (ModelNode*) &iedModel_PROT_PTOF2_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF2_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTOF2_Str,  (ModelNode*) &iedModel_PROT_PTOF2_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF2_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_PTOF2_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_PTOF2_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_PTOF2,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_PTOF2_Op_general,0};
-DataAttribute iedModel_PROT_PTOF2_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTOF2_Op,  (ModelNode*) &iedModel_PROT_PTOF2_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTOF2_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTOF2_Op,  (ModelNode*) &iedModel_PROT_PTOF2_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF2_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTOF2_Op,  (ModelNode*) &iedModel_PROT_PTOF2_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_PTOF2_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTOF2_Op,  (ModelNode*) &iedModel_PROT_PTOF2_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF2_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_PTOF2_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -8407,19 +8414,19 @@ DataAttribute iedModel_PROT_PTOF2_Op_t = { DataAttributeModelType,    		"t",    
 LogicalNode iedModel_PROT_PTOF3 = {    LogicalNodeModelType,    "PTOF3",    (ModelNode*)&iedModel_Generic_PROT,  (ModelNode*)&iedModel_PROT_PTOF4,    (ModelNode*) &iedModel_PROT_PTOF3_Mod};
 
 DataObject iedModel_PROT_PTOF3_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_PTOF3,    (ModelNode*) &iedModel_PROT_PTOF3_Beh,    (ModelNode*) &iedModel_PROT_PTOF3_Mod_q,0};
-DataAttribute iedModel_PROT_PTOF3_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF3_Mod,    (ModelNode*) &iedModel_PROT_PTOF3_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF3_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF3_Mod,    (ModelNode*) &iedModel_PROT_PTOF3_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF3_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTOF3_Mod,    (ModelNode*) &iedModel_PROT_PTOF3_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_PTOF3_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_PTOF3_Mod,    (ModelNode*) &iedModel_PROT_PTOF3_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_PTOF3_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_PTOF3_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTOF3_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_PTOF3,    (ModelNode*) &iedModel_PROT_PTOF3_Health,    (ModelNode*) &iedModel_PROT_PTOF3_Beh_stVal,0};
 DataAttribute iedModel_PROT_PTOF3_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_PTOF3_Beh,    (ModelNode*) &iedModel_PROT_PTOF3_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTOF3_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF3_Beh,    (ModelNode*) &iedModel_PROT_PTOF3_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF3_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF3_Beh,    (ModelNode*) &iedModel_PROT_PTOF3_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF3_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTOF3_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTOF3_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_PTOF3,    (ModelNode*) &iedModel_PROT_PTOF3_NamPlt,    (ModelNode*) &iedModel_PROT_PTOF3_Health_stVal,0};
 DataAttribute iedModel_PROT_PTOF3_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_PTOF3_Health,    (ModelNode*) &iedModel_PROT_PTOF3_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTOF3_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF3_Health,    (ModelNode*) &iedModel_PROT_PTOF3_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF3_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF3_Health,    (ModelNode*) &iedModel_PROT_PTOF3_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF3_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTOF3_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTOF3_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_PTOF3,    (ModelNode*) &iedModel_PROT_PTOF3_Str, (ModelNode*) &iedModel_PROT_PTOF3_NamPlt_vendor,0};
@@ -8429,15 +8436,15 @@ DataAttribute iedModel_PROT_PTOF3_NamPlt_d = { DataAttributeModelType,    "d",  
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_PTOF3_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_PTOF3,  	(ModelNode*)&iedModel_PROT_PTOF3_Op, (ModelNode*) &iedModel_PROT_PTOF3_Str_general,0};
-DataAttribute iedModel_PROT_PTOF3_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTOF3_Str,  (ModelNode*) &iedModel_PROT_PTOF3_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF3_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTOF3_Str,  (ModelNode*) &iedModel_PROT_PTOF3_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF3_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_PTOF3_Str,  (ModelNode*) &iedModel_PROT_PTOF3_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTOF3_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTOF3_Str,  (ModelNode*) &iedModel_PROT_PTOF3_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF3_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTOF3_Str,  (ModelNode*) &iedModel_PROT_PTOF3_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF3_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_PTOF3_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_PTOF3_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_PTOF3,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_PTOF3_Op_general,0};
-DataAttribute iedModel_PROT_PTOF3_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTOF3_Op,  (ModelNode*) &iedModel_PROT_PTOF3_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTOF3_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTOF3_Op,  (ModelNode*) &iedModel_PROT_PTOF3_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF3_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTOF3_Op,  (ModelNode*) &iedModel_PROT_PTOF3_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_PTOF3_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTOF3_Op,  (ModelNode*) &iedModel_PROT_PTOF3_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF3_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_PTOF3_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -8446,19 +8453,19 @@ DataAttribute iedModel_PROT_PTOF3_Op_t = { DataAttributeModelType,    		"t",    
 LogicalNode iedModel_PROT_PTOF4 = {    LogicalNodeModelType,    "PTOF4",    (ModelNode*)&iedModel_Generic_PROT,  (ModelNode*)&iedModel_PROT_PTUF1,    (ModelNode*) &iedModel_PROT_PTOF4_Mod};
 
 DataObject iedModel_PROT_PTOF4_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_PTOF4,    (ModelNode*) &iedModel_PROT_PTOF4_Beh,    (ModelNode*) &iedModel_PROT_PTOF4_Mod_q,0};
-DataAttribute iedModel_PROT_PTOF4_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF4_Mod,    (ModelNode*) &iedModel_PROT_PTOF4_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF4_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF4_Mod,    (ModelNode*) &iedModel_PROT_PTOF4_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF4_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTOF4_Mod,    (ModelNode*) &iedModel_PROT_PTOF4_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_PTOF4_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_PTOF4_Mod,    (ModelNode*) &iedModel_PROT_PTOF4_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_PTOF4_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_PTOF4_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTOF4_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_PTOF4,    (ModelNode*) &iedModel_PROT_PTOF4_Health,    (ModelNode*) &iedModel_PROT_PTOF4_Beh_stVal,0};
 DataAttribute iedModel_PROT_PTOF4_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_PTOF4_Beh,    (ModelNode*) &iedModel_PROT_PTOF4_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTOF4_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF4_Beh,    (ModelNode*) &iedModel_PROT_PTOF4_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF4_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF4_Beh,    (ModelNode*) &iedModel_PROT_PTOF4_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF4_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTOF4_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTOF4_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_PTOF4,    (ModelNode*) &iedModel_PROT_PTOF4_NamPlt,    (ModelNode*) &iedModel_PROT_PTOF4_Health_stVal,0};
 DataAttribute iedModel_PROT_PTOF4_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_PTOF4_Health,    (ModelNode*) &iedModel_PROT_PTOF4_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTOF4_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF4_Health,    (ModelNode*) &iedModel_PROT_PTOF4_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF4_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTOF4_Health,    (ModelNode*) &iedModel_PROT_PTOF4_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF4_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTOF4_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTOF4_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_PTOF4,    (ModelNode*) &iedModel_PROT_PTOF4_Str, (ModelNode*) &iedModel_PROT_PTOF4_NamPlt_vendor,0};
@@ -8468,15 +8475,15 @@ DataAttribute iedModel_PROT_PTOF4_NamPlt_d = { DataAttributeModelType,    "d",  
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_PTOF4_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_PTOF4,  	(ModelNode*)&iedModel_PROT_PTOF4_Op, (ModelNode*) &iedModel_PROT_PTOF4_Str_general,0};
-DataAttribute iedModel_PROT_PTOF4_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTOF4_Str,  (ModelNode*) &iedModel_PROT_PTOF4_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF4_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTOF4_Str,  (ModelNode*) &iedModel_PROT_PTOF4_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF4_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_PTOF4_Str,  (ModelNode*) &iedModel_PROT_PTOF4_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTOF4_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTOF4_Str,  (ModelNode*) &iedModel_PROT_PTOF4_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF4_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTOF4_Str,  (ModelNode*) &iedModel_PROT_PTOF4_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF4_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_PTOF4_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_PTOF4_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_PTOF4,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_PTOF4_Op_general,0};
-DataAttribute iedModel_PROT_PTOF4_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTOF4_Op,  (ModelNode*) &iedModel_PROT_PTOF4_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTOF4_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTOF4_Op,  (ModelNode*) &iedModel_PROT_PTOF4_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTOF4_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTOF4_Op,  (ModelNode*) &iedModel_PROT_PTOF4_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_PTOF4_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTOF4_Op,  (ModelNode*) &iedModel_PROT_PTOF4_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTOF4_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_PTOF4_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -8484,19 +8491,19 @@ DataAttribute iedModel_PROT_PTOF4_Op_t = { DataAttributeModelType,    		"t",    
 LogicalNode iedModel_PROT_PTUF1 = {    LogicalNodeModelType,    "PTUF1",    (ModelNode*)&iedModel_Generic_PROT,  (ModelNode*)&iedModel_PROT_PTUF2,    (ModelNode*) &iedModel_PROT_PTUF1_Mod};
 
 DataObject iedModel_PROT_PTUF1_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_PTUF1,    (ModelNode*) &iedModel_PROT_PTUF1_Beh,    (ModelNode*) &iedModel_PROT_PTUF1_Mod_q,0};
-DataAttribute iedModel_PROT_PTUF1_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF1_Mod,    (ModelNode*) &iedModel_PROT_PTUF1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF1_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF1_Mod,    (ModelNode*) &iedModel_PROT_PTUF1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF1_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTUF1_Mod,    (ModelNode*) &iedModel_PROT_PTUF1_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_PTUF1_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_PTUF1_Mod,    (ModelNode*) &iedModel_PROT_PTUF1_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_PTUF1_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_PTUF1_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTUF1_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_PTUF1,    (ModelNode*) &iedModel_PROT_PTUF1_Health,    (ModelNode*) &iedModel_PROT_PTUF1_Beh_stVal,0};
 DataAttribute iedModel_PROT_PTUF1_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_PTUF1_Beh,    (ModelNode*) &iedModel_PROT_PTUF1_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTUF1_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF1_Beh,    (ModelNode*) &iedModel_PROT_PTUF1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF1_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF1_Beh,    (ModelNode*) &iedModel_PROT_PTUF1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF1_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTUF1_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTUF1_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_PTUF1,    (ModelNode*) &iedModel_PROT_PTUF1_NamPlt,    (ModelNode*) &iedModel_PROT_PTUF1_Health_stVal,0};
 DataAttribute iedModel_PROT_PTUF1_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_PTUF1_Health,    (ModelNode*) &iedModel_PROT_PTUF1_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTUF1_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF1_Health,    (ModelNode*) &iedModel_PROT_PTUF1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF1_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF1_Health,    (ModelNode*) &iedModel_PROT_PTUF1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF1_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTUF1_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTUF1_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_PTUF1,    (ModelNode*) &iedModel_PROT_PTUF1_Str, (ModelNode*) &iedModel_PROT_PTUF1_NamPlt_vendor,0};
@@ -8506,15 +8513,15 @@ DataAttribute iedModel_PROT_PTUF1_NamPlt_d = { DataAttributeModelType,    "d",  
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_PTUF1_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_PTUF1,  	(ModelNode*)&iedModel_PROT_PTUF1_Op, (ModelNode*) &iedModel_PROT_PTUF1_Str_general,0};
-DataAttribute iedModel_PROT_PTUF1_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTUF1_Str,  (ModelNode*) &iedModel_PROT_PTUF1_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF1_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTUF1_Str,  (ModelNode*) &iedModel_PROT_PTUF1_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF1_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_PTUF1_Str,  (ModelNode*) &iedModel_PROT_PTUF1_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTUF1_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTUF1_Str,  (ModelNode*) &iedModel_PROT_PTUF1_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF1_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTUF1_Str,  (ModelNode*) &iedModel_PROT_PTUF1_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF1_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_PTUF1_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_PTUF1_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_PTUF1,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_PTUF1_Op_general,0};
-DataAttribute iedModel_PROT_PTUF1_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTUF1_Op,  (ModelNode*) &iedModel_PROT_PTUF1_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTUF1_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTUF1_Op,  (ModelNode*) &iedModel_PROT_PTUF1_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF1_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTUF1_Op,  (ModelNode*) &iedModel_PROT_PTUF1_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_PTUF1_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTUF1_Op,  (ModelNode*) &iedModel_PROT_PTUF1_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF1_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_PTUF1_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -8522,19 +8529,19 @@ DataAttribute iedModel_PROT_PTUF1_Op_t = { DataAttributeModelType,    		"t",    
 LogicalNode iedModel_PROT_PTUF2 = {    LogicalNodeModelType,    "PTUF2",    (ModelNode*)&iedModel_Generic_PROT,  (ModelNode*)&iedModel_PROT_PTUF3,    (ModelNode*) &iedModel_PROT_PTUF2_Mod};
 
 DataObject iedModel_PROT_PTUF2_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_PTUF2,    (ModelNode*) &iedModel_PROT_PTUF2_Beh,    (ModelNode*) &iedModel_PROT_PTUF2_Mod_q,0};
-DataAttribute iedModel_PROT_PTUF2_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF2_Mod,    (ModelNode*) &iedModel_PROT_PTUF2_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF2_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF2_Mod,    (ModelNode*) &iedModel_PROT_PTUF2_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF2_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTUF2_Mod,    (ModelNode*) &iedModel_PROT_PTUF2_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_PTUF2_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_PTUF2_Mod,    (ModelNode*) &iedModel_PROT_PTUF2_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_PTUF2_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_PTUF2_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTUF2_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_PTUF2,    (ModelNode*) &iedModel_PROT_PTUF2_Health,    (ModelNode*) &iedModel_PROT_PTUF2_Beh_stVal,0};
 DataAttribute iedModel_PROT_PTUF2_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_PTUF2_Beh,    (ModelNode*) &iedModel_PROT_PTUF2_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTUF2_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF2_Beh,    (ModelNode*) &iedModel_PROT_PTUF2_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF2_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF2_Beh,    (ModelNode*) &iedModel_PROT_PTUF2_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF2_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTUF2_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTUF2_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_PTUF2,    (ModelNode*) &iedModel_PROT_PTUF2_NamPlt,    (ModelNode*) &iedModel_PROT_PTUF2_Health_stVal,0};
 DataAttribute iedModel_PROT_PTUF2_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_PTUF2_Health,    (ModelNode*) &iedModel_PROT_PTUF2_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTUF2_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF2_Health,    (ModelNode*) &iedModel_PROT_PTUF2_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF2_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF2_Health,    (ModelNode*) &iedModel_PROT_PTUF2_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF2_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTUF2_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTUF2_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_PTUF2,    (ModelNode*) &iedModel_PROT_PTUF2_Str, (ModelNode*) &iedModel_PROT_PTUF2_NamPlt_vendor,0};
@@ -8544,34 +8551,34 @@ DataAttribute iedModel_PROT_PTUF2_NamPlt_d = { DataAttributeModelType,    "d",  
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_PTUF2_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_PTUF2,  	(ModelNode*)&iedModel_PROT_PTUF2_Op, (ModelNode*) &iedModel_PROT_PTUF2_Str_general,0};
-DataAttribute iedModel_PROT_PTUF2_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTUF2_Str,  (ModelNode*) &iedModel_PROT_PTUF2_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF2_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTUF2_Str,  (ModelNode*) &iedModel_PROT_PTUF2_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF2_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_PTUF2_Str,  (ModelNode*) &iedModel_PROT_PTUF2_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTUF2_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTUF2_Str,  (ModelNode*) &iedModel_PROT_PTUF2_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF2_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTUF2_Str,  (ModelNode*) &iedModel_PROT_PTUF2_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF2_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_PTUF2_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_PTUF2_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_PTUF2,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_PTUF2_Op_general,0};
-DataAttribute iedModel_PROT_PTUF2_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTUF2_Op,  (ModelNode*) &iedModel_PROT_PTUF2_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTUF2_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTUF2_Op,  (ModelNode*) &iedModel_PROT_PTUF2_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF2_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTUF2_Op,  (ModelNode*) &iedModel_PROT_PTUF2_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_PTUF2_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTUF2_Op,  (ModelNode*) &iedModel_PROT_PTUF2_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF2_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_PTUF2_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // -------------------
 LogicalNode iedModel_PROT_PTUF3 = {    LogicalNodeModelType,    "PTUF3",    (ModelNode*)&iedModel_Generic_PROT,  (ModelNode*)&iedModel_PROT_PTUF4,    (ModelNode*) &iedModel_PROT_PTUF3_Mod};
 
 DataObject iedModel_PROT_PTUF3_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_PTUF3,    (ModelNode*) &iedModel_PROT_PTUF3_Beh,    (ModelNode*) &iedModel_PROT_PTUF3_Mod_q,0};
-DataAttribute iedModel_PROT_PTUF3_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF3_Mod,    (ModelNode*) &iedModel_PROT_PTUF3_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF3_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF3_Mod,    (ModelNode*) &iedModel_PROT_PTUF3_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF3_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTUF3_Mod,    (ModelNode*) &iedModel_PROT_PTUF3_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_PTUF3_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_PTUF3_Mod,    (ModelNode*) &iedModel_PROT_PTUF3_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_PTUF3_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_PTUF3_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTUF3_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_PTUF3,    (ModelNode*) &iedModel_PROT_PTUF3_Health,    (ModelNode*) &iedModel_PROT_PTUF3_Beh_stVal,0};
 DataAttribute iedModel_PROT_PTUF3_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_PTUF3_Beh,    (ModelNode*) &iedModel_PROT_PTUF3_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTUF3_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF3_Beh,    (ModelNode*) &iedModel_PROT_PTUF3_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF3_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF3_Beh,    (ModelNode*) &iedModel_PROT_PTUF3_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF3_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTUF3_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTUF3_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_PTUF3,    (ModelNode*) &iedModel_PROT_PTUF3_NamPlt,    (ModelNode*) &iedModel_PROT_PTUF3_Health_stVal,0};
 DataAttribute iedModel_PROT_PTUF3_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_PTUF3_Health,    (ModelNode*) &iedModel_PROT_PTUF3_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTUF3_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF3_Health,    (ModelNode*) &iedModel_PROT_PTUF3_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF3_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF3_Health,    (ModelNode*) &iedModel_PROT_PTUF3_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF3_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTUF3_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTUF3_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_PTUF3,    (ModelNode*) &iedModel_PROT_PTUF3_Str, (ModelNode*) &iedModel_PROT_PTUF3_NamPlt_vendor,0};
@@ -8581,34 +8588,34 @@ DataAttribute iedModel_PROT_PTUF3_NamPlt_d = { DataAttributeModelType,    "d",  
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_PTUF3_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_PTUF3,  	(ModelNode*)&iedModel_PROT_PTUF3_Op, (ModelNode*) &iedModel_PROT_PTUF3_Str_general,0};
-DataAttribute iedModel_PROT_PTUF3_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTUF3_Str,  (ModelNode*) &iedModel_PROT_PTUF3_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF3_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTUF3_Str,  (ModelNode*) &iedModel_PROT_PTUF3_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF3_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_PTUF3_Str,  (ModelNode*) &iedModel_PROT_PTUF3_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTUF3_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTUF3_Str,  (ModelNode*) &iedModel_PROT_PTUF3_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF3_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTUF3_Str,  (ModelNode*) &iedModel_PROT_PTUF3_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF3_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_PTUF3_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_PTUF3_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_PTUF3,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_PTUF3_Op_general,0};
-DataAttribute iedModel_PROT_PTUF3_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTUF3_Op,  (ModelNode*) &iedModel_PROT_PTUF3_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTUF3_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTUF3_Op,  (ModelNode*) &iedModel_PROT_PTUF3_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF3_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTUF3_Op,  (ModelNode*) &iedModel_PROT_PTUF3_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_PTUF3_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTUF3_Op,  (ModelNode*) &iedModel_PROT_PTUF3_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF3_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_PTUF3_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // -------------------
 LogicalNode iedModel_PROT_PTUF4 = {    LogicalNodeModelType,    "PTUF4",    (ModelNode*)&iedModel_Generic_PROT,  (ModelNode*)&iedModel_PROT_LZSHPTOC,    (ModelNode*) &iedModel_PROT_PTUF4_Mod};
 
 DataObject iedModel_PROT_PTUF4_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_PTUF4,    (ModelNode*) &iedModel_PROT_PTUF4_Beh,    (ModelNode*) &iedModel_PROT_PTUF4_Mod_q,0};
-DataAttribute iedModel_PROT_PTUF4_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF4_Mod,    (ModelNode*) &iedModel_PROT_PTUF4_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF4_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF4_Mod,    (ModelNode*) &iedModel_PROT_PTUF4_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF4_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTUF4_Mod,    (ModelNode*) &iedModel_PROT_PTUF4_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_PTUF4_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_PTUF4_Mod,    (ModelNode*) &iedModel_PROT_PTUF4_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_PTUF4_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_PTUF4_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTUF4_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_PTUF4,    (ModelNode*) &iedModel_PROT_PTUF4_Health,    (ModelNode*) &iedModel_PROT_PTUF4_Beh_stVal,0};
 DataAttribute iedModel_PROT_PTUF4_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_PTUF4_Beh,    (ModelNode*) &iedModel_PROT_PTUF4_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTUF4_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF4_Beh,    (ModelNode*) &iedModel_PROT_PTUF4_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF4_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF4_Beh,    (ModelNode*) &iedModel_PROT_PTUF4_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF4_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTUF4_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTUF4_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_PTUF4,    (ModelNode*) &iedModel_PROT_PTUF4_NamPlt,    (ModelNode*) &iedModel_PROT_PTUF4_Health_stVal,0};
 DataAttribute iedModel_PROT_PTUF4_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_PTUF4_Health,    (ModelNode*) &iedModel_PROT_PTUF4_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTUF4_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF4_Health,    (ModelNode*) &iedModel_PROT_PTUF4_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF4_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_PTUF4_Health,    (ModelNode*) &iedModel_PROT_PTUF4_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF4_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_PTUF4_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_PTUF4_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_PTUF4,    (ModelNode*) &iedModel_PROT_PTUF4_Str, (ModelNode*) &iedModel_PROT_PTUF4_NamPlt_vendor,0};
@@ -8618,15 +8625,15 @@ DataAttribute iedModel_PROT_PTUF4_NamPlt_d = { DataAttributeModelType,    "d",  
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_PTUF4_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_PTUF4,  	(ModelNode*)&iedModel_PROT_PTUF4_Op, (ModelNode*) &iedModel_PROT_PTUF4_Str_general,0};
-DataAttribute iedModel_PROT_PTUF4_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTUF4_Str,  (ModelNode*) &iedModel_PROT_PTUF4_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF4_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTUF4_Str,  (ModelNode*) &iedModel_PROT_PTUF4_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF4_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_PTUF4_Str,  (ModelNode*) &iedModel_PROT_PTUF4_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTUF4_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTUF4_Str,  (ModelNode*) &iedModel_PROT_PTUF4_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF4_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTUF4_Str,  (ModelNode*) &iedModel_PROT_PTUF4_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF4_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_PTUF4_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_PTUF4_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_PTUF4,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_PTUF4_Op_general,0};
-DataAttribute iedModel_PROT_PTUF4_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTUF4_Op,  (ModelNode*) &iedModel_PROT_PTUF4_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_PTUF4_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTUF4_Op,  (ModelNode*) &iedModel_PROT_PTUF4_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_PTUF4_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_PTUF4_Op,  (ModelNode*) &iedModel_PROT_PTUF4_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_PTUF4_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_PTUF4_Op,  (ModelNode*) &iedModel_PROT_PTUF4_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_PTUF4_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_PTUF4_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -8634,19 +8641,19 @@ DataAttribute iedModel_PROT_PTUF4_Op_t = { DataAttributeModelType,    		"t",    
 LogicalNode iedModel_PROT_LZSHPTOC = {    LogicalNodeModelType,    "LZSHPTOC1",    (ModelNode*)&iedModel_Generic_PROT, (ModelNode*)&iedModel_PROT_RREC,    (ModelNode*) &iedModel_PROT_LZSHPTOC_Mod};
 
 DataObject iedModel_PROT_LZSHPTOC_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_LZSHPTOC,    (ModelNode*) &iedModel_PROT_LZSHPTOC_Beh,    (ModelNode*) &iedModel_PROT_LZSHPTOC_Mod_q,0};
-DataAttribute iedModel_PROT_LZSHPTOC_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_LZSHPTOC_Mod,    (ModelNode*) &iedModel_PROT_LZSHPTOC_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_LZSHPTOC_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_LZSHPTOC_Mod,    (ModelNode*) &iedModel_PROT_LZSHPTOC_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_LZSHPTOC_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_LZSHPTOC_Mod,    (ModelNode*) &iedModel_PROT_LZSHPTOC_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_LZSHPTOC_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_LZSHPTOC_Mod,    (ModelNode*) &iedModel_PROT_LZSHPTOC_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_LZSHPTOC_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_LZSHPTOC_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_LZSHPTOC_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_LZSHPTOC,    (ModelNode*) &iedModel_PROT_LZSHPTOC_Health,    (ModelNode*) &iedModel_PROT_LZSHPTOC_Beh_stVal,0};
 DataAttribute iedModel_PROT_LZSHPTOC_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_LZSHPTOC_Beh,    (ModelNode*) &iedModel_PROT_LZSHPTOC_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_LZSHPTOC_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_LZSHPTOC_Beh,    (ModelNode*) &iedModel_PROT_LZSHPTOC_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_LZSHPTOC_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_LZSHPTOC_Beh,    (ModelNode*) &iedModel_PROT_LZSHPTOC_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_LZSHPTOC_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_LZSHPTOC_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_LZSHPTOC_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_LZSHPTOC,    (ModelNode*) &iedModel_PROT_LZSHPTOC_NamPlt,    (ModelNode*) &iedModel_PROT_LZSHPTOC_Health_stVal,0};
 DataAttribute iedModel_PROT_LZSHPTOC_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_LZSHPTOC_Health,    (ModelNode*) &iedModel_PROT_LZSHPTOC_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_LZSHPTOC_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_LZSHPTOC_Health,    (ModelNode*) &iedModel_PROT_LZSHPTOC_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_LZSHPTOC_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_LZSHPTOC_Health,    (ModelNode*) &iedModel_PROT_LZSHPTOC_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_LZSHPTOC_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_LZSHPTOC_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_LZSHPTOC_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_LZSHPTOC,    (ModelNode*) &iedModel_PROT_LZSHPTOC_Str, (ModelNode*) &iedModel_PROT_LZSHPTOC_NamPlt_vendor,0};
@@ -8656,15 +8663,15 @@ DataAttribute iedModel_PROT_LZSHPTOC_NamPlt_d = { DataAttributeModelType,    "d"
 
 // информация о статусе ПУСК
 DataObject iedModel_PROT_LZSHPTOC_Str 	 = { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_LZSHPTOC,  	(ModelNode*)&iedModel_PROT_LZSHPTOC_Op, (ModelNode*) &iedModel_PROT_LZSHPTOC_Str_general,0};
-DataAttribute iedModel_PROT_LZSHPTOC_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_LZSHPTOC_Str,  (ModelNode*) &iedModel_PROT_LZSHPTOC_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_LZSHPTOC_Str_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_LZSHPTOC_Str,  (ModelNode*) &iedModel_PROT_LZSHPTOC_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_LZSHPTOC_Str_dirGeneral = { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_LZSHPTOC_Str,  (ModelNode*) &iedModel_PROT_LZSHPTOC_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_LZSHPTOC_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_LZSHPTOC_Str,  (ModelNode*) &iedModel_PROT_LZSHPTOC_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_LZSHPTOC_Str_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_LZSHPTOC_Str,  (ModelNode*) &iedModel_PROT_LZSHPTOC_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_LZSHPTOC_Str_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_LZSHPTOC_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_LZSHPTOC_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_LZSHPTOC,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_LZSHPTOC_Op_general,0};
-DataAttribute iedModel_PROT_LZSHPTOC_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_LZSHPTOC_Op,  (ModelNode*) &iedModel_PROT_LZSHPTOC_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_LZSHPTOC_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_LZSHPTOC_Op,  (ModelNode*) &iedModel_PROT_LZSHPTOC_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_LZSHPTOC_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_LZSHPTOC_Op,  (ModelNode*) &iedModel_PROT_LZSHPTOC_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_LZSHPTOC_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_LZSHPTOC_Op,  (ModelNode*) &iedModel_PROT_LZSHPTOC_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_LZSHPTOC_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_LZSHPTOC_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -8672,19 +8679,19 @@ DataAttribute iedModel_PROT_LZSHPTOC_Op_t = { DataAttributeModelType,    		"t", 
 LogicalNode iedModel_PROT_RREC = {    LogicalNodeModelType,    "RREC1",    (ModelNode*)&iedModel_Generic_PROT, (ModelNode*)&iedModel_PROT_RBRF,    (ModelNode*) &iedModel_PROT_RREC_Mod};
 
 DataObject iedModel_PROT_RREC_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_RREC,    (ModelNode*) &iedModel_PROT_RREC_Beh,    (ModelNode*) &iedModel_PROT_RREC_Mod_q,0};
-DataAttribute iedModel_PROT_RREC_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_RREC_Mod,    (ModelNode*) &iedModel_PROT_RREC_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RREC_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_RREC_Mod,    (ModelNode*) &iedModel_PROT_RREC_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_RREC_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_RREC_Mod,    (ModelNode*) &iedModel_PROT_RREC_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_RREC_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_RREC_Mod,    (ModelNode*) &iedModel_PROT_RREC_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_RREC_Mod_ctlModel 		= { DataAttributeModelType, "ctlModel",		(ModelNode*) &iedModel_PROT_RREC_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_RREC_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_RREC,    (ModelNode*) &iedModel_PROT_RREC_Health,    (ModelNode*) &iedModel_PROT_RREC_Beh_stVal,0};
 DataAttribute iedModel_PROT_RREC_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_RREC_Beh,    (ModelNode*) &iedModel_PROT_RREC_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_RREC_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_RREC_Beh,    (ModelNode*) &iedModel_PROT_RREC_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RREC_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_RREC_Beh,    (ModelNode*) &iedModel_PROT_RREC_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_RREC_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_RREC_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_RREC_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_RREC,    (ModelNode*) &iedModel_PROT_RREC_NamPlt,    (ModelNode*) &iedModel_PROT_RREC_Health_stVal,0};
 DataAttribute iedModel_PROT_RREC_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_RREC_Health,    (ModelNode*) &iedModel_PROT_RREC_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_RREC_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_RREC_Health,    (ModelNode*) &iedModel_PROT_RREC_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RREC_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_RREC_Health,    (ModelNode*) &iedModel_PROT_RREC_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_RREC_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_RREC_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_RREC_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_RREC,    (ModelNode*) &iedModel_PROT_RREC_AutoRecSt, (ModelNode*) &iedModel_PROT_RREC_NamPlt_vendor,0};
@@ -8695,13 +8702,13 @@ DataAttribute iedModel_PROT_RREC_NamPlt_d = { DataAttributeModelType,    "d",   
 // информация о статусе ПУСК
 DataObject iedModel_PROT_RREC_AutoRecSt 	 = { DataObjectModelType,    "AutoRecSt",  (ModelNode*) &iedModel_PROT_RREC,  	(ModelNode*)&iedModel_PROT_RREC_Op, (ModelNode*) &iedModel_PROT_RREC_AutoRecSt_stVal,0};
 DataAttribute iedModel_PROT_RREC_AutoRecSt_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_RREC_AutoRecSt,   (ModelNode*) &iedModel_PROT_RREC_AutoRecSt_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_RREC_AutoRecSt_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_RREC_AutoRecSt,  (ModelNode*) &iedModel_PROT_RREC_AutoRecSt_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RREC_AutoRecSt_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_RREC_AutoRecSt,  (ModelNode*) &iedModel_PROT_RREC_AutoRecSt_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_RREC_AutoRecSt_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_RREC_AutoRecSt,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_RREC_Op 	 = { DataObjectModelType,    		"Op",  (ModelNode*) &iedModel_PROT_RREC,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_RREC_Op_general,0};
-DataAttribute iedModel_PROT_RREC_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_RREC_Op,  (ModelNode*) &iedModel_PROT_RREC_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_RREC_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_RREC_Op,  (ModelNode*) &iedModel_PROT_RREC_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RREC_Op_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_RREC_Op,  (ModelNode*) &iedModel_PROT_RREC_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_RREC_Op_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_RREC_Op,  (ModelNode*) &iedModel_PROT_RREC_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_RREC_Op_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_RREC_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -8709,19 +8716,19 @@ DataAttribute iedModel_PROT_RREC_Op_t = { DataAttributeModelType,    		"t",    (
 LogicalNode iedModel_PROT_RBRF = {    LogicalNodeModelType,    "RBRF1",    (ModelNode*)&iedModel_Generic_PROT, (ModelNode*)&iedModel_PROT_AVRGGIO,    (ModelNode*) &iedModel_PROT_RBRF_Mod};
 
 DataObject iedModel_PROT_RBRF_Mod = { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_RBRF,    (ModelNode*) &iedModel_PROT_RBRF_Beh,    (ModelNode*) &iedModel_PROT_RBRF_Mod_q,0};
-DataAttribute iedModel_PROT_RBRF_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_RBRF_Mod,    (ModelNode*) &iedModel_PROT_RBRF_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RBRF_Mod_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_RBRF_Mod,    (ModelNode*) &iedModel_PROT_RBRF_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_RBRF_Mod_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_RBRF_Mod,    (ModelNode*) &iedModel_PROT_RBRF_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_RBRF_Mod_stVal = { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_RBRF_Mod,    (ModelNode*) &iedModel_PROT_RBRF_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_RBRF_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_RBRF_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_RBRF_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_RBRF,    (ModelNode*) &iedModel_PROT_RBRF_Health,    (ModelNode*) &iedModel_PROT_RBRF_Beh_stVal,0};
 DataAttribute iedModel_PROT_RBRF_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_RBRF_Beh,    (ModelNode*) &iedModel_PROT_RBRF_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_RBRF_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_RBRF_Beh,    (ModelNode*) &iedModel_PROT_RBRF_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RBRF_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_RBRF_Beh,    (ModelNode*) &iedModel_PROT_RBRF_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_RBRF_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_RBRF_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_RBRF_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_RBRF,    (ModelNode*) &iedModel_PROT_RBRF_NamPlt,    (ModelNode*) &iedModel_PROT_RBRF_Health_stVal,0};
 DataAttribute iedModel_PROT_RBRF_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_RBRF_Health,    (ModelNode*) &iedModel_PROT_RBRF_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_RBRF_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_RBRF_Health,    (ModelNode*) &iedModel_PROT_RBRF_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RBRF_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_RBRF_Health,    (ModelNode*) &iedModel_PROT_RBRF_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_RBRF_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_RBRF_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_RBRF_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_RBRF,    (ModelNode*) &iedModel_PROT_RBRF_OpEx, (ModelNode*) &iedModel_PROT_RBRF_NamPlt_vendor,0};
@@ -8731,27 +8738,27 @@ DataAttribute iedModel_PROT_RBRF_NamPlt_d = { DataAttributeModelType,    "d",   
 
 // информация о статусе СРАБАТЫВАНИЕ
 DataObject iedModel_PROT_RBRF_OpEx 	 = { DataObjectModelType,    		"OpEx",  (ModelNode*) &iedModel_PROT_RBRF,  	(ModelNode*)NULL, (ModelNode*) &iedModel_PROT_RBRF_OpEx_general,0};
-DataAttribute iedModel_PROT_RBRF_OpEx_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_RBRF_OpEx,  (ModelNode*) &iedModel_PROT_RBRF_OpEx_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_RBRF_OpEx_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_RBRF_OpEx,  (ModelNode*) &iedModel_PROT_RBRF_OpEx_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_RBRF_OpEx_general = { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_RBRF_OpEx,  (ModelNode*) &iedModel_PROT_RBRF_OpEx_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_RBRF_OpEx_q = { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_RBRF_OpEx,  (ModelNode*) &iedModel_PROT_RBRF_OpEx_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_RBRF_OpEx_t = { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_RBRF_OpEx,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 //----------------------------------------------------------------------------
 LogicalNode iedModel_PROT_AVRGGIO 			= { LogicalNodeModelType,   "AVRGGIO1",    (ModelNode*)&iedModel_Generic_PROT,  (ModelNode*)&iedModel_PROT_ID0PDIF1,    (ModelNode*) &iedModel_PROT_AVRGGIO_Mod};
 
 DataObject iedModel_PROT_AVRGGIO_Mod 		= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_PROT_AVRGGIO,    (ModelNode*) &iedModel_PROT_AVRGGIO_Beh,    (ModelNode*) &iedModel_PROT_AVRGGIO_Mod_q,0};
-DataAttribute iedModel_PROT_AVRGGIO_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_AVRGGIO_Mod,(ModelNode*) &iedModel_PROT_AVRGGIO_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_AVRGGIO_Mod_q 	= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_AVRGGIO_Mod,(ModelNode*) &iedModel_PROT_AVRGGIO_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_AVRGGIO_Mod_t 	= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_AVRGGIO_Mod,(ModelNode*) &iedModel_PROT_AVRGGIO_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_AVRGGIO_Mod_stVal = { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_PROT_AVRGGIO_Mod,(ModelNode*) &iedModel_PROT_AVRGGIO_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_AVRGGIO_Mod_ctlModel = {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_AVRGGIO_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_AVRGGIO_Beh = { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_AVRGGIO,    (ModelNode*) &iedModel_PROT_AVRGGIO_Health,    (ModelNode*) &iedModel_PROT_AVRGGIO_Beh_stVal,0};
 DataAttribute iedModel_PROT_AVRGGIO_Beh_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_AVRGGIO_Beh,    (ModelNode*) &iedModel_PROT_AVRGGIO_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_AVRGGIO_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_AVRGGIO_Beh,    (ModelNode*) &iedModel_PROT_AVRGGIO_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_AVRGGIO_Beh_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_AVRGGIO_Beh,    (ModelNode*) &iedModel_PROT_AVRGGIO_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_AVRGGIO_Beh_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_AVRGGIO_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_AVRGGIO_Health = { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_AVRGGIO,    (ModelNode*) &iedModel_PROT_AVRGGIO_NamPlt,    (ModelNode*) &iedModel_PROT_AVRGGIO_Health_stVal,0};
 DataAttribute iedModel_PROT_AVRGGIO_Health_stVal = { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_AVRGGIO_Health,    (ModelNode*) &iedModel_PROT_AVRGGIO_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_AVRGGIO_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_AVRGGIO_Health,    (ModelNode*) &iedModel_PROT_AVRGGIO_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_AVRGGIO_Health_q = { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_AVRGGIO_Health,    (ModelNode*) &iedModel_PROT_AVRGGIO_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_AVRGGIO_Health_t = { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_AVRGGIO_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_AVRGGIO_NamPlt = { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_AVRGGIO,    (ModelNode*)&iedModel_PROT_AVRGGIO_IntIn , (ModelNode*) &iedModel_PROT_AVRGGIO_NamPlt_vendor,0};
@@ -8770,19 +8777,19 @@ DataAttribute iedModel_PROT_AVRGGIO_IntIn_t = {DataAttributeModelType,"t",(Model
 LogicalNode iedModel_PROT_ID0PDIF1 							= {    LogicalNodeModelType,    "ID0PDIF1",    (ModelNode*)&iedModel_Generic_PROT,   (ModelNode*)&iedModel_PROT_ID0PDIF2,    (ModelNode*) &iedModel_PROT_ID0PDIF1_Mod};
 
 DataObject iedModel_PROT_ID0PDIF1_Mod 						= { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_ID0PDIF1,    (ModelNode*) &iedModel_PROT_ID0PDIF1_Beh,    (ModelNode*) &iedModel_PROT_ID0PDIF1_Mod_q,0};
-DataAttribute iedModel_PROT_ID0PDIF1_Mod_q 					= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_ID0PDIF1_Mod,    (ModelNode*) &iedModel_PROT_ID0PDIF1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,   NULL,0};
+DataAttribute iedModel_PROT_ID0PDIF1_Mod_q 					= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_ID0PDIF1_Mod,    (ModelNode*) &iedModel_PROT_ID0PDIF1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,   NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF1_Mod_t 					= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_ID0PDIF1_Mod,    (ModelNode*) &iedModel_PROT_ID0PDIF1_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO,   NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF1_Mod_stVal 				= { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_ID0PDIF1_Mod,    (ModelNode*) &iedModel_PROT_ID0PDIF1_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF1_Mod_ctlModel 		= {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_ID0PDIF1_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_ID0PDIF1_Beh 						= { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_ID0PDIF1,    (ModelNode*) &iedModel_PROT_ID0PDIF1_Health,    (ModelNode*) &iedModel_PROT_ID0PDIF1_Beh_stVal,0};
 DataAttribute iedModel_PROT_ID0PDIF1_Beh_stVal 				= { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_ID0PDIF1_Beh,    (ModelNode*) &iedModel_PROT_ID0PDIF1_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_ID0PDIF1_Beh_q 					= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_ID0PDIF1_Beh,    (ModelNode*) &iedModel_PROT_ID0PDIF1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_ID0PDIF1_Beh_q 					= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_ID0PDIF1_Beh,    (ModelNode*) &iedModel_PROT_ID0PDIF1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF1_Beh_t 					= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_ID0PDIF1_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_ID0PDIF1_Health 					= { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_ID0PDIF1,    (ModelNode*) &iedModel_PROT_ID0PDIF1_NamPlt,    (ModelNode*) &iedModel_PROT_ID0PDIF1_Health_stVal,0};
 DataAttribute iedModel_PROT_ID0PDIF1_Health_stVal 			= { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_ID0PDIF1_Health,    (ModelNode*) &iedModel_PROT_ID0PDIF1_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO,    NULL,0};
-DataAttribute iedModel_PROT_ID0PDIF1_Health_q 				= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_ID0PDIF1_Health,    (ModelNode*) &iedModel_PROT_ID0PDIF1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,    NULL,0};
+DataAttribute iedModel_PROT_ID0PDIF1_Health_q 				= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_ID0PDIF1_Health,    (ModelNode*) &iedModel_PROT_ID0PDIF1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,    NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF1_Health_t 				= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_ID0PDIF1_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_ID0PDIF1_NamPlt 					= { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_ID0PDIF1,    (ModelNode*) &iedModel_PROT_ID0PDIF1_Op, (ModelNode*) &iedModel_PROT_ID0PDIF1_NamPlt_vendor,0};
@@ -8791,33 +8798,33 @@ DataAttribute iedModel_PROT_ID0PDIF1_NamPlt_swRev 			= { DataAttributeModelType,
 DataAttribute iedModel_PROT_ID0PDIF1_NamPlt_d 				= { DataAttributeModelType,    "d",    (ModelNode*) &iedModel_PROT_ID0PDIF1_NamPlt,    NULL,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_ID0PDIF1_Op 	 					= { DataObjectModelType,    "Op",  (ModelNode*) &iedModel_PROT_ID0PDIF1,  	(ModelNode*)&iedModel_PROT_ID0PDIF1_Str, (ModelNode*) &iedModel_PROT_ID0PDIF1_Op_general,0};
-DataAttribute iedModel_PROT_ID0PDIF1_Op_general 			= { DataAttributeModelType, "general", (ModelNode*) &iedModel_PROT_ID0PDIF1_Op,  (ModelNode*) &iedModel_PROT_ID0PDIF1_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_ID0PDIF1_Op_q 					= { DataAttributeModelType, "q",    (ModelNode*) &iedModel_PROT_ID0PDIF1_Op,  (ModelNode*) &iedModel_PROT_ID0PDIF1_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_ID0PDIF1_Op_general 			= { DataAttributeModelType, "general", (ModelNode*) &iedModel_PROT_ID0PDIF1_Op,  (ModelNode*) &iedModel_PROT_ID0PDIF1_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_ID0PDIF1_Op_q 					= { DataAttributeModelType, "q",    (ModelNode*) &iedModel_PROT_ID0PDIF1_Op,  (ModelNode*) &iedModel_PROT_ID0PDIF1_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF1_Op_t 					= { DataAttributeModelType, "t",    (ModelNode*) &iedModel_PROT_ID0PDIF1_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_ID0PDIF1_Str 	 					= { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_ID0PDIF1,  NULL, (ModelNode*) &iedModel_PROT_ID0PDIF1_Str_general,0};
-DataAttribute iedModel_PROT_ID0PDIF1_Str_general 			= { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_ID0PDIF1_Str,  (ModelNode*) &iedModel_PROT_ID0PDIF1_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_ID0PDIF1_Str_general 			= { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_ID0PDIF1_Str,  (ModelNode*) &iedModel_PROT_ID0PDIF1_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF1_Str_dirGeneral 		= { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_ID0PDIF1_Str,  (ModelNode*) &iedModel_PROT_ID0PDIF1_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_ID0PDIF1_Str_q 					= { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_ID0PDIF1_Str,  (ModelNode*) &iedModel_PROT_ID0PDIF1_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_ID0PDIF1_Str_q 					= { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_ID0PDIF1_Str,  (ModelNode*) &iedModel_PROT_ID0PDIF1_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF1_Str_t 					= { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_ID0PDIF1_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 //-ID0PDIF2--------------------------------------------------------------------------
 LogicalNode iedModel_PROT_ID0PDIF2 					= {    LogicalNodeModelType,    "ID0PDIF2",    (ModelNode*)&iedModel_Generic_PROT,    (ModelNode*)&iedModel_PROT_ID0PDIF3,    (ModelNode*) &iedModel_PROT_ID0PDIF2_Mod};
 
 DataObject iedModel_PROT_ID0PDIF2_Mod 				= { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_ID0PDIF2,    (ModelNode*) &iedModel_PROT_ID0PDIF2_Beh,    (ModelNode*) &iedModel_PROT_ID0PDIF2_Mod_q,0};
-DataAttribute iedModel_PROT_ID0PDIF2_Mod_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_ID0PDIF2_Mod,    (ModelNode*) &iedModel_PROT_ID0PDIF2_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,   NULL,0};
+DataAttribute iedModel_PROT_ID0PDIF2_Mod_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_ID0PDIF2_Mod,    (ModelNode*) &iedModel_PROT_ID0PDIF2_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,   NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF2_Mod_t 			= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_ID0PDIF2_Mod,    (ModelNode*) &iedModel_PROT_ID0PDIF2_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO,   NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF2_Mod_stVal 		= { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_ID0PDIF2_Mod,    (ModelNode*) &iedModel_PROT_ID0PDIF2_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF2_Mod_ctlModel 	= {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_ID0PDIF2_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_ID0PDIF2_Beh 				= { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_ID0PDIF2,    (ModelNode*) &iedModel_PROT_ID0PDIF2_Health,    (ModelNode*) &iedModel_PROT_ID0PDIF2_Beh_stVal,0};
 DataAttribute iedModel_PROT_ID0PDIF2_Beh_stVal 		= { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_ID0PDIF2_Beh,    (ModelNode*) &iedModel_PROT_ID0PDIF2_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_ID0PDIF2_Beh_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_ID0PDIF2_Beh,    (ModelNode*) &iedModel_PROT_ID0PDIF2_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_ID0PDIF2_Beh_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_ID0PDIF2_Beh,    (ModelNode*) &iedModel_PROT_ID0PDIF2_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF2_Beh_t 			= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_ID0PDIF2_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_ID0PDIF2_Health 				= { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_ID0PDIF2,    (ModelNode*) &iedModel_PROT_ID0PDIF2_NamPlt,    (ModelNode*) &iedModel_PROT_ID0PDIF2_Health_stVal,0};
 DataAttribute iedModel_PROT_ID0PDIF2_Health_stVal 	= { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_ID0PDIF2_Health,    (ModelNode*) &iedModel_PROT_ID0PDIF2_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO,    NULL,0};
-DataAttribute iedModel_PROT_ID0PDIF2_Health_q 		= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_ID0PDIF2_Health,    (ModelNode*) &iedModel_PROT_ID0PDIF2_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,    NULL,0};
+DataAttribute iedModel_PROT_ID0PDIF2_Health_q 		= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_ID0PDIF2_Health,    (ModelNode*) &iedModel_PROT_ID0PDIF2_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,    NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF2_Health_t 		= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_ID0PDIF2_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_ID0PDIF2_NamPlt 				= { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_ID0PDIF2,    (ModelNode*) &iedModel_PROT_ID0PDIF2_Op, (ModelNode*) &iedModel_PROT_ID0PDIF2_NamPlt_vendor,0};
@@ -8826,33 +8833,33 @@ DataAttribute iedModel_PROT_ID0PDIF2_NamPlt_swRev 	= { DataAttributeModelType,  
 DataAttribute iedModel_PROT_ID0PDIF2_NamPlt_d 		= { DataAttributeModelType,    "d",    (ModelNode*) &iedModel_PROT_ID0PDIF2_NamPlt,    NULL,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_ID0PDIF2_Op 	 				= { DataObjectModelType,    "Op",  (ModelNode*) &iedModel_PROT_ID0PDIF2,  	(ModelNode*)&iedModel_PROT_ID0PDIF2_Str, (ModelNode*) &iedModel_PROT_ID0PDIF2_Op_general,0};
-DataAttribute iedModel_PROT_ID0PDIF2_Op_general 		= { DataAttributeModelType, "general", (ModelNode*) &iedModel_PROT_ID0PDIF2_Op,  (ModelNode*) &iedModel_PROT_ID0PDIF2_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_ID0PDIF2_Op_q 			= { DataAttributeModelType, "q",    (ModelNode*) &iedModel_PROT_ID0PDIF2_Op,  (ModelNode*) &iedModel_PROT_ID0PDIF2_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_ID0PDIF2_Op_general 		= { DataAttributeModelType, "general", (ModelNode*) &iedModel_PROT_ID0PDIF2_Op,  (ModelNode*) &iedModel_PROT_ID0PDIF2_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_ID0PDIF2_Op_q 			= { DataAttributeModelType, "q",    (ModelNode*) &iedModel_PROT_ID0PDIF2_Op,  (ModelNode*) &iedModel_PROT_ID0PDIF2_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF2_Op_t 			= { DataAttributeModelType, "t",    (ModelNode*) &iedModel_PROT_ID0PDIF2_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_ID0PDIF2_Str 	 			= { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_ID0PDIF2,  NULL, (ModelNode*) &iedModel_PROT_ID0PDIF2_Str_general,0};
-DataAttribute iedModel_PROT_ID0PDIF2_Str_general 		= { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_ID0PDIF2_Str,  (ModelNode*) &iedModel_PROT_ID0PDIF2_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_ID0PDIF2_Str_general 		= { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_ID0PDIF2_Str,  (ModelNode*) &iedModel_PROT_ID0PDIF2_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF2_Str_dirGeneral 	= { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_ID0PDIF2_Str,  (ModelNode*) &iedModel_PROT_ID0PDIF2_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_ID0PDIF2_Str_q 			= { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_ID0PDIF2_Str,  (ModelNode*) &iedModel_PROT_ID0PDIF2_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_ID0PDIF2_Str_q 			= { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_ID0PDIF2_Str,  (ModelNode*) &iedModel_PROT_ID0PDIF2_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF2_Str_t 			= { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_ID0PDIF2_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 //-ID0PDIF3--------------------------------------------------------------------------
 LogicalNode iedModel_PROT_ID0PDIF3 					= {    LogicalNodeModelType,    "ID0PDIF3",    (ModelNode*)&iedModel_Generic_PROT,   NULL,    (ModelNode*) &iedModel_PROT_ID0PDIF3_Mod};
 
 DataObject iedModel_PROT_ID0PDIF3_Mod 				= { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_PROT_ID0PDIF3,    (ModelNode*) &iedModel_PROT_ID0PDIF3_Beh,    (ModelNode*) &iedModel_PROT_ID0PDIF3_Mod_q,0};
-DataAttribute iedModel_PROT_ID0PDIF3_Mod_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_ID0PDIF3_Mod,    (ModelNode*) &iedModel_PROT_ID0PDIF3_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,   NULL,0};
+DataAttribute iedModel_PROT_ID0PDIF3_Mod_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_ID0PDIF3_Mod,    (ModelNode*) &iedModel_PROT_ID0PDIF3_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,   NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF3_Mod_t 			= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_ID0PDIF3_Mod,    (ModelNode*) &iedModel_PROT_ID0PDIF3_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO,   NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF3_Mod_stVal 		= { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_PROT_ID0PDIF3_Mod,    (ModelNode*) &iedModel_PROT_ID0PDIF3_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF3_Mod_ctlModel 	= {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_PROT_ID0PDIF3_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_ID0PDIF3_Beh 				= { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_PROT_ID0PDIF3,    (ModelNode*) &iedModel_PROT_ID0PDIF3_Health,    (ModelNode*) &iedModel_PROT_ID0PDIF3_Beh_stVal,0};
 DataAttribute iedModel_PROT_ID0PDIF3_Beh_stVal 		= { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_ID0PDIF3_Beh,    (ModelNode*) &iedModel_PROT_ID0PDIF3_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_ID0PDIF3_Beh_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_ID0PDIF3_Beh,    (ModelNode*) &iedModel_PROT_ID0PDIF3_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_ID0PDIF3_Beh_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_ID0PDIF3_Beh,    (ModelNode*) &iedModel_PROT_ID0PDIF3_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF3_Beh_t 			= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_ID0PDIF3_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_ID0PDIF3_Health 				= { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_PROT_ID0PDIF3,    (ModelNode*) &iedModel_PROT_ID0PDIF3_NamPlt,    (ModelNode*) &iedModel_PROT_ID0PDIF3_Health_stVal,0};
 DataAttribute iedModel_PROT_ID0PDIF3_Health_stVal 	= { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_PROT_ID0PDIF3_Health,    (ModelNode*) &iedModel_PROT_ID0PDIF3_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO,    NULL,0};
-DataAttribute iedModel_PROT_ID0PDIF3_Health_q 		= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_ID0PDIF3_Health,    (ModelNode*) &iedModel_PROT_ID0PDIF3_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,    NULL,0};
+DataAttribute iedModel_PROT_ID0PDIF3_Health_q 		= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_PROT_ID0PDIF3_Health,    (ModelNode*) &iedModel_PROT_ID0PDIF3_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,    NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF3_Health_t 		= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_PROT_ID0PDIF3_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_ID0PDIF3_NamPlt 				= { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_PROT_ID0PDIF3,    (ModelNode*) &iedModel_PROT_ID0PDIF3_Op, (ModelNode*) &iedModel_PROT_ID0PDIF3_NamPlt_vendor,0};
@@ -8861,14 +8868,14 @@ DataAttribute iedModel_PROT_ID0PDIF3_NamPlt_swRev 	= { DataAttributeModelType,  
 DataAttribute iedModel_PROT_ID0PDIF3_NamPlt_d 		= { DataAttributeModelType,    "d",    (ModelNode*) &iedModel_PROT_ID0PDIF3_NamPlt,    NULL,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_ID0PDIF3_Op 	 				= { DataObjectModelType,    "Op",  (ModelNode*) &iedModel_PROT_ID0PDIF3,  	(ModelNode*)&iedModel_PROT_ID0PDIF3_Str, (ModelNode*) &iedModel_PROT_ID0PDIF3_Op_general,0};
-DataAttribute iedModel_PROT_ID0PDIF3_Op_general 		= { DataAttributeModelType, "general", (ModelNode*) &iedModel_PROT_ID0PDIF3_Op,  (ModelNode*) &iedModel_PROT_ID0PDIF3_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_ID0PDIF3_Op_q 			= { DataAttributeModelType, "q",    (ModelNode*) &iedModel_PROT_ID0PDIF3_Op,  (ModelNode*) &iedModel_PROT_ID0PDIF3_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_ID0PDIF3_Op_general 		= { DataAttributeModelType, "general", (ModelNode*) &iedModel_PROT_ID0PDIF3_Op,  (ModelNode*) &iedModel_PROT_ID0PDIF3_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_PROT_ID0PDIF3_Op_q 			= { DataAttributeModelType, "q",    (ModelNode*) &iedModel_PROT_ID0PDIF3_Op,  (ModelNode*) &iedModel_PROT_ID0PDIF3_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF3_Op_t 			= { DataAttributeModelType, "t",    (ModelNode*) &iedModel_PROT_ID0PDIF3_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_PROT_ID0PDIF3_Str 	 			= { DataObjectModelType,    		"Str",  (ModelNode*) &iedModel_PROT_ID0PDIF3,  NULL, (ModelNode*) &iedModel_PROT_ID0PDIF3_Str_general,0};
-DataAttribute iedModel_PROT_ID0PDIF3_Str_general 		= { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_ID0PDIF3_Str,  (ModelNode*) &iedModel_PROT_ID0PDIF3_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_ID0PDIF3_Str_general 		= { DataAttributeModelType,"general", (ModelNode*) &iedModel_PROT_ID0PDIF3_Str,  (ModelNode*) &iedModel_PROT_ID0PDIF3_Str_dirGeneral,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF3_Str_dirGeneral 	= { DataAttributeModelType,"dirGeneral", (ModelNode*) &iedModel_PROT_ID0PDIF3_Str,  (ModelNode*) &iedModel_PROT_ID0PDIF3_Str_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_PROT_ID0PDIF3_Str_q 			= { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_ID0PDIF3_Str,  (ModelNode*) &iedModel_PROT_ID0PDIF3_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_PROT_ID0PDIF3_Str_q 			= { DataAttributeModelType,    		"q",    (ModelNode*) &iedModel_PROT_ID0PDIF3_Str,  (ModelNode*) &iedModel_PROT_ID0PDIF3_Str_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_PROT_ID0PDIF3_Str_t 			= { DataAttributeModelType,    		"t",    (ModelNode*) &iedModel_PROT_ID0PDIF3_Str,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 /*************************************************************************
@@ -8922,7 +8929,7 @@ DataAttribute iedModel_CTRL_CSWI1_Pos_q 				= { DataAttributeModelType,    "q", 
 DataAttribute iedModel_CTRL_CSWI1_Pos_t 				= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_CTRL_CSWI1_Pos,    (ModelNode*) &iedModel_CTRL_CSWI1_Pos_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_CSWI1_Pos_ctlModel 		= {   DataAttributeModelType,     "ctlModel",    (ModelNode*) &iedModel_CTRL_CSWI1_Pos, (ModelNode*) &iedModel_CTRL_CSWI1_Pos_Oper,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_CSWI1_Pos_Oper 			= { DataAttributeModelType,    "Oper",    (ModelNode*) &iedModel_CTRL_CSWI1_Pos,   NULL,    (ModelNode*) &iedModel_CTRL_CSWI1_Pos_Oper_ctlVal,    0,    IEC61850_FC_CO,    IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_CTRL_CSWI1_Pos_Oper_ctlVal 		= { DataAttributeModelType,    "ctlVal",    (ModelNode*) &iedModel_CTRL_CSWI1_Pos_Oper,    (ModelNode*) &iedModel_CTRL_CSWI1_Pos_Oper_origin,    NULL,    0,    IEC61850_FC_CO,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_CTRL_CSWI1_Pos_Oper_ctlVal 		= { DataAttributeModelType,    "ctlVal",    (ModelNode*) &iedModel_CTRL_CSWI1_Pos_Oper,    (ModelNode*) &iedModel_CTRL_CSWI1_Pos_Oper_origin,    NULL,    0,    IEC61850_FC_CO,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_CSWI1_Pos_Oper_origin 		= { DataAttributeModelType,    "origin",    (ModelNode*) &iedModel_CTRL_CSWI1_Pos_Oper,    (ModelNode*) &iedModel_CTRL_CSWI1_Pos_Oper_ctlNum,    (ModelNode*) &iedModel_CTRL_CSWI1_Pos_Oper_origin_orCat,    0,    IEC61850_FC_CO,    IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_CSWI1_Pos_Oper_origin_orCat = { DataAttributeModelType,   "orCat",    (ModelNode*) &iedModel_CTRL_CSWI1_Pos_Oper_origin,    (ModelNode*) &iedModel_CTRL_CSWI1_Pos_Oper_origin_orIdent,    NULL,    0,    IEC61850_FC_CO,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_CSWI1_Pos_Oper_origin_orIdent = { DataAttributeModelType, "orIdent",    (ModelNode*) &iedModel_CTRL_CSWI1_Pos_Oper_origin,    NULL,    NULL,    0,    IEC61850_FC_CO,    IEC61850_OCTET_STRING_64, TRG_OPT_NO, NULL,0};
@@ -9001,7 +9008,7 @@ DataAttribute iedModel_CTRL_XCBR1_BlkOpn_q 				= { DataAttributeModelType,  "q",
 DataAttribute iedModel_CTRL_XCBR1_BlkOpn_t 				= { DataAttributeModelType,  "t",    	(ModelNode*) &iedModel_CTRL_XCBR1_BlkOpn,    	(ModelNode*)&iedModel_CTRL_XCBR1_BlkOpn_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_XCBR1_BlkOpn_ctlModel 			= {   DataAttributeModelType,   "ctlModel", (ModelNode*) &iedModel_CTRL_XCBR1_BlkOpn,    	(ModelNode*)&iedModel_CTRL_XCBR1_BlkOpn_Oper,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_XCBR1_BlkOpn_Oper 				= { DataAttributeModelType,  "Oper",    	(ModelNode*) &iedModel_CTRL_XCBR1_BlkOpn,   NULL,    (ModelNode*) &iedModel_CTRL_XCBR1_BlkOpn_Oper_ctlVal,    0,    IEC61850_FC_CO,    IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_CTRL_XCBR1_BlkOpn_Oper_ctlVal 		= { DataAttributeModelType,  "ctlVal",  	(ModelNode*) &iedModel_CTRL_XCBR1_BlkOpn_Oper,    (ModelNode*) &iedModel_CTRL_XCBR1_BlkOpn_Oper_origin,    NULL,    0,    IEC61850_FC_CO,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_CTRL_XCBR1_BlkOpn_Oper_ctlVal 		= { DataAttributeModelType,  "ctlVal",  	(ModelNode*) &iedModel_CTRL_XCBR1_BlkOpn_Oper,    (ModelNode*) &iedModel_CTRL_XCBR1_BlkOpn_Oper_origin,    NULL,    0,    IEC61850_FC_CO,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_XCBR1_BlkOpn_Oper_origin 		= { DataAttributeModelType,  "origin",  	(ModelNode*) &iedModel_CTRL_XCBR1_BlkOpn_Oper,    (ModelNode*) &iedModel_CTRL_XCBR1_BlkOpn_Oper_ctlNum,    (ModelNode*) &iedModel_CTRL_XCBR1_BlkOpn_Oper_origin_orCat,    0,    IEC61850_FC_CO,    IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_XCBR1_BlkOpn_Oper_origin_orCat = { DataAttributeModelType,  "orCat",   	(ModelNode*) &iedModel_CTRL_XCBR1_BlkOpn_Oper_origin,    (ModelNode*) &iedModel_CTRL_XCBR1_BlkOpn_Oper_origin_orIdent,    NULL,    0,    IEC61850_FC_CO,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_XCBR1_BlkOpn_Oper_origin_orIdent= {   DataAttributeModelType,  "orIdent", 	(ModelNode*) &iedModel_CTRL_XCBR1_BlkOpn_Oper_origin,    NULL,    NULL,    0,    IEC61850_FC_CO,    IEC61850_OCTET_STRING_64, TRG_OPT_NO, NULL,0};
@@ -9017,7 +9024,7 @@ DataAttribute iedModel_CTRL_XCBR1_BlkCls_q 				= { DataAttributeModelType,  "q",
 DataAttribute iedModel_CTRL_XCBR1_BlkCls_t 				= { DataAttributeModelType,  "t",    	(ModelNode*) &iedModel_CTRL_XCBR1_BlkCls,    	(ModelNode*) &iedModel_CTRL_XCBR1_BlkCls_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_XCBR1_BlkCls_ctlModel 			= {   DataAttributeModelType,   "ctlModel", (ModelNode*) &iedModel_CTRL_XCBR1_BlkCls,    	(ModelNode*) &iedModel_CTRL_XCBR1_BlkCls_Oper,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_XCBR1_BlkCls_Oper 				= { DataAttributeModelType,  "Oper",    	(ModelNode*) &iedModel_CTRL_XCBR1_BlkCls,   NULL, (ModelNode*) &iedModel_CTRL_XCBR1_BlkCls_Oper_ctlVal,    0,    IEC61850_FC_CO,    IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_CTRL_XCBR1_BlkCls_Oper_ctlVal 		= { DataAttributeModelType,  "ctlVal",  	(ModelNode*) &iedModel_CTRL_XCBR1_BlkCls_Oper,    (ModelNode*) &iedModel_CTRL_XCBR1_BlkCls_Oper_origin,    NULL,    0,    IEC61850_FC_CO,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_CTRL_XCBR1_BlkCls_Oper_ctlVal 		= { DataAttributeModelType,  "ctlVal",  	(ModelNode*) &iedModel_CTRL_XCBR1_BlkCls_Oper,    (ModelNode*) &iedModel_CTRL_XCBR1_BlkCls_Oper_origin,    NULL,    0,    IEC61850_FC_CO,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_XCBR1_BlkCls_Oper_origin 		= { DataAttributeModelType,  "origin",  	(ModelNode*) &iedModel_CTRL_XCBR1_BlkCls_Oper,    (ModelNode*) &iedModel_CTRL_XCBR1_BlkCls_Oper_ctlNum,    (ModelNode*) &iedModel_CTRL_XCBR1_BlkCls_Oper_origin_orCat,    0,    IEC61850_FC_CO,    IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_XCBR1_BlkCls_Oper_origin_orCat = { DataAttributeModelType,  "orCat",   	(ModelNode*) &iedModel_CTRL_XCBR1_BlkCls_Oper_origin,    (ModelNode*) &iedModel_CTRL_XCBR1_BlkCls_Oper_origin_orIdent,    NULL,    0,    IEC61850_FC_CO,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_XCBR1_BlkCls_Oper_origin_orIdent= {   DataAttributeModelType,  "orIdent", 	(ModelNode*) &iedModel_CTRL_XCBR1_BlkCls_Oper_origin,    NULL,    NULL,    0,    IEC61850_FC_CO,    IEC61850_OCTET_STRING_64, TRG_OPT_NO, NULL,0};
@@ -9030,19 +9037,19 @@ DataAttribute iedModel_CTRL_XCBR1_BlkCls_Oper_Check 		= { DataAttributeModelType
 LogicalNode iedModel_CTRL_PTRC 					= {    LogicalNodeModelType,    "PTRC1",    (ModelNode*)&iedModel_Generic_CTRL,   (ModelNode*)&iedModel_CTRL_GGIO1,    (ModelNode*) &iedModel_CTRL_PTRC_Mod};
 
 DataObject iedModel_CTRL_PTRC_Mod 				= { DataObjectModelType,    "Mod",    (ModelNode*) &iedModel_CTRL_PTRC,    (ModelNode*) &iedModel_CTRL_PTRC_Beh,    (ModelNode*) &iedModel_CTRL_PTRC_Mod_q,0};
-DataAttribute iedModel_CTRL_PTRC_Mod_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_CTRL_PTRC_Mod,    (ModelNode*) &iedModel_CTRL_PTRC_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,   NULL,0};
+DataAttribute iedModel_CTRL_PTRC_Mod_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_CTRL_PTRC_Mod,    (ModelNode*) &iedModel_CTRL_PTRC_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,   NULL,0};
 DataAttribute iedModel_CTRL_PTRC_Mod_t 			= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_CTRL_PTRC_Mod,    (ModelNode*) &iedModel_CTRL_PTRC_Mod_stVal,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO,   NULL,0};
 DataAttribute iedModel_CTRL_PTRC_Mod_stVal 		= { DataAttributeModelType,"stVal",    (ModelNode*) &iedModel_CTRL_PTRC_Mod,    (ModelNode*) &iedModel_CTRL_PTRC_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_PTRC_Mod_ctlModel 	= {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_CTRL_PTRC_Mod,    NULL,    NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_CTRL_PTRC_Beh 				= { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_CTRL_PTRC,    (ModelNode*) &iedModel_CTRL_PTRC_Health,    (ModelNode*) &iedModel_CTRL_PTRC_Beh_stVal,0};
 DataAttribute iedModel_CTRL_PTRC_Beh_stVal 		= { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_CTRL_PTRC_Beh,    (ModelNode*) &iedModel_CTRL_PTRC_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_CTRL_PTRC_Beh_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_CTRL_PTRC_Beh,    (ModelNode*) &iedModel_CTRL_PTRC_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_PTRC_Beh_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_CTRL_PTRC_Beh,    (ModelNode*) &iedModel_CTRL_PTRC_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_CTRL_PTRC_Beh_t 			= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_CTRL_PTRC_Beh,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_CTRL_PTRC_Health 				= { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_CTRL_PTRC,    (ModelNode*) &iedModel_CTRL_PTRC_NamPlt,    (ModelNode*) &iedModel_CTRL_PTRC_Health_stVal,0};
 DataAttribute iedModel_CTRL_PTRC_Health_stVal 	= { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_CTRL_PTRC_Health,    (ModelNode*) &iedModel_CTRL_PTRC_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO,    NULL,0};
-DataAttribute iedModel_CTRL_PTRC_Health_q 		= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_CTRL_PTRC_Health,    (ModelNode*) &iedModel_CTRL_PTRC_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO,    NULL,0};
+DataAttribute iedModel_CTRL_PTRC_Health_q 		= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_CTRL_PTRC_Health,    (ModelNode*) &iedModel_CTRL_PTRC_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED,    NULL,0};
 DataAttribute iedModel_CTRL_PTRC_Health_t 		= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_CTRL_PTRC_Health,    NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_CTRL_PTRC_NamPlt 				= { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_CTRL_PTRC,    (ModelNode*) &iedModel_CTRL_PTRC_Op, (ModelNode*) &iedModel_CTRL_PTRC_NamPlt_vendor,0};
@@ -9051,8 +9058,8 @@ DataAttribute iedModel_CTRL_PTRC_NamPlt_swRev 	= { DataAttributeModelType,    "s
 DataAttribute iedModel_CTRL_PTRC_NamPlt_d 		= { DataAttributeModelType,    "d",    (ModelNode*) &iedModel_CTRL_PTRC_NamPlt,    NULL,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_CTRL_PTRC_Op 	 				= { DataObjectModelType,    "Op",  (ModelNode*) &iedModel_CTRL_PTRC,  	NULL, (ModelNode*) &iedModel_CTRL_PTRC_Op_general,0};
-DataAttribute iedModel_CTRL_PTRC_Op_general 		= { DataAttributeModelType, "general", (ModelNode*) &iedModel_CTRL_PTRC_Op,  (ModelNode*) &iedModel_CTRL_PTRC_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_CTRL_PTRC_Op_q 			= { DataAttributeModelType, "q",    (ModelNode*) &iedModel_CTRL_PTRC_Op,  (ModelNode*) &iedModel_CTRL_PTRC_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_PTRC_Op_general 		= { DataAttributeModelType, "general", (ModelNode*) &iedModel_CTRL_PTRC_Op,  (ModelNode*) &iedModel_CTRL_PTRC_Op_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_CTRL_PTRC_Op_q 			= { DataAttributeModelType, "q",    (ModelNode*) &iedModel_CTRL_PTRC_Op,  (ModelNode*) &iedModel_CTRL_PTRC_Op_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_CTRL_PTRC_Op_t 			= { DataAttributeModelType, "t",    (ModelNode*) &iedModel_CTRL_PTRC_Op,  NULL,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 
@@ -9060,19 +9067,19 @@ DataAttribute iedModel_CTRL_PTRC_Op_t 			= { DataAttributeModelType, "t",    (Mo
 LogicalNode iedModel_CTRL_GGIO1 					= {    LogicalNodeModelType,    "GGIO1",    (ModelNode*) &iedModel_Generic_CTRL,  NULL ,    (ModelNode*) &iedModel_CTRL_GGIO1_Mod};
 
 DataObject iedModel_CTRL_GGIO1_Mod 					= { DataObjectModelType,     "Mod",    (ModelNode*) &iedModel_CTRL_GGIO1,    (ModelNode*) &iedModel_CTRL_GGIO1_Beh,    (ModelNode*) &iedModel_CTRL_GGIO1_Mod_q,0};
-DataAttribute iedModel_CTRL_GGIO1_Mod_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_CTRL_GGIO1_Mod,(ModelNode*) &iedModel_CTRL_GGIO1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_Mod_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_CTRL_GGIO1_Mod,(ModelNode*) &iedModel_CTRL_GGIO1_Mod_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_Mod_t 			= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_CTRL_GGIO1_Mod,(ModelNode*) &iedModel_CTRL_GGIO1_Mod_stVal,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_Mod_stVal 		= { DataAttributeModelType,"stVal",   (ModelNode*) &iedModel_CTRL_GGIO1_Mod,(ModelNode*) &iedModel_CTRL_GGIO1_Mod_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32,     TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_Mod_ctlModel 		= {   DataAttributeModelType,    "ctlModel",    (ModelNode*) &iedModel_CTRL_GGIO1_Mod,    NULL,    NULL,    0,   IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_CTRL_GGIO1_Beh 					= { DataObjectModelType,    "Beh",    (ModelNode*) &iedModel_CTRL_GGIO1,    (ModelNode*) &iedModel_CTRL_GGIO1_Health,    (ModelNode*) &iedModel_CTRL_GGIO1_Beh_stVal,0};
 DataAttribute iedModel_CTRL_GGIO1_Beh_stVal 		= { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_CTRL_GGIO1_Beh,    (ModelNode*) &iedModel_CTRL_GGIO1_Beh_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_CTRL_GGIO1_Beh_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_CTRL_GGIO1_Beh,    (ModelNode*) &iedModel_CTRL_GGIO1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_Beh_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_CTRL_GGIO1_Beh,    (ModelNode*) &iedModel_CTRL_GGIO1_Beh_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_Beh_t 			= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_CTRL_GGIO1_Beh,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_CTRL_GGIO1_Health 				= { DataObjectModelType,    "Health",    (ModelNode*) &iedModel_CTRL_GGIO1,    (ModelNode*) &iedModel_CTRL_GGIO1_NamPlt,    (ModelNode*) &iedModel_CTRL_GGIO1_Health_stVal,0};
 DataAttribute iedModel_CTRL_GGIO1_Health_stVal 		= { DataAttributeModelType,    "stVal",    (ModelNode*) &iedModel_CTRL_GGIO1_Health,    (ModelNode*) &iedModel_CTRL_GGIO1_Health_q,    NULL,    0,    IEC61850_FC_ST,    IEC61850_INT32, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_CTRL_GGIO1_Health_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_CTRL_GGIO1_Health,    (ModelNode*) &iedModel_CTRL_GGIO1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_Health_q 			= { DataAttributeModelType,    "q",    (ModelNode*) &iedModel_CTRL_GGIO1_Health,    (ModelNode*) &iedModel_CTRL_GGIO1_Health_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_Health_t 			= { DataAttributeModelType,    "t",    (ModelNode*) &iedModel_CTRL_GGIO1_Health,    NULL,    NULL,    0,   IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 
 DataObject iedModel_CTRL_GGIO1_NamPlt 				= { DataObjectModelType,    "NamPlt",    (ModelNode*) &iedModel_CTRL_GGIO1,    (ModelNode*)&iedModel_CTRL_GGIO1_SPCSO1 , (ModelNode*) &iedModel_CTRL_GGIO1_NamPlt_vendor,0};
@@ -9085,10 +9092,10 @@ DataObject iedModel_CTRL_GGIO1_SPCSO1 						= { DataObjectModelType,     "SPCSO1
 DataAttribute iedModel_CTRL_GGIO1_SPCSO1_q 				= { DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO1_t 				= { DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1_d,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO1_d 				= { DataAttributeModelType,  "d",       		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1, 		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1_stVal,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_CTRL_GGIO1_SPCSO1_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_SPCSO1_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO1_ctlModel 			= {   DataAttributeModelType,   "ctlModel",		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1_Oper, NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO1_Oper 				= { DataAttributeModelType,  "Oper",    		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1,   		NULL,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1_Oper_ctlVal,    0,    IEC61850_FC_CO,    IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_CTRL_GGIO1_SPCSO1_Oper_ctlVal 			= { DataAttributeModelType,  "ctlVal",  	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1_Oper,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1_Oper_origin,    NULL,    0,    IEC61850_FC_CO,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_SPCSO1_Oper_ctlVal 			= { DataAttributeModelType,  "ctlVal",  	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1_Oper,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1_Oper_origin,    NULL,    0,    IEC61850_FC_CO,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO1_Oper_origin 			= { DataAttributeModelType,  "origin",  	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1_Oper,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1_Oper_ctlNum,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1_Oper_origin_orCat,    0,    IEC61850_FC_CO,    IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO1_Oper_origin_orCat 	= { DataAttributeModelType,  "orCat",   	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1_Oper_origin,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1_Oper_origin_orIdent,    NULL,    0,    IEC61850_FC_CO,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO1_Oper_origin_orIdent 	= { DataAttributeModelType,  "orIdent", 	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO1_Oper_origin,    NULL,    NULL,    0,    IEC61850_FC_CO,    IEC61850_OCTET_STRING_64, TRG_OPT_NO, NULL,0};
@@ -9101,10 +9108,10 @@ DataObject iedModel_CTRL_GGIO1_SPCSO2 						= { DataObjectModelType,     "SPCSO2
 DataAttribute iedModel_CTRL_GGIO1_SPCSO2_q 				= { DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO2_t 				= { DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2_d,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO2_d 				= { DataAttributeModelType,  "d",       		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2, 		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2_stVal,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_CTRL_GGIO1_SPCSO2_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_SPCSO2_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO2_ctlModel 			= {   DataAttributeModelType,   "ctlModel",		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2_Oper, NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO2_Oper 				= { DataAttributeModelType,  "Oper",    		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2,   		NULL,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2_Oper_ctlVal,    0,    IEC61850_FC_CO,    IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_CTRL_GGIO1_SPCSO2_Oper_ctlVal 			= { DataAttributeModelType,  "ctlVal",  	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2_Oper,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2_Oper_origin,    NULL,    0,    IEC61850_FC_CO,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_SPCSO2_Oper_ctlVal 			= { DataAttributeModelType,  "ctlVal",  	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2_Oper,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2_Oper_origin,    NULL,    0,    IEC61850_FC_CO,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO2_Oper_origin 			= { DataAttributeModelType,  "origin",  	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2_Oper,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2_Oper_ctlNum,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2_Oper_origin_orCat,    0,    IEC61850_FC_CO,    IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO2_Oper_origin_orCat 	= { DataAttributeModelType,  "orCat",   	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2_Oper_origin,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2_Oper_origin_orIdent,    NULL,    0,    IEC61850_FC_CO,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO2_Oper_origin_orIdent 	= { DataAttributeModelType,  "orIdent", 	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO2_Oper_origin,    NULL,    NULL,    0,    IEC61850_FC_CO,    IEC61850_OCTET_STRING_64, TRG_OPT_NO, NULL,0};
@@ -9117,10 +9124,10 @@ DataObject iedModel_CTRL_GGIO1_SPCSO3 						= { DataObjectModelType,     "SPCSO3
 DataAttribute iedModel_CTRL_GGIO1_SPCSO3_q 				= { DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO3_t 				= { DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3_d,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO3_d 				= { DataAttributeModelType,  "d",       		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3, 		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3_stVal,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_CTRL_GGIO1_SPCSO3_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_SPCSO3_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO3_ctlModel 			= {   DataAttributeModelType,   "ctlModel",		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3_Oper, NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO3_Oper 				= { DataAttributeModelType,  "Oper",    		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3,   		NULL,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3_Oper_ctlVal,    0,    IEC61850_FC_CO,    IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_CTRL_GGIO1_SPCSO3_Oper_ctlVal 			= { DataAttributeModelType,  "ctlVal",  	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3_Oper,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3_Oper_origin,    NULL,    0,    IEC61850_FC_CO,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_SPCSO3_Oper_ctlVal 			= { DataAttributeModelType,  "ctlVal",  	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3_Oper,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3_Oper_origin,    NULL,    0,    IEC61850_FC_CO,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO3_Oper_origin 			= { DataAttributeModelType,  "origin",  	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3_Oper,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3_Oper_ctlNum,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3_Oper_origin_orCat,    0,    IEC61850_FC_CO,    IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO3_Oper_origin_orCat 	= { DataAttributeModelType,  "orCat",   	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3_Oper_origin,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3_Oper_origin_orIdent,    NULL,    0,    IEC61850_FC_CO,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO3_Oper_origin_orIdent 	= { DataAttributeModelType,  "orIdent", 	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO3_Oper_origin,    NULL,    NULL,    0,    IEC61850_FC_CO,    IEC61850_OCTET_STRING_64, TRG_OPT_NO, NULL,0};
@@ -9134,10 +9141,10 @@ DataObject iedModel_CTRL_GGIO1_SPCSO4 						= { DataObjectModelType,     "SPCSO4
 DataAttribute iedModel_CTRL_GGIO1_SPCSO4_q 				= { DataAttributeModelType,  "q",       		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_t,    NULL,    0,    IEC61850_FC_ST,    IEC61850_QUALITY, TRG_OPT_QUALITY_CHANGED, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO4_t 				= { DataAttributeModelType,  "t",       		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_d,    NULL,    0,    IEC61850_FC_ST,    IEC61850_TIMESTAMP, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO4_d 				= { DataAttributeModelType,  "d",       		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4, 		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_stVal,    NULL,    0,    IEC61850_FC_DC,    IEC61850_VISIBLE_STRING_255, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_CTRL_GGIO1_SPCSO4_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN,     TRG_OPT_NO, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_stVal 			= { DataAttributeModelType,		"stVal",   		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_ctlModel,    NULL,    0,    IEC61850_FC_ST,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO4_ctlModel 			= {   DataAttributeModelType,   "ctlModel",		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4, 			(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper, NULL,    0,    IEC61850_FC_CF,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper 				= { DataAttributeModelType,  "Oper",    		(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4,   		NULL,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper_ctlVal,    0,    IEC61850_FC_CO,    IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
-DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_ctlVal 			= { DataAttributeModelType,  "ctlVal",  	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper_origin,    NULL,    0,    IEC61850_FC_CO,    IEC61850_BOOLEAN, TRG_OPT_DATA_CHANGED, NULL,0};
+DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_ctlVal 			= { DataAttributeModelType,  "ctlVal",  	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper_origin,    NULL,    0,    IEC61850_FC_CO,    IEC61850_BOOLEAN, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_origin 			= { DataAttributeModelType,  "origin",  	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper_ctlNum,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper_origin_orCat,    0,    IEC61850_FC_CO,    IEC61850_CONSTRUCTED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_origin_orCat 	= { DataAttributeModelType,  "orCat",   	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper_origin,    (ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper_origin_orIdent,    NULL,    0,    IEC61850_FC_CO,    IEC61850_ENUMERATED, TRG_OPT_NO, NULL,0};
 DataAttribute iedModel_CTRL_GGIO1_SPCSO4_Oper_origin_orIdent 	= { DataAttributeModelType,  "orIdent", 	(ModelNode*) &iedModel_CTRL_GGIO1_SPCSO4_Oper_origin,    NULL,    NULL,    0,    IEC61850_FC_CO,    IEC61850_OCTET_STRING_64, TRG_OPT_NO, NULL,0};
